@@ -1,0 +1,732 @@
+import xapi from 'xapi';
+import { DevicesManager } from './devices';
+import { config } from './config';
+import { Scenarios } from './scenarios'
+import { SystemStatus } from './systemstatus';
+import { zapiv1 } from './zapi';
+import { api } from './zapi';
+
+
+const zapi = zapiv1;
+
+const DEBUGLEVEL = {
+  LOW: 3,
+  MEDIUM: 2,
+  HIGH: 1,
+  NONE: 0
+}
+
+const INITSTEPDELAY = 500;
+
+const VERSION = '1.0.0';
+
+class Performance {
+  constructor() {
+    this.counters = [];
+    this.elapsedStarts = [];
+  }
+  setElapsedStart(name) {
+    this.elapsedStarts[name] = new Date();
+  }
+  setElapsedEnd(name) {
+
+    this.counters[name] = new Date() - this.elapsedStarts[name];
+    this.counters[name] = this.counters[name] + 'ms';
+    delete this.elapsedStarts[name];
+  }
+  clearElapsed(name) {
+
+  }
+  setCounter(name, value) {
+    this.counters[name] = value;
+  }
+  getCounter(name) {
+    return this.counters[name];
+  }
+  inc(name, num = 1) {
+    if (this.counters[name] != undefined) {
+      this.counters[name] += num;
+    }
+    else {
+      this.counters[name] = num;
+    }
+  }
+  dec(name, num = 1) {
+    if (this.counters[name] != undefined) {
+      this.counters[name] -= num;
+    }
+    else {
+      this.counters[name] = num;
+    }
+  }
+
+
+}
+
+class Shared {
+
+}
+
+
+
+var coldbootWarningInterval = undefined;
+var core;
+var deviceMissingState = false;
+
+var performance = new Performance();
+
+performance.setElapsedStart('Boot');
+
+
+
+
+function debug(level, text) {
+  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+    switch (level) {
+      case 1:
+        console.log(text);
+        break;
+      case 2:
+        console.warn(text);
+        break;
+      case 3:
+        console.error(text);
+        break;
+    }
+
+  }
+}
+
+
+
+function parseWidgetId(inputString) {
+  const keyValuePairs = inputString.split('&');
+  const parsedData = {};
+
+  keyValuePairs.forEach(pair => {
+    const [key, value] = pair.split('=');
+    parsedData[key] = value;
+  });
+
+  return parsedData;
+}
+
+
+
+function isbool(value) {
+  if (typeof value === 'boolean') {
+    return value === true || value === false;
+  } else if (typeof value === 'string') {
+    const lowerValue = value.toLowerCase();
+    return lowerValue === 'true' || lowerValue === 'on' || lowerValue === 'false' || lowerValue === 'off';
+  }
+  return false;
+}
+function makeBool(value) {
+  if (typeof value === 'boolean') {
+    return value;
+  } else if (typeof value === 'string') {
+    const lowerValue = value.toLowerCase();
+    if (lowerValue === 'true' || lowerValue === 'on') {
+      return true;
+    } else if (lowerValue === 'false' || lowerValue === 'off') {
+      return false;
+    }
+  }
+  return false;
+}
+
+
+var progress = 0;
+var timedProgressBar;
+function displayTimedProgressBar(title, time) {
+  timedProgressBar = setInterval(() => {
+    var done = '🟦'.repeat(progress);
+    var notdone = '⬛'.repeat(20 - progress);
+    xapi.Command.UserInterface.Message.Prompt.Display({
+      title: title,
+      text: done + notdone,
+      FeedbackId: 'TimedProgressBar'
+    });
+    progress++;
+
+    if (progress == 21) {
+      progress = 0;
+      done = '';
+      clearInterval(timedProgressBar);
+      xapi.Command.UserInterface.Message.Prompt.Clear({ FeedbackId: 'TimedProgressBar' });
+    }
+  }, time / 20);
+}
+
+
+class WidgetMapping {
+  constructor(widgetId) {
+    this.callbacks = [];
+    this.widgetId = widgetId;
+    this.value = undefined;
+  }
+  on(type, callback) {
+    this.callbacks.push({
+      type: type,
+      callback: callback
+    });
+  }
+  async getValue() {
+    return this.value;
+  }
+  setValue(value) {
+    performance.inc('WidgetMapping.setValue()');
+    zapi.ui.setWidgetValue(this.widgetId, value);
+  }
+  processEvent(event) {
+    if (event.WidgetId == this.widgetId) {
+      for (let cb of this.callbacks) {
+        if (cb.type == event.Type || cb.type == '') {
+          cb.callback(event.Value);
+        }
+      }
+    }
+  }
+}
+
+class UiManager {
+  constructor() {
+    this.allWidgets = [];
+    this.actionMaps = [];
+    this.valueMaps = [];
+    this.uiEventSubscribers = [];
+    this.widgetMappings = [];
+  }
+  async init() {
+    return new Promise(success => {
+
+
+      //Build widgets cache
+      xapi.Command.UserInterface.Extensions.List({}).then(list => {
+        for (let panel of list.Extensions.Panel) {
+          if (panel.Page) {
+            for (let page of panel.Page) {
+              if (page.Row) {
+                for (let row of page.Row) {
+                  if (row.Widget) {
+                    for (let widget of row.Widget) {
+                      this.allWidgets.push({ widgetId: widget.WidgetId, type: widget.Type });
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        xapi.Event.UserInterface.on(event => { this.forwardUiEvents(event); });
+        this.onUiEvent((event) => this.parseUiEvent(event));
+        zapi.ui.addActionMapping = (regex, func) => { this.addActionMapping(regex, func) }
+        zapi.ui.setWidgetValue = (widgetId, value) => { this.setWidgetValue(widgetId, value) }
+        zapi.ui.getAllWidgets = () => { return this.getAllWidgets() }
+        zapi.ui.addWidgetMapping = (widgetId) => { return this.addWidgetMapping(widgetId) }
+        success();
+      });
+    });
+  }
+  forwardUiEvents(event) {
+    for (let s of this.uiEventSubscribers) {
+      s(event);
+    }
+  }
+
+  getAllWidgets() {
+    return this.allWidgets;
+  }
+  setWidgetValue(widgetId, value) {
+    if (this.allWidgets.filter(w => w.widgetId == widgetId).length > 0) {
+      debug(1, `Setting widget "${widgetId}" value to "${value}"`);
+      xapi.Command.UserInterface.Extensions.Widget.SetValue({
+        WidgetId: widgetId,
+        Value: value
+      })
+    }
+  }
+
+  onUiEvent(callback) {
+    this.uiEventSubscribers.push(callback);
+  }
+  addWidgetMapping(widgetId) {
+    var tempWidgetMapping = new WidgetMapping(widgetId);
+    this.widgetMappings.push(tempWidgetMapping);
+    return tempWidgetMapping;
+  }
+  parseUiEvent(event) {
+    performance.inc('UiManager.ParsedUiEvents');
+    var eventId;
+    if (event.Extensions?.Widget?.Action?.Type == 'pressed') {
+      eventId = event.Extensions.Widget.Action.WidgetId;
+      this.processMatchAction(eventId);
+
+    }
+    else if (event.Extensions?.Panel?.Clicked) {
+      eventId = event.Extensions.Panel.Clicked.PanelId;
+      this.processMatchAction(eventId);
+    }
+
+    if (event.Extensions?.Widget?.Action) {
+      //Process Value Changed
+      //this.processValueChanged(event.Extensions.Widget.Action);
+      this.processWidgetMappingsEvent(event.Extensions.Widget.Action);
+
+      //console.log(event.Extensions.Widget.Action);
+      //Update system status IF name starts with "SS$"
+      if (event.Extensions.Widget.Action.WidgetId.startsWith('SS$')) {
+        zapi.system.setStatus(event.Extensions.Widget.Action.WidgetId, event.Extensions.Widget.Action.Value);
+      }
+    }
+  }
+
+  processWidgetMappingsEvent(event) {
+    performance.inc('UiManager.WidgetMappingEventProcessed');
+    for (let wm of this.widgetMappings) {
+      wm.processEvent(event);
+    }
+  }
+
+  processMatchAction(eventId) {
+          performance.inc('UiManager.ActionMappingProcessed');
+    if (eventId != undefined) {
+      if (eventId.startsWith('ACTION$') || eventId.startsWith('*ACTION$')) {
+        this.processAction(eventId.split('$')[1]);
+      }
+      else if (eventId.startsWith('ACTIONS$') || eventId.startsWith('*ACTIONS$')) {
+        let actions = eventId.split('$')[1];
+        let actionArray = actions.split('&');
+        for (let a of actionArray) {
+          this.processAction(a);
+        }
+      }
+    }
+  }
+  addActionMapping(action, func) {
+    this.actionMaps.push({
+      regex: action,
+      func: func
+    });
+  }
+
+  processAction(act) {
+    if (act.includes(':')) {
+      let actionParamsSplit = act.split(':');
+      let action = actionParamsSplit[0];
+      let params = actionParamsSplit[1];
+      let paramsArray = params.split(',');
+
+
+      for (let map of this.actionMaps) {
+        //console.log(map.regex);
+        if (map.regex.test(action)) {
+          map.func(...paramsArray);
+        }
+      }
+    }
+
+    else {
+      for (let map of this.actionMaps) {
+        //console.log(map.regex);
+        if (map.regex.test(act)) {
+          map.func();
+        }
+      }
+
+    }
+
+
+
+  }
+}
+
+
+class Core {
+  constructor() {
+    var that = this;
+    var self = this;
+
+    //this.systemStatus = systemStatus;
+    //this.systemStatus.init();
+
+
+
+    zapi.performance.setElapsedStart = (test) => { performance.setElapsedStart(test) };
+    zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test) };
+    zapi.performance.inc = (name, num) => { performance.inc(name, num) };
+    zapi.performance.dec = (name, num) => { performance.dec(name, num) };
+
+    
+  }
+
+  async init() {
+    var self = this;
+    this.uiManager = new UiManager();
+    this.systemStatus = new SystemStatus();
+    await this.uiManager.init();
+    await this.systemStatus.init();
+
+    //Add UI-related mappings
+    self.uiManager.addActionMapping(/^PANELCLOSE$/, () => {
+      xapi.Command.UserInterface.Extensions.Panel.Close();
+    });
+    self.uiManager.addActionMapping(/^STANDBY$/, () => {
+      xapi.Command.Standby.Activate();
+    });
+
+
+
+
+    //Setup devices
+    this.devicesManager = new DevicesManager();
+    this.devicesManager.init();
+    //Build ZAPI
+    //zapi.devices.getAllDevices = () => { return this.devicesManager.getAllDevices() };
+
+
+
+
+    //Handle standby
+    xapi.Status.Standby.State.on(status => {
+      if (status == 'Standby') {
+        this.handleStandby();
+      }
+      else if (status == 'Off') {
+        this.handleWakeup();
+      }
+    });
+
+    //Set DND
+    this.setDNDInterval = undefined;
+    if (config.system.onStandby.setDND) {
+      this.setDND();
+    }
+
+
+    //Handle system status change
+
+    this.systemStatus.onChange(status => {
+      //console.log(status);
+    });
+
+
+    //Starts devices monitoring
+    this.devicesMonitoringInterval = setInterval(async () => {
+      let missingDevices = await getDisconnectedRequiredPeripherals();
+      if (missingDevices.length > 0) {
+        this.deviceMissingState = true;
+        this.devicesMonitoringMissing(missingDevices);
+      }
+      else {
+        if (this.deviceMissingState == true) {
+          this.deviceMissingState = false;
+          xapi.Command.UserInterface.Message.Alert.Clear();
+        }
+
+      }
+    }, config.system.requiredPeripheralsCheckInterval);
+  }
+
+
+
+  devicesMonitoringMissing(devices) {
+    var devs = [];
+    for (let d of devices) {
+      devs.push(d.name);
+    }
+    xapi.Command.UserInterface.Message.Alert.Display({
+      Duration: 0,
+      Title: '🚩 Problème du système 🚩',
+      Text: `Contactez votre soutien technique.<br>Périphériques indisponibles:<br>${devs.join(', ')}`
+    });
+  }
+
+
+  loadScenarios() {
+    //Load Scenarios
+    let self = this;
+    this.scenarios = new Scenarios();
+
+
+
+  }
+  handleStandby() {
+    debug(1, 'Entering standby...');
+    this.setDND();
+    this.scenarios.enableScenario(config.system.onStandby.enableScenario);
+  }
+  handleWakeup() {
+    debug(1, 'Waking up...');
+    displayTimedProgressBar(config.strings.newSessionTitle, 2000);
+    if (this.scenarios.currentScenario == config.system.onStandby.enableScenario) {
+      this.scenarios.enableScenario(config.system.onWakeup.enableScenario);
+    }
+
+  }
+
+  setPresenterLocation(location) {
+    this.eventPresenterLocationSet(location);
+  }
+  setDND() {
+    this.setDNDInterval = setInterval(() => { this.setDND() }, 82800000);
+    xapi.Command.Conference.DoNotDisturb.Activate({ Timeout: 1440 });
+  }
+
+
+
+
+}
+
+function configValidityCheck() {//TODO
+  var valid = true;
+
+  //Check for devices names doubles
+
+  /*
+  var doubles = [];
+  for (let device of config.devices) {
+    let count = config.devices.filter(dev => { return device.id == dev.id }).length;
+    if (count > 1 && !doubles.includes(device.id)) {
+      debug(3,`Device "${device.id}" is declared ${count} times.`);
+      doubles.push(device.id);
+      valid = false;
+    }
+  }
+  */
+  return valid;
+}
+
+
+async function sleep(time) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve();
+    }, time);
+  });
+}
+
+async function getDisconnectedRequiredPeripherals() {
+  var disconnectedPeripherals = [];
+  var disconnected = 0;
+  let peripherals = await xapi.Status.Peripherals.get();
+  let requiredPeripherals = config.devices.filter(dev => { return dev.peripheralRequired == true });
+
+  for (let rp of requiredPeripherals) {
+    let matchCount = 0;
+
+    for (let p of peripherals.ConnectedDevice) {
+      if (rp.peripheralId == p.SerialNumber && p.Status == 'Connected') {
+        matchCount++;
+      }
+    }
+    if (matchCount == 0) {
+      debug(2, `Device disconnected: ${rp.id}, peripheralId: ${rp.peripheralId}`);
+      disconnectedPeripherals.push(rp);
+      disconnected++;
+    }
+  }
+
+  return disconnectedPeripherals;
+  /*
+    if (disconnected == 0) {
+      return true;
+    }
+    else {
+      return false;
+    }
+    */
+}
+
+
+
+async function waitForAllDevicesConnected(disconnectedCallback) {
+  return new Promise(async resolve => {
+    let discdevs = await getDisconnectedRequiredPeripherals();
+    if (await discdevs.length == 0) {
+      resolve();
+    }
+    else {
+      var checkInterval = setInterval(async () => {
+        let discdevs = await getDisconnectedRequiredPeripherals();
+        if (discdevs.length == 0) {
+          clearInterval(checkInterval);
+          resolve();
+        } else {
+          disconnectedCallback(discdevs);
+        }
+      }, config.system.requiredPeripheralsCheckInterval);
+      disconnectedCallback(discdevs);
+    }
+  });
+}
+
+async function requiredPeripheralsDisconnected(callback) {
+
+}
+async function requiredPeripheralsConnected(callback) {
+
+}
+//TODO: add interval check for required peripherals
+
+
+
+/* 
+    
+  */
+
+
+
+async function preInit() {
+
+
+  /* Wakeup system */
+  xapi.Command.Standby.Deactivate();
+  xapi.Command.UserInterface.Message.Prompt.Display({
+    Duration: 0,
+    Text: 'Le système démarre. Un instant svp.',
+    Title: 'Démarrage du système',
+  });
+  await sleep(INITSTEPDELAY);
+
+  xapi.Command.UserInterface.Message.Prompt.Display({
+    Duration: 0,
+    Text: '',
+    Title: 'En attente des périphériques...',
+  });
+  await sleep(INITSTEPDELAY);
+
+  await waitForAllDevicesConnected(deviceAlert => {
+    let devices = [];
+    for (let d of deviceAlert) {
+      devices.push(d.name);
+    }
+
+    xapi.Command.UserInterface.Message.Prompt.Display({
+      Duration: 0,
+      Text: devices.join(', '),
+      Title: 'En attente des périphériques...',
+    });
+  });
+
+
+  xapi.Command.UserInterface.Message.Prompt.Display({
+    Duration: 0,
+    Text: 'Tous les périphériques sont connectés. Un instant svp...',
+    Title: 'Démarrage du système',
+  });
+  await sleep(INITSTEPDELAY);
+
+  debug(2, `PreInit started...`);
+  clearInterval(coldbootWarningInterval);
+  if (config.system.debugInternalMessages) {
+    xapi.Event.Message.Send.Text.on(text => {
+      console.log(`[INTERNAL MESSAGE] ${text}`);
+    });
+  }
+
+  debug(1, `Checking config validity...`);
+  let validConfig = configValidityCheck();
+
+  if (validConfig) {
+    setTimeout(init, config.system.initDelay);
+    debug(1, `Waiting for init... (${config.system.initDelay}ms)`);
+  }
+  else {
+    debug(3, `Config is NOT valid. Please review errors above. System will not start.`);
+  }
+
+  debug(2, `PreInit finished.`);
+
+
+}
+
+async function init() {
+  debug(2, `Init started...`);
+  core = await new Core();
+  await core.init();
+
+
+  debug(1, 'Waiting 5 secs...');
+  await sleep(5000);
+
+
+  //TODO: set defaults at device wakeup
+  for (let prop in config.defaultSystemStatus) {
+    if (config.defaultSystemStatus.hasOwnProperty(prop)) {
+      zapi.system.setStatus(prop, config.defaultSystemStatus[prop], false);
+    }
+  }
+  //zapi.system.setStatus('SS$PresenterLocation', config.system.defaultPresenterLocation, false);
+  //zapi.system.setStatus('SS$PresenterTrackWarnings', config.system.displayPresenterTrackWarnings ? 'on' : 'off', false);
+
+  debug(2, `Init finished. Loading scenarios...`);
+  xapi.Command.UserInterface.Message.Prompt.Clear();
+  core.loadScenarios();
+  performance.setElapsedEnd('Boot');
+
+
+  setTimeout(() => {
+    console.warn(`POST-BOOT PERFORMANCE REPORT:`);
+    console.warn(performance);
+    console.warn(`POST-BOOT SYSTEM STATUS REPORT:`);
+    console.warn(zapi.system.getAllStatus());
+  }, 5000);
+
+
+  setInterval(() => {
+    console.warn(performance);
+  }, 240000);
+
+
+
+}
+
+
+debug(1, 'UNNAMED MIDDLEWARE is starting...');
+debug(1, `Version: ${VERSION}`);
+debug(1, `Debug level is: ${config.system.debugLevel}`);
+
+
+
+xapi.Status.SystemUnit.Uptime.get().then(uptime => {
+  if (uptime > config.system.coldBootWait) {
+    debug(1, 'Warm boot detected, running preInit() now.');
+    preInit();
+  }
+  else {
+    debug(1, `Cold boot detected, running preInit() in ${config.system.coldBootWait} seconds...`);
+    setTimeout(preInit, config.system.coldBootWait * 1000);
+    var x = 0;
+    coldbootWarningInterval = setInterval(() => {
+      x++;
+      xapi.Command.UserInterface.Message.Prompt.Display({
+        Duration: 0,
+        Text: `Le système vient de démarrer. Optimisation en cours...<br>Environ ${config.system.coldBootWait - (x * 5)} secondes restantes...`,
+        Title: 'Démarrage',
+      });
+    }, 5000);
+  }
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -4,8 +4,6 @@ import { config } from './config';
 import { Scenarios } from './scenarios'
 import { SystemStatus } from './systemstatus';
 import { zapiv1 } from './zapi';
-import { api } from './zapi';
-
 
 const zapi = zapiv1;
 
@@ -17,8 +15,31 @@ const DEBUGLEVEL = {
 }
 
 const INITSTEPDELAY = 500;
-
 const VERSION = '1.0.0';
+
+var coldbootWarningInterval = undefined;
+var core;
+
+
+function debug(level, text) {
+  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+    switch (level) {
+      case 1:
+        console.log(text);
+        break;
+      case 2:
+        console.warn(text);
+        break;
+      case 3:
+        console.error(text);
+        break;
+    }
+
+  }
+}
+
+
+
 
 class Performance {
   constructor() {
@@ -62,79 +83,13 @@ class Performance {
 
 
 }
-
-class Shared {
-
-}
-
-
-
-var coldbootWarningInterval = undefined;
-var core;
-var deviceMissingState = false;
-
 var performance = new Performance();
-
 performance.setElapsedStart('Boot');
 
 
 
 
-function debug(level, text) {
-  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
-    switch (level) {
-      case 1:
-        console.log(text);
-        break;
-      case 2:
-        console.warn(text);
-        break;
-      case 3:
-        console.error(text);
-        break;
-    }
 
-  }
-}
-
-
-
-function parseWidgetId(inputString) {
-  const keyValuePairs = inputString.split('&');
-  const parsedData = {};
-
-  keyValuePairs.forEach(pair => {
-    const [key, value] = pair.split('=');
-    parsedData[key] = value;
-  });
-
-  return parsedData;
-}
-
-
-
-function isbool(value) {
-  if (typeof value === 'boolean') {
-    return value === true || value === false;
-  } else if (typeof value === 'string') {
-    const lowerValue = value.toLowerCase();
-    return lowerValue === 'true' || lowerValue === 'on' || lowerValue === 'false' || lowerValue === 'off';
-  }
-  return false;
-}
-function makeBool(value) {
-  if (typeof value === 'boolean') {
-    return value;
-  } else if (typeof value === 'string') {
-    const lowerValue = value.toLowerCase();
-    if (lowerValue === 'true' || lowerValue === 'on') {
-      return true;
-    } else if (lowerValue === 'false' || lowerValue === 'off') {
-      return false;
-    }
-  }
-  return false;
-}
 
 
 var progress = 0;
@@ -158,6 +113,10 @@ function displayTimedProgressBar(title, time) {
     }
   }, time / 20);
 }
+
+
+
+
 
 
 class WidgetMapping {
@@ -270,12 +229,7 @@ class UiManager {
     }
 
     if (event.Extensions?.Widget?.Action) {
-      //Process Value Changed
-      //this.processValueChanged(event.Extensions.Widget.Action);
       this.processWidgetMappingsEvent(event.Extensions.Widget.Action);
-
-      //console.log(event.Extensions.Widget.Action);
-      //Update system status IF name starts with "SS$"
       if (event.Extensions.Widget.Action.WidgetId.startsWith('SS$')) {
         zapi.system.setStatus(event.Extensions.Widget.Action.WidgetId, event.Extensions.Widget.Action.Value);
       }
@@ -320,7 +274,6 @@ class UiManager {
 
 
       for (let map of this.actionMaps) {
-        //console.log(map.regex);
         if (map.regex.test(action)) {
           map.func(...paramsArray);
         }
@@ -329,7 +282,6 @@ class UiManager {
 
     else {
       for (let map of this.actionMaps) {
-        //console.log(map.regex);
         if (map.regex.test(act)) {
           map.func();
         }
@@ -343,15 +295,12 @@ class UiManager {
 }
 
 
+
+
 class Core {
   constructor() {
     var that = this;
     var self = this;
-
-    //this.systemStatus = systemStatus;
-    //this.systemStatus.init();
-
-
 
     zapi.performance.setElapsedStart = (test) => { performance.setElapsedStart(test) };
     zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test) };
@@ -382,10 +331,6 @@ class Core {
     //Setup devices
     this.devicesManager = new DevicesManager();
     this.devicesManager.init();
-    //Build ZAPI
-    //zapi.devices.getAllDevices = () => { return this.devicesManager.getAllDevices() };
-
-
 
 
     //Handle standby
@@ -406,7 +351,6 @@ class Core {
 
 
     //Handle system status change
-
     this.systemStatus.onChange(status => {
       //console.log(status);
     });
@@ -484,7 +428,7 @@ function configValidityCheck() {//TODO
 
   //Check for devices names doubles
 
-  /*
+  
   var doubles = [];
   for (let device of config.devices) {
     let count = config.devices.filter(dev => { return device.id == dev.id }).length;
@@ -494,7 +438,7 @@ function configValidityCheck() {//TODO
       valid = false;
     }
   }
-  */
+  
   return valid;
 }
 
@@ -529,14 +473,6 @@ async function getDisconnectedRequiredPeripherals() {
   }
 
   return disconnectedPeripherals;
-  /*
-    if (disconnected == 0) {
-      return true;
-    }
-    else {
-      return false;
-    }
-    */
 }
 
 
@@ -568,14 +504,6 @@ async function requiredPeripheralsDisconnected(callback) {
 async function requiredPeripheralsConnected(callback) {
 
 }
-//TODO: add interval check for required peripherals
-
-
-
-/* 
-    
-  */
-
 
 
 async function preInit() {
@@ -658,8 +586,7 @@ async function init() {
       zapi.system.setStatus(prop, config.defaultSystemStatus[prop], false);
     }
   }
-  //zapi.system.setStatus('SS$PresenterLocation', config.system.defaultPresenterLocation, false);
-  //zapi.system.setStatus('SS$PresenterTrackWarnings', config.system.displayPresenterTrackWarnings ? 'on' : 'off', false);
+
 
   debug(2, `Init finished. Loading scenarios...`);
   xapi.Command.UserInterface.Message.Prompt.Clear();
@@ -708,9 +635,6 @@ xapi.Status.SystemUnit.Uptime.get().then(uptime => {
       });
     }, 5000);
   }
-
-
-
 });
 
 

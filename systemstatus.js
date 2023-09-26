@@ -101,15 +101,8 @@ export var presentation = {
     return new Promise(success => {
       var status = {};
       xapi.Status.Conference.Presentation.get().then(pres => {
-        if (pres.Mode == 'Receiving') {
-          //status.remotePresentation = true;
-        }
-        else {
-          //status.remotePresentation = false;
-        }
         if (pres.LocalInstance !== undefined) {
-          //status.localPresentation = true;
-          //status.localPresentationMode = pres.LocalInstance[0].SendingMode;
+
           status.source = pres.LocalInstance[0].Source;
           status.id = pres.LocalInstance[0].id;
           if (status.remotePresentation == true) {
@@ -131,7 +124,6 @@ export var presentation = {
           success(status);
         }
         else {
-          //status.localPresentation = false;
           if (status.remotePresentation == true) {
             status.type = PRES_REMOTE;
           }

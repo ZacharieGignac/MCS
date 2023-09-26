@@ -61,18 +61,6 @@ export class Scenario {
   }
   start() {
     
-    //let dev = this.api.devices.getDevice('display.presentation');
-    
-    //console.log(this.api.devices.getDevicesInGroup('presentation.main'));
-    //var devs = this.api.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY,'presentation.main');
-    
-    //console.log(devs);
-    //devs.forEach(dev => dev.test());
-
-    //let status = this.api.system.getAllStatus();
-    
-
-    
   }
   test() {
     console.log('test from SCE_Normal');

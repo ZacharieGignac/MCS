@@ -186,51 +186,6 @@ export class Display {
     offButton.on('clicked', () => {
       self.powerOff();
     });
-
-
-    //this.setBlanking(this.config.defaultBlanking);
-
-    //Setup UI ID mapping
-    //Regex style with addActionMapping
-    /*
-    let powerPattern = new RegExp('^' + this.config.name + '_POWER');
-    this.api.ui.addActionMapping(powerPattern, (power) => { self.processActionPower(power); });
-
-    let powerDelayPattern = new RegExp('^' + this.config.name + '_DELAYPOWER');
-    this.api.ui.addActionMapping(powerDelayPattern, (power) => { self.processActionPowerDelay(power) });
-    */
-
-
-
-
-    /* TEST
-    var testslider = this.api.ui.addWidgetMapping('TEST_SLIDER');
-    var slidervalue = this.api.ui.addWidgetMapping('slider_value');
-    testslider.setValue(30);
-    slidervalue.setValue('Normal');
-
-    testslider.on('changed', value => {
-      if (value >= 0 && value < 85) {
-        slidervalue.setValue('Normal');
-      }
-      else if (value >= 85 && value < 170) {
-        slidervalue.setValue('Fort');
-      }
-      else if (value >= 170) {
-        slidervalue.setValue('Trop fort');
-      }
-    });
-
-
-    var testbutton = this.api.ui.addWidgetMapping('testbutton');
-    testbutton.on('clicked', event => {
-      testslider.setValue(30);
-      slidervalue.setValue('Normal');
-    });
-    */
-
-
-
   }
   setDefaults() {
     //Set defaults (adds a 1 second delay to accomodate other UI threads)

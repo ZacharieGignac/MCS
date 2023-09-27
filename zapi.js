@@ -43,7 +43,9 @@ export var zapiv1 = {
     endSession: () => { },
     setStatus: () => { },
     getStatus: () => { },
-    getAllStatus: () => { }
+    getAllStatus: () => { },
+    enablePresenterTrackWarnings: () => { },
+    disablePresenterTrackWarnings: () => { }
   },
   performance: {
     setElapsedStart: () => { },

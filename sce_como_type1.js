@@ -20,7 +20,7 @@ export var Manifest = {
     shareStart:true,
     cameraControls: true,
     endCallButton: true,
-    hdmiPassthrough: false,
+    hdmiPassthrough: true,
     joinGoogleMeet: false,
     joinWebex: true,
     joinZoom: true,

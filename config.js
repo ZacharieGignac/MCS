@@ -62,6 +62,8 @@ export var config = {
     forceSleepEnabled: true,
     forceSleepTime: '2:00',
     requiredPeripheralsCheckInterval: 5000,
+    usePresenterTrack:true,
+    forcePresenterTrackActivation:true,
     onStandby: {
       setDND: true,
       resetPresenterLocation: true,
@@ -80,7 +82,9 @@ export var config = {
     endSessionTitle: 'Fin de la session',
     endSessionText: 'À la prochaine!',
     deviceMonitoringWaitForDevicesTitle: 'Périphériques',
-    deviceMonitoringWaitForDevicesText: 'En attente des périphériques: %DEVICES%'
+    deviceMonitoringWaitForDevicesText: 'En attente des périphériques: %DEVICES%',
+    presenterTrackLocked:'🟢 Cadrage automatique ACTIVÉ 🟢',
+    presenterTrackLost:'🔴 Cadrage automatique DÉSACTIVÉ 🔴.<br>Revenez dans la zone de présentation pour le réactiver.'
   },
 
   scenarios: [
@@ -93,6 +97,8 @@ export var config = {
   modules: [
     telemetry
   ],
+
+
 
 
   devices: [
@@ -141,7 +147,8 @@ export var config = {
       defaultGain:50,      
       gainStep:1,
       defaultMute:false
-    }
+    },
+    
 
 
     /*
@@ -336,12 +343,12 @@ export var config = {
     }
   ],
 
-  defaultSystemStatus: {
-    SS$PresenterLocation: 'local', //Needed for core
-    SS$PresenterTrackWarnings: 'on', //Needed for core
-    SS$AutoDisplays:true,
-    SS$AutoScreens:true,
-    
+  systemStatus: {
+    SS$PresenterLocation: 'local', //Mandatory value
+    SS$PresenterTrackWarnings: 'on', //Mandatory value
+    SS$AutoDisplays:true, //Mandatory value
+    SS$AutoScreens:true, //Mandatory value
+    presenterDetected:false //Mandatory value
   },
 
 };

@@ -166,6 +166,13 @@ export class SystemStatus {
       let callStatus = await call.getCallStatus();
       this.setStatus('call', callStatus, false);
 
+      //Set special "hdmipassthrough" status
+      let hpt = await xapi.Status.Video.Output.HDMI.Passthrough.Status.get()
+      this.setStatus('hdmipassthrough',hpt);
+      xapi.Status.Video.Output.HDMI.Passthrough.Status.on(hptstatus => {
+        this.setStatus('hdmipassthrough',hptstatus);
+      });
+
 
 
       presentation.onChange(status => {
@@ -257,5 +264,8 @@ export class SystemStatus {
       key: key,
       callback: f
     });
+  }
+  displayStatus() {
+    console.warn(this._systemStatus);
   }
 }

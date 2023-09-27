@@ -244,7 +244,7 @@ class UiManager {
   }
 
   processMatchAction(eventId) {
-          performance.inc('UiManager.ActionMappingProcessed');
+    performance.inc('UiManager.ActionMappingProcessed');
     if (eventId != undefined) {
       if (eventId.startsWith('ACTION$') || eventId.startsWith('*ACTION$')) {
         this.processAction(eventId.split('$')[1]);
@@ -307,7 +307,9 @@ class Core {
     zapi.performance.inc = (name, num) => { performance.inc(name, num) };
     zapi.performance.dec = (name, num) => { performance.dec(name, num) };
 
-    
+
+    this.lastPresenterDetectedStatus = false;
+
   }
 
   async init() {
@@ -326,6 +328,40 @@ class Core {
     });
 
 
+
+    //Presenter track
+    xapi.Command.UserInterface.Message.TextLine.Clear();
+    if (config.system.usePresenterTrack) {
+      let presenterDetected = await xapi.Status.Cameras.PresenterTrack.PresenterDetected.get();
+      this.systemStatus.setStatus('presenterDetected', presenterDetected, false);
+      xapi.Status.Cameras.PresenterTrack.PresenterDetected.on(value => {
+        if (this.systemStatus.getStatus('SS$PresenterTrackWarnings') == 'on') {
+          this.systemStatus.setStatus('presenterDetected', value);
+          this.processPresenterDetectedStatus(value == 'True' ? true : false);
+        }
+      });
+    }
+    this.systemStatus.onKeyChg('SS$PresenterTrackWarnings', status => {
+      if (status.value == 'off') {
+        xapi.Command.UserInterface.Message.TextLine.Clear();
+      }
+    });
+    if (config.system.forcePresenterTrackActivation) {
+      this.systemStatus.onKeyChg('call', status => {
+        if (status.value == 'Connected') {
+          xapi.Command.Cameras.PresenterTrack.Set({
+            Mode: 'Follow'
+          });
+        }
+      });
+      this.systemStatus.onKeyChg('hdmipassthrough', status => {
+        if (status.value == 'Active') {
+          xapi.Command.Cameras.PresenterTrack.Set({
+            Mode: 'Follow'
+          });
+        }
+      });
+    }
 
 
     //Setup devices
@@ -374,6 +410,33 @@ class Core {
   }
 
 
+  processPresenterDetectedStatus(status) {
+    if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('hdmipassthrough') == 'Active') {
+      if (status != this.lastPresenterDetectedStatus) {
+        this.lastPresenterDetectedStatus = status;
+        if (status == true) {
+          this.displayPresenterTrackLockedMessage();
+        }
+        else {
+          this.displayPresenterTrackLostMessage();
+        }
+      }
+    }
+  }
+
+  displayPresenterTrackLockedMessage() {
+    xapi.Command.UserInterface.Message.TextLine.Clear();
+    xapi.Command.UserInterface.Message.TextLine.Display({
+      Duration: 5,
+      Text: config.strings.presenterTrackLocked
+    });
+  }
+  displayPresenterTrackLostMessage() {
+    xapi.Command.UserInterface.Message.TextLine.Display({
+      Duration: 0,
+      Text: config.strings.presenterTrackLost
+    });
+  }
 
   devicesMonitoringMissing(devices) {
     var devs = [];
@@ -428,17 +491,17 @@ function configValidityCheck() {//TODO
 
   //Check for devices names doubles
 
-  
+
   var doubles = [];
   for (let device of config.devices) {
     let count = config.devices.filter(dev => { return device.id == dev.id }).length;
     if (count > 1 && !doubles.includes(device.id)) {
-      debug(3,`Device "${device.id}" is declared ${count} times.`);
+      debug(3, `Device "${device.id}" is declared ${count} times.`);
       doubles.push(device.id);
       valid = false;
     }
   }
-  
+
   return valid;
 }
 
@@ -581,9 +644,9 @@ async function init() {
 
 
   //TODO: set defaults at device wakeup
-  for (let prop in config.defaultSystemStatus) {
-    if (config.defaultSystemStatus.hasOwnProperty(prop)) {
-      zapi.system.setStatus(prop, config.defaultSystemStatus[prop], false);
+  for (let prop in config.systemStatus) {
+    if (config.systemStatus.hasOwnProperty(prop)) {
+      zapi.system.setStatus(prop, config.systemStatus[prop], false);
     }
   }
 

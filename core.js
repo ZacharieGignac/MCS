@@ -362,6 +362,12 @@ class Core {
         }
       });
     }
+    zapi.system.enablePresenterTrackWarning = () => {
+      this.systemStatus.setStatus('SS$PresenterTrackWarnings','on');
+    }
+    zapi.system.disablePresenterTrackWarning = () => {
+      this.systemStatus.setStatus('SS$PresenterTrackWarnings','off');
+    }
 
 
     //Setup devices

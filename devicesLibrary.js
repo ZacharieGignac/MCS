@@ -19,29 +19,165 @@ function debug(level, text) {
   }
 }
 
+export class Light { //TODO: UI Handling
+  constructor(config) {
+    this.api = zapiv1;
+    this.config = config;
+    this.driver = new config.driver(this, config);
+    this.lastPowerStatus = undefined;
+    this.lastDimLevel = undefined;
+
+    this.setDefaults();
+
+
+  }
+  setDefaults() {
+    if (this.config.defaultPower != undefined) {
+      this.setPower(this.config.defaultPower);
+    }
+    if (this.config.defaultDim != undefined) {
+      this.dim(this.config.defaultDim);
+    }
+  }
+  on() {
+    if (this.config.supportsPower) {
+      if (this.lastPowerStatus != true) {
+        debug(1, `DEVICE ${this.config.id} (${this.config.name}): On`);
+        this.driver.on();
+      }
+    }
+  }
+  off() {
+    if (this.config.supportsPower) {
+      if (this.lastPowerStatus != false) {
+        debug(1, `DEVICE ${this.config.id} (${this.config.name}): Off`);
+        this.driver.off();
+      }
+    }
+    else {
+      if (this.config.supportsDim) {
+        debug(1, `DEVICE ${this.config.id} (${this.config.name}): Dim 0 (device does not support power commands)`);
+        this.driver.dim(0);
+      }
+    }
+  }
+  setPower(power) {
+    if (power) {
+      this.on();
+    }
+    else {
+      this.off();
+    }
+  }
+  dim(level) {
+    if (this.config.supportsDim) {
+      if (this.lastDimLevel != level) {
+        debug(1, `DEVICE ${this.config.id} (${this.config.name}): Dim ${level}`);
+        this.driver.dim(level);
+      }
+    }
+  }
+  reset() {
+    this.setDefaults();
+  }
+}
+
+
+export class CameraPreset {
+  constructor(config) {
+    this.api = zapiv1;
+    this.config = config;
+
+  }
+  activate() {
+    debug(1, `DEVICE ${this.config.id} (${this.config.name}): Activating preset`);
+    this.api.devices.activateCameraPreset(this.config.presetName);
+  }
+
+}
+
+
 export class AudioInput {
   constructor(config) {
+    this.api = zapiv1;
     this.config = config;
     this.driver = new config.driver(this, config);
     this.currentGain = undefined;
     this.currentMute = undefined;
-    this.setDefaults();
+    this.widgetModeName = this.config.id + '_MODE';
+    this.widgetLevelName = this.config.id + '_LEVEL';
+    this.widgetLevelGroupName = this.config.id + '_LEVELGROUP';
 
+    //Default UI Handling
+    this.modeSwitch = this.api.ui.addWidgetMapping(this.widgetModeName);
+    this.modeSwitch.on('changed', value => {
+      this.setMode(value);
+    });
+
+    this.levelSlider = this.api.ui.addWidgetMapping(this.widgetLevelName);
+    this.levelSlider.on('changed', value => {
+      let mappedGain = this.mapValue(value, 0, 255, this.config.gainLowLimit, this.config.gainHighLimit);
+      this.setGain(mappedGain);
+    });
+
+    if (this.config.lowGain || this.config.mediumGain || this.config.highGain) {
+      this.levelGroup = this.api.ui.addWidgetMapping(this.widgetLevelGroupName);
+      this.levelGroup.on('released', value => {
+        if (value == 'low') {
+          this.setGain(this.config.lowGain);
+        }
+        else if (value == 'medium') {
+          this.setGain(this.config.mediumGain);
+        }
+        else if (value == 'high') {
+          this.setGain(this.config.highGain);
+        }
+      });
+    }
+
+    this.setDefaults();
   }
   setDefaults() {
-    this.setGain(this.config.defaultGain);
-    this.setMute(this.config.defaultMute);
-  }
-  reset() {
-    debug(1, `DEVICE ${this.config.id} (${this.config.name}): RESET`);
-    this.setDefaults();
+    if (this.config.defaultGain != undefined) {
+      this.setGain(this.config.defaultGain);
+    }
+    if (this.config.defaultMode != undefined) {
+      this.setMode(this.config.defaultMode);
+    }
+
   }
   setGain(gain) {
     debug(1, `DEVICE ${this.config.id} (${this.config.name}): setGain: ${gain}`);
+    if (gain < this.config.gainLowLimit) {
+      gain = this.config.gainLowLimit;
+    }
+    if (gain > this.config.gainHighLimit) {
+      gain = this.config.gainHighLimit;
+    }
+
     this.currentGain = gain;
     this.driver.setGain(gain);
+    let mappedGain = this.mapValue(gain, this.config.gainLowLimit, this.config.gainHighLimit, 0, 255);
+    this.levelSlider.setValue(mappedGain);
+    if (this.config.lowGain || this.config.mediumGain || this.config.highGain) {
+        if (gain <= this.config.lowGain) {
+          this.levelGroup.setValue('low');
+        }
+        else if (gain > this.config.lowGain && gain < this.config.highGain) {
+          this.levelGroup.setValue('medium');
+        }
+        else if (gain >= this.config.highGain) {
+          this.levelGroup.setValue('high');
+        }
+      }
+  }
+  setLevel(level) {
+    this.setGain(level);
   }
   getGain() {
+    return this.currentGain;
+  }
+  getLevel() {
     return this.currentGain;
   }
   increaseGain() {
@@ -53,6 +189,9 @@ export class AudioInput {
       this.setGain(this.config.gainHighLimit);
     }
   }
+  increaseLEvel() {
+    this.increaseGain();
+  }
   decreaseGain() {
     debug(1, `DEVICE ${this.config.id} (${this.config.name}): Decreasing gain: ${this.currentGain - this.config.gainStep}`);
     if ((this.currentGain - this.config.gainLowLimit) >= this.config.gainLowLimit) {
@@ -61,25 +200,40 @@ export class AudioInput {
     else {
       this.setGain(this.config.gainLowLimit);
     }
-
   }
-  mute() {
-    debug(1, `DEVICE ${this.config.id} (${this.config.name}): Muting`);
+  decreaseLevel() {
+    this.decreaseGain();
+  }
+  off() {
+    debug(1, `DEVICE ${this.config.id} (${this.config.name}): Off`);
     this.currentMute = true;
-    this.driver.mute();
+    this.driver.off();
+    this.modeSwitch.setValue('off');
   }
-  unmute() {
-    debug(1, `DEVICE ${this.config.id} (${this.config.name}): Unmuting`);
+  on() {
+    debug(1, `DEVICE ${this.config.id} (${this.config.name}): On`);
     this.currentMute = false;
-    this.driver.unmute();
+    this.driver.on();
+    this.modeSwitch.setValue('on');
   }
-  setMute(mute) {
-    if (mute) {
-      this.mute();
+  setMode(mode) {
+    if (mode.toLowerCase() == 'off') {
+      this.off();
     }
     else {
-      this.unmute();
+      this.on();
     }
+  }
+  mapValue(value, fromMin, fromMax, toMin, toMax) {
+    if (value < fromMin) value = fromMin;
+    if (value > fromMax) value = fromMax;
+    const normalizedValue = (value - fromMin) / (fromMax - fromMin);
+    const mappedValue = Math.round((normalizedValue * (toMax - toMin)) + toMin);
+    return mappedValue;
+  }
+  reset() {
+    debug(1, `DEVICE ${this.config.id} (${this.config.name}): RESET`);
+    this.setDefaults();
   }
 }
 
@@ -103,8 +257,8 @@ export class Screen {
     this.setDefaults();
 
     //Default WidgetMapping
-    var downButton = this.api.ui.addWidgetMapping(this.config.name + '_SETPOSITION:DOWN');
-    var upButton = this.api.ui.addWidgetMapping(this.config.name + '_SETPOSITION:UP');
+    var downButton = this.api.ui.addWidgetMapping(this.config.id + '_SETPOSITION:DOWN');
+    var upButton = this.api.ui.addWidgetMapping(this.config.id + '_SETPOSITION:UP');
 
     downButton.on('clicked', () => {
       self.down();
@@ -321,9 +475,7 @@ export class ACOutputGroup {
 }
 
 
-export class Light {
 
-}
 
 export class LightScene {
 

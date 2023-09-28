@@ -41,12 +41,13 @@ export class DevicesManager {
     this.api.devices.getDevicesByType = (type) => { return self.getDevicesByType(type); }
     this.api.devices.getDevicesInGroup = (group) => { return self.getDevicesInGroup(group); }
     this.api.devices.getDevicesByTypeInGroup = (type, group) => { return self.getDevicesByTypeInGroup(type, group); }
+    this.api.devices.activateCameraPreset = (presetId) => { self.activateCameraPreset(presetId); }
 
   }
   init() {
 
 
-    //TODO: Build devices and groups cache, don't work on static config
+    
     debug(1, `Checking ${config.devices.length} devices...`);
     for (let dev of config.devices) {
       this.allDevices.push(dev);
@@ -59,17 +60,22 @@ export class DevicesManager {
     for (let d of this.allDevices) {
       if (d.device != undefined) {
         let deviceClass = d.device;
-        debug(1,`Creating instance for device ID="${d.id}" NAME="${d.name}" TYPE="${d.type}"`);
+        debug(1, `Creating instance for device ID="${d.id}" NAME="${d.name}" TYPE="${d.type}"`);
         let tempDevice = new deviceClass(d);
         d.inst = tempDevice;
       }
       else {
-        debug(3,`Device with id "${d.id}" is not configured correctly: Missing "device" property. Device not loaded.`);
+        debug(3, `Device with id "${d.id}" is not configured correctly: Missing "device" property. Device not loaded.`);
       }
 
-      
+
     }
 
+    //TODO UI mappings
+    this.api.ui.addActionMapping(/^ACTIVATECAMPRESET$/, (params) => {
+      this.activateCameraPreset(params);
+    });
+    
 
 
     this.api.performance.setElapsedEnd('DevicesManager.init');
@@ -82,7 +88,7 @@ export class DevicesManager {
     }
     return devicesList;
   }
-  getDevice(id,includeConfig=false) {
+  getDevice(id, includeConfig = false) {
     if (!includeConfig) {
       return this.allDevices.filter(dev => dev.id == id)[0].inst;
 
@@ -98,7 +104,7 @@ export class DevicesManager {
       devicesList.push(d.inst);
     }
     return devicesList;
-    
+
   }
   getDevicesInGroup(group) {
     let foundGroup = this.allGroups.filter(g => g.id == group)[0];
@@ -112,11 +118,24 @@ export class DevicesManager {
     let foundGroup = this.allGroups.filter(g => g.id == group)[0];
     let devices = [];
     for (let d of foundGroup.devices) {
-      let tempDevice = this.getDevice(d,true);
+      let tempDevice = this.getDevice(d, true);
       if (tempDevice.type == type) {
         devices.push(tempDevice.inst);
       }
     }
     return devices;
+  }
+
+  async activateCameraPreset(presetName) {
+    let allPresets = await xapi.Command.Camera.Preset.List();
+    let preset = allPresets.Preset.filter(p => p.Name == presetName)[0];
+    let presetDetails = await xapi.Command.Camera.Preset.Show({ PresetId: preset.PresetId });
+    let presetCamId = presetDetails.CameraId;
+    let connectors = await xapi.Config.Video.Input.Connector.get();
+    let camConnectorDetails = connectors.filter(connector => connector.CameraControl.CameraId == presetCamId)[0];
+    let camConnector = camConnectorDetails.id;
+
+    xapi.Command.Camera.Preset.Activate({ PresetId: preset.PresetId });
+    xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
   }
 }

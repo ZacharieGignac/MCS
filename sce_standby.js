@@ -41,7 +41,10 @@ export class Scenario {
     let devices = this.api.devices.getAllDevices();
 
     for (let d of devices) {
-      d.reset();
+      try {
+        d.reset();
+      }
+      catch{}
     }
   }
   test() {

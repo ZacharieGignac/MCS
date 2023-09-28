@@ -363,10 +363,18 @@ class Core {
       });
     }
     zapi.system.enablePresenterTrackWarning = () => {
-      this.systemStatus.setStatus('SS$PresenterTrackWarnings','on');
+      debug(1, `Enabling presenter tracking`);
+      this.systemStatus.setStatus('SS$PresenterTrackWarnings', 'on');
+      xapi.Command.Cameras.PresenterTrack.Set({
+        Mode: 'Follow'
+      });
     }
     zapi.system.disablePresenterTrackWarning = () => {
-      this.systemStatus.setStatus('SS$PresenterTrackWarnings','off');
+      debug(1, `Disabling presenter tracking`);
+      this.systemStatus.setStatus('SS$PresenterTrackWarnings', 'off');
+      xapi.Command.Cameras.PresenterTrack.Set({
+        Mode: 'Off'
+      });
     }
 
 
@@ -649,7 +657,7 @@ async function init() {
   await sleep(5000);
 
 
-  //TODO: set defaults at device wakeup
+
   for (let prop in config.systemStatus) {
     if (config.systemStatus.hasOwnProperty(prop)) {
       zapi.system.setStatus(prop, config.systemStatus[prop], false);
@@ -676,6 +684,14 @@ async function init() {
   }, 240000);
 
 
+  //TESTAREA
+
+  //let campresets = zapi.devices.getDevicesByType(zapi.devices.DEVICETYPE.CAMERAPRESET);
+  //campresets.forEach(cp => { console.log(cp.config.name)});
+
+  //let light = zapi.devices.getDevice('light.presenter');
+  //light.off();
+  //light.dim(75);
 
 }
 

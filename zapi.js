@@ -8,9 +8,11 @@ export var zapiv1 = {
     getAllDevices: () => { },
     getDevicesByType: () => { },
     getDevicesByTypeInGroup: () => { },
+    activateCameraPreset: (presetId) => { },
     DEVICETYPE: {
       CONTROLSYSTEM: 'CONTROLSYSTEM',
       DISPLAY: 'DISPLAY',
+      CAMERAPRESET:'CAMERAPRESET',
       VIDEOOUTPUT: 'VIDEOOUTPUT',
       AUDIOINPUT: 'AUDIOINPUT',
       AUDIOOUTPUT: 'AUDIOOUTPUT',
@@ -44,6 +46,8 @@ export var zapiv1 = {
     setStatus: () => { },
     getStatus: () => { },
     getAllStatus: () => { },
+    onStatusChange: () => { },
+    onStatusKeyChange: () => { },
     enablePresenterTrackWarnings: () => { },
     disablePresenterTrackWarnings: () => { }
   },

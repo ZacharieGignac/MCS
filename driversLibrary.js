@@ -69,27 +69,76 @@ export class ScreenDriver_isc_h21 {
   }
 }
 
-export class AudioInput_internal {
+export class AudioInput_codecpro {
   constructor(device, config) {
     this.config = config;
     this.device = device;
   }
   setGain(gain) {
     debug(1, `DRIVER AudioInput_internal (${this.config.name}): setGain: ${gain}`);
+    switch (this.config.input) {
+      case "microphone":
+        xapi.Config.Audio.Input.Microphone[this.config.connector].Level.set(gain);
+        break;
+      case "hdmi":
+        xapi.Config.Audio.Input.HDMI[this.config.connector].Level.set(gain);
+        break;
+      case "ethernet":
+        xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].Level.set(gain);
+        break;
+    }
   }
-  setMute(mute) {
-    if (mute) {
+  off(mute) {
+    if (mute.toLowerCase() == 'off') {
       this.mute();
     }
     else {
       this.unmute();
     }
   }
-  mute() {
-    debug(1, `DRIVER AudioInput_internal (${this.config.name}): Muting`);
+  off() {
+    debug(1, `DRIVER AudioInput_internal (${this.config.name}): Off`);
+    switch (this.config.input) {
+      case 'microphone':
+        xapi.Config.Audio.Input.Microphone[this.config.connector].mode.set('Off');
+        break;
+      case 'hdmi':
+        this.Config.Audio.Input.Microphone[this.config.connector].mode.set('Off');
+        break;
+      case 'ethernet':
+        this.Config.Audio.Input.Microphone[this.config.connector].mode.set('Off');
+        break;
+    }
   }
-  unmute() {
-    debug(1, `DRIVER AudioInput_internal (${this.config.name}): Unmuting`);
+  on() {
+    debug(1, `DRIVER AudioInput_internal (${this.config.name}): On`);
+    switch (this.config.input) {
+      case 'microphone':
+        xapi.Config.Audio.Input.Microphone[this.config.connector].mode.set('On');
+        break;
+      case 'hdmi':
+        this.Config.Audio.Input.Microphone[this.config.connector].mode.set('On');
+        break;
+      case 'ethernet':
+        this.Config.Audio.Input.Microphone[this.config.connector].mode.set('On');
+        break;
+    }
+  }
+}
+
+export class Light_isc_h21 {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+  on() {
+    debug(1, `DRIVER Light_isc_h21 (${this.config.name}): On`);
+  }
+  off() {
+    debug(1, `DRIVER Light_isc_h21 (${this.config.name}): Off`);
+  }
+  dim(level) {
+    debug(1, `DRIVER Light_isc_h21 (${this.config.name}): Dim ${level}`);
   }
 }
 

@@ -36,6 +36,7 @@ const DEBUGLEVEL = {
 const DEVICETYPE = {
   CONTROLSYSTEM: 'CONTROLSYSTEM',
   DISPLAY: 'DISPLAY',
+  CAMERAPRESET:'CAMERAPRESET',
   VIDEOOUTPUT: 'VIDEOOUTPUT',
   AUDIOINPUT: 'AUDIOINPUT',
   AUDIOOUTPUT: 'AUDIOOUTPUT',
@@ -62,8 +63,8 @@ export var config = {
     forceSleepEnabled: true,
     forceSleepTime: '2:00',
     requiredPeripheralsCheckInterval: 5000,
-    usePresenterTrack:true,
-    forcePresenterTrackActivation:true,
+    usePresenterTrack: true,
+    forcePresenterTrackActivation: false,
     onStandby: {
       setDND: true,
       resetPresenterLocation: true,
@@ -76,6 +77,7 @@ export var config = {
     }
   },
 
+
   strings: {
     systemStart: 'Démarrage du système',
     newSessionTitle: `Préparation de votre session`,
@@ -83,8 +85,8 @@ export var config = {
     endSessionText: 'À la prochaine!',
     deviceMonitoringWaitForDevicesTitle: 'Périphériques',
     deviceMonitoringWaitForDevicesText: 'En attente des périphériques: %DEVICES%',
-    presenterTrackLocked:'🟢 Cadrage automatique ACTIVÉ 🟢',
-    presenterTrackLost:'🔴 Cadrage automatique DÉSACTIVÉ 🔴.<br>Revenez dans la zone de présentation pour le réactiver.'
+    presenterTrackLocked: '🟢 Cadrage automatique ACTIVÉ 🟢',
+    presenterTrackLost: '🔴 Cadrage automatique DÉSACTIVÉ 🔴.<br>Revenez dans la zone de présentation pour le réactiver.'
   },
 
   scenarios: [
@@ -104,12 +106,12 @@ export var config = {
   devices: [
     //Types: DISPLAY, SCREEN, CONTROLSYSTEM, LIGHT, LIGHTSCENE, VIDEOOUTPUT
     {
-      id:'controlsystem',
-      type:DEVICETYPE.CONTROLSYSTEM,
-      name:'RaspberryPi / Crestron',
-      device:devicesLibrary.ControlSystem,
-      peripheralRequired:true,
-      peripheralId:'FOC2447N5FW'
+      id: 'controlsystem',
+      type: DEVICETYPE.CONTROLSYSTEM,
+      name: 'RaspberryPi / Crestron',
+      device: devicesLibrary.ControlSystem,
+      peripheralRequired: true,
+      peripheralId: 'FOC2447N5FW'
     },
     {
       id: 'display.presentation.main',
@@ -121,7 +123,7 @@ export var config = {
       supportsPower: true,
       supportsBlanking: true,
       supportsSource: false,
-      supportsUsageHours: true,
+      supportsUsageHours: false,
       defaultPower: false,
       blankBeforePowerOff: true,
       powerOffDelay: 60000,
@@ -136,19 +138,48 @@ export var config = {
       defaultPosition: false,
     },
     {
-      id:'audioinput.presenter.mic1',
-      type:DEVICETYPE.AUDIOINPUT,
-      name:'Micro présentateur 1',
+      id: 'audioinput.presenter.mic1',
+      type: DEVICETYPE.AUDIOINPUT,
+      name: 'Micro présentateur 1',
       device: devicesLibrary.AudioInput,
-      driver: driversLibrary.AudioInput_internal,
-      connector:1,
-      gainLowLimit:0,
-      gainHighLimit:70,
-      defaultGain:50,      
-      gainStep:1,
-      defaultMute:false
+      driver: driversLibrary.AudioInput_codecpro,
+      connector: 1,
+      input:'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
+      gainLowLimit: 0,
+      gainHighLimit: 70,
+      defaultGain: 50,
+      gainStep: 1,     
+      defaultMode:'on',
+      lowGain:20,
+      mediumGain:40,
+      highGain:60
     },
-    
+    {
+      id:'campreset.tableau',
+      name:'Preset Tableau',
+      type:DEVICETYPE.CAMERAPRESET,
+      device:devicesLibrary.CameraPreset,
+      presetName:'Tableau'
+    },
+    {
+      id:'campreset.presenter',
+      name:'Présentateur',
+      type:DEVICETYPE.CAMERAPRESET,
+      device:devicesLibrary.CameraPreset,
+      presetName:'Présentateur'
+    },
+    {
+      id:'light.presenter',
+      name:'Lumière meuble console',
+      type:DEVICETYPE.LIGHT,
+      device:devicesLibrary.Light,
+      driver:driversLibrary.Light_isc_h21,
+      supportsPower:true,
+      supportsDim:true,
+      defaultPower:true,
+      defaultDim:100
+    }
+
 
 
     /*
@@ -281,7 +312,7 @@ export var config = {
 
 
   normal_config: {
-    mysetting:true
+    mysetting: true
   },
 
   firealarm_config: {
@@ -293,44 +324,6 @@ export var config = {
   },
 
 
-  lightScenes: [
-    {
-      id: 'emergency',
-      lights: [
-        {
-          id: 'light.presenter.desk',
-          power: true,
-          dim: 100
-        },
-        {
-          id: 'light.room',
-          power: true,
-          dim: 100
-        },
-        {
-          id: 'lightscene.emergency',
-        }
-      ]
-    },
-    {
-      id: 'presentation',
-      lights: [
-        {
-          id: 'lightscene.presentation',
-        }
-      ]
-    },
-    {
-      id: 'alloff',
-      lights: [
-        {
-          id: 'lightscene.alloff',
-        }
-      ]
-    }
-  ],
-
-
 
   groups: [
     {
@@ -340,15 +333,20 @@ export var config = {
     {
       id: 'audienceMics',
       devices: ['audience.ceilingmic.1', 'audience.ceilingmic.2']
+    },
+    {
+      id:'presenter',
+      devices:['campreset.presenter', 'audioinput.presenter.mic1']
     }
   ],
 
   systemStatus: {
     SS$PresenterLocation: 'local', //Mandatory value
     SS$PresenterTrackWarnings: 'on', //Mandatory value
-    SS$AutoDisplays:true, //Mandatory value
-    SS$AutoScreens:true, //Mandatory value
-    presenterDetected:false //Mandatory value
+    SS$AutoDisplays: true, //Mandatory value
+    SS$AutoScreens: true, //Mandatory value
+    SS$AutoCamPresets: true, //Mandatory value
+    presenterDetected: false, //Mandatory value
   },
 
 };

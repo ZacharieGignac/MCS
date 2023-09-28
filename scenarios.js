@@ -64,7 +64,7 @@ export class Scenarios {
     }
     debug(1, 'All scenarios loaded.');
     setTimeout(() => {
-      this.enableScenario(config.system.onWakeup.enableScenario);
+      this.enableScenario(config.system.onStandby.enableScenario);
     }, 1000);
     this.api.performance.setElapsedEnd('Scenarios.init');
   }

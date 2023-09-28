@@ -36,7 +36,7 @@ const DEBUGLEVEL = {
 const DEVICETYPE = {
   CONTROLSYSTEM: 'CONTROLSYSTEM',
   DISPLAY: 'DISPLAY',
-  CAMERAPRESET:'CAMERAPRESET',
+  CAMERAPRESET: 'CAMERAPRESET',
   VIDEOOUTPUT: 'VIDEOOUTPUT',
   AUDIOINPUT: 'AUDIOINPUT',
   AUDIOOUTPUT: 'AUDIOOUTPUT',
@@ -59,7 +59,7 @@ export var config = {
     coldBootWait: 120,
     debugLevel: DEBUGLEVEL.HIGH,
     debugInternalMessages: false,
-    messagesPacing:500,
+    messagesPacing: 200,
     initDelay: 1000,
     forceSleepEnabled: true,
     forceSleepTime: '2:00',
@@ -125,7 +125,7 @@ export var config = {
       supportsBlanking: true,
       supportsSource: false,
       supportsUsageHours: false,
-      defaultPower: 'on',
+      defaultPower: 'off',
       blankBeforePowerOff: true,
       powerOffDelay: 6000,
       usageHoursRequestInterval: 100000,
@@ -136,7 +136,7 @@ export var config = {
       name: 'SCREEN',
       device: devicesLibrary.Screen,
       driver: driversLibrary.ScreenDriver_isc_h21,
-      defaultPosition: false,
+      defaultPosition: 'up'
     },
     {
       id: 'audioinput.presenter.mic1',
@@ -145,40 +145,65 @@ export var config = {
       device: devicesLibrary.AudioInput,
       driver: driversLibrary.AudioInput_codecpro,
       connector: 1,
-      input:'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
+      input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
       gainHighLimit: 70,
       defaultGain: 50,
-      gainStep: 1,     
-      defaultMode:'on',
-      lowGain:20,
-      mediumGain:40,
-      highGain:60
+      gainStep: 1,
+      defaultMode: 'on',
+      lowGain: 20,
+      mediumGain: 40,
+      highGain: 60
     },
     {
-      id:'campreset.tableau',
-      name:'Preset Tableau',
-      type:DEVICETYPE.CAMERAPRESET,
-      device:devicesLibrary.CameraPreset,
-      presetName:'Tableau'
+      id: 'campreset.tableau',
+      name: 'Preset Tableau',
+      type: DEVICETYPE.CAMERAPRESET,
+      device: devicesLibrary.CameraPreset,
+      presetName: 'Tableau'
     },
     {
-      id:'campreset.presenter',
-      name:'Présentateur',
-      type:DEVICETYPE.CAMERAPRESET,
-      device:devicesLibrary.CameraPreset,
-      presetName:'Présentateur'
+      id: 'campreset.presenter',
+      name: 'Présentateur',
+      type: DEVICETYPE.CAMERAPRESET,
+      device: devicesLibrary.CameraPreset,
+      presetName: 'Présentateur'
     },
     {
-      id:'light.presenter',
-      name:'ZONE1',
-      type:DEVICETYPE.LIGHT,
-      device:devicesLibrary.Light,
-      driver:driversLibrary.Light_isc_h21,
-      supportsPower:true,
-      supportsDim:true,
-      defaultPower:'on',
-      defaultDim:100
+      id: 'light.presenter',
+      name: 'ZONE1',
+      type: DEVICETYPE.LIGHT,
+      device: devicesLibrary.Light,
+      driver: driversLibrary.Light_isc_h21,
+      sliderEvent: 'changed', //released, changed
+      supportsPower: false,
+      supportsDim: true,
+      defaultPower: 'on',
+      defaultDim: 100
+    },
+    {
+      id: 'light.board',
+      name: 'ZONE2',
+      type: DEVICETYPE.LIGHT,
+      device: devicesLibrary.Light,
+      driver: driversLibrary.Light_isc_h21,
+      sliderEvent: 'changed', //released, changed
+      supportsPower: false,
+      supportsDim: true,
+      defaultPower: 'on',
+      defaultDim: 100
+    },
+    {
+      id: 'light.audience',
+      name: 'ZONE3',
+      type: DEVICETYPE.LIGHT,
+      device: devicesLibrary.Light,
+      driver: driversLibrary.Light_isc_h21,
+      sliderEvent: 'changed', //released, changed
+      supportsPower: false,
+      supportsDim: true,
+      defaultPower: 'on',
+      defaultDim: 100
     }
 
 
@@ -336,8 +361,8 @@ export var config = {
       devices: ['audience.ceilingmic.1', 'audience.ceilingmic.2']
     },
     {
-      id:'presenter',
-      devices:['campreset.presenter', 'audioinput.presenter.mic1']
+      id: 'presenter',
+      devices: ['campreset.presenter', 'audioinput.presenter.mic1']
     }
   ],
 

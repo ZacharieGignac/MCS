@@ -68,9 +68,8 @@ export class ScreenDriver_isc_h21 {
   }
   setPosition(position) {
     position = position.toLowerCase();
-    let positionString = position ? 'DOWN' : 'UP';
     //xapi.Command.Message.Send({ Text: this.config.name + '_' + positionString });
-    zapi.system.sendMessage(this.config.name + '_' + positionString);
+    zapi.system.sendMessage(this.config.name + '_' + position);
   }
   custom() {
 

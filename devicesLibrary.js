@@ -84,7 +84,7 @@ export class Display {
     console.log('setpower ' + power);
     power = power.toLowerCase();
     if (this.config.supportsPower) {
-      if (this._currentPower !== power) { 
+      if (this._currentPower !== power) {
         if (power === 'on') {
           this.powerOn();
         } else {
@@ -190,6 +190,7 @@ export class Display {
 
   reset() {
     debug(1, `DEVICE ${this.config.id} (${this.config.id}): RESET`);
+    this.setPower(this.config.defaultPower, 0);
   }
 }
 
@@ -202,6 +203,8 @@ export class Light { //TODO: UI Handling
     this.lastDimLevel = undefined;
     this.widgetLevelName = this.config.id + '_LEVEL';
     this.widgetPowerName = this.config.id + '_POWER';
+    this.beforeOffLevel = this.config.defaultDim;
+    this.currentPower = undefined;
 
 
     this.powerSwitch = zapi.ui.addWidgetMapping(this.widgetPowerName);
@@ -210,7 +213,7 @@ export class Light { //TODO: UI Handling
     });
 
     this.levelSlider = zapi.ui.addWidgetMapping(this.widgetLevelName);
-    this.levelSlider.on('released', value => {
+    this.levelSlider.on(this.config.sliderEvent, value => {
       let mappedValue = mapValue(value, 0, 255, 0, 100);
       this.dim(mappedValue);
     });
@@ -232,7 +235,14 @@ export class Light { //TODO: UI Handling
       if (this.lastPowerStatus != true) {
         debug(1, `DEVICE ${this.config.id}: On`);
         this.driver.on();
+        this.currentPower = 'on';
         this.powerSwitch.setValue('on');
+      }
+    }
+    else {
+      if (this.config.supportsDim) {
+        debug(1, `DEVICE ${this.config.id}: Dim ${this.lastDimLevel} (device does not support power commands)`);
+        this.dim(this.beforeOffLevel);
       }
     }
   }
@@ -241,13 +251,15 @@ export class Light { //TODO: UI Handling
       if (this.lastPowerStatus != false) {
         debug(1, `DEVICE ${this.config.id}: Off`);
         this.driver.off();
+        this.currentPower = 'off';
         this.powerSwitch.setValue('off');
       }
     }
     else {
       if (this.config.supportsDim) {
         debug(1, `DEVICE ${this.config.id}: Dim 0 (device does not support power commands)`);
-        this.driver.dim(0);
+        this.beforeOffLevel = this.lastDimLevel;
+        this.dim(0);
       }
     }
   }
@@ -264,6 +276,7 @@ export class Light { //TODO: UI Handling
       if (this.lastDimLevel != level) {
         debug(1, `DEVICE ${this.config.id}: Dim ${level}`);
         this.driver.dim(level);
+        this.lastDimLevel = level;
         let mappedValue = mapValue(level, 0, 100, 0, 255);
         this.levelSlider.setValue(mappedValue);
       }
@@ -439,8 +452,8 @@ export class Screen {
     this.setDefaults();
 
     //Default WidgetMapping
-    var downButton = zapi.ui.addWidgetMapping(this.config.id + '_SETPOSITION:DOWN');
-    var upButton = zapi.ui.addWidgetMapping(this.config.id + '_SETPOSITION:UP');
+    var downButton = zapi.ui.addWidgetMapping(this.config.id + '_DOWN');
+    var upButton = zapi.ui.addWidgetMapping(this.config.id + '_UP');
 
     downButton.on('clicked', () => {
       self.down();
@@ -451,9 +464,10 @@ export class Screen {
     });
   }
   setDefaults() {
-    this.setPosition(config.defaultPosition);
+    this.setPosition(this.config.defaultPosition);
   }
   setPosition(position) {
+    position = position.toLowerCase();
     if (position != this._currentPosition) {
       this._currentPosition = position;
       this.driver.setPosition(position)
@@ -461,11 +475,11 @@ export class Screen {
   }
   up() {
     zapi.performance.inc('DEVICE.' + this.config.id + '.up');
-    this.setPosition(false);
+    this.setPosition('up');
   }
   down() {
     zapi.performance.inc('DEVICE.' + this.config.id + '.down');
-    this.setPosition(true);
+    this.setPosition('down');
   }
   reset() {
     debug(1, `DEVICE ${this.config.id}: RESET`);

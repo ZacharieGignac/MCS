@@ -21,6 +21,10 @@ var coldbootWarningInterval = undefined;
 var core;
 
 
+
+
+
+
 function debug(level, text) {
   if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
     switch (level) {
@@ -80,8 +84,6 @@ class Performance {
       this.counters[name] = num;
     }
   }
-
-
 }
 var performance = new Performance();
 performance.setElapsedStart('Boot');
@@ -112,6 +114,34 @@ function displayTimedProgressBar(title, time) {
       xapi.Command.UserInterface.Message.Prompt.Clear({ FeedbackId: 'TimedProgressBar' });
     }
   }, time / 20);
+}
+
+
+class MessageQueue {
+  constructor() {
+    this.queue = [];
+    this.sending = false;
+  }
+
+  send(text) {
+    this.queue.push(text);
+    if (!this.sending) {
+      this.sendNextMessage();
+    }
+  }
+
+  sendNextMessage() {
+    if (this.queue.length === 0) {
+      this.sending = false;
+      return;
+    }
+    const message = this.queue.shift();
+    xapi.Command.Message.Send({ Text: message });
+    this.sending = true;
+    setTimeout(() => {
+      this.sendNextMessage();
+    }, config.system.messagesPacing);
+  }
 }
 
 
@@ -301,12 +331,13 @@ class Core {
   constructor() {
     var that = this;
     var self = this;
+    this.messageQueue = new MessageQueue();
 
     zapi.performance.setElapsedStart = (test) => { performance.setElapsedStart(test) };
     zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test) };
     zapi.performance.inc = (name, num) => { performance.inc(name, num) };
     zapi.performance.dec = (name, num) => { performance.dec(name, num) };
-
+    zapi.system.sendMessage = (message) => { self.messageQueue.send(message) };
 
     this.lastPresenterDetectedStatus = false;
 
@@ -326,6 +357,22 @@ class Core {
     self.uiManager.addActionMapping(/^STANDBY$/, () => {
       xapi.Command.Standby.Activate();
     });
+    self.uiManager.addActionMapping(/^RESETDEVICES$/, (params) => {
+      if (params.includes(';')) {
+        params = params.split(';');
+      }
+      else {
+        params = [params];
+      }
+      for (let d of params) {
+        try {
+          let tempDevice = zapi.devices.getDevice(d);
+          tempDevice.reset();
+        }
+        catch { }
+      }
+    });
+
 
 
 
@@ -377,7 +424,6 @@ class Core {
       });
     }
 
-
     //Setup devices
     this.devicesManager = new DevicesManager();
     this.devicesManager.init();
@@ -425,7 +471,7 @@ class Core {
 
 
   processPresenterDetectedStatus(status) {
-    if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('hdmipassthrough') == 'Active') {
+    if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('hdmiPassthrough') == 'Active') {
       if (status != this.lastPresenterDetectedStatus) {
         this.lastPresenterDetectedStatus = status;
         if (status == true) {
@@ -494,9 +540,6 @@ class Core {
     this.setDNDInterval = setInterval(() => { this.setDND() }, 82800000);
     xapi.Command.Conference.DoNotDisturb.Activate({ Timeout: 1440 });
   }
-
-
-
 
 }
 
@@ -692,7 +735,6 @@ async function init() {
   //let light = zapi.devices.getDevice('light.presenter');
   //light.off();
   //light.dim(75);
-
 }
 
 

@@ -1,16 +1,26 @@
 import xapi from 'xapi';
 
 /*
-Core status:
-
-SS$PresenterLocation
-SS$PresenterTrackWarnings
 
 Core Actions:
-CHANGESCENARIO:name
-ENDSESSION
+CHANGESCENARIO:name -> Change le scénario pour "name"
+STANDBY -> met le système en veille, par conséquent charge le scénario par défaut pour la veille
+PANELCLOSE -> ferme le panel actif
+RESETDEVICES:device1;device2;device3 -> appelle la fonction reset() sur tous les devices id spécifiés
 
 
+Default system status:
+SS$PresenterLocation          literal <local / remote / unknown / both>
+SS$PresenterTrackWarnings     literal <on / off>
+SS$AutoDisplays               boolean <true, false>
+SS$AutoScreens                boolean <true, false>
+SS$AutoCamPresets             boolean <true, false>
+presenterDetected             boolean <true, false>
+call                          literal <Connected / Connecting / Dialling / Disconnecting / EarlyMedia / Idle / OnHold / Preserved / RemotePreserved / Ringing>
+presentation                  structure
+  type                        literal <NOPRESENTATION / LOCALPREVIEW / LOCALSHARE / REMOTE / REMOTELOCALPREVIEW>
+hdmiPassthrough               literal <Active / Inactive>
+currentScenario               literal
 
 
 == Standard Mesages ==
@@ -34,13 +44,34 @@ PWR:ZONE1;OFF
 DIM:ZONE1;50
 
 
-Default system status:
-SS$PresenterLocation
-SS$PresenterTrackWarnings
-SS$MainPresentationDisplayUnavailable
-SS$SecondaryPresentationDisplayUnavailable
-SS$MainFarendDisplayUnavailable
-SS$SecondaryFarendDisplayUnavailable
+
+
+== DEVICES CONFIGUTATION ==
+Control System:
+    id                    literal (nom unique du device, pas d'espaces, pas de virgule, pas de point-virgule)
+    type                  literal (valeurs supportées dans la structure DEVICETYPE)
+    name                  literal (nom "friendly" lisible et identifiable par un utilisateur)
+    device                class   (type "device")
+    peripheralRequired    boolean (spécifie si le périphérique est nécessaire au fonctionnement du système. Sa présence est vérifiée au démarrage et à interval régulier)
+    peripheralId          literal (numéro de série de l'appareil tel qu'indiqué dans status/peripherals)
+
+Display
+    id                          literal (nom unique du device, pas d'espaces, pas de virgule, pas de point-virgule)
+    type                        literal (valeurs supportées dans la structure DEVICETYPE)
+    name                        literal (nom "friendly", utilisé pour la communication avec un système de contrôle externe)
+    device                      class   (type "device")
+    driver                      class   (type "driver")
+    connector                   number  (numéro du connecteur physique sur le codec)
+    supportsPower               boolean (spécifie si le display supporte les commandes d'alimentation)
+    supportsBlanking            boolean (spécifie si le display supporte les commandes de blanking)
+    supportsSource              boolean (spécifie si le display supporte les commandes de changement de source)
+    supportsUsageHours          boolean (spécifie si le display supporte les commandes de rapport de temps d'utilisation)
+    defaultPower                boolean (état d'alimentation par défaut)
+    blankBeforePowerOff         boolean (spécifie si le display se met automatiquement en blanking pendant le délais de mise hors tension. La valeur "supportsBlanking" doit être à "true", et la valeur "powerOffDelay" doit être > 0)
+    powerOffDelay               number  (délais (ms) avant la fermeture du display. Le délais s'active lors d'une commande "off". Le délais peut être overridé lors de l'appel de la commande.)
+    usageHoursRequestInterval   number  (interval (ms) de temps entre chaque demande de temps d'utilisation. La valeur "supportsUsageHours" doit être à "true")    
+
+
 
 
 

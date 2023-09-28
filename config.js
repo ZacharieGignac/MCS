@@ -59,12 +59,13 @@ export var config = {
     coldBootWait: 120,
     debugLevel: DEBUGLEVEL.HIGH,
     debugInternalMessages: false,
+    messagesPacing:500,
     initDelay: 1000,
     forceSleepEnabled: true,
     forceSleepTime: '2:00',
     requiredPeripheralsCheckInterval: 5000,
     usePresenterTrack: true,
-    forcePresenterTrackActivation: false,
+    forcePresenterTrackActivation: true,
     onStandby: {
       setDND: true,
       resetPresenterLocation: true,
@@ -124,9 +125,9 @@ export var config = {
       supportsBlanking: true,
       supportsSource: false,
       supportsUsageHours: false,
-      defaultPower: false,
+      defaultPower: 'on',
       blankBeforePowerOff: true,
-      powerOffDelay: 60000,
+      powerOffDelay: 6000,
       usageHoursRequestInterval: 100000,
     },
     {
@@ -170,13 +171,13 @@ export var config = {
     },
     {
       id:'light.presenter',
-      name:'Lumière meuble console',
+      name:'ZONE1',
       type:DEVICETYPE.LIGHT,
       device:devicesLibrary.Light,
       driver:driversLibrary.Light_isc_h21,
       supportsPower:true,
       supportsDim:true,
-      defaultPower:true,
+      defaultPower:'on',
       defaultDim:100
     }
 

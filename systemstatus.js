@@ -168,9 +168,9 @@ export class SystemStatus {
 
       //Set special "hdmipassthrough" status
       let hpt = await xapi.Status.Video.Output.HDMI.Passthrough.Status.get()
-      this.setStatus('hdmipassthrough',hpt);
+      this.setStatus('hdmiPassthrough',hpt);
       xapi.Status.Video.Output.HDMI.Passthrough.Status.on(hptstatus => {
-        this.setStatus('hdmipassthrough',hptstatus);
+        this.setStatus('hdmiPassthrough',hptstatus);
       });
 
 

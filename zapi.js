@@ -49,7 +49,8 @@ export var zapiv1 = {
     onStatusChange: () => { },
     onStatusKeyChange: () => { },
     enablePresenterTrackWarnings: () => { },
-    disablePresenterTrackWarnings: () => { }
+    disablePresenterTrackWarnings: () => { },
+    sendMessage:() => { }
   },
   performance: {
     setElapsedStart: () => { },

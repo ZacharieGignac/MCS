@@ -81,6 +81,7 @@ export class Display {
   getType() { return 'DISPLAY ' }
 
   setPower(power, delay = this.config.powerOffDelay) {
+    console.log('setpower ' + power);
     power = power.toLowerCase();
     if (this.config.supportsPower) {
       if (this._currentPower !== power) {

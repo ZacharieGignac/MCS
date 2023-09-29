@@ -204,6 +204,24 @@ export var config = {
       supportsDim: true,
       defaultPower: 'on',
       defaultDim: 100
+    },
+    {
+      id: 'cam1',
+      type: DEVICETYPE.VIRTUAL,
+      name: 'Caméra (enseignant)',
+      device: devicesLibrary.Virtual,
+      peripheralRequired: true,
+      peripheralId: 'FDO2515J291'
+
+    },
+    {
+      id: 'cam2',
+      type: DEVICETYPE.VIRTUAL,
+      name: 'Caméra (auditoire)',
+      device: devicesLibrary.Virtual,
+      peripheralRequired: true,
+      peripheralId: 'FDO2603J89L'
+
     }
 
 

@@ -81,7 +81,6 @@ export class Display {
   getType() { return 'DISPLAY ' }
 
   setPower(power, delay = this.config.powerOffDelay) {
-    console.log('setpower ' + power);
     power = power.toLowerCase();
     if (this.config.supportsPower) {
       if (this._currentPower !== power) {
@@ -195,15 +194,15 @@ export class Display {
 }
 
 
-export class Light { //TODO: UI Handling
+export class Light {
   constructor(config) {
     this.config = config;
     this.driver = new config.driver(this, config);
     this.currentPowerStatus = undefined;
-    this.currentDimLevel = undefined;
     this.widgetLevelName = this.config.id + '_LEVEL';
     this.widgetPowerName = this.config.id + '_POWER';
     this.beforeOffLevel = this.config.defaultDim;
+    this.currentDimLevel = this.config.defaultDim;
     this.currentPower = undefined;
 
 
@@ -238,12 +237,25 @@ export class Light { //TODO: UI Handling
 
   }
   setDefaults() {
-    if (this.config.defaultPower != undefined) {
-      this.setPower(this.config.defaultPower);
+    //Power
+    if (this.supportsPower) {
+      if (this.defaultPower == 'on') {
+        this.on();
+      }
+      else {
+        this.off();
+      }
     }
-    if (this.config.defaultDim != undefined) {
-      this.dim(this.config.defaultDim);
+    else {
+      this.powerSwitch.setValue(this.config.defaultPower);
     }
+
+    //Dim
+    if (this.config.supportsDim) {
+      this.dim(this.config.defaultDim,true);
+    }
+
+
   }
   on() {
     if (this.config.supportsPower) {
@@ -284,9 +296,9 @@ export class Light { //TODO: UI Handling
       this.off();
     }
   }
-  dim(level) {
+  dim(level,force=false) {
     if (this.config.supportsDim) {
-      if (this.currentDimLevel != level) {
+      if (this.currentDimLevel != level || force) {
         debug(1, `DEVICE ${this.config.id}: Dim ${level}`);
         this.driver.dim(level);
         this.currentDimLevel = level;

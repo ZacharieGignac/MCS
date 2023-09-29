@@ -199,8 +199,8 @@ export class Light { //TODO: UI Handling
   constructor(config) {
     this.config = config;
     this.driver = new config.driver(this, config);
-    this.lastPowerStatus = undefined;
-    this.lastDimLevel = undefined;
+    this.currentPowerStatus = undefined;
+    this.currentDimLevel = undefined;
     this.widgetLevelName = this.config.id + '_LEVEL';
     this.widgetPowerName = this.config.id + '_POWER';
     this.beforeOffLevel = this.config.defaultDim;
@@ -209,13 +209,28 @@ export class Light { //TODO: UI Handling
 
     this.powerSwitch = zapi.ui.addWidgetMapping(this.widgetPowerName);
     this.powerSwitch.on('changed', value => {
-      this.setPower(value);
+      if (this.config.supportsPower) {
+        this.setPower(value);
+      }
+      else {
+        if (value == 'on') {
+          this.dim(this.beforeOffLevel);
+        }
+        else {
+          this.beforeOffLevel = this.currentDimLevel
+          this.dim(0);
+        }
+      }
+
     });
 
     this.levelSlider = zapi.ui.addWidgetMapping(this.widgetLevelName);
     this.levelSlider.on(this.config.sliderEvent, value => {
       let mappedValue = mapValue(value, 0, 255, 0, 100);
       this.dim(mappedValue);
+      if (!this.supportsPower) {
+        this.powerSwitch.setValue('on');
+      }
     });
 
     this.setDefaults();
@@ -232,7 +247,7 @@ export class Light { //TODO: UI Handling
   }
   on() {
     if (this.config.supportsPower) {
-      if (this.lastPowerStatus != true) {
+      if (this.currentPowerStatus != true) {
         debug(1, `DEVICE ${this.config.id}: On`);
         this.driver.on();
         this.currentPower = 'on';
@@ -241,14 +256,13 @@ export class Light { //TODO: UI Handling
     }
     else {
       if (this.config.supportsDim) {
-        debug(1, `DEVICE ${this.config.id}: Dim ${this.lastDimLevel} (device does not support power commands)`);
-        this.dim(this.beforeOffLevel);
+        debug(1, `DEVICE ${this.config.id}: Dim ${this.currentDimLevel} (device does not support power commands)`);
       }
     }
   }
   off() {
     if (this.config.supportsPower) {
-      if (this.lastPowerStatus != false) {
+      if (this.currentPowerStatus != false) {
         debug(1, `DEVICE ${this.config.id}: Off`);
         this.driver.off();
         this.currentPower = 'off';
@@ -258,7 +272,6 @@ export class Light { //TODO: UI Handling
     else {
       if (this.config.supportsDim) {
         debug(1, `DEVICE ${this.config.id}: Dim 0 (device does not support power commands)`);
-        this.beforeOffLevel = this.lastDimLevel;
         this.dim(0);
       }
     }
@@ -273,10 +286,10 @@ export class Light { //TODO: UI Handling
   }
   dim(level) {
     if (this.config.supportsDim) {
-      if (this.lastDimLevel != level) {
+      if (this.currentDimLevel != level) {
         debug(1, `DEVICE ${this.config.id}: Dim ${level}`);
         this.driver.dim(level);
-        this.lastDimLevel = level;
+        this.currentDimLevel = level;
         let mappedValue = mapValue(level, 0, 100, 0, 255);
         this.levelSlider.setValue(mappedValue);
       }

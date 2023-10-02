@@ -146,7 +146,51 @@ class MessageQueue {
 
 
 
+class Audio {
+  constructor() {
 
+  }
+  getLocalInputId(name) {
+    return new Promise((success, failure) => {
+      xapi.Status.Audio.Input.LocalInput.get().then(li => {
+        for (let i of li) {
+          if (i.Name == name) {
+            success(i.id);
+          }
+        }
+        failure('LocalInput not found: ' + name);
+      });
+    });
+  }
+  getLocalOutputId(name) {
+    return new Promise((success, failure) => {
+      xapi.Status.Audio.Output.LocalOutput.get().then(lo => {
+        for (let o of lo) {
+          if (o.Name == name) {
+            success(o.id);
+          }
+        }
+        failure('LocalOutput not found: ' + name);
+      });
+    });
+  }
+  getRemoteInputsIds(name) {
+    return new Promise((success, failure) => {
+      var inputs = [];
+      xapi.Status.Audio.Input.RemoteInput.get().then(ri => {
+        for (let r of ri) {
+          inputs.push(r.id);
+        }
+        if (inputs.length > 0) {
+          success(inputs);
+        }
+        else {
+          failure('No remote inputs found.');
+        }
+      });
+    });
+  }
+}
 
 
 class WidgetMapping {
@@ -169,15 +213,28 @@ class WidgetMapping {
     zapi.ui.setWidgetValue(this.widgetId, value);
   }
   processEvent(event) {
-    if (event.WidgetId == this.widgetId) {
-      for (let cb of this.callbacks) {
-        if (cb.type == event.Type || cb.type == '') {
-          cb.callback(event.Value);
+    if (this.widgetId instanceof RegExp) {
+      if (this.widgetId.test(event.WidgetId)) {
+        for (let cb of this.callbacks) {
+          if (cb.type == event.Type || cb.type == '') {
+            cb.callback(event.WidgetId, event.Value);
+          }
+        }
+      }
+    }
+    else {
+      if (event.WidgetId == this.widgetId) {
+        for (let cb of this.callbacks) {
+          if (cb.type == event.Type || cb.type == '') {
+            cb.callback(event.Value);
+          }
         }
       }
     }
   }
 }
+
+
 
 class UiManager {
   constructor() {
@@ -245,6 +302,7 @@ class UiManager {
     this.widgetMappings.push(tempWidgetMapping);
     return tempWidgetMapping;
   }
+
   parseUiEvent(event) {
     performance.inc('UiManager.ParsedUiEvents');
     var eventId;
@@ -332,12 +390,16 @@ class Core {
     var that = this;
     var self = this;
     this.messageQueue = new MessageQueue();
+    this.audio = new Audio();
 
     zapi.performance.setElapsedStart = (test) => { performance.setElapsedStart(test) };
     zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test) };
     zapi.performance.inc = (name, num) => { performance.inc(name, num) };
     zapi.performance.dec = (name, num) => { performance.dec(name, num) };
     zapi.system.sendMessage = (message) => { self.messageQueue.send(message) };
+    zapi.audio.getLocalInputId = (name) => { return self.audio.getLocalInputId(name) };
+    zapi.audio.getLocalOutputId = (name) => { return self.audio.getLocalOutputId(name) };
+    zapi.audio.getRemoteInputsIds = () => { return self.audio.getRemoteInputsIds() };
 
     this.lastPresenterDetectedStatus = false;
 
@@ -349,6 +411,7 @@ class Core {
     this.systemStatus = new SystemStatus();
     await this.uiManager.init();
     await this.systemStatus.init();
+
 
     //Add UI-related mappings
     self.uiManager.addActionMapping(/^PANELCLOSE$/, () => {
@@ -701,11 +764,7 @@ async function init() {
 
 
 
-  for (let prop in config.systemStatus) {
-    if (config.systemStatus.hasOwnProperty(prop)) {
-      zapi.system.setStatus(prop, config.systemStatus[prop], false);
-    }
-  }
+
 
 
   debug(2, `Init finished. Loading scenarios...`);
@@ -735,6 +794,10 @@ async function init() {
   //let light = zapi.devices.getDevice('light.presenter');
   //light.off();
   //light.dim(75);
+
+  //let test = zapi.devices.getDevice('lightscene.standby');
+  //test.activate();
+
 }
 
 

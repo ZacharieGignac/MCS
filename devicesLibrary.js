@@ -27,6 +27,27 @@ function mapValue(value, fromMin, fromMax, toMin, toMax) {
   return mappedValue;
 }
 
+export class LightScene {
+  constructor(config) {
+    this.config = config;
+    this.driver = new config.driver(this, config);
+    zapi.ui.addActionMapping(/^LIGHTSCENE$/, (id) => {
+      if (id == this.config.id) {
+        this.activate();
+      }
+    });
+  }
+  activate() {
+    this.driver.activate();
+  }
+}
+
+export class AudioInputGroup {
+
+}
+export class AudioOutputGroup {
+
+}
 export class Display {
   constructor(config) {
     this.config = config;
@@ -67,14 +88,11 @@ export class Display {
     });
   }
   setDefaults() {
-    // Set defaults (adds a 1-second delay to accommodate other UI threads)
-    setTimeout(() => {
-      if (this.config.defaultPower === 'on') {
-        this.powerOn();
-      } else {
-        this.powerOff(0);
-      }
-    }, 0);
+    if (this.config.defaultPower === 'on') {
+      this.powerOn();
+    } else {
+      this.powerOff(0);
+    }
   }
 
 
@@ -210,7 +228,7 @@ export class Light {
     this.powerSwitch = zapi.ui.addWidgetMapping(this.widgetPowerName);
     this.powerSwitch.on('changed', value => {
       if (this.config.supportsPower) {
-        this.setPower(value);
+        this.power(value);
       }
       else {
         if (value == 'on') {
@@ -240,7 +258,7 @@ export class Light {
   setDefaults() {
     //Power
     if (this.supportsPower) {
-      if (this.defaultPower == 'on') {
+      if (this.config.defaultPower == 'on') {
         this.on();
       }
       else {
@@ -248,12 +266,18 @@ export class Light {
       }
     }
     else {
-      this.powerSwitch.setValue(this.config.defaultPower);
+      if (this.config.defaultPower != undefined) {
+        this.powerSwitch.setValue(this.config.defaultPower);
+      }
+
     }
 
     //Dim
     if (this.config.supportsDim) {
-      this.dim(this.config.defaultDim,true);
+      if (this.config.defaultDim != undefined) {
+        this.dim(this.config.defaultDim, true);
+      }
+
     }
 
 
@@ -289,7 +313,7 @@ export class Light {
       }
     }
   }
-  setPower(power) {
+  power(power) {
     if (power.toLowerCase() == 'on') {
       this.on();
     }
@@ -297,7 +321,7 @@ export class Light {
       this.off();
     }
   }
-  dim(level,force=false) {
+  dim(level, force = false) {
     if (this.config.supportsDim) {
       if (this.currentDimLevel != level || force) {
         debug(1, `DEVICE ${this.config.id}: Dim ${level}`);
@@ -527,40 +551,12 @@ export class Virtual {
 
 
 
-
-export class ACInputGroup {
-
-}
-export class ACOutputGroup {
-
-}
-
-
-
-
-export class LightScene {
-
-}
-
-export class VideoOutput {
-
-}
-
 export class Camera {
   constructor() {
 
   }
 }
 
-export class AudioInputGroup {
-
-}
-export class AudioOutputGroup {
-
-}
-export class LightsGroup {
-
-}
 
 
 

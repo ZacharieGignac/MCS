@@ -47,7 +47,7 @@ export class DevicesManager {
   init() {
 
 
-    
+
     debug(1, `Checking ${config.devices.length} devices...`);
     for (let dev of config.devices) {
       this.allDevices.push(dev);
@@ -75,7 +75,7 @@ export class DevicesManager {
     this.api.ui.addActionMapping(/^ACTIVATECAMPRESET$/, (params) => {
       this.activateCameraPreset(params);
     });
-    
+
 
 
     this.api.performance.setElapsedEnd('DevicesManager.init');
@@ -90,14 +90,19 @@ export class DevicesManager {
   }
   getDevice(id, includeConfig = false) {
     if (!includeConfig) {
-      return this.allDevices.filter(dev => dev.id == id)[0].inst;
-
+      let found = this.allDevices.filter(dev => dev.id == id);
+      if (found.length > 0) {
+        return found[0].inst;
+      }
     }
     else {
-      return this.allDevices.filter(dev => dev.id == id)[0];
+      let found = this.allDevices.filter(dev => dev.id == id);
+      if (found.length > 0) {
+        return found[0];
+      }
     }
-
   }
+
   getDevicesByType(type) {
     let devicesList = [];
     for (let d of this.allDevices.filter(dev => dev.type == type)) {
@@ -106,6 +111,7 @@ export class DevicesManager {
     return devicesList;
 
   }
+
   getDevicesInGroup(group) {
     let foundGroup = this.allGroups.filter(g => g.id == group)[0];
     let devices = [];
@@ -114,13 +120,16 @@ export class DevicesManager {
     }
     return devices;
   }
+
   getDevicesByTypeInGroup(type, group) {
     let foundGroup = this.allGroups.filter(g => g.id == group)[0];
     let devices = [];
-    for (let d of foundGroup.devices) {
-      let tempDevice = this.getDevice(d, true);
-      if (tempDevice.type == type) {
-        devices.push(tempDevice.inst);
+    if (foundGroup) {
+      for (let d of foundGroup.devices) {
+        let tempDevice = this.getDevice(d, true);
+        if (tempDevice.type == type) {
+          devices.push(tempDevice.inst);
+        }
       }
     }
     return devices;

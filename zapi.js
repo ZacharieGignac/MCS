@@ -16,9 +16,11 @@ export var zapiv1 = {
       VIDEOOUTPUT: 'VIDEOOUTPUT',
       AUDIOINPUT: 'AUDIOINPUT',
       AUDIOOUTPUT: 'AUDIOOUTPUT',
+      AUDIOINPUTGROUP: 'AUDIOINPUTGROUP',
+      AUDIOOUTPUTGROUP: 'AUDIOOUTPUTGROUP',
       SCREEN: 'SCREEN',
       LIGHT: 'LIGHT',
-      LIGHTSCENEMGR: 'LIGHTSCENEMGR',
+      LIGHTSCENE: 'LIGHTSCENE',
       SHADE:'SHADE',
       CAMERA: 'CAMERA',
       AUDIOSTAT: 'AUDIOSTAT',
@@ -42,6 +44,7 @@ export var zapiv1 = {
 
   },
   system: {
+    resetSystemStatus: () => { },
     endSession: () => { },
     setStatus: () => { },
     getStatus: () => { },
@@ -57,6 +60,11 @@ export var zapiv1 = {
     setElapsedEnd: () => { },
     inc: () => { },
     dec: () => { }
+  },
+  audio:{
+    getLocalInputId: () => { },
+    getLocalOutputId: () => { },
+    getRemoteInputsIds: () => { }
   },
   ui: {
     addActionMapping: () => { },

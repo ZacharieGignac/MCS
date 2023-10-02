@@ -146,11 +146,12 @@ export class SystemStatus {
     this._systemStatus = {};
     this._systemStatus.presentation = {};
     this._callbacks = [];
-    this.api.system.setStatus = (key, value, notify) => { self.setStatus(key, value, notify) }
-    this.api.system.getAllStatus = () => { return self.getAllStatus() }
-    this.api.system.onStatusChange = (callback) => { self.onChange(callback) }
-    this.api.system.onStatusKeyChange = (key, callback) => { self.onKeyChg(key, callback) }
-    this.api.system.getStatus = (key) => { return self.getStatus(key) }
+    this.api.system.setStatus = (key, value, notify) => { self.setStatus(key, value, notify) };
+    this.api.system.getAllStatus = () => { return self.getAllStatus() };
+    this.api.system.onStatusChange = (callback) => { self.onChange(callback) };
+    this.api.system.onStatusKeyChange = (key, callback) => { self.onKeyChg(key, callback) };
+    this.api.system.getStatus = (key) => { return self.getStatus(key) };
+    this.api.system.resetSystemStatus = () => { self.setDefaults() };
 
   }
   async init() {
@@ -168,9 +169,9 @@ export class SystemStatus {
 
       //Set special "hdmipassthrough" status
       let hpt = await xapi.Status.Video.Output.HDMI.Passthrough.Status.get()
-      this.setStatus('hdmiPassthrough',hpt);
+      this.setStatus('hdmiPassthrough', hpt);
       xapi.Status.Video.Output.HDMI.Passthrough.Status.on(hptstatus => {
-        this.setStatus('hdmiPassthrough',hptstatus);
+        this.setStatus('hdmiPassthrough', hptstatus);
       });
 
 
@@ -208,10 +209,22 @@ export class SystemStatus {
         console.warn(this._systemStatus);
       }, 240000);
 
+
+      this.setDefaults();
+
       success();
     });
 
+    
 
+
+  }
+  setDefaults() {
+    for (let prop in config.systemStatus) {
+      if (config.systemStatus.hasOwnProperty(prop)) {
+        this.api.system.setStatus(prop, config.systemStatus[prop], false);
+      }
+    }
   }
   setStatus(key, value, notifyChange = true) {
 

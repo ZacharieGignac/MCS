@@ -40,15 +40,17 @@ const DEVICETYPE = {
   VIDEOOUTPUT: 'VIDEOOUTPUT',
   AUDIOINPUT: 'AUDIOINPUT',
   AUDIOOUTPUT: 'AUDIOOUTPUT',
+  AUDIOINPUTGROUP: 'AUDIOINPUTGROUP',
+  AUDIOOUTPUTGROUP: 'AUDIOOUTPUTGROUP',
   SCREEN: 'SCREEN',
   LIGHT: 'LIGHT',
-  LIGHTSCENEMGR: 'LIGHTSCENEMGR',
+  LIGHTSCENE: 'LIGHTSCENE',
   SHADE: 'SHADE',
   CAMERA: 'CAMERA',
   AUDIOSTAT: 'AUDIOSTAT',
   HID: 'HID',
-  VIRTUAL: 'VIRTUAL',
   TERMINALEMULATION: 'TERMINALEMULATION',
+  VIRTUAL: 'VIRTUAL',
   CUSTOM: 'CUSTOM'
 }
 
@@ -59,7 +61,7 @@ export var config = {
     coldBootWait: 120,
     debugLevel: DEBUGLEVEL.HIGH,
     debugInternalMessages: false,
-    messagesPacing: 200,
+    messagesPacing: 500,
     initDelay: 1000,
     forceSleepEnabled: true,
     forceSleepTime: '2:00',
@@ -176,10 +178,10 @@ export var config = {
       device: devicesLibrary.Light,
       driver: driversLibrary.Light_isc_h21,
       sliderEvent: 'changed', //released, changed
-      supportsPower: false,
+      supportsPower: true,
       supportsDim: true,
-      defaultPower: 'on',
-      defaultDim: 100
+      //defaultPower: 'on',
+      //defaultDim: 100
     },
     {
       id: 'light.board',
@@ -188,10 +190,10 @@ export var config = {
       device: devicesLibrary.Light,
       driver: driversLibrary.Light_isc_h21,
       sliderEvent: 'changed', //released, changed
-      supportsPower: false,
+      supportsPower: true,
       supportsDim: true,
-      defaultPower: 'on',
-      defaultDim: 100
+      //defaultPower: 'on',
+      //defaultDim: 100
     },
     {
       id: 'light.audience',
@@ -200,10 +202,58 @@ export var config = {
       device: devicesLibrary.Light,
       driver: driversLibrary.Light_isc_h21,
       sliderEvent: 'changed', //released, changed
-      supportsPower: false,
+      supportsPower: true,
       supportsDim: true,
-      defaultPower: 'on',
-      defaultDim: 100
+      //defaultPower: 'on',
+      //defaultDim: 100
+    },
+    {
+      id: 'lightscene.100%',
+      name: 'STANDBY',
+      type: DEVICETYPE.LIGHTSCENE,
+      device: devicesLibrary.LightScene,
+      driver: driversLibrary.LightSceneDriver_lights,
+      lights: [
+        {
+          id: 'light.presenter',
+          power: 'on',
+          dim: 100
+        },
+        {
+          id: 'light.board',
+          power: 'on',
+          dim: 100
+        },
+        {
+          id: 'light.audience',
+          power: 'on',
+          dim: 100
+        }
+      ]
+    },
+    {
+      id: 'lightscene.50%',
+      name: 'IDLE',
+      type: DEVICETYPE.LIGHTSCENE,
+      device: devicesLibrary.LightScene,
+      driver: driversLibrary.LightSceneDriver_lights,
+      lights: [
+        {
+          id: 'light.presenter',
+          power: 'on',
+          dim: 50
+        },
+        {
+          id: 'light.board',
+          power: 'on',
+          dim: 50
+        },
+        {
+          id: 'light.audience',
+          power: 'on',
+          dim: 50
+        }
+      ]
     },
     {
       id: 'cam1',
@@ -366,9 +416,6 @@ export var config = {
     webpageUrl: `http://youtube....`,
     displayFarendMessaeg: true
   },
-
-
-
   groups: [
     {
       id: 'presentation.main',
@@ -381,15 +428,24 @@ export var config = {
     {
       id: 'presenter',
       devices: ['campreset.presenter', 'audioinput.presenter.mic1']
+    },
+    {
+      id: 'system.lightscene.standby',
+      devices: ['lightscene.100%']
+    },
+    {
+      id: 'system.lightscene.idle',
+      devices: ['lightscene.50%']
     }
   ],
 
   systemStatus: {
     SS$PresenterLocation: 'local', //Mandatory value
     SS$PresenterTrackWarnings: 'on', //Mandatory value
-    SS$AutoDisplays: true, //Mandatory value
-    SS$AutoScreens: true, //Mandatory value
-    SS$AutoCamPresets: true, //Mandatory value
+    SS$AutoDisplays: 'on', //Mandatory value
+    SS$AutoScreens: 'on', //Mandatory value
+    SS$AutoLights: 'on', //Mandatory value
+    SS$AutoCamPresets: 'on', //Mandatory value
     presenterDetected: false, //Mandatory value
   },
 

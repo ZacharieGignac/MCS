@@ -22,6 +22,34 @@ function debug(level, text) {
   }
 }
 
+export class LightSceneDriver_lights {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
+  }
+  activate() {
+    for (let light of this.config.lights) {
+      for (let prop in light) {
+        if(light.hasOwnProperty(prop)) {
+          if (prop != 'id') {
+            let l = zapi.devices.getDevice(light.id);
+            l[prop](light[prop]);
+          }
+        }
+      }
+    }
+  }
+}
+export class LightSceneDriver_isc {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
+  }
+  activate() {
+    zapi.system.sendMessage(`LS_${this.config.name}`);
+  }
+}
+
 export class DisplayDriver_isc_h21 {
   constructor(device, config) {
     this.config = config;

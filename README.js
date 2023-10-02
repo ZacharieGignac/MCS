@@ -7,20 +7,22 @@ CHANGESCENARIO:name -> Change le scénario pour "name"
 STANDBY -> met le système en veille, par conséquent charge le scénario par défaut pour la veille
 PANELCLOSE -> ferme le panel actif
 RESETDEVICES:device1;device2;device3 -> appelle la fonction reset() sur tous les devices id spécifiés
+LIGHTSCENE:name
 
 
 Default system status:
-SS$PresenterLocation          literal <local / remote / unknown / both>
-SS$PresenterTrackWarnings     literal <on / off>
-SS$AutoDisplays               boolean <true, false>
-SS$AutoScreens                boolean <true, false>
-SS$AutoCamPresets             boolean <true, false>
-presenterDetected             boolean <true, false>
-call                          literal <Connected / Connecting / Dialling / Disconnecting / EarlyMedia / Idle / OnHold / Preserved / RemotePreserved / Ringing>
+SS$PresenterLocation          literal <local / remote / unknown / both> : Emplacement du présentateur
+SS$PresenterTrackWarnings     literal <on / off> : Afficher les avertissement lorsque le présentateur sort de la zone PresenterTrack
+SS$AutoDisplays               boolean <true, false> : Les scénarios doivent gérer automatiquement les affichages
+SS$AutoScreens                boolean <true, false> : Les scénarios doivent gérer automatiquement les toiles de projection
+SS$AutoLights                 boolean <true, false> : Les scénarios doivent gérer automatiquement l'éclairage
+SS$AutoCamPresets             boolean <true, false> : Les scénarios doivent gérer automatiquement les presets de caméra
+presenterDetected             boolean <true, false> : Présentateur détecté dans la zone de présentation
+call                          literal <Connected / Connecting / Dialling / Disconnecting / EarlyMedia / Idle / OnHold / Preserved / RemotePreserved / Ringing> : État de l'appel
 presentation                  structure
-  type                        literal <NOPRESENTATION / LOCALPREVIEW / LOCALSHARE / REMOTE / REMOTELOCALPREVIEW>
-hdmiPassthrough               literal <Active / Inactive>
-currentScenario               literal
+  type                        literal <NOPRESENTATION / LOCALPREVIEW / LOCALSHARE / REMOTE / REMOTELOCALPREVIEW> : Type de présentation
+hdmiPassthrough               literal <Active / Inactive> : État du mode hdmiPassthrough (Ancien UsbMode)
+currentScenario               literal : Scénario présentement actif
 
 
 == Standard Mesages ==

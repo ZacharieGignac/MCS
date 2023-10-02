@@ -17,7 +17,7 @@ export var Manifest = {
     show: ['normal_settings']
   },
   features: {
-    shareStart:true,
+    shareStart: true,
     cameraControls: true,
     endCallButton: true,
     hdmiPassthrough: true,
@@ -42,7 +42,7 @@ export class Scenario {
     this.api.system.onStatusChange(status => {
 
     });
-    this.api.system.onStatusKeyChange('call',call => {
+    this.api.system.onStatusKeyChange('call', call => {
 
     });
 
@@ -60,7 +60,17 @@ export class Scenario {
     });
   }
   start() {
-    
+      if (this.api.system.getStatus('SS$AutoLights') == 'on') {
+      let lightscenes = this.api.devices.getDevicesByTypeInGroup(this.api.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.idle');
+      if (lightscenes.length > 0) {
+        for (let lightscene of lightscenes) {
+          let lsdevice = this.api.devices.getDevice(lightscene.config.id);
+          if (lsdevice) {
+            lsdevice.activate();
+          }
+        }
+      }
+    }
   }
   test() {
     console.log('test from SCE_Normal');

@@ -52,14 +52,17 @@ export class Scenario {
       }
     });
   }
+
   test() {
     console.log('test from SCE_FireAlarm');
   }
+
   enable() {
     return new Promise(success => {
       success(true);
     });
   }
+
   disable() {
     clearInterval(this.alertMessage);
     xapi.Command.UserInterface.Message.Prompt.Clear();
@@ -68,6 +71,7 @@ export class Scenario {
       success(true);
     });
   }
+
   start() {
     this.alertMessage = setInterval(() => {
       xapi.Command.UserInterface.Message.Prompt.Display({
@@ -81,6 +85,5 @@ export class Scenario {
       Title: 'ALARME INCENDIE', 
       Url: 'https://www.nfpa.org/-/media/Images/Blog-Images/Blog-Post-Attachments/NFPA-Today/EvacuationBlog_web.ashx?h=400&w=800&la=en&hash=C8C18868074E7BA20202DEBD170D2737' 
       });
-
   }
 }

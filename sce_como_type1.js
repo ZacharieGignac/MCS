@@ -47,6 +47,7 @@ export class Scenario {
     });
 
   }
+
   enable() {
     return new Promise(success => {
       success(true);
@@ -54,11 +55,13 @@ export class Scenario {
 
 
   }
+  
   disable() {
     return new Promise(success => {
       success(true);
     });
   }
+  
   start() {
       if (this.api.system.getStatus('SS$AutoLights') == 'on') {
       let lightscenes = this.api.devices.getDevicesByTypeInGroup(this.api.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.idle');
@@ -72,6 +75,7 @@ export class Scenario {
       }
     }
   }
+  
   test() {
     console.log('test from SCE_Normal');
   }

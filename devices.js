@@ -2,6 +2,8 @@ import xapi from 'xapi';
 import { config } from './config';
 import * as devicesLibrary from './devices';
 import { zapiv1 } from './zapi';
+
+
 function debug(level, text) {
   if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
     switch (level) {
@@ -23,9 +25,7 @@ function debug(level, text) {
 export class DevicesManager {
   constructor() {
     this.api = zapiv1;
-
     this.api.performance.setElapsedStart('DevicesManager.init');
-
     this.displays = [];
     this.screens = [];
     this.lights = [];
@@ -44,10 +44,8 @@ export class DevicesManager {
     this.api.devices.activateCameraPreset = (presetId) => { self.activateCameraPreset(presetId); }
 
   }
+
   init() {
-
-
-
     debug(1, `Checking ${config.devices.length} devices...`);
     for (let dev of config.devices) {
       this.allDevices.push(dev);
@@ -76,8 +74,6 @@ export class DevicesManager {
       this.activateCameraPreset(params);
     });
 
-
-
     this.api.performance.setElapsedEnd('DevicesManager.init');
   }
 
@@ -88,6 +84,7 @@ export class DevicesManager {
     }
     return devicesList;
   }
+
   getDevice(id, includeConfig = false) {
     if (!includeConfig) {
       let found = this.allDevices.filter(dev => dev.id == id);
@@ -109,7 +106,6 @@ export class DevicesManager {
       devicesList.push(d.inst);
     }
     return devicesList;
-
   }
 
   getDevicesInGroup(group) {

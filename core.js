@@ -89,11 +89,6 @@ var performance = new Performance();
 performance.setElapsedStart('Boot');
 
 
-
-
-
-
-
 var progress = 0;
 var timedProgressBar;
 function displayTimedProgressBar(title, time) {
@@ -150,6 +145,7 @@ class Audio {
   constructor() {
 
   }
+
   getLocalInputId(name) {
     return new Promise((success, failure) => {
       xapi.Status.Audio.Input.LocalInput.get().then(li => {
@@ -162,6 +158,7 @@ class Audio {
       });
     });
   }
+
   getLocalOutputId(name) {
     return new Promise((success, failure) => {
       xapi.Status.Audio.Output.LocalOutput.get().then(lo => {
@@ -174,6 +171,7 @@ class Audio {
       });
     });
   }
+
   getRemoteInputsIds(name) {
     return new Promise((success, failure) => {
       var inputs = [];
@@ -199,19 +197,23 @@ class WidgetMapping {
     this.widgetId = widgetId;
     this.value = undefined;
   }
+
   on(type, callback) {
     this.callbacks.push({
       type: type,
       callback: callback
     });
   }
+
   async getValue() {
     return this.value;
   }
+
   setValue(value) {
     performance.inc('WidgetMapping.setValue()');
     zapi.ui.setWidgetValue(this.widgetId, value);
   }
+
   processEvent(event) {
     if (this.widgetId instanceof RegExp) {
       if (this.widgetId.test(event.WidgetId)) {
@@ -235,7 +237,6 @@ class WidgetMapping {
 }
 
 
-
 class UiManager {
   constructor() {
     this.allWidgets = [];
@@ -244,10 +245,9 @@ class UiManager {
     this.uiEventSubscribers = [];
     this.widgetMappings = [];
   }
+
   async init() {
     return new Promise(success => {
-
-
       //Build widgets cache
       xapi.Command.UserInterface.Extensions.List({}).then(list => {
         for (let panel of list.Extensions.Panel) {
@@ -275,6 +275,7 @@ class UiManager {
       });
     });
   }
+
   forwardUiEvents(event) {
     for (let s of this.uiEventSubscribers) {
       s(event);
@@ -284,6 +285,7 @@ class UiManager {
   getAllWidgets() {
     return this.allWidgets;
   }
+
   setWidgetValue(widgetId, value) {
     if (this.allWidgets.filter(w => w.widgetId == widgetId).length > 0) {
       debug(1, `Setting widget "${widgetId}" value to "${value}"`);
@@ -297,6 +299,7 @@ class UiManager {
   onUiEvent(callback) {
     this.uiEventSubscribers.push(callback);
   }
+
   addWidgetMapping(widgetId) {
     var tempWidgetMapping = new WidgetMapping(widgetId);
     this.widgetMappings.push(tempWidgetMapping);
@@ -346,6 +349,7 @@ class UiManager {
       }
     }
   }
+
   addActionMapping(action, func) {
     this.actionMaps.push({
       regex: action,
@@ -374,11 +378,7 @@ class UiManager {
           map.func();
         }
       }
-
     }
-
-
-
   }
 }
 
@@ -402,7 +402,6 @@ class Core {
     zapi.audio.getRemoteInputsIds = () => { return self.audio.getRemoteInputsIds() };
 
     this.lastPresenterDetectedStatus = false;
-
   }
 
   async init() {
@@ -411,7 +410,6 @@ class Core {
     this.systemStatus = new SystemStatus();
     await this.uiManager.init();
     await this.systemStatus.init();
-
 
     //Add UI-related mappings
     self.uiManager.addActionMapping(/^PANELCLOSE$/, () => {
@@ -435,9 +433,6 @@ class Core {
         catch { }
       }
     });
-
-
-
 
     //Presenter track
     xapi.Command.UserInterface.Message.TextLine.Clear();
@@ -532,7 +527,6 @@ class Core {
     }, config.system.requiredPeripheralsCheckInterval);
   }
 
-
   processPresenterDetectedStatus(status) {
     if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('hdmiPassthrough') == 'Active') {
       if (status != this.lastPresenterDetectedStatus) {
@@ -554,6 +548,7 @@ class Core {
       Text: config.strings.presenterTrackLocked
     });
   }
+
   displayPresenterTrackLostMessage() {
     xapi.Command.UserInterface.Message.TextLine.Display({
       Duration: 0,
@@ -573,20 +568,18 @@ class Core {
     });
   }
 
-
   loadScenarios() {
     //Load Scenarios
     let self = this;
     this.scenarios = new Scenarios();
-
-
-
   }
+
   handleStandby() {
     debug(1, 'Entering standby...');
     this.setDND();
     this.scenarios.enableScenario(config.system.onStandby.enableScenario);
   }
+
   handleWakeup() {
     debug(1, 'Waking up...');
     displayTimedProgressBar(config.strings.newSessionTitle, 2000);
@@ -621,10 +614,8 @@ function configValidityCheck() {//TODO
       valid = false;
     }
   }
-
   return valid;
 }
-
 
 async function sleep(time) {
   return new Promise(resolve => {
@@ -658,8 +649,6 @@ async function getDisconnectedRequiredPeripherals() {
   return disconnectedPeripherals;
 }
 
-
-
 async function waitForAllDevicesConnected(disconnectedCallback) {
   return new Promise(async resolve => {
     let discdevs = await getDisconnectedRequiredPeripherals();
@@ -688,10 +677,7 @@ async function requiredPeripheralsConnected(callback) {
 
 }
 
-
 async function preInit() {
-
-
   /* Wakeup system */
   xapi.Command.Standby.Deactivate();
   xapi.Command.UserInterface.Message.Prompt.Display({
@@ -749,8 +735,6 @@ async function preInit() {
   }
 
   debug(2, `PreInit finished.`);
-
-
 }
 
 async function init() {
@@ -761,11 +745,6 @@ async function init() {
 
   debug(1, 'Waiting 5 secs...');
   await sleep(5000);
-
-
-
-
-
 
   debug(2, `Init finished. Loading scenarios...`);
   xapi.Command.UserInterface.Message.Prompt.Clear();
@@ -779,7 +758,6 @@ async function init() {
     console.warn(`POST-BOOT SYSTEM STATUS REPORT:`);
     console.warn(zapi.system.getAllStatus());
   }, 5000);
-
 
   setInterval(() => {
     console.warn(performance);

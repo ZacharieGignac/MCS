@@ -25,7 +25,6 @@ export class Scenario {
     this.api = zapiv1;
   }
 
-
   enable() {
     return new Promise(success => {
       this.enabled = true;
@@ -33,14 +32,12 @@ export class Scenario {
     });
   }
 
-
   disable() {
     return new Promise(success => {
       this.enabled = false;
       success(true);
     });
   }
-
 
   start() {
     xapi.Command.Standby.Activate();
@@ -54,7 +51,6 @@ export class Scenario {
     }
 
     this.api.system.resetSystemStatus();
-
     if (this.api.system.getStatus('SS$AutoLights') == 'on') {
 
       let lightscenes = this.api.devices.getDevicesByTypeInGroup(this.api.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.standby');
@@ -68,7 +64,6 @@ export class Scenario {
       }
     }
   }
-
 
   test() {
     console.log('test from SCE_Standby');

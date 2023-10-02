@@ -51,7 +51,6 @@ export class Scenarios {
       };
     });
 
-
     debug(1, 'Scenarios Manager starting...');
     debug(1, `Loading ${config.scenarios.length} scenarios..`);
     for (let sce of config.scenarios) {
@@ -68,6 +67,7 @@ export class Scenarios {
     }, 1000);
     this.api.performance.setElapsedEnd('Scenarios.init');
   }
+
   getScenario(id) {
     return this.scenariosLibrary.filter(sce => { return sce.manifest.id == id })[0];
   }
@@ -152,6 +152,7 @@ export class Scenarios {
       this.enableScenario(this.previousScenario);
     }
   }
+
   hideAllPanels(force = false) {
     this.api.performance.setElapsedStart('Scenarios.hideAllPanels');
     for (let panel of this.uiPanels) {
@@ -166,6 +167,7 @@ export class Scenarios {
     }
     this.api.performance.setElapsedEnd('Scenarios.hideAllPanels');
   }
+
   hidePanels(panels) {
     this.api.performance.setElapsedStart('Scenarios.hidePanels');
     for (let panel of panels) {
@@ -180,6 +182,7 @@ export class Scenarios {
     }
     this.api.performance.setElapsedEnd('Scenarios.hidePanels');
   }
+
   showPanels(panels) {
     this.api.performance.setElapsedStart('Scenarios.showPanels');
     for (let panel of panels) {
@@ -194,6 +197,7 @@ export class Scenarios {
     }
     this.api.performance.setElapsedEnd('Scenarios.showPanels');
   }
+
   setupFeatures(features) {
     this.api.performance.setElapsedStart('Scenarios.setupFeatures');
     xapi.Config.UserInterface.Features.Call.CameraControls.set(features.cameraControls ? 'Auto' : 'Hidden');
@@ -213,11 +217,7 @@ export class Scenarios {
     xapi.Config.UserInterface.Features.Call.VideoMute.set(features.videoMute ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.JoinMicrosoftTeamsCVI.set(features.joinMicrosoftTeamsCVI ? 'Auto' : 'Hidden');
     this.api.performance.setElapsedEnd('Scenarios.setupFeatures');
-
   }
-
-
-
 }
 
 

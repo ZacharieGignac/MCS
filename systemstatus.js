@@ -14,7 +14,6 @@ var eventSinks = [];
 var callEventSinks = [];
 
 
-
 function debug(level, text) {
   if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
     console.log(text);
@@ -50,17 +49,20 @@ async function checkPresentationStatus() {
   const presStatus = await presentation.getStatus();
   processCallbacks(presStatus);
 }
+
 function processCallbacks(presStatus) {
   for (const e of eventSinks) e(presStatus);
 }
+
 function processCallCallbacks(callStatus) {
-  for (const e of callEventSinks) e(callStatus)
+  for (const e of callEventSinks) e(callStatus);
 }
 
 xapi.Event.PresentationPreviewStarted.on(checkPresentationStatus);
 xapi.Event.PresentationPreviewStopped.on(checkPresentationStatus);
 xapi.Event.PresentationStarted.on(checkPresentationStatus);
 xapi.Event.PresentationStopped.on(checkPresentationStatus);
+
 xapi.Status.Call.on(call => {
   if (call.Status != undefined) {
     processCallCallbacks(call.Status);
@@ -91,7 +93,6 @@ export var call = {
     callEventSinks.push(callback);
   }
 }
-
 
 export var presentation = {
   onChange: function (callback) {
@@ -137,8 +138,6 @@ export var presentation = {
   }
 }
 
-
-
 export class SystemStatus {
   constructor() {
     var self = this;
@@ -154,6 +153,7 @@ export class SystemStatus {
     this.api.system.resetSystemStatus = () => { self.setDefaults() };
 
   }
+
   async init() {
     return new Promise(async success => {
       debug(1, 'SystemStatus started!');
@@ -174,16 +174,11 @@ export class SystemStatus {
         this.setStatus('hdmiPassthrough', hptstatus);
       });
 
-
-
       presentation.onChange(status => {
-
         if (!compareObjects(this._systemStatus.presentation, status)) {
           debug(1, 'Updating presentation status');
           this.setStatus('presentation', status);
         }
-
-
       });
       call.onChange(call => {
         if (!compareObjects(this._systemStatus.call, call)) {
@@ -191,9 +186,6 @@ export class SystemStatus {
           this.setStatus('call', call);
         };
       });
-
-
-
 
       /* Handle UI automapping */
       let widgets = await xapi.Status.UserInterface.Extensions.Widget.get();
@@ -209,16 +201,11 @@ export class SystemStatus {
         console.warn(this._systemStatus);
       }, 240000);
 
-
       this.setDefaults();
-
       success();
     });
-
-    
-
-
   }
+
   setDefaults() {
     for (let prop in config.systemStatus) {
       if (config.systemStatus.hasOwnProperty(prop)) {
@@ -226,6 +213,7 @@ export class SystemStatus {
       }
     }
   }
+
   setStatus(key, value, notifyChange = true) {
 
     if (this._systemStatus[key] != value) {
@@ -246,14 +234,16 @@ export class SystemStatus {
     else {
       debug(1, `SystemStatus: CHANGED (filtered, identical values) Key="${key}" Value="${value}"`);
     }
-
   }
+
   getStatus(key) {
     return this._systemStatus[key];
   }
+
   getAllStatus() {
     return this._systemStatus;
   }
+
   notifySystemStatusChange(key) {
     var newStatus = {
       key: key,
@@ -266,18 +256,21 @@ export class SystemStatus {
       }
     }
   }
+
   onChange(f) {
     this._callbacks.push({
       key: undefined,
       callback: f
     });
   }
+
   onKeyChg(key, f) {
     this._callbacks.push({
       key: key,
       callback: f
     });
   }
+  
   displayStatus() {
     console.warn(this._systemStatus);
   }

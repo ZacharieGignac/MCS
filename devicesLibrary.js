@@ -27,6 +27,7 @@ function mapValue(value, fromMin, fromMax, toMin, toMax) {
   return mappedValue;
 }
 
+
 export class LightScene {
   constructor(config) {
     this.config = config;
@@ -42,12 +43,17 @@ export class LightScene {
   }
 }
 
+
 export class AudioInputGroup {
 
 }
+
+
 export class AudioOutputGroup {
 
 }
+
+
 export class Display {
   constructor(config) {
     this.config = config;
@@ -57,7 +63,6 @@ export class Display {
     this._usageHours = undefined;
     this._usageHoursReqTimeout = undefined;
     this.powerOffTimeout = undefined;
-
     var self = this;
 
     if (config.supportsUsageHours) {
@@ -87,6 +92,7 @@ export class Display {
       self.powerOff();
     });
   }
+
   setDefaults() {
     if (this.config.defaultPower === 'on') {
       this.powerOn();
@@ -94,9 +100,6 @@ export class Display {
       this.powerOff(0);
     }
   }
-
-
-  getType() { return 'DISPLAY ' }
 
   setPower(power, delay = this.config.powerOffDelay) {
     console.log('setpower ' + power);
@@ -132,7 +135,6 @@ export class Display {
     }
   }
 
-
   powerOn() {
     debug(1, `DEVICE ${this.config.id} (${this.config.id}): ON`);
     zapi.performance.inc('DEVICE.' + this.config.id + '.powerOn');
@@ -148,9 +150,11 @@ export class Display {
       }
     }
   }
+
   getPower() {
     return this._currentPower;
   }
+
   setBlanking(blanking) {
     if (this.config.supportsBlanking) {
       if (this._currentBlanking != blanking) {
@@ -160,9 +164,11 @@ export class Display {
       }
     }
   }
+
   getBlanking() {
     return this._currentBlanking;
   }
+
   setSource(source) {
     if (this.config.supportsSource) {
       if (this._currentSource != source) {
@@ -172,15 +178,19 @@ export class Display {
       }
     }
   }
+
   getSource() {
     return this._currentSource;
   }
+
   getUsageHours() {
     return this._usageHours;
   }
+
   custom(action) {
     this.driver.custom(action);
   }
+
   fbUsageHours(usage) {
     clearTimeout(this._usageHoursReqTimeout);
     debug(1, `Received usage hours report for display "${this.config.id}": ${usage}`);
@@ -196,6 +206,7 @@ export class Display {
       this.powerOff(0);
     }
   }
+
   processActionPowerDelay(power) {
     power = power.toLowerCase();
     if (power == 'on') {
@@ -223,8 +234,6 @@ export class Light {
     this.beforeOffLevel = this.config.defaultDim;
     this.currentDimLevel = this.config.defaultDim;
     this.currentPower = undefined;
-
-
     this.powerSwitch = zapi.ui.addWidgetMapping(this.widgetPowerName);
     this.powerSwitch.on('changed', value => {
       if (this.config.supportsPower) {
@@ -255,6 +264,7 @@ export class Light {
 
 
   }
+
   setDefaults() {
     //Power
     if (this.supportsPower) {
@@ -282,6 +292,7 @@ export class Light {
 
 
   }
+
   on() {
     if (this.config.supportsPower) {
       if (this.currentPowerStatus != true) {
@@ -297,6 +308,7 @@ export class Light {
       }
     }
   }
+
   off() {
     if (this.config.supportsPower) {
       if (this.currentPowerStatus != false) {
@@ -313,6 +325,7 @@ export class Light {
       }
     }
   }
+
   power(power) {
     if (power.toLowerCase() == 'on') {
       this.on();
@@ -321,6 +334,7 @@ export class Light {
       this.off();
     }
   }
+  
   dim(level, force = false) {
     if (this.config.supportsDim) {
       if (this.currentDimLevel != level || force) {
@@ -332,6 +346,7 @@ export class Light {
       }
     }
   }
+  
   reset() {
     this.setDefaults();
   }
@@ -341,13 +356,11 @@ export class Light {
 export class CameraPreset {
   constructor(config) {
     this.config = config;
-
   }
   activate() {
     debug(1, `DEVICE ${this.config.id}: Activating preset`);
     zapi.devices.activateCameraPreset(this.config.presetName);
   }
-
 }
 
 
@@ -390,6 +403,7 @@ export class AudioInput {
 
     this.setDefaults();
   }
+
   setDefaults() {
     if (this.config.defaultGain != undefined) {
       this.setGain(this.config.defaultGain);
@@ -399,6 +413,7 @@ export class AudioInput {
     }
 
   }
+
   setGain(gain) {
     debug(1, `DEVICE ${this.config.id}: setGain: ${gain}`);
     if (gain < this.config.gainLowLimit) {
@@ -424,15 +439,19 @@ export class AudioInput {
       }
     }
   }
+
   setLevel(level) {
     this.setGain(level);
   }
+
   getGain() {
     return this.currentGain;
   }
+
   getLevel() {
     return this.currentGain;
   }
+
   increaseGain() {
     debug(1, `DEVICE ${this.config.id}: Increasing gain: ${this.currentGain + this.config.gainStep}`);
     if ((this.currentGain + this.config.gainStep) <= this.config.gainHighLimit) {
@@ -442,9 +461,11 @@ export class AudioInput {
       this.setGain(this.config.gainHighLimit);
     }
   }
-  increaseLEvel() {
+
+  increaseLevel() {
     this.increaseGain();
   }
+  
   decreaseGain() {
     debug(1, `DEVICE ${this.config.id}: Decreasing gain: ${this.currentGain - this.config.gainStep}`);
     if ((this.currentGain - this.config.gainLowLimit) >= this.config.gainLowLimit) {
@@ -454,21 +475,25 @@ export class AudioInput {
       this.setGain(this.config.gainLowLimit);
     }
   }
+  
   decreaseLevel() {
     this.decreaseGain();
   }
+  
   off() {
     debug(1, `DEVICE ${this.config.id}: Off`);
     this.currentMute = true;
     this.driver.off();
     this.modeSwitch.setValue('off');
   }
+  
   on() {
     debug(1, `DEVICE ${this.config.id}: On`);
     this.currentMute = false;
     this.driver.on();
     this.modeSwitch.setValue('on');
   }
+  
   setMode(mode) {
     if (mode.toLowerCase() == 'off') {
       this.off();
@@ -477,11 +502,13 @@ export class AudioInput {
       this.on();
     }
   }
+  
   reset() {
     debug(1, `DEVICE ${this.config.id}: RESET`);
     this.setDefaults();
   }
 }
+
 
 export class ControlSystem {
   constructor(config) {
@@ -513,9 +540,11 @@ export class Screen {
       self.up();
     });
   }
+
   setDefaults() {
     this.setPosition(this.config.defaultPosition);
   }
+
   setPosition(position) {
     position = position.toLowerCase();
     if (position != this._currentPosition) {
@@ -523,14 +552,17 @@ export class Screen {
       this.driver.setPosition(position)
     }
   }
+
   up() {
     zapi.performance.inc('DEVICE.' + this.config.id + '.up');
     this.setPosition('up');
   }
+
   down() {
     zapi.performance.inc('DEVICE.' + this.config.id + '.down');
     this.setPosition('down');
   }
+
   reset() {
     debug(1, `DEVICE ${this.config.id}: RESET`);
   }
@@ -541,6 +573,7 @@ export class Virtual {
   constructor(config) {
     this.config = config;
   }
+
   reset() {
     debug(1, `DEVICE ${this.config.id}: RESET`);
   }

@@ -27,6 +27,7 @@ export class LightSceneDriver_lights {
     this.device = device;
     this.config = config;
   }
+
   activate() {
     for (let light of this.config.lights) {
       for (let prop in light) {
@@ -40,15 +41,19 @@ export class LightSceneDriver_lights {
     }
   }
 }
+
+
 export class LightSceneDriver_isc {
   constructor(device, config) {
     this.device = device;
     this.config = config;
   }
+
   activate() {
     zapi.system.sendMessage(`LS_${this.config.name}`);
   }
 }
+
 
 export class DisplayDriver_isc_h21 {
   constructor(device, config) {
@@ -63,28 +68,34 @@ export class DisplayDriver_isc_h21 {
       });
     }
   }
+
   setPower(power) {
     power = power.toLowerCase();
     let powerString = this.config.name + '_' + power.toUpperCase();
     //xapi.Command.Message.Send({ Text: powerString });
     zapi.system.sendMessage(powerString);
   }
+
   setBlanking(blanking) {
     let blankingStatus = blanking ? 'ON' : 'OFF';
     let blankingString = this.config.name + '_BLANKING_' + blankingStatus;
     //xapi.Command.Message.Send({ Text: blankingString });
     zapi.system.sendMessage(blankingString);
   }
+
   setSource(source) {
 
   }
+
   getUsageHours() {
     return this.usageHours;
   }
+
   requestUsageHours() {
     //xapi.Command.Message.Send({ Text: 'LAMPREQ:' + this.config.name });
     zapi.system.sendMessage('LAMPREQ:' + this.config.name);
   }
+
   custom() { }
 }
 
@@ -94,11 +105,13 @@ export class ScreenDriver_isc_h21 {
     this.config = config;
     this.device = device;
   }
+
   setPosition(position) {
     position = position.toLowerCase();
     //xapi.Command.Message.Send({ Text: this.config.name + '_' + positionString });
     zapi.system.sendMessage(this.config.name + '_' + position);
   }
+
   custom() {
 
   }
@@ -109,6 +122,7 @@ export class AudioInput_codecpro {
     this.config = config;
     this.device = device;
   }
+
   setGain(gain) {
     debug(1, `DRIVER AudioInput_internal (${this.config.id}): setGain: ${gain}`);
     switch (this.config.input) {
@@ -123,6 +137,7 @@ export class AudioInput_codecpro {
         break;
     }
   }
+
   off(mute) {
     if (mute.toLowerCase() == 'off') {
       this.mute();
@@ -131,6 +146,7 @@ export class AudioInput_codecpro {
       this.unmute();
     }
   }
+
   off() {
     debug(1, `DRIVER AudioInput_internal (${this.config.id}): Off`);
     switch (this.config.input) {
@@ -145,6 +161,7 @@ export class AudioInput_codecpro {
         break;
     }
   }
+
   on() {
     debug(1, `DRIVER AudioInput_internal (${this.config.id}): On`);
     switch (this.config.input) {
@@ -161,21 +178,25 @@ export class AudioInput_codecpro {
   }
 }
 
+
 export class Light_isc_h21 {
   constructor(device, config) {
     this.config = config;
     this.device = device;
   }
+
   on() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): On`);
     //xapi.Command.Message.Send({ Text: `${this.config.name}_ON`});
     zapi.system.sendMessage(`${this.config.name}_ON`);
   }
+
   off() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Off`);
     //xapi.Command.Message.Send({ Text: `${this.config.name}_OFF`});
     zapi.system.sendMessage(`${this.config.name}_OFF`);
   }
+
   dim(level) {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Dim ${level}`);
     //xapi.Command.Message.Send({ Text: `${this.config.name}_DIM ${level}`});
@@ -183,13 +204,16 @@ export class Light_isc_h21 {
   }
 }
 
+
 export class ScreenDriver_gpio {
 
 }
 
+
 export class LightDriver_messages {
 
 }
+
 
 export class LightSceneDriver_messages {
 

@@ -188,6 +188,23 @@ class Audio {
       });
     });
   }
+
+  getRemoteOutputIds() {
+    return new Promise((success, failure) => {
+      var outputs = [];
+      xapi.Status.Audio.Output.RemoteOutput.get().then(ro => {
+        for (let r of ro) {
+          outputs.push(r.id);
+        }
+        if (outputs.length > 0) {
+          success(outputs);
+        }
+        else {
+          failure('No remote output found.');
+        }
+      });
+    });
+  }
 }
 
 
@@ -402,6 +419,7 @@ class Core {
     zapi.audio.getLocalInputId = (name) => { return self.audio.getLocalInputId(name) };
     zapi.audio.getLocalOutputId = (name) => { return self.audio.getLocalOutputId(name) };
     zapi.audio.getRemoteInputsIds = () => { return self.audio.getRemoteInputsIds() };
+    zapi.audio.getRemoteOutputIds = () => { return self.audio.getRemoteOutputIds() };
 
     this.lastPresenterDetectedStatus = false;
   }

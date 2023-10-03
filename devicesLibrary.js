@@ -27,6 +27,13 @@ function mapValue(value, fromMin, fromMax, toMin, toMax) {
   return mappedValue;
 }
 
+export class Camera {
+  constructor() {
+
+  }
+}
+
+
 
 export class LightScene {
   constructor(config) {
@@ -53,12 +60,62 @@ export class AudioInputGroup {
     });
   }
 
-  connectToRemoteOutputs() {
-
+  async connectToRemoteOutputs() {
+    try {
+      let remoteOutputs = await zapi.audio.getRemoteOutputIds();
+      for (let ro of remoteOutputs) {
+        xapi.Command.Audio.RemoteOutput.ConnectInput({
+          InputId: this.inputId,
+          OutputId: ro
+        });
+      }
+      debug(1, `DEVICE ${this.config.id}: connectToRemoteOutputs`);
+    }
+    catch (e) {
+      debug(2, `DEVICE ${this.config.id} connectToRemoteOutputs error: ${e}`);
+    }
   }
 
-  disconnectFromRemoteOutputs() {
+  async disconnectFromRemoteOutputs() {
+    try {
+      let remoteOutputs = await zapi.audio.getRemoteOutputIds();
+      for (let ro of remoteOutputs) {
+        xapi.Command.Audio.RemoteOutput.DisconnectInput({
+          InputId: this.inputId,
+          OutputId: ro
+        });
+      }
+      debug(1, `DEVICE ${this.config.id}: disconnectFromRemoteOutputs`);
+    }
+    catch (e) {
+      debug(2, `DEVICE ${this.config.id} disconnectFromRemoteOutputs error: ${e}`);
+    }
+  }
 
+  connectToLocalOutput(lo) {
+    try {
+      xapi.Command.Audio.LocalOutput.ConnectInput({
+        InputId: this.inputId,
+        OutputId: lo.inputId
+      });
+      debug(1, `DEVICE ${this.config.id}: ConnectToLocalOutput: ${li.id}`);
+    }
+    catch (e) {
+      debug(2, `DEVICE ${this.config.id} ConnectToLocalOutput error: ${e}`);
+    }
+  }
+
+  disconnectFromLocalOutput(lo) {
+    try {
+      xapi.Command.Audio.LocalOutput.DisconnectInput({
+        InputId: this.inputId,
+        OutputId: lo.outputId
+      });
+      debug(1, `DEVICE ${this.config.id}: DisconnectFromLocalOutput: ${li.id}`);
+    }
+    catch (e) {
+      debug(2, `DEVICE ${this.config.id} DisconnectFromLocalOutput error: ${e}`);
+    }
   }
 }
 
@@ -99,17 +156,23 @@ export class AudioOutputGroup {
   }
 
   async connectRemoteInputs() {
-    let remoteinputs = await zapi.audio.getRemoteInputsIds();
-    for (let ri of remoteinputs) {
-      xapi.Command.Audio.LocalOutput.ConnectInput({
-        InputId: ri,
-        OutputId: this.outputId
-      });
+    try {
+      let remoteinputs = await zapi.audio.getRemoteInputsIds();
+      for (let ri of remoteinputs) {
+        xapi.Command.Audio.LocalOutput.ConnectInput({
+          InputId: ri,
+          OutputId: this.outputId
+        });
+      }
+      debug(1, `DEVICE ${this.config.id}: ConnectRemoteInputs`);
     }
-    debug(1, `DEVICE ${this.config.id}: ConnectRemoteInputs`);
+    catch (e) {
+      debug(2, `DEVICE ${this.config.id} connectRemoteInputs error: ${e}`);
+    }
   }
 
   async disconnectRemoteInputs() {
+    try {
     let remoteinputs = await zapi.audio.getRemoteInputsIds();
     for (let ri of remoteinputs) {
       xapi.Command.Audio.LocalOutput.DisconnectInput({
@@ -117,8 +180,15 @@ export class AudioOutputGroup {
         OutputId: this.outputId
       });
     }
-    debug(1, `DEVICE ${this.config.id}: DisconnectRemoteInputs`);
+
+      debug(1, `DEVICE ${this.config.id}: DisconnectRemoteInputs`);
+    }
+    catch(e) {
+      debug(2, `DEVICE ${this.config.id} disConnectRemoteInputs error: ${e}`);
+    }
+
   }
+
 }
 
 
@@ -652,11 +722,6 @@ export class Virtual {
 
 
 
-export class Camera {
-  constructor() {
-
-  }
-}
 
 
 

@@ -172,7 +172,7 @@ class Audio {
     });
   }
 
-  getRemoteInputsIds(name) {
+  getRemoteInputsIds() {
     return new Promise((success, failure) => {
       var inputs = [];
       xapi.Status.Audio.Input.RemoteInput.get().then(ri => {
@@ -189,6 +189,8 @@ class Audio {
     });
   }
 }
+
+
 
 
 class WidgetMapping {

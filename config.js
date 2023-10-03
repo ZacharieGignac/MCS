@@ -272,6 +272,30 @@ export var config = {
       peripheralRequired: true,
       peripheralId: 'FDO2603J89L'
 
+    },
+    {
+      id: 'ai.computers',
+      name: 'PC',
+      type: DEVICETYPE.AUDIOINPUTGROUP,
+      device: devicesLibrary.AudioInputGroup
+    },
+    {
+      id: 'ai.microphones',
+      name: 'Microphone',
+      type: DEVICETYPE.AUDIOINPUTGROUP,
+      device: devicesLibrary.AudioInputGroup
+    },
+    {
+      id: 'ao.roomspeakers',
+      name: 'Room',
+      type: DEVICETYPE.AUDIOOUTPUTGROUP,
+      device: devicesLibrary.AudioOutputGroup
+    },
+    {
+      id: 'ao.monitorspeakers',
+      name: 'Monitor',
+      type: DEVICETYPE.AUDIOOUTPUTGROUP,
+      device: devicesLibrary.AudioOutputGroup
     }
 
 

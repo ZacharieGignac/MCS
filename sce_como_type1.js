@@ -55,15 +55,15 @@ export class Scenario {
 
 
   }
-  
+
   disable() {
     return new Promise(success => {
       success(true);
     });
   }
-  
+
   start() {
-      if (this.api.system.getStatus('SS$AutoLights') == 'on') {
+    if (this.api.system.getStatus('SS$AutoLights') == 'on') {
       let lightscenes = this.api.devices.getDevicesByTypeInGroup(this.api.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.idle');
       if (lightscenes.length > 0) {
         for (let lightscene of lightscenes) {
@@ -73,9 +73,27 @@ export class Scenario {
           }
         }
       }
+
+      /*
+      let pcinputgroup = this.api.devices.getDevice('PC');
+      let roomoutputgroup = this.api.devices.getDevice('ROOM');
+
+      roomoutputgroup.connectLocalInput(pcinputgroup);
+
+      var button = this.api.ui.addWidgetMapping('testac');
+      button.on('clicked', () => {
+        roomoutputgroup.connectRemoteInputs();
+      });
+
+      var button2 = this.api.ui.addWidgetMapping('testac2');
+      button2.on('clicked', () => {
+        roomoutputgroup.disconnectRemoteInputs();
+      });
+      */
+
     }
   }
-  
+
   test() {
     console.log('test from SCE_Normal');
   }

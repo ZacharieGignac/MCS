@@ -45,12 +45,80 @@ export class LightScene {
 
 
 export class AudioInputGroup {
+  constructor(config) {
+    this.config = config;
+    this.inputId = undefined;
+    zapi.audio.getLocalInputId(this.config.name).then(id => {
+      this.inputId = id;
+    });
+  }
 
+  connectToRemoteOutputs() {
+
+  }
+
+  disconnectFromRemoteOutputs() {
+
+  }
 }
 
 
 export class AudioOutputGroup {
+  constructor(config) {
+    this.config = config;
+    this.outputId = undefined;
+    zapi.audio.getLocalOutputId(this.config.name).then(id => {
+      this.outputId = id;
+    });
+  }
 
+  connectLocalInput(li) {
+    try {
+      xapi.Command.Audio.LocalOutput.ConnectInput({
+        InputId: li.inputId,
+        OutputId: this.outputId
+      });
+      debug(1, `DEVICE ${this.config.id}: ConnectLocalInput: ${li.id}`);
+    }
+    catch (e) {
+      debug(2, `DEVICE ${this.config.id} ConnectLocalInput error: ${e}`);
+    }
+  }
+
+  disconnectLocalInput(li) {
+    try {
+      xapi.Command.Audio.LocalOutput.DisconnectInput({
+        InputId: li.inputId,
+        OutputId: this.outputId
+      });
+      debug(1, `DEVICE ${this.config.id}: disConnectLocalInput: ${li.id}`);
+    }
+    catch (e) {
+      debug(2, `DEVICE ${this.config.id} DisconnectLocalInput error: ${e}`);
+    }
+  }
+
+  async connectRemoteInputs() {
+    let remoteinputs = await zapi.audio.getRemoteInputsIds();
+    for (let ri of remoteinputs) {
+      xapi.Command.Audio.LocalOutput.ConnectInput({
+        InputId: ri,
+        OutputId: this.outputId
+      });
+    }
+    debug(1, `DEVICE ${this.config.id}: ConnectRemoteInputs`);
+  }
+
+  async disconnectRemoteInputs() {
+    let remoteinputs = await zapi.audio.getRemoteInputsIds();
+    for (let ri of remoteinputs) {
+      xapi.Command.Audio.LocalOutput.DisconnectInput({
+        InputId: ri,
+        OutputId: this.outputId
+      });
+    }
+    debug(1, `DEVICE ${this.config.id}: DisconnectRemoteInputs`);
+  }
 }
 
 
@@ -116,7 +184,7 @@ export class Display {
   }
 
   powerOff(delay = this.config.powerOffDelay) {
-    debug(1, `DEVICE ${this.config.id} (${this.config.id}): OFF`);
+    debug(1, `DEVICE ${this.config.id}: OFF`);
     zapi.performance.inc('DEVICE.' + this.config.id + '.powerOff');
     if (this.config.supportsPower) {
       if (this._currentPower !== 'off') {
@@ -136,7 +204,7 @@ export class Display {
   }
 
   powerOn() {
-    debug(1, `DEVICE ${this.config.id} (${this.config.id}): ON`);
+    debug(1, `DEVICE ${this.config.id}: ON`);
     zapi.performance.inc('DEVICE.' + this.config.id + '.powerOn');
     if (this.config.supportsPower) {
       if (this._currentPower !== 'on') {
@@ -172,7 +240,7 @@ export class Display {
   setSource(source) {
     if (this.config.supportsSource) {
       if (this._currentSource != source) {
-        debug(1, `DEVICE ${this.config.id} (${this.config.id}): Source ${source}`);
+        debug(1, `DEVICE ${this.config.id}: Source ${source}`);
         this.driver.setSource(source);
         this._currentSource = source;
       }
@@ -218,7 +286,7 @@ export class Display {
   }
 
   reset() {
-    debug(1, `DEVICE ${this.config.id} (${this.config.id}): RESET`);
+    debug(1, `DEVICE ${this.config.id}: RESET`);
     this.setPower(this.config.defaultPower, 0);
   }
 }
@@ -334,7 +402,7 @@ export class Light {
       this.off();
     }
   }
-  
+
   dim(level, force = false) {
     if (this.config.supportsDim) {
       if (this.currentDimLevel != level || force) {
@@ -346,7 +414,7 @@ export class Light {
       }
     }
   }
-  
+
   reset() {
     this.setDefaults();
   }
@@ -465,7 +533,7 @@ export class AudioInput {
   increaseLevel() {
     this.increaseGain();
   }
-  
+
   decreaseGain() {
     debug(1, `DEVICE ${this.config.id}: Decreasing gain: ${this.currentGain - this.config.gainStep}`);
     if ((this.currentGain - this.config.gainLowLimit) >= this.config.gainLowLimit) {
@@ -475,25 +543,25 @@ export class AudioInput {
       this.setGain(this.config.gainLowLimit);
     }
   }
-  
+
   decreaseLevel() {
     this.decreaseGain();
   }
-  
+
   off() {
     debug(1, `DEVICE ${this.config.id}: Off`);
     this.currentMute = true;
     this.driver.off();
     this.modeSwitch.setValue('off');
   }
-  
+
   on() {
     debug(1, `DEVICE ${this.config.id}: On`);
     this.currentMute = false;
     this.driver.on();
     this.modeSwitch.setValue('on');
   }
-  
+
   setMode(mode) {
     if (mode.toLowerCase() == 'off') {
       this.off();
@@ -502,7 +570,7 @@ export class AudioInput {
       this.on();
     }
   }
-  
+
   reset() {
     debug(1, `DEVICE ${this.config.id}: RESET`);
     this.setDefaults();

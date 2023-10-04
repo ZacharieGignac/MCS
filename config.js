@@ -178,10 +178,10 @@ export var config = {
       device: devicesLibrary.Light,
       driver: driversLibrary.Light_isc_h21,
       sliderEvent: 'changed', //released, changed
-      supportsPower: true,
+      supportsPower: false,
       supportsDim: true,
-      //defaultPower: 'on',
-      //defaultDim: 100
+      defaultPower: 'on',
+      defaultDim: 100
     },
     {
       id: 'light.board',
@@ -192,8 +192,8 @@ export var config = {
       sliderEvent: 'changed', //released, changed
       supportsPower: true,
       supportsDim: true,
-      //defaultPower: 'on',
-      //defaultDim: 100
+      defaultPower: 'on',
+      defaultDim: 100
     },
     {
       id: 'light.audience',
@@ -204,8 +204,8 @@ export var config = {
       sliderEvent: 'changed', //released, changed
       supportsPower: true,
       supportsDim: true,
-      //defaultPower: 'on',
-      //defaultDim: 100
+      defaultPower: 'on',
+      defaultDim: 100
     },
     {
       id: 'lightscene.100%',
@@ -466,10 +466,13 @@ export var config = {
   systemStatus: {
     SS$PresenterLocation: 'local', //Mandatory value
     SS$PresenterTrackWarnings: 'on', //Mandatory value
+    SS$UsePresentationTrack: 'on', //Mandatory value
     SS$AutoDisplays: 'on', //Mandatory value
     SS$AutoScreens: 'on', //Mandatory value
     SS$AutoLights: 'on', //Mandatory value
     SS$AutoCamPresets: 'on', //Mandatory value
+    SS$AudienceMics: 'on', //Mandatory valuee
+    SS$PresenterMics: 'on', //Mandatory value
     presenterDetected: false, //Mandatory value
   },
 

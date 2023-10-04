@@ -173,17 +173,17 @@ export class AudioOutputGroup {
 
   async disconnectRemoteInputs() {
     try {
-    let remoteinputs = await zapi.audio.getRemoteInputsIds();
-    for (let ri of remoteinputs) {
-      xapi.Command.Audio.LocalOutput.DisconnectInput({
-        InputId: ri,
-        OutputId: this.outputId
-      });
-    }
+      let remoteinputs = await zapi.audio.getRemoteInputsIds();
+      for (let ri of remoteinputs) {
+        xapi.Command.Audio.LocalOutput.DisconnectInput({
+          InputId: ri,
+          OutputId: this.outputId
+        });
+      }
 
       debug(1, `DEVICE ${this.config.id}: DisconnectRemoteInputs`);
     }
-    catch(e) {
+    catch (e) {
       debug(2, `DEVICE ${this.config.id} disConnectRemoteInputs error: ${e}`);
     }
 
@@ -219,8 +219,8 @@ export class Display {
     this.setDefaults();
 
     // Default WidgetMapping
-    var onButton = zapi.ui.addWidgetMapping(this.config.id + '_POWERON');
-    var offButton = zapi.ui.addWidgetMapping(this.config.id + '_POWEROFF');
+    var onButton = zapi.ui.addWidgetMapping(this.config.id + ':POWERON');
+    var offButton = zapi.ui.addWidgetMapping(this.config.id + ':POWEROFF');
 
     onButton.on('clicked', () => {
       self.powerOn();
@@ -240,7 +240,6 @@ export class Display {
   }
 
   setPower(power, delay = this.config.powerOffDelay) {
-    console.log('setpower ' + power);
     power = power.toLowerCase();
     if (this.config.supportsPower) {
       if (this._currentPower !== power) {
@@ -367,8 +366,10 @@ export class Light {
     this.config = config;
     this.driver = new config.driver(this, config);
     this.currentPowerStatus = undefined;
-    this.widgetLevelName = this.config.id + '_LEVEL';
-    this.widgetPowerName = this.config.id + '_POWER';
+    this.widgetLevelName = this.config.id + ':LEVEL';
+    this.widgetPowerName = this.config.id + ':POWER';
+    this.widgetPowerOn = this.config.id + ':POWERON';
+    this.widgetPowerOff = this.config.id + ':POWEROFF';
     this.beforeOffLevel = this.config.defaultDim;
     this.currentDimLevel = this.config.defaultDim;
     this.currentPower = undefined;
@@ -393,10 +394,33 @@ export class Light {
     this.levelSlider.on(this.config.sliderEvent, value => {
       let mappedValue = mapValue(value, 0, 255, 0, 100);
       this.dim(mappedValue);
-      if (!this.supportsPower) {
+      if (!this.config.supportsPower) {
         this.powerSwitch.setValue('on');
       }
     });
+
+    this.powerOnButton = zapi.ui.addWidgetMapping(this.widgetPowerOn);
+    this.powerOnButton.on('clicked', () => {
+      if (this.config.supportsPower) {
+        this.on();
+      }
+      else {
+        this.dim(this.beforeOffLevel);
+      }
+    });
+
+    this.powerOffButton = zapi.ui.addWidgetMapping(this.widgetPowerOff);
+    this.powerOffButton.on('clicked', () => {
+      if (this.config.supportsPower) {
+        this.off();
+      }
+      else {
+        this.beforeOffLevel = this.currentDimLevel;
+        this.dim(0);
+      }
+
+    });
+
 
     this.setDefaults();
 
@@ -404,8 +428,9 @@ export class Light {
   }
 
   setDefaults() {
+    /*
     //Power
-    if (this.supportsPower) {
+    if (this.config.supportsPower) {
       if (this.config.defaultPower == 'on') {
         this.on();
       }
@@ -424,9 +449,11 @@ export class Light {
     if (this.config.supportsDim) {
       if (this.config.defaultDim != undefined) {
         this.dim(this.config.defaultDim, true);
+
       }
 
     }
+    */
 
 
   }
@@ -442,6 +469,7 @@ export class Light {
     }
     else {
       if (this.config.supportsDim) {
+        this.dim(this.beforeOffLevel);
         debug(1, `DEVICE ${this.config.id}: Dim ${this.currentDimLevel} (device does not support power commands)`);
       }
     }

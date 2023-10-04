@@ -2,7 +2,6 @@ import xapi from 'xapi';
 
 
 export var zapiv1 = {
-  test: undefined,
   devices: {
     getDevice: () => { },
     getAllDevices: () => { },

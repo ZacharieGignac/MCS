@@ -5,7 +5,6 @@ import xapi from 'xapi';
 import * as sce_standby from './sce_standby';
 import * as sce_como_type1 from './sce_como_type1';
 import * as sce_firealarm from './sce_firealarm';
-import * as sce_normal_nocall from './sce_normal_nocall';
 //Add scenarios to config.scenarios below.
 /****************************/
 
@@ -55,8 +54,11 @@ const DEVICETYPE = {
 }
 
 
+export const PRODUCT = 'CretOS (dev)';
+export const VERSION = '0.0.1';
+
 export var config = {
-  version: '0.0.1',
+  version: VERSION,
   system: {
     coldBootWait: 120,
     debugLevel: DEBUGLEVEL.HIGH,
@@ -96,7 +98,6 @@ export var config = {
     sce_standby,
     sce_como_type1,
     sce_firealarm,
-    sce_normal_nocall
   ],
 
   modules: [
@@ -464,6 +465,8 @@ export var config = {
   ],
 
   systemStatus: {
+    Product:PRODUCT,
+    Version:VERSION,
     PresenterLocation: 'local', //Mandatory value
     PresenterTrackWarnings: 'on', //Mandatory value
     UsePresenterTrack: 'on', //Mandatory value

@@ -2,6 +2,7 @@ import xapi from 'xapi';
 import { config } from './config';
 import { zapiv1 } from './zapi';
 
+var zapi = zapiv1;
 
 function debug(level, text) {
   if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
@@ -25,21 +26,21 @@ export class Scenarios {
   constructor() {
     this.uiPanels = [];
     this.scenariosLibrary = [];
-    this.api = zapiv1;
-    this.api.performance.setElapsedStart('Scenarios.init');
+    zapi = zapiv1;
+    zapi.performance.setElapsedStart('Scenarios.init');
     this.currentScenario = undefined;
     this.previousScenario = undefined;
 
-    this.api.system.setStatus('currentScenario', undefined, false);
+    zapi.system.setStatus('currentScenario', undefined, false);
     var self = this;
 
     //Setup ZAPI
-    this.api.scenarios.enableScenario = (id) => { self.enableScenario(id); }
-    this.api.scenarios.enablePreviousScenario = () => { self.enablePreviousScenario(); }
+    zapi.scenarios.enableScenario = (id) => { self.enableScenario(id); }
+    zapi.scenarios.enablePreviousScenario = () => { self.enablePreviousScenario(); }
 
     //Add scenarios-related auto-mapping
     
-    this.api.ui.addActionMapping(/^ENABLESCENARIO$/, (id) => {
+    zapi.ui.addActionMapping(/^ENABLESCENARIO$/, (id) => {
       self.enableScenario(id);
     });
 
@@ -65,7 +66,7 @@ export class Scenarios {
     setTimeout(() => {
       this.enableScenario(config.system.onStandby.enableScenario);
     }, 1000);
-    this.api.performance.setElapsedEnd('Scenarios.init');
+    zapi.performance.setElapsedEnd('Scenarios.init');
   }
 
   getScenario(id) {
@@ -73,7 +74,7 @@ export class Scenarios {
   }
 
   async enableScenario(id) {
-    this.api.performance.setElapsedStart('Scenarios.enableScenario');
+    zapi.performance.setElapsedStart('Scenarios.enableScenario');
     var currManifest = undefined;
     var currScenario = undefined;
     var disableResult = undefined;
@@ -113,7 +114,7 @@ export class Scenarios {
             debug(1, `Scenario "${id}" enable success!`);
 
             this.currentScenario = id;
-            this.api.system.setStatus('currentScenario', this.currentScenario);
+            zapi.system.setStatus('currentScenario', this.currentScenario);
 
 
             this.hidePanels(currManifest.panels.hide);
@@ -144,7 +145,7 @@ export class Scenarios {
       debug(2, `Can't enable scenario "${id}" because this scenario is already the current enabled scenario.`);
     }
     debug(1, `Current scenario is: ${this.currentScenario}`);
-    this.api.performance.setElapsedEnd('Scenarios.enableScenario');
+    zapi.performance.setElapsedEnd('Scenarios.enableScenario');
   }
 
   enablePreviousScenario() {
@@ -154,7 +155,7 @@ export class Scenarios {
   }
 
   hideAllPanels(force = false) {
-    this.api.performance.setElapsedStart('Scenarios.hideAllPanels');
+    zapi.performance.setElapsedStart('Scenarios.hideAllPanels');
     for (let panel of this.uiPanels) {
       if ((!panel.startsWith('*') || force) && panel != '') {
         debug(1, `Hiding panel ${panel}`);
@@ -165,11 +166,11 @@ export class Scenarios {
       }
 
     }
-    this.api.performance.setElapsedEnd('Scenarios.hideAllPanels');
+    zapi.performance.setElapsedEnd('Scenarios.hideAllPanels');
   }
 
   hidePanels(panels) {
-    this.api.performance.setElapsedStart('Scenarios.hidePanels');
+    zapi.performance.setElapsedStart('Scenarios.hidePanels');
     for (let panel of panels) {
       if (panel == '*') {
         debug(1, `Hiding all panels...`);
@@ -180,11 +181,11 @@ export class Scenarios {
         this.hideAllPanels(true);
       }
     }
-    this.api.performance.setElapsedEnd('Scenarios.hidePanels');
+    zapi.performance.setElapsedEnd('Scenarios.hidePanels');
   }
 
   showPanels(panels) {
-    this.api.performance.setElapsedStart('Scenarios.showPanels');
+    zapi.performance.setElapsedStart('Scenarios.showPanels');
     for (let panel of panels) {
       debug(1, `Showing panel ${panel}`);
       if (panel != '') {
@@ -195,11 +196,11 @@ export class Scenarios {
       }
 
     }
-    this.api.performance.setElapsedEnd('Scenarios.showPanels');
+    zapi.performance.setElapsedEnd('Scenarios.showPanels');
   }
 
   setupFeatures(features) {
-    this.api.performance.setElapsedStart('Scenarios.setupFeatures');
+    zapi.performance.setElapsedStart('Scenarios.setupFeatures');
     xapi.Config.UserInterface.Features.Call.CameraControls.set(features.cameraControls ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.End.set(features.endCallButton ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.HdmiPassthrough.set(features.hdmiPassthrough ? 'Auto' : 'Hidden');
@@ -216,7 +217,7 @@ export class Scenarios {
     xapi.Config.UserInterface.Features.Call.Start.set(features.start ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.VideoMute.set(features.videoMute ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.JoinMicrosoftTeamsCVI.set(features.joinMicrosoftTeamsCVI ? 'Auto' : 'Hidden');
-    this.api.performance.setElapsedEnd('Scenarios.setupFeatures');
+    zapi.performance.setElapsedEnd('Scenarios.setupFeatures');
   }
 }
 

@@ -1,7 +1,8 @@
 import xapi from 'xapi';
 import { config } from './config';
 import { zapiv1 } from './zapi';
-const zapi = zapiv1;
+
+var zapi = zapiv1;
 
 function debug(level, text) {
   if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
@@ -530,6 +531,10 @@ export class Light {
 export class CameraPreset {
   constructor(config) {
     this.config = config;
+    this.camPresetWidget = zapi.ui.addWidgetMapping(this.config.id + ':ACTIVATE');
+    this.camPresetWidget.on('clicked', () => {
+      this.activate();
+    });
   }
   activate() {
     debug(1, `DEVICE ${this.config.id}: Activating preset`);
@@ -544,9 +549,9 @@ export class AudioInput {
     this.driver = new config.driver(this, config);
     this.currentGain = undefined;
     this.currentMute = undefined;
-    this.widgetModeName = this.config.id + '_MODE';
-    this.widgetLevelName = this.config.id + '_LEVEL';
-    this.widgetLevelGroupName = this.config.id + '_LEVELGROUP';
+    this.widgetModeName = this.config.id + ':MODE';
+    this.widgetLevelName = this.config.id + ':LEVEL';
+    this.widgetLevelGroupName = this.config.id + ':LEVELGROUP';
 
     //Default UI Handling
     this.modeSwitch = zapi.ui.addWidgetMapping(this.widgetModeName);
@@ -703,8 +708,8 @@ export class Screen {
     this.setDefaults();
 
     //Default WidgetMapping
-    var downButton = zapi.ui.addWidgetMapping(this.config.id + '_DOWN');
-    var upButton = zapi.ui.addWidgetMapping(this.config.id + '_UP');
+    var downButton = zapi.ui.addWidgetMapping(this.config.id + ':DOWN');
+    var upButton = zapi.ui.addWidgetMapping(this.config.id + ':UP');
 
     downButton.on('clicked', () => {
       self.down();

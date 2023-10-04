@@ -1,7 +1,7 @@
 import xapi from 'xapi';
 import { zapiv1 } from './zapi';
 
-
+var zapi = zapiv1;
 
 export var Manifest = {
   fileName: 'sce_standby',
@@ -22,7 +22,6 @@ export var Manifest = {
 export class Scenario {
   constructor(api) {
     this.enabled = false;
-    this.api = zapiv1;
   }
 
   enable() {
@@ -41,7 +40,7 @@ export class Scenario {
 
   start() {
     xapi.Command.Standby.Activate();
-    let devices = this.api.devices.getAllDevices();
+    let devices = zapi.devices.getAllDevices();
 
     for (let d of devices) {
       try {
@@ -50,11 +49,11 @@ export class Scenario {
       catch { }
     }
 
-    this.api.system.resetSystemStatus();
-      let lightscenes = this.api.devices.getDevicesByTypeInGroup(this.api.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.standby');
+    zapi.system.resetSystemStatus();
+      let lightscenes = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.standby');
       if (lightscenes.length > 0) {
         for (let lightscene of lightscenes) {
-          let lsdevice = this.api.devices.getDevice(lightscene.config.id);
+          let lsdevice = zapi.devices.getDevice(lightscene.config.id);
           if (lsdevice) {
             lsdevice.activate();
           }

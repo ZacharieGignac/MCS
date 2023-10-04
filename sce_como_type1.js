@@ -2,9 +2,9 @@ import xapi from 'xapi';
 import { zapiv1 } from './zapi';
 
 
-const api = zapiv1;
+var zapi = zapiv1;
 
-const DEVICETYPE = api.devices.DEVICETYPE;
+const DEVICETYPE = zapi.devices.DEVICETYPE;
 
 export var Manifest = {
   fileName: 'sce_como_type1',
@@ -38,11 +38,10 @@ export var Manifest = {
 
 export class Scenario {
   constructor() {
-    this.api = api;
-    this.api.system.onStatusChange(status => {
+    zapi.system.onStatusChange(status => {
 
     });
-    this.api.system.onStatusKeyChange('call', call => {
+    zapi.system.onStatusKeyChange('call', call => {
 
     });
 
@@ -63,11 +62,11 @@ export class Scenario {
   }
 
   start() {
-    if (this.api.system.getStatus('AutoLights') == 'on') {
-      let lightscenes = this.api.devices.getDevicesByTypeInGroup(this.api.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.idle');
+    if (zapi.system.getStatus('AutoLights') == 'on') {
+      let lightscenes = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.idle');
       if (lightscenes.length > 0) {
         for (let lightscene of lightscenes) {
-          let lsdevice = this.api.devices.getDevice(lightscene.config.id);
+          let lsdevice = zapi.devices.getDevice(lightscene.config.id);
           if (lsdevice) {
             lsdevice.activate();
           }

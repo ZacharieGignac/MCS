@@ -3,6 +3,7 @@ import { config } from './config';
 import * as devicesLibrary from './devices';
 import { zapiv1 } from './zapi';
 
+var zapi = zapiv1;
 
 function debug(level, text) {
   if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
@@ -24,8 +25,7 @@ function debug(level, text) {
 
 export class DevicesManager {
   constructor() {
-    this.api = zapiv1;
-    this.api.performance.setElapsedStart('DevicesManager.init');
+    zapi.performance.setElapsedStart('DevicesManager.init');
     this.displays = [];
     this.screens = [];
     this.lights = [];
@@ -36,12 +36,12 @@ export class DevicesManager {
     var self = this;
 
     //Setup ZAPI
-    this.api.devices.getAllDevices = () => { return self.getAllDevices(); }
-    this.api.devices.getDevice = (id) => { return self.getDevice(id); }
-    this.api.devices.getDevicesByType = (type) => { return self.getDevicesByType(type); }
-    this.api.devices.getDevicesInGroup = (group) => { return self.getDevicesInGroup(group); }
-    this.api.devices.getDevicesByTypeInGroup = (type, group) => { return self.getDevicesByTypeInGroup(type, group); }
-    this.api.devices.activateCameraPreset = (presetId) => { self.activateCameraPreset(presetId); }
+    zapi.devices.getAllDevices = () => { return self.getAllDevices(); }
+    zapi.devices.getDevice = (id) => { return self.getDevice(id); }
+    zapi.devices.getDevicesByType = (type) => { return self.getDevicesByType(type); }
+    zapi.devices.getDevicesInGroup = (group) => { return self.getDevicesInGroup(group); }
+    zapi.devices.getDevicesByTypeInGroup = (type, group) => { return self.getDevicesByTypeInGroup(type, group); }
+    zapi.devices.activateCameraPreset = (presetId) => { self.activateCameraPreset(presetId); }
 
   }
 
@@ -69,12 +69,12 @@ export class DevicesManager {
 
     }
 
-    //TODO UI mappings
-    this.api.ui.addActionMapping(/^ACTIVATECAMPRESET$/, (params) => {
+    
+    zapi.ui.addActionMapping(/^ACTIVATECAMPRESET$/, (params) => {
       this.activateCameraPreset(params);
     });
 
-    this.api.performance.setElapsedEnd('DevicesManager.init');
+    zapi.performance.setElapsedEnd('DevicesManager.init');
   }
 
   getAllDevices() {

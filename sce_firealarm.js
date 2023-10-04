@@ -1,8 +1,7 @@
 import xapi from 'xapi';
 import { zapiv1 } from './zapi';
 
-
-const api = zapiv1;
+var zapi = zapiv1;
 
 export var Manifest = {
   fileName: 'sce_firealarm',
@@ -34,20 +33,18 @@ export var Manifest = {
 
 export class Scenario {
   constructor() {
-    this.api = api;
     this.alertMessage;
-
     xapi.Status.RoomAnalytics.T3Alarm.Detected.on(value => {
       console.log(`Current T3 value is: ${value}`);
       if (value == 'True') {
         console.warn('🔥🚨 WARNING: FIRE ALARM DETECTED 🚨🔥');
         if (!this.enabled) {
-          this.api.scenarios.enableScenario('firealarm');
+          zapi.scenarios.enableScenario('firealarm');
         }
       }
       else {
         if (this.enabled) {
-          this.api.scenarios.enablePreviousScenario();
+          zapi.scenarios.enablePreviousScenario();
         }
       }
     });

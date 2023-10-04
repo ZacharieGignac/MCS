@@ -1,11 +1,11 @@
 import xapi from 'xapi';
 import { DevicesManager } from './devices';
-import { config } from './config';
+import { config, VERSION, PRODUCT } from './config';
 import { Scenarios } from './scenarios'
 import { SystemStatus } from './systemstatus';
 import { zapiv1 } from './zapi';
 
-const zapi = zapiv1;
+var zapi = zapiv1;
 
 const DEBUGLEVEL = {
   LOW: 3,
@@ -15,7 +15,6 @@ const DEBUGLEVEL = {
 }
 
 const INITSTEPDELAY = 500;
-const VERSION = '1.0.0';
 
 var coldbootWarningInterval = undefined;
 var core;
@@ -481,15 +480,15 @@ class Core {
     xapi.Command.UserInterface.Message.TextLine.Clear();
     if (config.system.usePresenterTrack) {
       let presenterDetected = await xapi.Status.Cameras.PresenterTrack.PresenterDetected.get();
-      this.systemStatus.setStatus('presenterDetected', presenterDetected, false);
+      this.systemStatus.setStatus('PresenterDetected', presenterDetected, false);
       xapi.Status.Cameras.PresenterTrack.PresenterDetected.on(value => {
-        if (this.systemStatus.getStatus('SS$PresenterTrackWarnings') == 'on') {
-          this.systemStatus.setStatus('presenterDetected', value);
+        if (this.systemStatus.getStatus('PresenterTrackWarnings') == 'on') {
+          this.systemStatus.setStatus('PresenterDetected', value);
           this.processPresenterDetectedStatus(value == 'True' ? true : false);
         }
       });
     }
-    this.systemStatus.onKeyChg('SS$PresenterTrackWarnings', status => {
+    this.systemStatus.onKeyChg('PresenterTrackWarnings', status => {
       if (status.value == 'off') {
         xapi.Command.UserInterface.Message.TextLine.Clear();
       }
@@ -512,14 +511,14 @@ class Core {
     }
     zapi.system.enablePresenterTrackWarning = () => {
       debug(1, `Enabling presenter tracking`);
-      this.systemStatus.setStatus('SS$PresenterTrackWarnings', 'on');
+      this.systemStatus.setStatus('PresenterTrackWarnings', 'on');
       xapi.Command.Cameras.PresenterTrack.Set({
         Mode: 'Follow'
       });
     }
     zapi.system.disablePresenterTrackWarning = () => {
       debug(1, `Disabling presenter tracking`);
-      this.systemStatus.setStatus('SS$PresenterTrackWarnings', 'off');
+      this.systemStatus.setStatus('PresenterTrackWarnings', 'off');
       xapi.Command.Cameras.PresenterTrack.Set({
         Mode: 'Off'
       });
@@ -568,6 +567,13 @@ class Core {
 
       }
     }, config.system.requiredPeripheralsCheckInterval);
+
+    zapi.system.setStatus('Uptime',await xapi.Status.SystemUnit.Uptime.get());
+    zapi.system.setStatus('Temperature', await xapi.Status.SystemUnit.Hardware.Monitoring.Temperature.Status.get());
+    setInterval(async () => {
+      zapi.system.setStatus('Uptime',await xapi.Status.SystemUnit.Uptime.get());
+      zapi.system.setStatus('Temperature', await xapi.Status.SystemUnit.Hardware.Monitoring.Temperature.Status.get());
+    },480000);
   }
 
   processPresenterDetectedStatus(status) {
@@ -802,9 +808,11 @@ async function init() {
     console.warn(zapi.system.getAllStatus());
   }, 5000);
 
+
   setInterval(() => {
     console.warn(performance);
   }, 240000);
+
 
 
   //TESTAREA
@@ -824,7 +832,7 @@ async function init() {
 }
 
 
-debug(1, 'UNNAMED MIDDLEWARE is starting...');
+debug(1, `${PRODUCT} is starting...`);
 debug(1, `Version: ${VERSION}`);
 debug(1, `Debug level is: ${config.system.debugLevel}`);
 

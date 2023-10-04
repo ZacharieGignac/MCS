@@ -2,6 +2,8 @@ import xapi from 'xapi';
 import { config } from './config';
 import { zapiv1 } from './zapi';
 
+var zapi = zapiv1;
+
 const PRES_NOPRES = 'NOPRESENTATION';
 const PRES_LOCALPREVIEW = 'LOCALPREVIEW';
 const PRES_LOCALSHARE = 'LOCALSHARE';
@@ -141,16 +143,15 @@ export var presentation = {
 export class SystemStatus {
   constructor() {
     var self = this;
-    this.api = zapiv1;
     this._systemStatus = {};
     this._systemStatus.presentation = {};
     this._callbacks = [];
-    this.api.system.setStatus = (key, value, notify) => { self.setStatus(key, value, notify) };
-    this.api.system.getAllStatus = () => { return self.getAllStatus() };
-    this.api.system.onStatusChange = (callback) => { self.onChange(callback) };
-    this.api.system.onStatusKeyChange = (key, callback) => { self.onKeyChg(key, callback) };
-    this.api.system.getStatus = (key) => { return self.getStatus(key) };
-    this.api.system.resetSystemStatus = () => { self.setDefaults() };
+    zapi.system.setStatus = (key, value, notify) => { self.setStatus(key, value, notify) };
+    zapi.system.getAllStatus = () => { return self.getAllStatus() };
+    zapi.system.onStatusChange = (callback) => { self.onChange(callback) };
+    zapi.system.onStatusKeyChange = (key, callback) => { self.onKeyChg(key, callback) };
+    zapi.system.getStatus = (key) => { return self.getStatus(key) };
+    zapi.system.resetSystemStatus = () => { self.setDefaults() };
 
   }
 
@@ -209,7 +210,7 @@ export class SystemStatus {
   setDefaults() {
     for (let prop in config.systemStatus) {
       if (config.systemStatus.hasOwnProperty(prop)) {
-        this.api.system.setStatus(prop, config.systemStatus[prop], false);
+        zapi.system.setStatus(prop, config.systemStatus[prop], false);
       }
     }
   }
@@ -234,7 +235,7 @@ export class SystemStatus {
         this.api.ui.setWidgetValue('SS$' + key, value);
       }
       */
-      this.api.ui.setWidgetValue('SS$' + key, value);
+      zapi.ui.setWidgetValue('SS$' + key, value);
     }
     else {
       debug(1, `SystemStatus: CHANGED (filtered, identical values) Key="${key}" Value="${value}"`);

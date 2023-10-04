@@ -2,7 +2,7 @@ import xapi from 'xapi';
 import { config } from './config';
 import { zapiv1 } from './zapi';
 
-const zapi = zapiv1;
+var zapi = zapiv1;
 
 
 function debug(level, text) {

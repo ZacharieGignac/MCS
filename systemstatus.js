@@ -193,7 +193,7 @@ export class SystemStatus {
 
 
       for (let w of amapWidgets) {
-        this.setStatus(w.WidgetId, w.Value, false);
+        this.setStatus(w.WidgetId.split('$')[1], w.Value, false);
       }
 
       //Display current status at 30 seconds interval
@@ -215,7 +215,9 @@ export class SystemStatus {
   }
 
   setStatus(key, value, notifyChange = true) {
-
+    if (key.startsWith('SS$')) {
+      key = key.split('$')[1];
+    }
     if (this._systemStatus[key] != value) {
       this._systemStatus[key] = value;
       if (notifyChange) {
@@ -226,10 +228,13 @@ export class SystemStatus {
         debug(1, `SystemStatus: CHANGED (skip notify) Key="${key}", Value="${value}"`);
       }
       //Check if there is a corresponding widget to update
+      /*
       let allWidgets = this.api.ui.getAllWidgets();
-      if (allWidgets.filter(w => w.widgetId == key).length > 0) {
-        this.api.ui.setWidgetValue(key, value);
+      if (allWidgets.filter(w => w.widgetId == 'SS$' + key).length > 0) {
+        this.api.ui.setWidgetValue('SS$' + key, value);
       }
+      */
+      this.api.ui.setWidgetValue('SS$' + key, value);
     }
     else {
       debug(1, `SystemStatus: CHANGED (filtered, identical values) Key="${key}" Value="${value}"`);

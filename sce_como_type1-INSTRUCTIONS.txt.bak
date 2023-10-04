@@ -93,7 +93,7 @@ Les widgets suivants peuvent être utilisés pour modifier le comportement du sy
 
 Projecteur faisant face à l'auditoire:
     {
-      id: 'display.presentation.main', //id du device
+      id: 'display.presentation.main', //id du device. Commencer le nom par le type d'équipement est généralement conseillé.
       type: DEVICETYPE.DISPLAY, //ce device est un affichage
       name: 'PROJ', //ce nom est utilisé par le driver pour communiquer avec le système de contrôle (crestron, raspi)
       device: devicesLibrary.Display, //utilisation du device standard pour un affichage
@@ -108,9 +108,27 @@ Projecteur faisant face à l'auditoire:
 	
 Toile de projection lié au projecteur "display.presentation.main":
     {
-      id: 'screen.presentation.main', //id du device
+      id: 'screen.presentation.main', //id du device. Commencer le nom par le type d'équipement est généralement conseillé.
       type: DEVICETYPE.SCREEN, //ce device est une toile motorisée
       name: 'SCREEN', //ce nom est utilisé par le driver pour communiquer avec le système de contrôle (crestron, raspi)
       device: devicesLibrary.Screen, //utilisation du device standard pour toile motorisée
       driver: driversLibrary.ScreenDriver_isc_h21, //utilisation du driver de toile pour communication crestron, commandes normalisées du projet "e21"
+    }
+	
+Microphone casque (sans-fil) du présentateur:
+    {
+      id: 'audioinput.presenter.sf1', //id du device. Commencer le nom par le type d'équipement est généralement conseillé.
+      type: DEVICETYPE.AUDIOINPUT, //ce device est une entrée audio
+      name: 'Micro présentateur 1', //ce nom n'est pas utilisé dans le scénario, mais il peut apparaître dans les logs
+      device: devicesLibrary.AudioInput, //utilisation du device standard pour une entrée audio
+      driver: driversLibrary.AudioInput_codecpro, //utilisation du driver pour CodecPro
+      connector: 1, //Connecteur d'entrée du codec
+      input: 'microphone', //Type d'entrée
+      gainLowLimit: 40, //Limite basse du gain
+      gainHighLimit: 70, //Limite haute du gain
+      defaultGain: 50, //Gain par défaut
+      gainStep: 1, //Incrémentation / décrémentation par 1 (lorsque utilisé par un widget)
+      lowGain: 20, //Valeur fixes pour gain "low"
+      mediumGain: 40, //Valeur fixes pour gain "medium"
+      highGain: 60 //Valeur fixe pour gain "high"
     }

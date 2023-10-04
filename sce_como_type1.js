@@ -8,13 +8,13 @@ const DEVICETYPE = api.devices.DEVICETYPE;
 
 export var Manifest = {
   fileName: 'sce_como_type1',
-  id: 'como_type1',
+  id: 'comotype1',
   friendlyName: 'Salle Comodale (Type 1)',
   version: '0.0.1',
   description: 'Comportement normal pour une salle comodale de type 1',
   panels: {
     hide: ['*'],
-    show: ['normal_settings']
+    show: ['comotype1_settings']
   },
   features: {
     shareStart: true,
@@ -63,7 +63,7 @@ export class Scenario {
   }
 
   start() {
-    if (this.api.system.getStatus('SS$AutoLights') == 'on') {
+    if (this.api.system.getStatus('AutoLights') == 'on') {
       let lightscenes = this.api.devices.getDevicesByTypeInGroup(this.api.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.idle');
       if (lightscenes.length > 0) {
         for (let lightscene of lightscenes) {

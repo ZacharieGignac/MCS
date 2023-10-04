@@ -51,8 +51,6 @@ export class Scenario {
     }
 
     this.api.system.resetSystemStatus();
-    if (this.api.system.getStatus('SS$AutoLights') == 'on') {
-
       let lightscenes = this.api.devices.getDevicesByTypeInGroup(this.api.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.standby');
       if (lightscenes.length > 0) {
         for (let lightscene of lightscenes) {
@@ -68,7 +66,6 @@ export class Scenario {
 
       roomoutputgroup.disconnectLocalInput(pcinputgroup);
       */
-    } 
   }
 
   test() {

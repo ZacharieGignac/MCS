@@ -76,7 +76,7 @@ export var config = {
       enableScenario: 'standby'
     },
     onWakeup: {
-      enableScenario: 'como_type1'
+      enableScenario: 'comotype1'
     }
   },
 
@@ -464,16 +464,16 @@ export var config = {
   ],
 
   systemStatus: {
-    SS$PresenterLocation: 'local', //Mandatory value
-    SS$PresenterTrackWarnings: 'on', //Mandatory value
-    SS$UsePresentationTrack: 'on', //Mandatory value
-    SS$AutoDisplays: 'on', //Mandatory value
-    SS$AutoScreens: 'on', //Mandatory value
-    SS$AutoLights: 'on', //Mandatory value
-    SS$AutoCamPresets: 'on', //Mandatory value
-    SS$AudienceMics: 'on', //Mandatory valuee
-    SS$PresenterMics: 'on', //Mandatory value
-    presenterDetected: false, //Mandatory value
+    PresenterLocation: 'local', //Mandatory value
+    PresenterTrackWarnings: 'on', //Mandatory value
+    UsePresenterTrack: 'on', //Mandatory value
+    AutoDisplays: 'on', //Mandatory value
+    AutoScreens: 'on', //Mandatory value
+    AutoLights: 'on', //Mandatory value
+    AutoCamPresets: 'on', //Mandatory value
+    AudienceMics: 'on', //Mandatory valuee
+    PresenterMics: 'on', //Mandatory value
+    PresenterDetected: false, //Mandatory value
   },
 
 };

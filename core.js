@@ -234,6 +234,10 @@ class WidgetMapping {
   }
 
   processEvent(event) {
+    if (event.WidgetId.includes('|')) {
+      event.WidgetId = event.WidgetId.split('|')[1];
+    }
+
     if (this.widgetId instanceof RegExp) {
       if (this.widgetId.test(event.WidgetId)) {
         for (let cb of this.callbacks) {
@@ -306,13 +310,27 @@ class UiManager {
   }
 
   setWidgetValue(widgetId, value) {
+    for (let w of this.allWidgets) {
+      var targetWidgetId = w.widgetId;
+      if (w.widgetId.includes('|')) {
+        targetWidgetId = w.widgetId.split('|')[1];
+      }
+      if (targetWidgetId == widgetId) {
+        xapi.Command.UserInterface.Extensions.Widget.SetValue({
+          WidgetId: w.widgetId,
+          Value: value
+        });
+      }
+    }
+
+    /*
     if (this.allWidgets.filter(w => w.widgetId == widgetId).length > 0) {
       debug(1, `Setting widget "${widgetId}" value to "${value}"`);
       xapi.Command.UserInterface.Extensions.Widget.SetValue({
         WidgetId: widgetId,
         Value: value
       })
-    }
+    }*/
   }
 
   onUiEvent(callback) {
@@ -340,8 +358,13 @@ class UiManager {
 
     if (event.Extensions?.Widget?.Action) {
       this.processWidgetMappingsEvent(event.Extensions.Widget.Action);
-      if (event.Extensions.Widget.Action.WidgetId.startsWith('SS$')) {
-        zapi.system.setStatus(event.Extensions.Widget.Action.WidgetId, event.Extensions.Widget.Action.Value);
+      //UGLY FIX
+      eventId = event.Extensions.Widget.Action.WidgetId;
+      if (eventId.includes('|')) {
+        eventId = eventId.split('|')[1];
+      }
+      if (eventId.startsWith('SS$')) {
+        zapi.system.setStatus(eventId, event.Extensions.Widget.Action.Value);
       }
     }
   }
@@ -795,6 +818,8 @@ async function init() {
 
   //let test = zapi.devices.getDevice('lightscene.standby');
   //test.activate();
+
+
 
 }
 

@@ -221,6 +221,7 @@ export class Display {
     // Default WidgetMapping
     var onButton = zapi.ui.addWidgetMapping(this.config.id + ':POWERON');
     var offButton = zapi.ui.addWidgetMapping(this.config.id + ':POWEROFF');
+    var powerToggle = zapi.ui.addWidgetMapping(this.config.id + ':POWER');
 
     onButton.on('clicked', () => {
       self.powerOn();
@@ -228,6 +229,10 @@ export class Display {
 
     offButton.on('clicked', () => {
       self.powerOff();
+    });
+
+    powerToggle.on('changed', (value) => {
+      this.setPower(value);
     });
   }
 
@@ -258,12 +263,14 @@ export class Display {
     if (this.config.supportsPower) {
       if (this._currentPower !== 'off') {
         this._currentPower = 'off';
-        zapi.ui.setWidgetValue(this.config.id + '_POWERSTATUS', `OFF (transiting ${delay}ms)`);
+        zapi.ui.setWidgetValue(this.config.id + ':POWERSTATUS', `OFF (transiting ${delay}ms)`);
+        zapi.ui.setWidgetValue(this.config.id + ':POWER', 'off');
         debug(1, `Display "${this.config.id}" POWER set to OFF. Delay: ${delay} ms"`);
         clearTimeout(this.powerOffTimeout);
         this.powerOffTimeout = setTimeout(() => {
           this.driver.setPower('off');
-          zapi.ui.setWidgetValue(this.config.id + '_POWERSTATUS', `OFF`);
+          zapi.ui.setWidgetValue(this.config.id + ':POWERSTATUS', `OFF`);
+          zapi.ui.setWidgetValue(this.config.id + ':POWER', 'off');
         }, delay);
         if (this.config.blankBeforePowerOff) {
           this.driver.setBlanking(true);
@@ -278,7 +285,8 @@ export class Display {
     if (this.config.supportsPower) {
       if (this._currentPower !== 'on') {
         this._currentPower = 'on';
-        zapi.ui.setWidgetValue(this.config.id + '_POWERSTATUS', 'ON');
+        zapi.ui.setWidgetValue(this.config.id + ':POWERSTATUS', 'ON');
+        zapi.ui.setWidgetValue(this.config.id + ':POWER', 'on');
         clearTimeout(this.powerOffTimeout);
         this.driver.setPower('on');
         if (this.config.blankBeforePowerOff) {

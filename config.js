@@ -72,7 +72,7 @@ export var config = {
     forcePresenterTrackActivation: true,
     onStandby: {
       setDND: true,
-      clearCallHistory: true,
+      clearCallHistory: false,
       enableScenario: 'standby'
     },
     onWakeup: {
@@ -130,6 +130,7 @@ export var config = {
       supportsSource: false,
       supportsUsageHours: false,
       defaultPower: 'off',
+      defaultBlanking: false,
       blankBeforePowerOff: true,
       powerOffDelay: 6000,
       usageHoursRequestInterval: 100000,
@@ -192,7 +193,7 @@ export var config = {
       gainStep: 1,
       defaultMode: 'on',
       lowGain: 20,
-      mediumGain: 40,
+      mediumGain: 50,
       highGain: 60
     },
     {
@@ -209,7 +210,7 @@ export var config = {
       gainStep: 1,
       defaultMode: 'on',
       lowGain: 20,
-      mediumGain: 40,
+      mediumGain: 50,
       highGain: 60
     },
     {
@@ -503,6 +504,7 @@ export var config = {
   ],
 
   systemStatus: {
+    //System status
     Product: PRODUCT,
     Version: VERSION,
     PresenterLocation: 'local', //Mandatory value
@@ -515,6 +517,10 @@ export var config = {
     AudienceMics: 'on', //Mandatory valuee
     PresenterMics: 'on', //Mandatory value
     PresenterDetected: false, //Mandatory value
+    ClearBoard: 'off'
+    
+    //Scenario-specific status
+    
   },
 
 };

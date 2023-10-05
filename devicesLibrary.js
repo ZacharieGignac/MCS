@@ -734,17 +734,20 @@ export class Screen {
   }
 
   up() {
+    debug(1, `DEVICE ${this.config.id}: Going UP`);
     zapi.performance.inc('DEVICE.' + this.config.id + '.up');
     this.setPosition('up');
   }
 
   down() {
+    debug(1, `DEVICE ${this.config.id}: Going DOWN`);
     zapi.performance.inc('DEVICE.' + this.config.id + '.down');
     this.setPosition('down');
   }
 
   reset() {
     debug(1, `DEVICE ${this.config.id}: RESET`);
+    this.setDefaults();
   }
 }
 

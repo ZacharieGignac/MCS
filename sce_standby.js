@@ -3,6 +3,8 @@ import { zapiv1 } from './zapi';
 
 var zapi = zapiv1;
 
+//TODO: stop any presentation
+
 export var Manifest = {
   fileName: 'sce_standby',
   id: 'standby',

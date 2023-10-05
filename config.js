@@ -67,14 +67,12 @@ export var config = {
     initDelay: 1000,
     forceSleepEnabled: true,
     forceSleepTime: '2:00',
-    requiredPeripheralsCheckInterval: 5000,
+    requiredPeripheralsCheckInterval: 30000,
     usePresenterTrack: true,
     forcePresenterTrackActivation: true,
     onStandby: {
       setDND: true,
-      resetPresenterLocation: true,
-      resetAudioLevels: true,
-      clearCallLogs: true,
+      clearCallHistory: true,
       enableScenario: 'standby'
     },
     onWakeup: {

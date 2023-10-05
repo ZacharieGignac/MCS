@@ -568,13 +568,52 @@ class Core {
       }
     }, config.system.requiredPeripheralsCheckInterval);
 
-    zapi.system.setStatus('Uptime',await xapi.Status.SystemUnit.Uptime.get());
+    zapi.system.setStatus('Uptime', await xapi.Status.SystemUnit.Uptime.get());
     zapi.system.setStatus('Temperature', await xapi.Status.SystemUnit.Hardware.Monitoring.Temperature.Status.get());
     setInterval(async () => {
-      zapi.system.setStatus('Uptime',await xapi.Status.SystemUnit.Uptime.get());
+      zapi.system.setStatus('Uptime', await xapi.Status.SystemUnit.Uptime.get());
       zapi.system.setStatus('Temperature', await xapi.Status.SystemUnit.Hardware.Monitoring.Temperature.Status.get());
-    },480000);
+    }, 480000);
+
+
+
+    //Basic diagnostics
+    zapi.ui.addWidgetMapping('system:DIAGNOSTICS').on('clicked', async () => {
+      this.diags = await xapi.Status.Diagnostics.Message.get();
+      this.displayNextDiagnosticsMessages();
+    });
+
+    xapi.Event.UserInterface.Message.Prompt.Response.on(value => {
+      if (value.FeedbackId == 'systemDiagsNext') {
+        this.displayNextDiagnosticsMessages();
+      }
+    });
+
   }
+
+  displayNextDiagnosticsMessages() {
+    if (this.diags.length > 0) {
+      let diag = this.diags.shift();
+      xapi.Command.UserInterface.Message.Prompt.Display({
+        Duration: 0,
+        FeedbackId: 'systemDiagsNext',
+        "Option.1": 'Prochain message',
+        Text: diag.Description,
+        Title: diag.Level + " / " + diag.Type
+      });
+    }
+    else {
+      xapi.Command.UserInterface.Message.Prompt.Display({
+        Duration: 0,
+        FeedbackId: 'systemDiagsEnd',
+        "Option.1": 'Ferner',
+        Text: 'Si vous voyez ceci, le logiciel fonctionne.<br>Prennez en note ces messages pour faciliter le dépannage.',
+        Title: 'Fin des messages du système'
+      });
+    }
+  }
+
+
 
   processPresenterDetectedStatus(status) {
     if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('hdmiPassthrough') == 'Active') {
@@ -625,7 +664,14 @@ class Core {
 
   handleStandby() {
     debug(1, 'Entering standby...');
-    this.setDND();
+    if (config.system.onStandby.setDND) {
+      this.setDND();
+    }
+    if (config.system.onStandby.clearCallHistory) {
+      xapi.Command.CallHistory.DeleteAll();
+    }
+    
+    
     this.scenarios.enableScenario(config.system.onStandby.enableScenario);
   }
 
@@ -812,6 +858,7 @@ async function init() {
   setInterval(() => {
     console.warn(performance);
   }, 240000);
+
 
 
 

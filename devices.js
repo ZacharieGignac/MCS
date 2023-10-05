@@ -91,11 +91,19 @@ export class DevicesManager {
       if (found.length > 0) {
         return found[0].inst;
       }
+      else {
+        debug(3,`Cannot get device with id "${id}". Are you sure you got the right id (case sensitive) ?"`);
+        return [];
+      }
     }
     else {
       let found = this.allDevices.filter(dev => dev.id == id);
       if (found.length > 0) {
         return found[0];
+      }
+      else {
+        debug(3,`Cannot get device with id "${id}". Are you sure you got the right id (case sensitive) ?"`);
+        return [];
       }
     }
   }

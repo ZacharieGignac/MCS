@@ -694,12 +694,11 @@ class Core {
 
 }
 
-function configValidityCheck() {//TODO
-  var valid = true;
+function configValidityCheck() {
+    var valid = true;
 
   //Check for devices names doubles
-
-
+  debug(1,`Checking for non-unique device ids...`);
   var doubles = [];
   for (let device of config.devices) {
     let count = config.devices.filter(dev => { return device.id == dev.id }).length;
@@ -707,6 +706,17 @@ function configValidityCheck() {//TODO
       debug(3, `Device "${device.id}" is declared ${count} times.`);
       doubles.push(device.id);
       valid = false;
+    }
+  }
+
+  //Check if all devices in groups are declared in devices list
+  debug(1,`Checking devices groups for non-declared devices...`);
+  for (let group of config.groups) {
+    for (let device of group.devices) {
+      if (config.devices.filter(dev => dev.id == device).length == 0) {
+        debug(3,`Device "${device}" in group "${group.id}" is referencing a device that is not declared in the devices list.`);
+        valid = false;
+      }
     }
   }
   return valid;

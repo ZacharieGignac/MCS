@@ -124,7 +124,7 @@ export class AudioInput_codecpro {
   }
 
   setGain(gain) {
-    debug(1, `DRIVER AudioInput_internal (${this.config.id}): setGain: ${gain}`);
+    debug(1, `DRIVER AudioInput_codecpro (${this.config.id}): setGain: ${gain}`);
     switch (this.config.input) {
       case "microphone":
         xapi.Config.Audio.Input.Microphone[this.config.connector].Level.set(gain);
@@ -148,7 +148,7 @@ export class AudioInput_codecpro {
   }
 
   off() {
-    debug(1, `DRIVER AudioInput_internal (${this.config.id}): Off`);
+    debug(1, `DRIVER AudioInput_codecpro (${this.config.id}): Off`);
     switch (this.config.input) {
       case 'microphone':
         xapi.Config.Audio.Input.Microphone[this.config.connector].mode.set('Off');
@@ -163,7 +163,7 @@ export class AudioInput_codecpro {
   }
 
   on() {
-    debug(1, `DRIVER AudioInput_internal (${this.config.id}): On`);
+    debug(1, `DRIVER AudioInput_codecpro (${this.config.id}): On`);
     switch (this.config.input) {
       case 'microphone':
         xapi.Config.Audio.Input.Microphone[this.config.connector].mode.set('On');

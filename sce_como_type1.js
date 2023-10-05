@@ -38,6 +38,8 @@ export var Manifest = {
 
 export class Scenario {
   constructor() {
+    this.devices = {};
+
     zapi.system.onStatusChange(status => {
 
     });
@@ -48,7 +50,37 @@ export class Scenario {
   }
 
   enable() {
-    return new Promise(success => {
+    return new Promise(async success => {
+
+      
+      /* getting devices from config */
+      //Displays
+      this.devices.displays = {};   
+      this.devices.displays.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.presentation.main');
+      this.devices.displays.farend = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.farend.main');
+      this.devices.displays.byod = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.byod.main');
+
+      //Screens
+      this.devices.screens = {};
+      this.devices.screens.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.SCREEN, 'system.presentation.main');
+      this.devices.screens.farend = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.SCREEN, 'system.farend.main');
+
+      //Lightscenes
+      this.devices.lightscenes = {};
+      this.devices.lightscenes.idle = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.idle');
+      this.devices.lightscenes.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.presentation.main');
+
+      //AudioOutputGroups
+      this.devices.audiooutputgroups = {};
+      this.devices.audiooutputgroups.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.AUDIOOUTPUTGROUP, 'system.presentation.main');
+      this.devices.audiooutputgroups.farend = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.AUDIOOUTPUTGROUP, 'system.farend.main');
+
+      //AudioInputs
+      this.devices.audioinputs = {};
+      this.devices.audioinputs.presentermics = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.AUDIOINPUT, 'system.audio.presentermics');
+      this.devices.audioinputs.audiencemics = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.AUDIOINPUT, 'system.audio.audiencemics');
+      
+
       success(true);
     });
 
@@ -56,40 +88,24 @@ export class Scenario {
   }
 
   disable() {
-    return new Promise(success => {
+    return new Promise(async success => {
       success(true);
     });
   }
 
   start() {
+    
+
+
+
+    /* Setting video outputs */
+    xapi.Config.Video.Monitors.set('DualPresentationOnly');
+
+
     if (zapi.system.getStatus('AutoLights') == 'on') {
-      let lightscenes = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.idle');
-      if (lightscenes.length > 0) {
-        for (let lightscene of lightscenes) {
-          let lsdevice = zapi.devices.getDevice(lightscene.config.id);
-          if (lsdevice) {
-            lsdevice.activate();
-          }
+        for (let lightscene of this.devices.lightscenes.idle) {
+            lightscene.activate();
         }
-      }
-
-      /*
-      let pcinputgroup = this.api.devices.getDevice('PC');
-      let roomoutputgroup = this.api.devices.getDevice('ROOM');
-
-      roomoutputgroup.connectLocalInput(pcinputgroup);
-
-      var button = this.api.ui.addWidgetMapping('testac');
-      button.on('clicked', () => {
-        roomoutputgroup.connectRemoteInputs();
-      });
-
-      var button2 = this.api.ui.addWidgetMapping('testac2');
-      button2.on('clicked', () => {
-        roomoutputgroup.disconnectRemoteInputs();
-      });
-      */
-
     }
   }
 

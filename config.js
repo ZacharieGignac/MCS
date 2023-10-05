@@ -54,7 +54,7 @@ const DEVICETYPE = {
 }
 
 
-export const PRODUCT = 'CretOS (dev)';
+export const PRODUCT = 'PrepOS (dev)';
 export const VERSION = '0.0.1';
 
 export var config = {
@@ -146,6 +146,21 @@ export var config = {
       supportsSource: false,
       supportsUsageHours: false,
       defaultPower: 'off',
+      blankBeforePowerOff: false,
+      powerOffDelay: 0,
+    },
+    {
+      id: 'display.byod',
+      type: DEVICETYPE.DISPLAY,
+      name: 'BYOD',
+      device: devicesLibrary.Display,
+      driver: driversLibrary.DisplayDriver_isc_h21,
+      connector: 2,
+      supportsPower: false,
+      supportsBlanking: false,
+      supportsSource: false,
+      supportsUsageHours: false,
+      defaultPower: 'on',
       blankBeforePowerOff: false,
       powerOffDelay: 0,
     },
@@ -349,7 +364,6 @@ export var config = {
       lights: [
         {
           id: 'light.presenter',
-          power: 'on',
           dim: 50
         },
         {
@@ -392,7 +406,7 @@ export var config = {
 
     /* CAMERAS */
     {
-      id: 'cam1',
+      id: 'camera.presenter',
       type: DEVICETYPE.VIRTUAL,
       name: 'Caméra (enseignant)',
       device: devicesLibrary.Virtual,
@@ -401,13 +415,12 @@ export var config = {
 
     },
     {
-      id: 'cam2',
+      id: 'camera.audience',
       type: DEVICETYPE.VIRTUAL,
       name: 'Caméra (auditoire)',
       device: devicesLibrary.Virtual,
       peripheralRequired: true,
       peripheralId: 'FDO2603J89L'
-
     },
 
 
@@ -434,7 +447,7 @@ export var config = {
       device: devicesLibrary.AudioOutputGroup
     },
     {
-      id: 'ao.monitor',
+      id: 'aog.monitor',
       name: 'Monitor',
       type: DEVICETYPE.AUDIOOUTPUTGROUP,
       device: devicesLibrary.AudioOutputGroup
@@ -457,13 +470,16 @@ export var config = {
   groups: [
     {
       id: 'system.presentation.main',
-      devices: ['display.projector', 'screen', 'cammpreset.presenter', 'lightscene.presentation', 'camera.presenter', 'aog.room']
+      devices: ['display.projector', 'screen', 'campreset.presenter', 'lightscene.presentation', 'camera.presenter', 'aog.room']
     },
     {
       id: 'system.farend.main',
       devices: ['display.monitor', 'campreset.audience', 'camera.audience', 'aog.monitor']
     },
-
+    {
+      id: 'system.byod.main',
+      devices: ['display.byod']
+    },
     {
       id: 'system.audio.allmics',
       devices: ['audioinput.presenter.sf1', 'audioinput.presenter.bat1', 'audioinput.ceilingmic.1', 'audioinput.ceilingmic.2', 'audioinput.ceilingmic.3']

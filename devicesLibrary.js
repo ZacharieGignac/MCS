@@ -47,6 +47,7 @@ export class LightScene {
     });
   }
   activate() {
+    debug(1, `DEVICE ${this.config.id}: activate`);
     this.driver.activate();
   }
 }

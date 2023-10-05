@@ -106,7 +106,7 @@ export var config = {
 
 
   devices: [
-    //Types: DISPLAY, SCREEN, CONTROLSYSTEM, LIGHT, LIGHTSCENE, VIDEOOUTPUT
+    /* CONTROL SYSTEM */
     {
       id: 'controlsystem',
       type: DEVICETYPE.CONTROLSYSTEM,
@@ -115,15 +115,18 @@ export var config = {
       peripheralRequired: true,
       peripheralId: 'FOC2447N5FW'
     },
+
+
+    /* DISPLAYS */
     {
-      id: 'display.presentation.main',
+      id: 'display.projector',
       type: DEVICETYPE.DISPLAY,
       name: 'PROJ',
       device: devicesLibrary.Display,
       driver: driversLibrary.DisplayDriver_isc_h21,
       connector: 1,
       supportsPower: true,
-      supportsBlanking: true,
+      supportsBlanking: false,
       supportsSource: false,
       supportsUsageHours: false,
       defaultPower: 'off',
@@ -132,20 +135,41 @@ export var config = {
       usageHoursRequestInterval: 100000,
     },
     {
-      id: 'screen.presentation.main',
+      id: 'display.monitor',
+      type: DEVICETYPE.DISPLAY,
+      name: 'TV',
+      device: devicesLibrary.Display,
+      driver: driversLibrary.DisplayDriver_isc_h21,
+      connector: 3,
+      supportsPower: true,
+      supportsBlanking: false,
+      supportsSource: false,
+      supportsUsageHours: false,
+      defaultPower: 'off',
+      blankBeforePowerOff: false,
+      powerOffDelay: 0,
+    },
+
+
+    /* MOTORIZED SCREENS */
+    {
+      id: 'screen',
       type: DEVICETYPE.SCREEN,
       name: 'SCREEN',
       device: devicesLibrary.Screen,
       driver: driversLibrary.ScreenDriver_isc_h21,
       defaultPosition: 'up'
     },
+
+
+    /* AUDIO INPUTS */
     {
-      id: 'audioinput.presenter.mic1',
+      id: 'audioinput.presenter.sf1',
       type: DEVICETYPE.AUDIOINPUT,
-      name: 'Micro présentateur 1',
+      name: 'Micro sans-fil',
       device: devicesLibrary.AudioInput,
       driver: driversLibrary.AudioInput_codecpro,
-      connector: 1,
+      connector: 7,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
       gainHighLimit: 70,
@@ -157,12 +181,78 @@ export var config = {
       highGain: 60
     },
     {
-      id: 'campreset.tableau',
-      name: 'Preset Tableau',
-      type: DEVICETYPE.CAMERAPRESET,
-      device: devicesLibrary.CameraPreset,
-      presetName: 'Tableau'
+      id: 'audioinput.presenter.bat1',
+      type: DEVICETYPE.AUDIOINPUT,
+      name: 'Micro bâton',
+      device: devicesLibrary.AudioInput,
+      driver: driversLibrary.AudioInput_codecpro,
+      connector: 8,
+      input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
+      gainLowLimit: 0,
+      gainHighLimit: 70,
+      defaultGain: 50,
+      gainStep: 1,
+      defaultMode: 'on',
+      lowGain: 20,
+      mediumGain: 40,
+      highGain: 60
     },
+    {
+      id: 'audioinput.ceilingmic.1',
+      type: DEVICETYPE.AUDIOINPUT,
+      name: 'Micro plafond 1',
+      device: devicesLibrary.AudioInput,
+      driver: driversLibrary.AudioInput_codecpro,
+      connector: 8,
+      input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
+      gainLowLimit: 0,
+      gainHighLimit: 70,
+      defaultGain: 50,
+      gainStep: 1,
+      defaultMode: 'on',
+      lowGain: 20,
+      mediumGain: 40,
+      highGain: 60
+    },
+    {
+      id: 'audioinput.ceilingmic.2',
+      type: DEVICETYPE.AUDIOINPUT,
+      name: 'Micro plafond 2',
+      device: devicesLibrary.AudioInput,
+      driver: driversLibrary.AudioInput_codecpro,
+      connector: 8,
+      input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
+      gainLowLimit: 0,
+      gainHighLimit: 70,
+      defaultGain: 50,
+      gainStep: 1,
+      defaultMode: 'on',
+      lowGain: 20,
+      mediumGain: 40,
+      highGain: 60
+    },
+    {
+      id: 'audioinput.ceilingmic.3',
+      type: DEVICETYPE.AUDIOINPUT,
+      name: 'Micro plafond 3',
+      device: devicesLibrary.AudioInput,
+      driver: driversLibrary.AudioInput_codecpro,
+      connector: 8,
+      input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
+      gainLowLimit: 0,
+      gainHighLimit: 70,
+      defaultGain: 50,
+      gainStep: 1,
+      defaultMode: 'on',
+      lowGain: 20,
+      mediumGain: 40,
+      highGain: 60
+    },
+
+
+
+
+    /* CAMERA PRESETS */
     {
       id: 'campreset.presenter',
       name: 'Présentateur',
@@ -170,6 +260,23 @@ export var config = {
       device: devicesLibrary.CameraPreset,
       presetName: 'Présentateur'
     },
+    {
+      id: 'campreset.board',
+      name: 'Preset Tableau',
+      type: DEVICETYPE.CAMERAPRESET,
+      device: devicesLibrary.CameraPreset,
+      presetName: 'Tableau'
+    },
+    {
+      id: 'campreset.audience',
+      name: 'Preset Tableau',
+      type: DEVICETYPE.CAMERAPRESET,
+      device: devicesLibrary.CameraPreset,
+      presetName: 'Auditoire'
+    },
+
+
+    /* LIGHTS */
     {
       id: 'light.presenter',
       name: 'ZONE1',
@@ -206,6 +313,9 @@ export var config = {
       defaultPower: 'on',
       defaultDim: 100
     },
+
+
+    /* LIGHTSCENES */
     {
       id: 'lightscene.100%',
       name: 'STANDBY',
@@ -255,6 +365,33 @@ export var config = {
       ]
     },
     {
+      id: 'lightscene.presentation',
+      name: 'IDLE',
+      type: DEVICETYPE.LIGHTSCENE,
+      device: devicesLibrary.LightScene,
+      driver: driversLibrary.LightSceneDriver_lights,
+      lights: [
+        {
+          id: 'light.presenter',
+          power: 'on',
+          dim: 70
+        },
+        {
+          id: 'light.board',
+          power: 'on',
+          dim: 0
+        },
+        {
+          id: 'light.audience',
+          power: 'on',
+          dim: 100
+        }
+      ]
+    },
+
+
+    /* CAMERAS */
+    {
       id: 'cam1',
       type: DEVICETYPE.VIRTUAL,
       name: 'Caméra (enseignant)',
@@ -272,158 +409,36 @@ export var config = {
       peripheralId: 'FDO2603J89L'
 
     },
+
+
+    /* AUDIO INPUT GROUPS */
     {
-      id: 'ai.computers',
+      id: 'aig.computers',
       name: 'PC',
       type: DEVICETYPE.AUDIOINPUTGROUP,
       device: devicesLibrary.AudioInputGroup
     },
     {
-      id: 'ai.microphones',
+      id: 'aig.microphones.all',
       name: 'Microphone',
       type: DEVICETYPE.AUDIOINPUTGROUP,
       device: devicesLibrary.AudioInputGroup
     },
+
+
+    /* AUDIO OUTPUT GROUPS */
     {
-      id: 'ao.roomspeakers',
+      id: 'aog.room',
       name: 'Room',
       type: DEVICETYPE.AUDIOOUTPUTGROUP,
       device: devicesLibrary.AudioOutputGroup
     },
     {
-      id: 'ao.monitorspeakers',
+      id: 'ao.monitor',
       name: 'Monitor',
       type: DEVICETYPE.AUDIOOUTPUTGROUP,
       device: devicesLibrary.AudioOutputGroup
     }
-
-
-
-    /*
-    {
-      id: 'display.usbmode',
-      type: DEVICETYPE.DISPLAY,
-      name: 'INOGENI',
-      device: devicesLibrary.Display,
-      driver: driversLibrary.DisplayDriver_isc_h21,
-      connector: 2,
-      supportsPower: false,
-      supportsBlanking: false,
-      supportsSource: false,
-      supportsUsageHours: false,
-      defaultPower: false,
-      defaultBlanking: false,
-    },
-    {
-      id: 'display.farend',
-      type: DEVICETYPE.DISPLAY,
-      name: 'TV',
-      device: devicesLibrary.Display,
-      driver: driversLibrary.DisplayDriver_isc_h21,
-      connector: 3,
-      supportsPower: true,
-      supportsBlanking: false,
-      supportsSource: false,
-      supportsUsageHours: false,
-      defaultPower: false,
-      defaultBlanking: false,
-    },
-    {
-      id:'VirtualDevice',
-      type:DEVICETYPE.VIRTUAL,
-      name:'Système de contrôle (RaspberryPI)',
-      device: devicesLibrary.Virtual,
-      peripheralRequired: false,
-      peripheralId: 'test'
-
-    },
-    {
-      id: 'default.presentation.output',
-      type: DEVICETYPE.VIDEOOUTPUT,
-      name: 'default.presentation.output',
-      //device: devicesLibrary.VideoOutput,
-      connector: 1
-    },
-
-    {
-      id: 'light.presenter.desk',
-      type: DEVICETYPE.LIGHT,
-      name: 'Éclairage présentateur',
-      //device: devices.Light,
-      //driver: deviceDrivers.LightDriver_messages,
-      supportsOnOff: true,
-      supportsDim: true,
-      rangeLow: 0,
-      rangeHigh: 100
-    },
-
-    {
-      id: 'lightscenes',
-      type: DEVICETYPE.LIGHTSCENEMGR,
-      name: 'CRESTRON_MANAGED_LIGHTSCENES',
-      //device: devices.LightScene,
-      //driver: deviceDrivers.LightSceneDriver_messages,
-      pattern: 'LS_EXEC_%LIGHTSCENE%'
-    },
-    {
-      id: 'camera.teacher',
-      type: DEVICETYPE.CAMERA,
-      name: 'Caméra Prof',
-      //device: devicesLibrary.Camera,
-      peripheralRequired: false,
-      peripheralId: '6C:13:D5:2E:51:FA'
-    },
-    {
-      id: 'camera.room',
-      type: DEVICETYPE.CAMERA,
-      name: 'Caméra Salle',
-      //device: devicesLibrary.Camera,
-      peripheralRequired: false,
-      peripheralId: '6C:13:D5:2E:51:FF'
-    },
-    {
-      id: 'controlsystem',
-      type: DEVICETYPE.CONTROLSYSTEM,
-      name: 'Système de contrôle',
-      peripheralRequired: false,
-      peripheralId: 'abc'
-    },
-    {
-      id: 'teacher.sf.1',
-      type: DEVICETYPE.AUDIOINPUT,
-      name: 'Microphone sans-fil 1',
-      //device: devices.AudioInput,
-      //driver: devicesDrivers.AudioInputInternal,
-      gainLow: 40,
-      gainHigh: 61,
-      gainDefault: 50,
-      muteDefault: false
-    },
-    {
-      id: 'audience.ceilingmic.1',
-      type: DEVICETYPE.AUDIOINPUT,
-      name: 'ceiling 1',
-      //device: devices.AudioInput,
-      //driver: devicesDrivers.AudioInputInternal,
-      input:1,
-      gainLow: 51,
-      gainHigh: 51,
-      gainDefault: 51,
-      muteDefault: false
-    },
-    {
-      id: 'audience.ceilingmic.2',
-      type: DEVICETYPE.AUDIOINPUT,
-      name: 'ceiling 2',
-      //device: devices.AudioInput,
-      //driver: devicesDrivers.AudioInputInternal,
-      input:2,
-      gainLow: 51,
-      gainHigh: 51,
-      gainDefault: 51,
-      muteDefault: false
-    }
-    */
 
   ],
 
@@ -441,16 +456,25 @@ export var config = {
   },
   groups: [
     {
-      id: 'presentation.main',
-      devices: ['display.presentation', 'display.farend', 'screen.presentation', 'camera.teacher', 'teacher.sf.1']
+      id: 'system.presentation.main',
+      devices: ['display.projector', 'screen', 'cammpreset.presenter', 'lightscene.presentation', 'camera.presenter', 'aog.room']
     },
     {
-      id: 'audienceMics',
-      devices: ['audience.ceilingmic.1', 'audience.ceilingmic.2']
+      id: 'system.farend.main',
+      devices: ['display.monitor', 'campreset.audience', 'camera.audience', 'aog.monitor']
+    },
+
+    {
+      id: 'system.audio.allmics',
+      devices: ['audioinput.presenter.sf1', 'audioinput.presenter.bat1', 'audioinput.ceilingmic.1', 'audioinput.ceilingmic.2', 'audioinput.ceilingmic.3']
     },
     {
-      id: 'presenter',
-      devices: ['campreset.presenter', 'audioinput.presenter.mic1']
+      id: 'system.audio.presentermics',
+      devices: ['audioinput.presenter.sf1', 'audioinput.presenter.bat1']
+    },
+    {
+      id: 'system.audio.audiencemics',
+      devices: ['audioinput.ceilingmic.1', 'audioinput.ceilingmic.2', 'audioinput.ceilingmic.3']
     },
     {
       id: 'system.lightscene.standby',
@@ -463,8 +487,8 @@ export var config = {
   ],
 
   systemStatus: {
-    Product:PRODUCT,
-    Version:VERSION,
+    Product: PRODUCT,
+    Version: VERSION,
     PresenterLocation: 'local', //Mandatory value
     PresenterTrackWarnings: 'on', //Mandatory value
     UsePresenterTrack: 'on', //Mandatory value

@@ -74,6 +74,7 @@ export class DisplayDriver_isc_h21 {
     let powerString = this.config.name + '_' + power.toUpperCase();
     //xapi.Command.Message.Send({ Text: powerString });
     zapi.system.sendMessage(powerString);
+    debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): setPower: ${power}`);
   }
 
   setBlanking(blanking) {
@@ -81,6 +82,7 @@ export class DisplayDriver_isc_h21 {
     let blankingString = this.config.name + '_BLANKING_' + blankingStatus;
     //xapi.Command.Message.Send({ Text: blankingString });
     zapi.system.sendMessage(blankingString);
+    debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): setBlanking: ${blanking}`);
   }
 
   setSource(source) {
@@ -110,6 +112,7 @@ export class ScreenDriver_isc_h21 {
     position = position.toLowerCase();
     //xapi.Command.Message.Send({ Text: this.config.name + '_' + positionString });
     zapi.system.sendMessage(this.config.name + '_' + position);
+    debug(1, `DRIVER ScreenDriver_isc_h21 (${this.config.id}): setPosition: ${position}`);
   }
 
   custom() {

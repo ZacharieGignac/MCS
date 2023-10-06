@@ -135,6 +135,25 @@ export var config = {
       powerOffDelay: 6000,
       usageHoursRequestInterval: 100000,
     },
+    /*
+    {
+      id: 'display.projector.secondary',
+      type: DEVICETYPE.DISPLAY,
+      name: 'PROJ2',
+      device: devicesLibrary.Display,
+      driver: driversLibrary.DisplayDriver_isc_h21,
+      connector: 1,
+      supportsPower: true,
+      supportsBlanking: false,
+      supportsSource: false,
+      supportsUsageHours: false,
+      defaultPower: 'off',
+      defaultBlanking: false,
+      blankBeforePowerOff: true,
+      powerOffDelay: 6000,
+      usageHoursRequestInterval: 100000,
+    },
+    */
     {
       id: 'display.monitor',
       type: DEVICETYPE.DISPLAY,
@@ -176,6 +195,16 @@ export var config = {
       driver: driversLibrary.ScreenDriver_isc_h21,
       defaultPosition: 'up'
     },
+    /*
+    {
+      id: 'screen.secondary',
+      type: DEVICETYPE.SCREEN,
+      name: 'SCREEN2',
+      device: devicesLibrary.Screen,
+      driver: driversLibrary.ScreenDriver_isc_h21,
+      defaultPosition: 'up'
+    },
+    */
 
 
     /* AUDIO INPUTS */
@@ -473,6 +502,12 @@ export var config = {
       id: 'system.presentation.main',
       devices: ['display.projector', 'screen', 'campreset.presenter', 'lightscene.presentation', 'camera.presenter', 'aog.room']
     },
+    /*
+    {
+      id: 'system.presentation.secondary',
+      devices: ['display.projector.secondary', 'screen.secondary']
+    },
+    */
     {
       id: 'system.farend.main',
       devices: ['display.monitor', 'campreset.audience', 'camera.audience', 'aog.monitor']
@@ -517,10 +552,11 @@ export var config = {
     AudienceMics: 'on', //Mandatory valuee
     PresenterMics: 'on', //Mandatory value
     PresenterDetected: false, //Mandatory value
-    ClearBoard: 'off'
-    
+    ClearPresentationZone: 'off',
+    ClearPresentationZoneSecondary: 'off'
+
     //Scenario-specific status
-    
+
   },
 
 };

@@ -56,12 +56,14 @@ export class Scenario {
     //Displays
     this.devices.displays = {};
     this.devices.displays.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.presentation.main');
+    this.devices.displays.presentationsecondary = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.presentation.secondary');
     this.devices.displays.farend = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.farend.main');
     this.devices.displays.byod = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.byod.main');
 
     //Screens
     this.devices.screens = {};
     this.devices.screens.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.SCREEN, 'system.presentation.main');
+    this.devices.screens.presentationsecondary = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.SCREEN, 'system.presentation.secondary');
     this.devices.screens.farend = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.SCREEN, 'system.farend.main');
 
     //Lightscenes
@@ -86,6 +88,10 @@ export class Scenario {
   enable() {
     return new Promise(async success => {
       this.enabled = true;
+      this.devices.displays.farend.forEach(display => {
+        display.setBlanking(false);
+        display.powerOn();
+      });
 
       success(true);
     });
@@ -96,7 +102,6 @@ export class Scenario {
   disable() {
     return new Promise(async success => {
       this.enabled = false;
-
       success(true);
     });
   }
@@ -123,13 +128,14 @@ export class Scenario {
           break;
         case 'call':
           //Filter non-important call status
-          if (status.status.call == 'Idle' && status.status.call == 'Connected') {
+          if (status.status.call == 'Idle' || status.status.call == 'Connected') {
             this.evaluateDisplays(status.status);
             this.evaluateScreens(status.status);
           }
           break;
+        case 'ClearPresentationZoneSecondary':
         case 'presentation':
-        case 'ClearBoard':
+        case 'ClearPresentationZone':
         case 'PresenterLocation':
           this.evaluateDisplays(status.status);
           this.evaluateScreens(status.status);
@@ -154,16 +160,16 @@ export class Scenario {
   }
 
   async evaluateScreens(status) {
-
     //TODO: manage farend screen (improbable)
     /******************
      * 
      *  screens configuration
      * 
      ******************/
-    console.error(this.devices.screens);
+
+    //Evaluate primary screens
     if (status.PresenterLocation == 'local' || status.call != 'Connected') {
-      if (status.ClearBoard == 'on') {
+      if (status.ClearPresentationZone == 'on') {
         this.devices.screens.presentation.forEach(screen => {
           screen.up();
         });
@@ -178,7 +184,7 @@ export class Scenario {
     }
     else {
       if (status.call == 'Connected') {
-        if (status.ClearBoard == 'on') {
+        if (status.ClearPresentationZone == 'on') {
           this.devices.screens.presentation.forEach(screen => {
             screen.up();
           });
@@ -191,6 +197,18 @@ export class Scenario {
       }
     }
 
+    //Evaluate secondary screens
+    this.devices.screens.presentationsecondary.forEach(screen => {
+      if (status.ClearPresentationZoneSecondary == 'on') {
+        screen.up();
+      }
+      else if (status.ClearPresentationZoneSecondary == 'off') {
+        if (status.presentation.type != 'NOPRESENTATION' || (status.call == 'Connected' && status.PresenterLocation == 'remote')) {
+          screen.down();
+        }
+      }
+    });
+
   }
 
   async evaluateDisplays(status) {
@@ -200,20 +218,26 @@ export class Scenario {
      *  Displays configuration
      * 
      ******************/
+
+    //Evaluate primary presentation displays
     await xapi.Command.Video.Matrix.Reset();
     this.devices.displays.byod.forEach(display => {
       xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('Auto');
     });
 
-    if (status.ClearBoard == 'off') {
-      //Invert displays or not, depending on the presenter location
+    if (status.ClearPresentationZone == 'off') {
+      //when presenter is local
       if (status.PresenterLocation == 'local') {
         xapi.Config.Video.Monitors.set('DualPresentationOnly');
 
         this.devices.displays.presentation.forEach(display => {
-          //Choose unblanking mode (display blanking or video matrix)
-          if (display.config.supportsBlanking) {
+          if (status.presentation.type != 'NOPRESENTATION') {
             display.setBlanking(false);
+            display.powerOn();
+          }
+          else {
+            display.setBlanking(true);
+            display.powerOff();
           }
 
           xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('Second');
@@ -223,26 +247,47 @@ export class Scenario {
           xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
         });
       }
+      //When presenter is remote
       else {
-        xapi.Config.Video.Monitors.set('Single');
-        this.devices.displays.presentation.forEach(display => {
-          xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
-        });
-        this.devices.displays.farend.forEach(display => {
-          xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
-          if (status.call == 'Connected') {
+        if (status.call == 'Connected') {
+          xapi.Config.Video.Monitors.set('Single');
+          this.devices.displays.presentation.forEach(display => {
+            display.setBlanking(false);
+            display.powerOn();
+            xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
+          });
+          this.devices.displays.farend.forEach(display => {
+            xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
             xapi.Command.Video.Matrix.Assign({
               Mode: 'Replace',
               Output: display.config.connector,
               RemoteMain: 1
             });
-          }
-        });
+          });
+        }
+        else {
+          xapi.Config.Video.Monitors.set('DualPresentationOnly');
+          this.devices.displays.presentation.forEach(display => {
+            if (status.presentation.type != 'NOPRESENTATION') {
+              display.setBlanking(false);
+              display.powerOn();
+            }
+            else {
+              display.setBlanking(true);
+              display.powerOff();
+            }
+            xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
+          });
+          this.devices.displays.farend.forEach(display => {
+            xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('Second');
+          });
+        }
+
 
       }
     }
 
-    else if (status.ClearBoard == 'on') {
+    else if (status.ClearPresentationZone == 'on') {
       xapi.Config.Video.Monitors.set('Single');
       this.devices.displays.presentation.forEach(display => {
         //Setting role
@@ -266,6 +311,39 @@ export class Scenario {
       });
 
     }
+
+
+
+
+    //Evaluate secondary displays
+    this.devices.displays.presentationsecondary.forEach(display => {
+      if (status.ClearPresentationZoneSecondary == 'on') {
+        if (display.config.supportsBlanking) {
+          display.setBlanking(true);
+        }
+        else {
+          display.powerOff(0);
+        }
+      }
+      else {
+        if (status.presentation.type != 'NOPRESENTATION' || (status.call == 'Connected' && status.PresenterLocation == 'remote')) {
+          if (display.config.supportsBlanking) {
+            display.setBlanking(false);
+          }
+          else {
+            display.powerOn();
+          }
+        }
+        else {
+          if (display.config.supportsBlanking) {
+            display.setBlanking(true);
+          }
+          else {
+            display.powerOff();
+          }
+        }
+      }
+    });
   }
 
 

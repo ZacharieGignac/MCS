@@ -460,6 +460,7 @@ class Core {
     self.uiManager.addActionMapping(/^STANDBY$/, () => {
       xapi.Command.Standby.Activate();
     });
+    
     self.uiManager.addActionMapping(/^RESETDEVICES$/, (params) => {
       if (params.includes(';')) {
         params = params.split(';');

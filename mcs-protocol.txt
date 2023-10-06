@@ -1,0 +1,169 @@
+Le protocol MCS est utilisé entre le codec et un système de contrôle externe (Crestron, RaspberryPi, etc..)
+Conçu pour être simple à lire, simple à découper et flexible.
+
+Chaque message commence par le nom de l'appareil, suivi de ":", suivi de la commande, suivi d'un point virgule, suivi des arguments séparés par une virgule.
+
+Exemple: NOM:COMMANDE;1,2,3
+
+Il est théoriquement possible (si les 2 systèmes le supporte) d'enchainer plusieurs commandes en utilisant "&"
+
+Exemple: PREMIERAPPAREIL:COMMANDE;1&DEUXIEMEAPPAREIL:COMMANDE2;2
+
+Voici un simple décodeur TEXTE -> JSON en javascript:
+
+------------------
+const inputString = "PREMIERAPPAREIL:COMMANDE;1,2,3&SECONDAPPAREIL:ANOTHERCOMMAND;4,5,6";
+const commandStrings = inputString.split('&');
+const commandsArray = [];
+for (const commandString of commandStrings) {
+  const [deviceName, commandInfo] = commandString.split(':');
+  const [command, argumentsStr] = commandInfo.split(';');
+  const argumentsArray = argumentsStr.split(',').map(arg => parseInt(arg, 10));
+  const commandObject = {
+    deviceName,
+    command,
+    arguments: argumentsArray
+  };
+  commandsArray.push(commandObject);
+}
+const jsonObject = {
+  commands: commandsArray
+};
+const jsonString = JSON.stringify(jsonObject, null, 2);
+console.log(jsonString);
+-----------------
+
+
+Et voici un encodeur JSON -> TEXTE en javascript:
+-----------------
+function convertJsonToCommands(jsonObject) {
+  if (!jsonObject || !jsonObject.commands || !Array.isArray(jsonObject.commands)) {
+    return '';
+  }
+  const commandStrings = [];
+  for (const commandObject of jsonObject.commands) {
+    if (
+      commandObject &&
+      commandObject.deviceName &&
+      commandObject.command &&
+      Array.isArray(commandObject.arguments)
+    ) {
+      const deviceName = commandObject.deviceName;
+      const command = commandObject.command;
+      const argumentsStr = commandObject.arguments.join(',');
+      const commandString = `${deviceName}:${command};${argumentsStr}`;
+      commandStrings.push(commandString);
+    }
+  }
+
+  return commandStrings.join('&');
+}
+const jsonExample = {
+  commands: [
+    {
+      deviceName: "PREMIERAPPAREIL",
+      command: "COMMANDE",
+      arguments: [1, 2, 3]
+    },
+    {
+      deviceName: "SECONDAPPAREIL",
+      command: "ANOTHERCOMMAND",
+      arguments: [4, 5, 6]
+    }
+  ]
+};
+const commandsString = convertJsonToCommands(jsonExample);
+console.log(commandsString);
+--------------------
+
+[Contrôle du système de contrôle]
+Le système de controle est toujours nommé "CTRLSYS"
+
+Hardware reset (normalement un reboot):
+  CTRLSYS:HWRESET
+
+Software reset (normalement le redémarrage du logiciel:
+  CTRLSYS:SWRESET
+
+Heartbeat (codec->ctrlsys)
+  CTRLSYS:HEARTBEAT;CODEC
+
+Heartbeat (ctrlsys->codec)
+  CODEC:HEARTBEAT;CTRLSYS
+
+
+
+[Contrôle de toile motorisée]
+Ici la toile s'appelle "SCREEN" (défini sur le codec et le système de contrôle)
+
+Monter:
+   SCREEN:UP
+
+Descendre:
+   SCREEN:DOWN
+
+Arrêter:
+   SCREEN:STOP
+
+Définir la position:
+   SCREEN:POSITION;UP
+   SCREEN:POSITION;DOWN
+
+
+
+[Contrôle d'un dispositif d'affichage (projecteur, moniteur)]
+Ici l'affichage s'appelle "PROJ"(défini sur le codec et le système de contrôle)
+
+Allumer:
+   PROJ:ON
+
+Éteindre
+   PROJ:OFF
+
+Blank:
+   PROJ:BLANK
+
+Unblank:
+   PROJ:UNBLANK
+
+SetBlank:
+   PROJ:SETBLANK;ON
+   PROJ:SETBLANK;OFF
+
+Source:
+   PROJ:SOURCE;HDMI1
+   PROJ:SOURCE;HDBT
+
+Usage request:
+   PROJ:USAGEREQUEST
+
+Usage reply:
+   PROJ:USAGEREPLY;1056
+
+
+
+[Contrôle d'un dispositif d'éclairage]
+Ici l'affichage s'appelle "LIGHT"(défini sur le codec et le système de contrôle)
+
+Allumer:
+   LIGHT:ON
+
+Éteindre
+   LIGHT:OFF
+
+Set Power:
+   LIGHT:SETPOWER:ON
+   LIGHT:SETPOWER:OFF
+
+Tamiser (dim):
+   LIGHT:DIM:40
+
+
+[Contrôle d'une scène d'éclairage]
+Ici la scène s'appelle "SCENE"
+
+Activer (sélectionner, en mode unique):
+   SCENE:ACTIVATE
+
+Ajouter (ajoute la scène à celles déjà actives):
+   SCENE:APPEND

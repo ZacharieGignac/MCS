@@ -41,7 +41,9 @@ export class Scenario {
   }
 
   start() {
-    xapi.Command.Standby.Activate();
+
+    xapi.Command.Presentation.Stop();
+    
     let devices = zapi.devices.getAllDevices();
 
     for (let d of devices) {
@@ -67,6 +69,7 @@ export class Scenario {
 
       roomoutputgroup.disconnectLocalInput(pcinputgroup);
       */
+      xapi.Command.Standby.Activate();
   }
 
   test() {

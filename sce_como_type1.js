@@ -69,7 +69,10 @@ export class Scenario {
     //Lightscenes
     this.devices.lightscenes = {};
     this.devices.lightscenes.idle = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.idle');
-    this.devices.lightscenes.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.presentation.main');
+    this.devices.lightscenes.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.presentation');
+    this.devices.lightscenes.writingprimary = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.writingprimary');
+    this.devices.lightscenes.writingsecondary = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.writingsecondary');
+    this.devices.lightscenes.writingboth = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.writingboth');
 
     //AudioOutputGroups
     this.devices.audiooutputgroups = {};
@@ -109,7 +112,7 @@ export class Scenario {
   start() {
 
     let status = zapi.system.getAllStatus();
-    this.evaluateDisplays(status);
+    this.evaluateAll(status);
 
     /*
     if (zapi.system.getStatus('AutoLights') == 'on') {
@@ -139,6 +142,7 @@ export class Scenario {
         case 'PresenterLocation':
           this.evaluateDisplays(status.status);
           this.evaluateScreens(status.status);
+          this.evaluateLightscene(status.status);
           break;
         case 'AudienceMics':
           this.setAudienceMics(status.value);
@@ -159,7 +163,54 @@ export class Scenario {
 
   }
 
+  evaluateAll(status) {
+    this.evaluateDisplays(status);
+    this.evaluateScreens(status);
+    this.evaluateLightscene(status);
+  }
+
+  async evaluateLightscene(status) {
+    console.log('ComoType1 evaluating lightscenes...');
+
+    if (status.ClearPresentationZone == 'on' && status.ClearPresentationZoneSecondary == 'on') {
+      this.devices.lightscenes.writingboth.forEach(lightscene => {
+        lightscene.activate();
+      });
+    }
+    else if (status.ClearPresentationZone == 'on' && status.ClearPresentationZoneSecondary == 'off') {
+      this.devices.lightscenes.writingprimary.forEach(lightscene => {
+        lightscene.activate();
+      });
+    }
+    else if (status.ClearPresentationZone == 'off' && status.ClearPresentationZoneSecondary == 'on') {
+      this.devices.lightscenes.writingsecondary.forEach(lightscene => {
+        lightscene.activate();
+      });
+    }
+    else {
+      //Normal
+      if (status.presentation.type == 'NOPRESENTATION' && (status.ClearPresentationZone == 'off' || status.ClearPresentationZone == undefined) && (status.ClearPresentationZoneSecondary == 'off' || status.ClearPresentationZoneSecondary == undefined)) {
+        this.devices.lightscenes.idle.forEach(lightscene => {
+          lightscene.activate();
+        });
+      }
+
+      //Writing on board
+
+
+      //Presentation or remote presenter
+      if ((status.call == 'Connected' && status.PresenterLocation == 'remote') || status.presentation.type != 'NOPRESENTATION') {
+        this.devices.lightscenes.presentation.forEach(lightscene => {
+          lightscene.activate();
+        });
+      }
+    }
+
+
+  }
+
   async evaluateScreens(status) {
+    console.log('ComoType1 evaluating screens...');
     //TODO: manage farend screen (improbable)
     /******************
      * 

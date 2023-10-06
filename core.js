@@ -460,10 +460,16 @@ class Core {
     self.uiManager.addActionMapping(/^STANDBY$/, () => {
       xapi.Command.Standby.Activate();
     });
-    
+    self.uiManager.addActionMapping(/^PANELOPEN$/, (panelId, pageId) => {
+      xapi.Command.UserInterface.Extensions.Panel.Open({
+        PanelId: panelId,
+        PageId: pageId
+      });
+
+    });
     self.uiManager.addActionMapping(/^RESETDEVICES$/, (params) => {
-      if (params.includes(';')) {
-        params = params.split(';');
+      if (params.includes(',')) {
+        params = params.split(',');
       }
       else {
         params = [params];
@@ -671,8 +677,8 @@ class Core {
     if (config.system.onStandby.clearCallHistory) {
       xapi.Command.CallHistory.DeleteAll();
     }
-    
-    
+
+
     this.scenarios.enableScenario(config.system.onStandby.enableScenario);
   }
 
@@ -696,10 +702,10 @@ class Core {
 }
 
 function configValidityCheck() {
-    var valid = true;
+  var valid = true;
 
   //Check for devices names doubles
-  debug(1,`Checking for non-unique device ids...`);
+  debug(1, `Checking for non-unique device ids...`);
   var doubles = [];
   for (let device of config.devices) {
     let count = config.devices.filter(dev => { return device.id == dev.id }).length;
@@ -711,11 +717,11 @@ function configValidityCheck() {
   }
 
   //Check if all devices in groups are declared in devices list
-  debug(1,`Checking devices groups for non-declared devices...`);
+  debug(1, `Checking devices groups for non-declared devices...`);
   for (let group of config.groups) {
     for (let device of group.devices) {
       if (config.devices.filter(dev => dev.id == device).length == 0) {
-        debug(3,`Device "${device}" in group "${group.id}" is referencing a device that is not declared in the devices list.`);
+        debug(3, `Device "${device}" in group "${group.id}" is referencing a device that is not declared in the devices list.`);
         valid = false;
       }
     }

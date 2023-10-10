@@ -13,6 +13,15 @@ handle presentertrack activation
 var zapi = zapiv1;
 
 const DEVICETYPE = zapi.devices.DEVICETYPE;
+const ON = 'on';
+const OFF = 'off';
+const LOCAL = 'local';
+const REMOTE = 'remote';
+const SINGLE = 'Single';
+const DUALPRESENTATIONONLY = 'DualPresentationOnly';
+const FIRST = 'First';
+const SECOND = 'Second';
+const AUTO = 'Auto';
 
 export var Manifest = {
   fileName: 'sce_como_type1',
@@ -109,14 +118,6 @@ export class Scenario {
 
     let status = zapi.system.getAllStatus();
     this.evaluateAll(status);
-
-    /*
-    if (zapi.system.getStatus('AutoLights') == 'on') {
-      for (let lightscene of this.devices.lightscenes.idle) {
-        lightscene.activate();
-      }
-    }
-    */
   }
 
   onStatusChange(status) {
@@ -172,11 +173,11 @@ export class Scenario {
     console.log('ComoType1 evaluating lightscenes...');
 
 
-    var needClearZone = status.ClearPresentationZone == 'on' ? true : false;
+    var needClearZone = status.ClearPresentationZone == ON ? true : false;
     var presenterLocation = status.PresenterLocation;
     var presentationActive = status.presentation.type != 'NOPRESENTATION';
     var callConnected = status.call == 'Connected';
-    var remotePresenterPresent = callConnected && presenterLocation == 'remote';
+    var remotePresenterPresent = callConnected && presenterLocation == REMOTE;
 
 
 
@@ -203,7 +204,7 @@ export class Scenario {
 
   async evaluateAudio(status) {
     
-    if (status.PresenterLocation == 'local') {
+    if (status.PresenterLocation == LOCAL) {
       this.devices.audiooutputgroups.presentation.forEach(aog => {
         aog.disconnectRemoteInputs();
       });
@@ -231,8 +232,8 @@ export class Scenario {
      * 
      ******************/
 
-    var needPresentationScreen = (status.call == 'Connected' && status.PresenterLocation == 'remote') || status.presentation.type != 'NOPRESENTATION';
-    var needClearZone = status.ClearPresentationZone == 'on' ? true : false;
+    var needPresentationScreen = (status.call == 'Connected' && status.PresenterLocation == REMOTE) || status.presentation.type != 'NOPRESENTATION';
+    var needClearZone = status.ClearPresentationZone == ON ? true : false;
 
     if (needPresentationScreen) {
       if (needClearZone) {
@@ -258,12 +259,12 @@ export class Scenario {
      * 
      ******************/
 
-    var needClearZone = status.ClearPresentationZone == 'on' ? true : false;
+    var needClearZone = status.ClearPresentationZone == ON ? true : false;
     var permanentDisplays = this.devices.displays.presentation.filter(disp => disp.config.alwaysUse == true).length > 0 ? true : false;
     var presenterLocation = status.PresenterLocation;
     var presentationActive = status.presentation.type != 'NOPRESENTATION';
     var callConnected = status.call == 'Connected';
-    var remotePresenterPresent = callConnected && presenterLocation == 'remote';
+    var remotePresenterPresent = callConnected && presenterLocation == REMOTE;
     var presentationSupportsBlanking = this.devices.displays.presentation.filter(disp => disp.config.supportsBlanking).length == this.devices.displays.presentation.length;
 
 
@@ -340,45 +341,45 @@ export class Scenario {
         //Permanent displays + Clear zone
         if (!presentationActive && !remotePresenterPresent) {
           //console.error('1');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'Second');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, SECOND);
           blankDisplays(presentationDisplays);
           powerOffDisplays(presentationDisplays);
           matrixReset(farendDisplays);
         }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'local') {
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
           //console.error('2');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'Second');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, SECOND);
           powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
           blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
           matrixReset(farendDisplays);
         }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'remote') {
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
           //console.error('3');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'Second');
-          setDisplaysRole(presentationDisplays, 'First');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, SECOND);
+          setDisplaysRole(presentationDisplays, FIRST);
           powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
           blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
           matrixReset(farendDisplays);
         }
         else if (remotePresenterPresent && !presentationActive) {
           //console.error('4');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'Second');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, SECOND);
           powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
           blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
           matrixReset(farendDisplays);
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('5');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'Second');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, SECOND);
           powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
           blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
           matrixReset(farendDisplays);
@@ -388,45 +389,45 @@ export class Scenario {
       else {
         if (!presentationActive && !remotePresenterPresent) {
           //console.error('6');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'Second');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, SECOND);
           powerOffDisplays(presentationDisplays);
           blankDisplays(presentationDisplays);
           matrixReset(farendDisplays);
         }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'local') {
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
           //console.error('7');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'Second');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, SECOND);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
           matrixReset(farendDisplays);
         }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'remote') {
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
           //console.error('8');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'Second');
-          setDisplaysRole(presentationDisplays, 'First');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, SECOND);
+          setDisplaysRole(presentationDisplays, FIRST);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
           matrixReset(farendDisplays);
         }
         else if (remotePresenterPresent && !presentationActive) {
           //console.error('9');
-          setMonitors('Single');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'First');
+          setMonitors(SINGLE);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, FIRST);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
           matrixReset(farendDisplays);
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('10');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'Second');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, SECOND);
           matrixRemoteToDisplay(farendDisplays);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
@@ -447,18 +448,18 @@ export class Scenario {
         //WITHOUT Permanent displays + Clear zone
         if (!presentationActive && !remotePresenterPresent) {
           //console.error('11');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'Second');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, SECOND);
           powerOffDisplays(presentationDisplays);
           matrixBlankDisplay(presentationDisplays)
           matrixReset(farendDisplays);
         }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'local') {
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
           //console.error('12');
-          setMonitors('Single');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'First');
+          setMonitors(SINGLE);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, FIRST);
           powerOffDisplays(presentationDisplays);
           if (presentationSupportsBlanking) {
             blankDisplays(presentationDisplays);
@@ -468,11 +469,11 @@ export class Scenario {
           }
           matrixReset(farendDisplays);
         }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'remote') {
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
           //console.error('13');
-          setMonitors('Single');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'First');
+          setMonitors(SINGLE);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, FIRST);
           powerOffDisplays(presentationDisplays);
           if (presentationSupportsBlanking) {
             blankDisplays(presentationDisplays);
@@ -485,9 +486,9 @@ export class Scenario {
         }
         else if (remotePresenterPresent && !presentationActive) {
           //console.error('14');
-          setMonitors('Single');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'First');
+          setMonitors(SINGLE);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, FIRST);
           powerOffDisplays(presentationDisplays);
           if (presentationSupportsBlanking) {
             blankDisplays(presentationDisplays);
@@ -499,9 +500,9 @@ export class Scenario {
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('15');
-          setMonitors('Single');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'First');
+          setMonitors(SINGLE);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, FIRST);
           powerOffDisplays(presentationDisplays);
           if (presentationSupportsBlanking) {
             blankDisplays(presentationDisplays);
@@ -517,29 +518,29 @@ export class Scenario {
         //console.error('DOES NOT NEED CLEAR ZONE');
         if (!presentationActive && !remotePresenterPresent) {
           //console.error('16');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'Second');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, SECOND);
           powerOffDisplays(presentationDisplays);
           blankDisplays(presentationDisplays);
           matrixReset(farendDisplays);
           matrixReset(presentationDisplays);
         }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'local') {
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
           //console.error('17');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'Second');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, SECOND);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
           matrixReset(farendDisplays);
           matrixReset(presentationDisplays);
         }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'remote') {
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
           //console.error('18');
-          setMonitors('DualPresentationOnly');
-          setDisplaysRole(farendDisplays, 'Second');
-          setDisplaysRole(presentationDisplays, 'First');
+          setMonitors(DUALPRESENTATIONONLY);
+          setDisplaysRole(farendDisplays, SECOND);
+          setDisplaysRole(presentationDisplays, FIRST);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
           matrixReset(farendDisplays);
@@ -547,9 +548,9 @@ export class Scenario {
         }
         else if (remotePresenterPresent && !presentationActive) {
           //console.error('19');
-          setMonitors('Single');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'First');
+          setMonitors(SINGLE);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, FIRST);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
           matrixReset(farendDisplays);
@@ -557,9 +558,9 @@ export class Scenario {
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('20');
-          setMonitors('Single');
-          setDisplaysRole(farendDisplays, 'First');
-          setDisplaysRole(presentationDisplays, 'First');
+          setMonitors(SINGLE);
+          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, FIRST);
           matrixRemoteToDisplay(farendDisplays);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);

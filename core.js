@@ -871,7 +871,7 @@ async function preInit() {
   debug(2, `PreInit started...`);
   clearInterval(coldbootWarningInterval);
   if (config.system.debugInternalMessages) {
-    xapi.Event.Message.Send.Text.on(text => {
+    xapi.Event.Message.Send.Text.on(text => {//TODO: Why this ?
       console.log(`[INTERNAL MESSAGE] ${text}`);
     });
   }

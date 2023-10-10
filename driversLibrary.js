@@ -72,7 +72,6 @@ export class DisplayDriver_isc_h21 {
   setPower(power) {
     power = power.toLowerCase();
     let powerString = this.config.name + '_' + power.toUpperCase();
-    //xapi.Command.Message.Send({ Text: powerString });
     zapi.system.sendMessage(powerString);
     debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): setPower: ${power}`);
   }
@@ -80,7 +79,6 @@ export class DisplayDriver_isc_h21 {
   setBlanking(blanking) {
     let blankingStatus = blanking ? 'ON' : 'OFF';
     let blankingString = this.config.name + '_BLANKING_' + blankingStatus;
-    //xapi.Command.Message.Send({ Text: blankingString });
     zapi.system.sendMessage(blankingString);
     debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): setBlanking: ${blanking}`);
   }
@@ -94,7 +92,6 @@ export class DisplayDriver_isc_h21 {
   }
 
   requestUsageHours() {
-    //xapi.Command.Message.Send({ Text: 'LAMPREQ:' + this.config.name });
     zapi.system.sendMessage('LAMPREQ:' + this.config.name);
   }
 
@@ -110,7 +107,6 @@ export class ScreenDriver_isc_h21 {
 
   setPosition(position) {
     position = position.toLowerCase();
-    //xapi.Command.Message.Send({ Text: this.config.name + '_' + positionString });
     zapi.system.sendMessage(this.config.name + '_' + position);
     debug(1, `DRIVER ScreenDriver_isc_h21 (${this.config.id}): setPosition: ${position}`);
   }
@@ -190,19 +186,16 @@ export class Light_isc_h21 {
 
   on() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): On`);
-    //xapi.Command.Message.Send({ Text: `${this.config.name}_ON`});
     zapi.system.sendMessage(`${this.config.name}_ON`);
   }
 
   off() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Off`);
-    //xapi.Command.Message.Send({ Text: `${this.config.name}_OFF`});
     zapi.system.sendMessage(`${this.config.name}_OFF`);
   }
 
   dim(level) {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Dim ${level}`);
-    //xapi.Command.Message.Send({ Text: `${this.config.name}_DIM ${level}`});
     zapi.system.sendMessage(`${this.config.name}_DIM ${level}`);
   }
 }

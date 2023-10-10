@@ -374,7 +374,7 @@ export class Display {
 
   reset() {
     debug(1, `DEVICE ${this.config.id}: RESET`);
-    this.setPower(this.config.defaultPower, 0);
+    this.setDefaults();
   }
 }
 

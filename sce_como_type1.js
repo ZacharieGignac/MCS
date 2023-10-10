@@ -23,6 +23,24 @@ const FIRST = 'First';
 const SECOND = 'Second';
 const AUTO = 'Auto';
 
+function debug(level, text) {
+  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+    switch (level) {
+      case 1:
+        console.log(text);
+        break;
+      case 2:
+        console.warn(text);
+        break;
+      case 3:
+        console.error(text);
+        break;
+    }
+
+  }
+}
+
+
 export var Manifest = {
   fileName: 'sce_como_type1',
   id: 'comotype1',

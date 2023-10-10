@@ -170,40 +170,40 @@ export class Scenario {
   }
 
   async evaluateLightscene(status) {
-    console.log('ComoType1 evaluating lightscenes...');
+    if (status.AutoLights == ON) {
+      debug(1,'ComoType1 evaluating lightscenes...');
+      var needClearZone = status.ClearPresentationZone == ON ? true : false;
+      var presenterLocation = status.PresenterLocation;
+      var presentationActive = status.presentation.type != 'NOPRESENTATION';
+      var callConnected = status.call == 'Connected';
+      var remotePresenterPresent = callConnected && presenterLocation == REMOTE;
 
 
-    var needClearZone = status.ClearPresentationZone == ON ? true : false;
-    var presenterLocation = status.PresenterLocation;
-    var presentationActive = status.presentation.type != 'NOPRESENTATION';
-    var callConnected = status.call == 'Connected';
-    var remotePresenterPresent = callConnected && presenterLocation == REMOTE;
 
-
-
-    if (needClearZone) {
-      this.devices.lightscenes.writing.forEach(lightscene => {
-        lightscene.activate();
-      });
-    }
-    else {
-      if (remotePresenterPresent || presentationActive) {
-        this.devices.lightscenes.presentation.forEach(lightscene => {
+      if (needClearZone) {
+        this.devices.lightscenes.writing.forEach(lightscene => {
           lightscene.activate();
         });
       }
       else {
+        if (remotePresenterPresent || presentationActive) {
+          this.devices.lightscenes.presentation.forEach(lightscene => {
+            lightscene.activate();
+          });
+        }
+        else {
 
-        this.devices.lightscenes.idle.forEach(lightscene => {
-          lightscene.activate();
-        });
+          this.devices.lightscenes.idle.forEach(lightscene => {
+            lightscene.activate();
+          });
+        }
       }
     }
 
   }
 
   async evaluateAudio(status) {
-    
+
     if (status.PresenterLocation == LOCAL) {
       this.devices.audiooutputgroups.presentation.forEach(aog => {
         aog.disconnectRemoteInputs();
@@ -212,7 +212,7 @@ export class Scenario {
         aog.connectRemoteInputs();
       });
     }
-        else {
+    else {
       this.devices.audiooutputgroups.presentation.forEach(aog => {
         aog.connectRemoteInputs();
       });

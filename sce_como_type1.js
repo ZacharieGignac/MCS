@@ -1,5 +1,7 @@
 import xapi from 'xapi';
+import { config } from './config';
 import { zapiv1 } from './zapi';
+
 
 
 /* NOTES

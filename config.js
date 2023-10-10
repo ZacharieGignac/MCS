@@ -135,16 +135,16 @@ export var config = {
       powerOffDelay: 6000,
       usageHoursRequestInterval: 100000,
     },
-    /*
     {
       id: 'display.projector.secondary',
       type: DEVICETYPE.DISPLAY,
       name: 'PROJ2',
       device: devicesLibrary.Display,
       driver: driversLibrary.DisplayDriver_isc_h21,
+      //alwaysUse: true,
       connector: 1,
       supportsPower: true,
-      supportsBlanking: false,
+      supportsBlanking: true,
       supportsSource: false,
       supportsUsageHours: false,
       defaultPower: 'off',
@@ -153,7 +153,6 @@ export var config = {
       powerOffDelay: 6000,
       usageHoursRequestInterval: 100000,
     },
-    */
     {
       id: 'display.monitor',
       type: DEVICETYPE.DISPLAY,
@@ -195,16 +194,15 @@ export var config = {
       driver: driversLibrary.ScreenDriver_isc_h21,
       defaultPosition: 'up'
     },
-    /*
     {
       id: 'screen.secondary',
       type: DEVICETYPE.SCREEN,
       name: 'SCREEN2',
       device: devicesLibrary.Screen,
       driver: driversLibrary.ScreenDriver_isc_h21,
+      //alwaysUse: true,
       defaultPosition: 'up'
     },
-    */
 
 
     /* AUDIO INPUTS */
@@ -409,6 +407,29 @@ export var config = {
       ]
     },
     {
+      id: 'lightscene.75%',
+      name: 'IDLE',
+      type: DEVICETYPE.LIGHTSCENE,
+      device: devicesLibrary.LightScene,
+      driver: driversLibrary.LightSceneDriver_lights,
+      lights: [
+        {
+          id: 'light.presenter',
+          dim: 75
+        },
+        {
+          id: 'light.board',
+          power: 'on',
+          dim: 75
+        },
+        {
+          id: 'light.audience',
+          power: 'on',
+          dim: 75
+        }
+      ]
+    },
+    {
       id: 'lightscene.presentation',
       name: 'IDLE',
       type: DEVICETYPE.LIGHTSCENE,
@@ -500,14 +521,9 @@ export var config = {
   groups: [
     {
       id: 'system.presentation.main',
-      devices: ['display.projector', 'screen', 'campreset.presenter', 'lightscene.presentation', 'camera.presenter', 'aog.room']
+      devices: ['display.projector', 'screen', 'display.projector.secondary', 'screen.secondary', 'campreset.presenter', 'lightscene.presentation', 'camera.presenter', 'aog.room']
     },
-    /*
-    {
-      id: 'system.presentation.secondary',
-      devices: ['display.projector.secondary', 'screen.secondary']
-    },
-    */
+
     {
       id: 'system.farend.main',
       devices: ['display.monitor', 'campreset.audience', 'camera.audience', 'aog.monitor']
@@ -534,8 +550,17 @@ export var config = {
     },
     {
       id: 'system.lightscene.idle',
+      devices: ['lightscene.100%']
+    },
+    {
+      id: 'system.lightscene.presentation',
       devices: ['lightscene.50%']
+    },
+    {
+      id: 'system.lightscene.writing',
+      devices: ['lightscene.75%']
     }
+
   ],
 
   systemStatus: {

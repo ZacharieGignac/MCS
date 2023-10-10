@@ -130,7 +130,9 @@ export class AudioOutputGroup {
       this.outputId = id;
     });
   }
-
+  test() {
+    console.error('IT WORKS!');
+  }
   connectLocalInput(li) {
     try {
       xapi.Command.Audio.LocalOutput.ConnectInput({
@@ -259,6 +261,9 @@ export class Display {
     }
   }
 
+  off (delay = this.config.powerOffDelay) {
+    this.powerOff(delay);
+  }
   powerOff(delay = this.config.powerOffDelay) {
     debug(1, `DEVICE ${this.config.id}: OFF`);
     zapi.performance.inc('DEVICE.' + this.config.id + '.powerOff');
@@ -296,6 +301,9 @@ export class Display {
         }
       }
     }
+  }
+  on() {
+    this.powerOn();
   }
 
   getPower() {

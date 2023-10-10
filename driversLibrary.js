@@ -208,17 +208,4 @@ export class Light_isc_h21 {
 }
 
 
-export class ScreenDriver_gpio {
-
-}
-
-
-export class LightDriver_messages {
-
-}
-
-
-export class LightSceneDriver_messages {
-
-}
 

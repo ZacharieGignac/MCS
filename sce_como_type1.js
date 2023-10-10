@@ -56,23 +56,19 @@ export class Scenario {
     //Displays
     this.devices.displays = {};
     this.devices.displays.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.presentation.main');
-    this.devices.displays.presentationsecondary = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.presentation.secondary');
     this.devices.displays.farend = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.farend.main');
     this.devices.displays.byod = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.DISPLAY, 'system.byod.main');
 
     //Screens
     this.devices.screens = {};
     this.devices.screens.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.SCREEN, 'system.presentation.main');
-    this.devices.screens.presentationsecondary = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.SCREEN, 'system.presentation.secondary');
     this.devices.screens.farend = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.SCREEN, 'system.farend.main');
 
     //Lightscenes
     this.devices.lightscenes = {};
     this.devices.lightscenes.idle = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.idle');
     this.devices.lightscenes.presentation = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.presentation');
-    this.devices.lightscenes.writingprimary = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.writingprimary');
-    this.devices.lightscenes.writingsecondary = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.writingsecondary');
-    this.devices.lightscenes.writingboth = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.writingboth');
+    this.devices.lightscenes.writing = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.LIGHTSCENE, 'system.lightscene.writing');
 
     //AudioOutputGroups
     this.devices.audiooutputgroups = {};
@@ -135,6 +131,7 @@ export class Scenario {
             this.evaluateDisplays(status.status);
             this.evaluateScreens(status.status);
           }
+          this.evaluateAudio(status.status);
           break;
         case 'ClearPresentationZoneSecondary':
         case 'presentation':
@@ -143,6 +140,7 @@ export class Scenario {
           this.evaluateDisplays(status.status);
           this.evaluateScreens(status.status);
           this.evaluateLightscene(status.status);
+          this.evaluateAudio(status.status);
           break;
         case 'AudienceMics':
           this.setAudienceMics(status.value);
@@ -155,11 +153,11 @@ export class Scenario {
     }
   }
 
-  setAudienceMics(mode) {
+  setAudienceMics(mode) {//TODO
 
   }
 
-  setPresenterMics(mode) {
+  setPresenterMics(mode) {//TODO
 
   }
 
@@ -167,45 +165,60 @@ export class Scenario {
     this.evaluateDisplays(status);
     this.evaluateScreens(status);
     this.evaluateLightscene(status);
+    this.evaluateAudio(status);
   }
 
   async evaluateLightscene(status) {
     console.log('ComoType1 evaluating lightscenes...');
 
-    if (status.ClearPresentationZone == 'on' && status.ClearPresentationZoneSecondary == 'on') {
-      this.devices.lightscenes.writingboth.forEach(lightscene => {
-        lightscene.activate();
-      });
-    }
-    else if (status.ClearPresentationZone == 'on' && status.ClearPresentationZoneSecondary == 'off') {
-      this.devices.lightscenes.writingprimary.forEach(lightscene => {
-        lightscene.activate();
-      });
-    }
-    else if (status.ClearPresentationZone == 'off' && status.ClearPresentationZoneSecondary == 'on') {
-      this.devices.lightscenes.writingsecondary.forEach(lightscene => {
+
+    var needClearZone = status.ClearPresentationZone == 'on' ? true : false;
+    var presenterLocation = status.PresenterLocation;
+    var presentationActive = status.presentation.type != 'NOPRESENTATION';
+    var callConnected = status.call == 'Connected';
+    var remotePresenterPresent = callConnected && presenterLocation == 'remote';
+
+
+
+    if (needClearZone) {
+      this.devices.lightscenes.writing.forEach(lightscene => {
         lightscene.activate();
       });
     }
     else {
-      //Normal
-      if (status.presentation.type == 'NOPRESENTATION' && (status.ClearPresentationZone == 'off' || status.ClearPresentationZone == undefined) && (status.ClearPresentationZoneSecondary == 'off' || status.ClearPresentationZoneSecondary == undefined)) {
-        this.devices.lightscenes.idle.forEach(lightscene => {
+      if (remotePresenterPresent || presentationActive) {
+        this.devices.lightscenes.presentation.forEach(lightscene => {
           lightscene.activate();
         });
       }
+      else {
 
-      //Writing on board
-
-
-      //Presentation or remote presenter
-      if ((status.call == 'Connected' && status.PresenterLocation == 'remote') || status.presentation.type != 'NOPRESENTATION') {
-        this.devices.lightscenes.presentation.forEach(lightscene => {
+        this.devices.lightscenes.idle.forEach(lightscene => {
           lightscene.activate();
         });
       }
     }
 
+  }
+
+  async evaluateAudio(status) {
+    
+    if (status.PresenterLocation == 'local') {
+      this.devices.audiooutputgroups.presentation.forEach(aog => {
+        aog.disconnectRemoteInputs();
+      });
+      this.devices.audiooutputgroups.farend.forEach(aog => {
+        aog.connectRemoteInputs();
+      });
+    }
+        else {
+      this.devices.audiooutputgroups.presentation.forEach(aog => {
+        aog.connectRemoteInputs();
+      });
+      this.devices.audiooutputgroups.farend.forEach(aog => {
+        aog.disconnectRemoteInputs();
+      });
+    }
 
   }
 
@@ -218,48 +231,23 @@ export class Scenario {
      * 
      ******************/
 
-    //Evaluate primary screens
-    if (status.PresenterLocation == 'local' || status.call != 'Connected') {
-      if (status.ClearPresentationZone == 'on') {
+    var needPresentationScreen = (status.call == 'Connected' && status.PresenterLocation == 'remote') || status.presentation.type != 'NOPRESENTATION';
+    var needClearZone = status.ClearPresentationZone == 'on' ? true : false;
+
+    if (needPresentationScreen) {
+      if (needClearZone) {
         this.devices.screens.presentation.forEach(screen => {
-          screen.up();
+          if (!screen.config.alwaysUse) {
+            screen.up();
+          }
         });
       }
       else {
-        if (status.presentation.type != 'NOPRESENTATION') {
-          this.devices.screens.presentation.forEach(screen => {
-            screen.down();
-          });
-        }
-      }
-    }
-    else {
-      if (status.call == 'Connected') {
-        if (status.ClearPresentationZone == 'on') {
-          this.devices.screens.presentation.forEach(screen => {
-            screen.up();
-          });
-        }
-        else {
-          this.devices.screens.presentation.forEach(screen => {
-            screen.down();
-          });
-        }
-      }
-    }
-
-    //Evaluate secondary screens
-    this.devices.screens.presentationsecondary.forEach(screen => {
-      if (status.ClearPresentationZoneSecondary == 'on') {
-        screen.up();
-      }
-      else if (status.ClearPresentationZoneSecondary == 'off') {
-        if (status.presentation.type != 'NOPRESENTATION' || (status.call == 'Connected' && status.PresenterLocation == 'remote')) {
+        this.devices.screens.presentation.forEach(screen => {
           screen.down();
-        }
+        });
       }
-    });
-
+    }
   }
 
   async evaluateDisplays(status) {
@@ -270,131 +258,320 @@ export class Scenario {
      * 
      ******************/
 
-    //Evaluate primary presentation displays
-    await xapi.Command.Video.Matrix.Reset();
-    this.devices.displays.byod.forEach(display => {
-      xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('Auto');
-    });
-
-    if (status.ClearPresentationZone == 'off') {
-      //when presenter is local
-      if (status.PresenterLocation == 'local') {
-        xapi.Config.Video.Monitors.set('DualPresentationOnly');
-
-        this.devices.displays.presentation.forEach(display => {
-          if (status.presentation.type != 'NOPRESENTATION') {
-            display.setBlanking(false);
-            display.powerOn();
-          }
-          else {
-            display.setBlanking(true);
-            display.powerOff();
-          }
-
-          xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('Second');
-        });
-
-        this.devices.displays.farend.forEach(display => {
-          xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
-        });
-      }
-      //When presenter is remote
-      else {
-        if (status.call == 'Connected') {
-          xapi.Config.Video.Monitors.set('Single');
-          this.devices.displays.presentation.forEach(display => {
-            display.setBlanking(false);
-            display.powerOn();
-            xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
-          });
-          this.devices.displays.farend.forEach(display => {
-            xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
-            xapi.Command.Video.Matrix.Assign({
-              Mode: 'Replace',
-              Output: display.config.connector,
-              RemoteMain: 1
-            });
-          });
-        }
-        else {
-          xapi.Config.Video.Monitors.set('DualPresentationOnly');
-          this.devices.displays.presentation.forEach(display => {
-            if (status.presentation.type != 'NOPRESENTATION') {
-              display.setBlanking(false);
-              display.powerOn();
-            }
-            else {
-              display.setBlanking(true);
-              display.powerOff();
-            }
-            xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
-          });
-          this.devices.displays.farend.forEach(display => {
-            xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('Second');
-          });
-        }
+    var needClearZone = status.ClearPresentationZone == 'on' ? true : false;
+    var permanentDisplays = this.devices.displays.presentation.filter(disp => disp.config.alwaysUse == true).length > 0 ? true : false;
+    var presenterLocation = status.PresenterLocation;
+    var presentationActive = status.presentation.type != 'NOPRESENTATION';
+    var callConnected = status.call == 'Connected';
+    var remotePresenterPresent = callConnected && presenterLocation == 'remote';
+    var presentationSupportsBlanking = this.devices.displays.presentation.filter(disp => disp.config.supportsBlanking).length == this.devices.displays.presentation.length;
 
 
-      }
+
+    const setDisplaysRole = (displays, role) => {
+      displays.forEach(display => {
+        xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set(role);
+      });
+    };
+
+    const setMonitors = (monitors) => {
+      xapi.Config.Video.Monitors.set(monitors);
+    };
+
+    const powerOffDisplays = (displays) => {
+      displays.forEach(display => {
+        display.off();
+      });
     }
 
-    else if (status.ClearPresentationZone == 'on') {
-      xapi.Config.Video.Monitors.set('Single');
-      this.devices.displays.presentation.forEach(display => {
-        //Setting role
-        xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
-
-        //Choose blanking mode (display blanking or video matrix)
-        if (display.config.supportsBlanking) {
-          display.setBlanking(true);
-        }
-        else {
-          xapi.Command.Video.Matrix.Assign({
-            Mode: 'Replace',
-            Output: display.config.connector,
-            RemoteMain: 4
-          });
-        }
+    const powerOnDisplays = (displays) => {
+      displays.forEach(display => {
+        display.on();
       });
+    }
 
-      this.devices.displays.farend.forEach(display => {
-        xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set('First');
+    const blankDisplays = (displays) => {
+      displays.forEach(display => {
+        display.setBlanking(true);
       });
+    }
+
+    const unblankDisplays = (displays) => {
+      displays.forEach(display => {
+        display.setBlanking(false);
+      });
+    }
+
+    const matrixBlankDisplay = displays => {
+      xapi.Command.Video.Matrix.Assign({
+        Mode: 'Replace',
+        Output: displays[0].config.connector,
+        RemoteMain: 4
+      })
+    }
+
+    const matrixRemoteToDisplay = (display) => {
+      xapi.Command.Video.Matrix.Assign({
+        Mode: 'Replace',
+        Output: display[0].config.connector,
+        RemoteMain: 1
+      });
+    };
+
+    const matrixReset = (displays) => {
+      setTimeout(() => {
+        xapi.Command.Video.Matrix.Reset({
+          Output: displays[0].config.connector
+        });
+      }, 1000);
 
     }
 
 
+    var presentationDisplays = this.devices.displays.presentation;
+    var farendDisplays = this.devices.displays.farend;
 
 
-    //Evaluate secondary displays
-    this.devices.displays.presentationsecondary.forEach(display => {
-      if (status.ClearPresentationZoneSecondary == 'on') {
-        if (display.config.supportsBlanking) {
-          display.setBlanking(true);
+
+    //With permanent displays for presentation
+
+    if (permanentDisplays) {
+      if (needClearZone) {
+        //Permanent displays + Clear zone
+        if (!presentationActive && !remotePresenterPresent) {
+          //console.error('1');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'Second');
+          blankDisplays(presentationDisplays);
+          powerOffDisplays(presentationDisplays);
+          matrixReset(farendDisplays);
         }
-        else {
-          display.powerOff(0);
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'local') {
+          //console.error('2');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'Second');
+          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
+          matrixReset(farendDisplays);
+        }
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'remote') {
+          //console.error('3');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'Second');
+          setDisplaysRole(presentationDisplays, 'First');
+          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
+          matrixReset(farendDisplays);
+        }
+        else if (remotePresenterPresent && !presentationActive) {
+          //console.error('4');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'Second');
+          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
+          matrixReset(farendDisplays);
+        }
+        else if (remotePresenterPresent && presentationActive) {
+          //console.error('5');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'Second');
+          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
+          matrixReset(farendDisplays);
         }
       }
+      //Permanent displays + NO clear zone
       else {
-        if (status.presentation.type != 'NOPRESENTATION' || (status.call == 'Connected' && status.PresenterLocation == 'remote')) {
-          if (display.config.supportsBlanking) {
-            display.setBlanking(false);
-          }
-          else {
-            display.powerOn();
-          }
+        if (!presentationActive && !remotePresenterPresent) {
+          //console.error('6');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'Second');
+          powerOffDisplays(presentationDisplays);
+          blankDisplays(presentationDisplays);
+          matrixReset(farendDisplays);
         }
-        else {
-          if (display.config.supportsBlanking) {
-            display.setBlanking(true);
-          }
-          else {
-            display.powerOff();
-          }
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'local') {
+          //console.error('7');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'Second');
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
+          matrixReset(farendDisplays);
+        }
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'remote') {
+          //console.error('8');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'Second');
+          setDisplaysRole(presentationDisplays, 'First');
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
+          matrixReset(farendDisplays);
+        }
+        else if (remotePresenterPresent && !presentationActive) {
+          //console.error('9');
+          setMonitors('Single');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'First');
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
+          matrixReset(farendDisplays);
+        }
+        else if (remotePresenterPresent && presentationActive) {
+          //console.error('10');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'Second');
+          matrixRemoteToDisplay(farendDisplays);
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
         }
       }
-    });
+
+
+    }
+
+
+
+
+    //Without permanent displays for presentation
+    else {
+      //console.error('NO PRERMANENT DISPLASYS!');
+      if (needClearZone) {
+        //console.error('NEED CLEAR ZONE');
+        //WITHOUT Permanent displays + Clear zone
+        if (!presentationActive && !remotePresenterPresent) {
+          //console.error('11');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'Second');
+          powerOffDisplays(presentationDisplays);
+          matrixBlankDisplay(presentationDisplays)
+          matrixReset(farendDisplays);
+        }
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'local') {
+          //console.error('12');
+          setMonitors('Single');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'First');
+          powerOffDisplays(presentationDisplays);
+          if (presentationSupportsBlanking) {
+            blankDisplays(presentationDisplays);
+          }
+          else {
+            matrixBlankDisplay(presentationDisplays);
+          }
+          matrixReset(farendDisplays);
+        }
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'remote') {
+          //console.error('13');
+          setMonitors('Single');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'First');
+          powerOffDisplays(presentationDisplays);
+          if (presentationSupportsBlanking) {
+            blankDisplays(presentationDisplays);
+          }
+          else {
+            matrixBlankDisplay(presentationDisplays);
+          }
+
+          matrixReset(farendDisplays);
+        }
+        else if (remotePresenterPresent && !presentationActive) {
+          //console.error('14');
+          setMonitors('Single');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'First');
+          powerOffDisplays(presentationDisplays);
+          if (presentationSupportsBlanking) {
+            blankDisplays(presentationDisplays);
+          }
+          else {
+            matrixBlankDisplay(presentationDisplays);
+          }
+          matrixReset(farendDisplays);
+        }
+        else if (remotePresenterPresent && presentationActive) {
+          //console.error('15');
+          setMonitors('Single');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'First');
+          powerOffDisplays(presentationDisplays);
+          if (presentationSupportsBlanking) {
+            blankDisplays(presentationDisplays);
+          }
+          else {
+            matrixBlankDisplay(presentationDisplays);
+          }
+          matrixReset(farendDisplays);
+        }
+      }
+      //WITHOUT Permanent displays + NO clear zone
+      else {
+        //console.error('DOES NOT NEED CLEAR ZONE');
+        if (!presentationActive && !remotePresenterPresent) {
+          //console.error('16');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'Second');
+          powerOffDisplays(presentationDisplays);
+          blankDisplays(presentationDisplays);
+          matrixReset(farendDisplays);
+          matrixReset(presentationDisplays);
+        }
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'local') {
+          //console.error('17');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'Second');
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
+          matrixReset(farendDisplays);
+          matrixReset(presentationDisplays);
+        }
+        else if (presentationActive && !remotePresenterPresent && presenterLocation == 'remote') {
+          //console.error('18');
+          setMonitors('DualPresentationOnly');
+          setDisplaysRole(farendDisplays, 'Second');
+          setDisplaysRole(presentationDisplays, 'First');
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
+          matrixReset(farendDisplays);
+          matrixReset(presentationDisplays);
+        }
+        else if (remotePresenterPresent && !presentationActive) {
+          //console.error('19');
+          setMonitors('Single');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'First');
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
+          matrixReset(farendDisplays);
+          matrixReset(presentationDisplays);
+        }
+        else if (remotePresenterPresent && presentationActive) {
+          //console.error('20');
+          setMonitors('Single');
+          setDisplaysRole(farendDisplays, 'First');
+          setDisplaysRole(presentationDisplays, 'First');
+          matrixRemoteToDisplay(farendDisplays);
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
+        }
+      }
+
+    }
+
+
+
+
+
   }
 
 

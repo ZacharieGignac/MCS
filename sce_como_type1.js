@@ -171,7 +171,7 @@ export class Scenario {
 
   async evaluateLightscene(status) {
     if (status.AutoLights == ON) {
-      debug(1,'ComoType1 evaluating lightscenes...');
+      debug(1, 'ComoType1 evaluating lightscenes...');
       var needClearZone = status.ClearPresentationZone == ON ? true : false;
       var presenterLocation = status.PresenterLocation;
       var presentationActive = status.presentation.type != 'NOPRESENTATION';
@@ -231,22 +231,23 @@ export class Scenario {
      *  screens configuration
      * 
      ******************/
+    if (status.AutoScreens) {
+      var needPresentationScreen = (status.call == 'Connected' && status.PresenterLocation == REMOTE) || status.presentation.type != 'NOPRESENTATION';
+      var needClearZone = status.ClearPresentationZone == ON ? true : false;
 
-    var needPresentationScreen = (status.call == 'Connected' && status.PresenterLocation == REMOTE) || status.presentation.type != 'NOPRESENTATION';
-    var needClearZone = status.ClearPresentationZone == ON ? true : false;
-
-    if (needPresentationScreen) {
-      if (needClearZone) {
-        this.devices.screens.presentation.forEach(screen => {
-          if (!screen.config.alwaysUse) {
-            screen.up();
-          }
-        });
-      }
-      else {
-        this.devices.screens.presentation.forEach(screen => {
-          screen.down();
-        });
+      if (needPresentationScreen) {
+        if (needClearZone) {
+          this.devices.screens.presentation.forEach(screen => {
+            if (!screen.config.alwaysUse) {
+              screen.up();
+            }
+          });
+        }
+        else {
+          this.devices.screens.presentation.forEach(screen => {
+            screen.down();
+          });
+        }
       }
     }
   }

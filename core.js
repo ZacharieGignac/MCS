@@ -446,6 +446,8 @@ class Core {
     this.lastPresenterDetectedStatus = false;
   }
 
+
+
   async init() {
     var self = this;
     this.uiManager = new UiManager();
@@ -457,8 +459,47 @@ class Core {
     self.uiManager.addActionMapping(/^PANELCLOSE$/, () => {
       xapi.Command.UserInterface.Extensions.Panel.Close();
     });
-    self.uiManager.addActionMapping(/^STANDBY$/, () => {
-      xapi.Command.Standby.Activate();
+    self.uiManager.addActionMapping(/^STANDBY$/, async () => {
+      let status = await zapi.system.getAllStatus();
+      let presentationStatus = status.presentation.type;
+      let callStatus = status.call;
+
+      var msg = undefined;
+      if (presentationStatus != 'NOPRESENTATION' && callStatus == 'Idle') {
+        msg = 'Ceci mettra fin à votre présentation.<br>Terminer la session ?';
+      }
+      else if (presentationStatus == 'NOPRESENTATION' && callStatus == 'Connected') {
+        msg = 'Ceci mettra fin aux communications.<br>Terminer la session ?';
+      }
+      else if (presentationStatus != 'NOPRESENTATION' && callStatus == 'Connected') {
+        msg = 'Ceci mettra fin à votre présentation et aux communications.<br>Terminer la session ?';
+      }
+
+      if (msg != undefined) {
+        xapi.Command.UserInterface.Message.Prompt.Display({
+          Title: 'Terminer la session ?',
+          Text: msg,
+          FeedbackId: 'system_ask_standby',
+          "Option.1": 'Oui (Terminer la session)',
+          "Option.2": 'Non (Annuler)'
+        });
+        xapi.Event.UserInterface.Message.Prompt.Response.on(event => {
+          if (event.FeedbackId == 'system_ask_standby') {
+            if (event.OptionId == '1') {
+              xapi.Command.Presentation.Stop();
+              xapi.Command.Call.Disconnect();
+              setTimeout(() => {
+                xapi.Command.Standby.Activate();
+              }, 2000);
+
+            }
+          }
+        });
+      }
+      else {
+        xapi.Command.Standby.Activate();
+      }
+
     });
     self.uiManager.addActionMapping(/^PANELOPEN$/, (panelId, pageId) => {
       xapi.Command.UserInterface.Extensions.Panel.Open({

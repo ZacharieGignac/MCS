@@ -19,11 +19,6 @@ const INITSTEPDELAY = 500;
 var coldbootWarningInterval = undefined;
 var core;
 
-
-
-
-
-
 function debug(level, text) {
   if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
     switch (level) {
@@ -40,8 +35,6 @@ function debug(level, text) {
 
   }
 }
-
-
 
 
 class Performance {
@@ -86,8 +79,6 @@ class Performance {
 }
 var performance = new Performance();
 performance.setElapsedStart('Boot');
-
-
 var progress = 0;
 var timedProgressBar;
 function displayTimedProgressBar(title, time) {
@@ -321,15 +312,6 @@ class UiManager {
         });
       }
     }
-
-    /*
-    if (this.allWidgets.filter(w => w.widgetId == widgetId).length > 0) {
-      debug(1, `Setting widget "${widgetId}" value to "${value}"`);
-      xapi.Command.UserInterface.Extensions.Widget.SetValue({
-        WidgetId: widgetId,
-        Value: value
-      })
-    }*/
   }
 
   onUiEvent(callback) {
@@ -592,13 +574,6 @@ class Core {
     if (config.system.onStandby.setDND) {
       this.setDND();
     }
-
-
-    //Handle system status change
-    this.systemStatus.onChange(status => {
-      //console.log(status);
-    });
-
 
     //Starts devices monitoring
     this.devicesMonitoringInterval = setInterval(async () => {
@@ -920,19 +895,7 @@ async function init() {
 
 
 
-  //TESTAREA
-
-  //let campresets = zapi.devices.getDevicesByType(zapi.devices.DEVICETYPE.CAMERAPRESET);
-  //campresets.forEach(cp => { console.log(cp.config.name)});
-
-  //let light = zapi.devices.getDevice('light.presenter');
-  //light.off();
-  //light.dim(75);
-
-  //let test = zapi.devices.getDevice('lightscene.standby');
-  //test.activate();
-
-
+  //TESTAREA AFTERBOOT
 
 }
 

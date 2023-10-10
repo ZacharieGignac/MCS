@@ -228,13 +228,6 @@ export class SystemStatus {
       else {
         debug(1, `SystemStatus: CHANGED (skip notify) Key="${key}", Value="${value}"`);
       }
-      //Check if there is a corresponding widget to update
-      /*
-      let allWidgets = this.api.ui.getAllWidgets();
-      if (allWidgets.filter(w => w.widgetId == 'SS$' + key).length > 0) {
-        this.api.ui.setWidgetValue('SS$' + key, value);
-      }
-      */
       zapi.ui.setWidgetValue('SS$' + key, value);
     }
     else {

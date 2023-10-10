@@ -63,12 +63,6 @@ export class Scenario {
           }
         }
       }
-      /*
-      let pcinputgroup = this.api.devices.getDevice('PC');
-      let roomoutputgroup = this.api.devices.getDevice('ROOM');
-
-      roomoutputgroup.disconnectLocalInput(pcinputgroup);
-      */
       xapi.Command.Standby.Activate();
   }
 

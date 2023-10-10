@@ -69,7 +69,7 @@ export var config = {
     forceSleepTime: '2:00',
     requiredPeripheralsCheckInterval: 30000,
     usePresenterTrack: true,
-    forcePresenterTrackActivation: true,
+    forcePresenterTrackActivation: false,
     onStandby: {
       setDND: true,
       clearCallHistory: false,

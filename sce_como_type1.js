@@ -110,6 +110,17 @@ export class Scenario {
     this.devices.audioinputs.audiencemics = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.AUDIOINPUT, 'system.audio.audiencemics');
 
 
+    //Handle PresenterTrack camera change
+    xapi.Status.Cameras.PresenterTrack.Status.on(status => {
+      if (status == 'Follow') {
+        zapi.system.enablePresenterTrackWarning();
+      }
+      else if (status == 'Off') {
+        zapi.system.disablePresenterTrackWarning();
+      }
+    });
+
+
 
   }
 
@@ -145,6 +156,7 @@ export class Scenario {
       switch (status.key) {
 
         case 'hdmiPassthrough':
+          this.evaluateCameras(status.status);
           break;
         case 'call':
           //Filter non-important call status
@@ -153,6 +165,10 @@ export class Scenario {
             this.evaluateScreens(status.status);
           }
           this.evaluateAudio(status.status);
+          this.evaluateCameras(status.status);
+          break;
+        case 'UsePresenterTrack:':
+          this.evaluateCameras(status.status);
           break;
         case 'ClearPresentationZoneSecondary':
         case 'presentation':
@@ -187,6 +203,16 @@ export class Scenario {
     this.evaluateScreens(status);
     this.evaluateLightscene(status);
     this.evaluateAudio(status);
+    this.evaluateCameras(status);
+  }
+
+  evaluateCameras(status) {
+    if (status.UsePresenterTrack == ON && (status.call == 'Connected' || status.hdmiPassthrough == 'Active')) {
+      xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Follow' });
+    }
+    else {
+      xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Off' });
+    }
   }
 
   async evaluateLightscene(status) {
@@ -301,7 +327,7 @@ export class Scenario {
 
     const setMonitors = (monitors) => {
       if (status.AutoDisplays == ON) {
-xapi.Config.Video.Monitors.set(monitors);
+        xapi.Config.Video.Monitors.set(monitors);
       }
     };
 
@@ -315,55 +341,55 @@ xapi.Config.Video.Monitors.set(monitors);
 
     const powerOnDisplays = (displays) => {
       if (status.AutoDisplays == ON) {
-      displays.forEach(display => {
-        display.on();
-      });
+        displays.forEach(display => {
+          display.on();
+        });
       }
     }
 
     const blankDisplays = (displays) => {
       if (status.AutoDisplays == ON) {
-      displays.forEach(display => {
-        display.setBlanking(true);
-      });
+        displays.forEach(display => {
+          display.setBlanking(true);
+        });
       }
     }
 
     const unblankDisplays = (displays) => {
       if (status.AutoDisplays == ON) {
-      displays.forEach(display => {
-        display.setBlanking(false);
-      });
+        displays.forEach(display => {
+          display.setBlanking(false);
+        });
       }
     }
 
     const matrixBlankDisplay = displays => {
       if (status.AutoDisplays == ON) {
-      xapi.Command.Video.Matrix.Assign({
-        Mode: 'Replace',
-        Output: displays[0].config.connector,
-        RemoteMain: 4
-      });
+        xapi.Command.Video.Matrix.Assign({
+          Mode: 'Replace',
+          Output: displays[0].config.connector,
+          RemoteMain: 4
+        });
       }
     }
 
     const matrixRemoteToDisplay = (display) => {
       if (status.AutoDisplays == ON) {
-      xapi.Command.Video.Matrix.Assign({
-        Mode: 'Replace',
-        Output: display[0].config.connector,
-        RemoteMain: 1
-      });
+        xapi.Command.Video.Matrix.Assign({
+          Mode: 'Replace',
+          Output: display[0].config.connector,
+          RemoteMain: 1
+        });
       }
     };
 
     const matrixReset = (displays) => {
       if (status.AutoDisplays == ON) {
-      setTimeout(() => {
-        xapi.Command.Video.Matrix.Reset({
-          Output: displays[0].config.connector
-        });
-      }, 1000);
+        setTimeout(() => {
+          xapi.Command.Video.Matrix.Reset({
+            Output: displays[0].config.connector
+          });
+        }, 1000);
       }
     }
 

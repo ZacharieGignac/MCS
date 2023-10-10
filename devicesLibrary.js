@@ -446,8 +446,6 @@ export class Light {
   }
 
   setDefaults() {
-    /*
-    //Power
     if (this.config.supportsPower) {
       if (this.config.defaultPower == 'on') {
         this.on();
@@ -471,9 +469,6 @@ export class Light {
       }
 
     }
-    */
-
-
   }
 
   on() {

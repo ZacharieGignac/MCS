@@ -574,6 +574,7 @@ export var config = {
     AutoScreens: 'on', //Mandatory value
     AutoLights: 'on', //Mandatory value
     AutoCamPresets: 'on', //Mandatory value
+    AutoCamSelection: 'off', //Mandatory value
     AudienceMics: 'on', //Mandatory valuee
     PresenterMics: 'on', //Mandatory value
     PresenterDetected: false, //Mandatory value

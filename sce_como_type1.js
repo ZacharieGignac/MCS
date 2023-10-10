@@ -231,7 +231,7 @@ export class Scenario {
      *  screens configuration
      * 
      ******************/
-    if (status.AutoScreens) {
+    if (status.AutoScreens == ON) {
       var needPresentationScreen = (status.call == 'Connected' && status.PresenterLocation == REMOTE) || status.presentation.type != 'NOPRESENTATION';
       var needClearZone = status.ClearPresentationZone == ON ? true : false;
 
@@ -271,62 +271,80 @@ export class Scenario {
 
 
     const setDisplaysRole = (displays, role) => {
+      if (status.AutoDisplays == ON) {
+
+      }
       displays.forEach(display => {
         xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set(role);
       });
     };
 
     const setMonitors = (monitors) => {
-      xapi.Config.Video.Monitors.set(monitors);
+      if (status.AutoDisplays == ON) {
+xapi.Config.Video.Monitors.set(monitors);
+      }
     };
 
     const powerOffDisplays = (displays) => {
-      displays.forEach(display => {
-        display.off();
-      });
+      if (status.AutoDisplays == ON) {
+        displays.forEach(display => {
+          display.off();
+        });
+      }
     }
 
     const powerOnDisplays = (displays) => {
+      if (status.AutoDisplays == ON) {
       displays.forEach(display => {
         display.on();
       });
+      }
     }
 
     const blankDisplays = (displays) => {
+      if (status.AutoDisplays == ON) {
       displays.forEach(display => {
         display.setBlanking(true);
       });
+      }
     }
 
     const unblankDisplays = (displays) => {
+      if (status.AutoDisplays == ON) {
       displays.forEach(display => {
         display.setBlanking(false);
       });
+      }
     }
 
     const matrixBlankDisplay = displays => {
+      if (status.AutoDisplays == ON) {
       xapi.Command.Video.Matrix.Assign({
         Mode: 'Replace',
         Output: displays[0].config.connector,
         RemoteMain: 4
-      })
+      });
+      }
     }
 
     const matrixRemoteToDisplay = (display) => {
+      if (status.AutoDisplays == ON) {
       xapi.Command.Video.Matrix.Assign({
         Mode: 'Replace',
         Output: display[0].config.connector,
         RemoteMain: 1
       });
+      }
     };
 
     const matrixReset = (displays) => {
+      if (status.AutoDisplays == ON) {
       setTimeout(() => {
         xapi.Command.Video.Matrix.Reset({
           Output: displays[0].config.connector
         });
       }, 1000);
-
+      }
     }
 
 

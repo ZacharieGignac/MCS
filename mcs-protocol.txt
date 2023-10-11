@@ -152,11 +152,11 @@ Allumer:
    LIGHT:OFF
 
 Set Power:
-   LIGHT:SETPOWER:ON
-   LIGHT:SETPOWER:OFF
+   LIGHT:SETPOWER;ON
+   LIGHT:SETPOWER;OFF
 
 Tamiser (dim):
-   LIGHT:DIM:40
+   LIGHT:DIM;40
 
 
 [Contrôle d'une scène d'éclairage]

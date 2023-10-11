@@ -116,6 +116,25 @@ export class ScreenDriver_isc_h21 {
   }
 }
 
+
+export class ScreenDriver_isc {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setPosition(position) {
+    position = position.toUpperCase();
+    zapi.system.sendMessage(this.config.name + ':' + position);
+    debug(1, `DRIVER ScreenDriver_isc (${this.config.id}): setPosition: ${position}`);
+  }
+
+  custom() {
+
+  }
+}
+
+
 export class ScreenDriver_gpio {
   constructor(device, config) {
     this.config = config;
@@ -135,6 +154,7 @@ export class ScreenDriver_gpio {
   }
 
   setPosition(position) {
+    debug(1, `DRIVER ScreenDriver_gpio (${this.config.id}): setPosition: ${position}`);
     var config = {};
     if (this.gpiotype == 'single') {
       config['Pin' + this.pin] = position == 'up' ? 'Low' : 'High';
@@ -143,7 +163,6 @@ export class ScreenDriver_gpio {
       config['Pin' + this.pin1] = position == 'up' ? 'Low' : 'High';
       config['Pin' + this.pin2] = position == 'up' ? 'High' : 'Low';
     }
-    console.error(config);
     xapi.Command.GPIO.ManualState.Set(config);
   }
 

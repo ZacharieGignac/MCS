@@ -256,4 +256,27 @@ export class LightDriver_isc_h21 {
 }
 
 
+export class LightDriver_isc {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  on() {
+    debug(1, `DRIVER Light_isc_h21 (${this.config.id}): On`);
+    zapi.system.sendMessage(`${this.config.name}:ON`);
+  }
+
+  off() {
+    debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Off`);
+    zapi.system.sendMessage(`${this.config.name}:OFF`);
+  }
+
+  dim(level) {
+    debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Dim ${level}`);
+    zapi.system.sendMessage(`${this.config.name}:DIM;${level}`);
+  }
+}
+
+
 

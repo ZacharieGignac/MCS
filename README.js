@@ -2,6 +2,9 @@ import xapi from 'xapi';
 
 /*
 
+JUSTE DES NOTES, NE PAS PRENDRE POUR DU CASH
+
+
 Core Actions:
 CHANGESCENARIO:name -> Change le scénario pour "name"
 STANDBY -> met le système en veille, par conséquent charge le scénario par défaut pour la veille

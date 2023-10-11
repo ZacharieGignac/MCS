@@ -80,12 +80,6 @@ export class Scenario {
     this.enabled = false;
 
 
-    let dbg = zapi.modules.isModuleAvailable('debug');
-
-    dbg = zapi.modules.getModule('debug');
-    dbg.debug(3,`CA MARCHEEEEEEEEEEE!!!!!!!!!`);
-
-
     zapi.system.onStatusChange(status => { self.onStatusChange(status); });
 
     this.originalUsePresenterTrack = zapi.system.getStatus('UsePresenterTrack');

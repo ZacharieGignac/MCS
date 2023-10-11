@@ -199,8 +199,11 @@ export var config = {
       type: DEVICETYPE.SCREEN,
       name: 'SCREEN2',
       device: devicesLibrary.Screen,
-      driver: driversLibrary.ScreenDriver_isc_h21,
+      driver: driversLibrary.ScreenDriver_gpio,
       //alwaysUse: true,
+      //pin:1,
+      pin1:1,
+      pin2:2,
       defaultPosition: 'up'
     },
 

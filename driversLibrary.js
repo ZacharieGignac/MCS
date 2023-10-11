@@ -31,7 +31,7 @@ export class LightSceneDriver_lights {
   activate() {
     for (let light of this.config.lights) {
       for (let prop in light) {
-        if(light.hasOwnProperty(prop)) {
+        if (light.hasOwnProperty(prop)) {
           if (prop != 'id') {
             let l = zapi.devices.getDevice(light.id);
             l[prop](light[prop]);
@@ -109,6 +109,42 @@ export class ScreenDriver_isc_h21 {
     position = position.toLowerCase();
     zapi.system.sendMessage(this.config.name + '_' + position);
     debug(1, `DRIVER ScreenDriver_isc_h21 (${this.config.id}): setPosition: ${position}`);
+  }
+
+  custom() {
+
+  }
+}
+
+export class ScreenDriver_gpio {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+
+    if (this.config.pin) {
+      this.gpiotype = 'single';
+      this.pin = this.config.pin;
+    }
+    else {
+      this.gpiotype = 'pair';
+      this.pin1 = this.config.pin1;
+      this.pin2 = this.config.pin2;
+    }
+    this.setPosition(this.config.defaultPosition);
+
+  }
+
+  setPosition(position) {
+    var config = {};
+    if (this.gpiotype == 'single') {
+      config['Pin' + this.pin] = position == 'up' ? 'Low' : 'High';
+    }
+    else if (this.gpiotype == 'pair') {
+      config['Pin' + this.pin1] = position == 'up' ? 'Low' : 'High';
+      config['Pin' + this.pin2] = position == 'up' ? 'High' : 'Low';
+    }
+    console.error(config);
+    xapi.Command.GPIO.ManualState.Set(config);
   }
 
   custom() {

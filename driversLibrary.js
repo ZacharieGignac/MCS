@@ -59,14 +59,6 @@ export class DisplayDriver_isc_h21 {
   constructor(device, config) {
     this.config = config;
     this.device = device;
-    if (config.supportsUsageHours) {
-      xapi.Event.Message.Send.Text.on(text => {
-        let split = text.split('_');
-        if (split[0] == config.name && split[1] == "UHREP") {
-          this.device.fbUsageHours(split[2]);
-        }
-      });
-    }
   }
 
   setPower(power) {
@@ -84,7 +76,56 @@ export class DisplayDriver_isc_h21 {
   }
 
   setSource(source) {
+    debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): setSource not supported`);
+  }
 
+  getUsageHours() {
+    debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): getUsageHours not supported`);
+    return 0;
+  }
+
+  requestUsageHours() {
+    debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): requestUsageHopurs not supported`);
+  }
+
+  custom() { }
+}
+
+
+export class DisplayDriver_isc {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+    if (config.supportsUsageHours) {
+      xapi.Event.Message.Send.Text.on(text => {
+        let split = text.split(':');
+        if (split[0] == config.name) {
+          let split = split[1](';');
+          if (split[0] == 'USAGEREPLY') {
+            this.device.fbUsageHours(split[1]);
+          }
+        }
+      });
+    }
+  }
+
+  setPower(power) {
+    power = power.toUpperCase();
+    let powerString = this.config.name + ':' + power;
+    zapi.system.sendMessage(powerString);
+    debug(1, `DRIVER DisplayDriver_isc (${this.config.id}): setPower: ${power}`);
+  }
+
+  setBlanking(blanking) {
+    let blankingAction = blanking ? 'BLANK' : 'UNBLANK';
+    let blankingString = this.config.name + ':' + blankingAction;
+    zapi.system.sendMessage(blankingString);
+    debug(1, `DRIVER DisplayDriver_isc (${this.config.id}): setBlanking: ${blanking}`);
+  }
+
+  setSource(source) {
+    let sourceString = this.config.name + ':SOURCE;' + source;
+    zapi.system.sendMessage(sourceString);
   }
 
   getUsageHours() {
@@ -92,11 +133,14 @@ export class DisplayDriver_isc_h21 {
   }
 
   requestUsageHours() {
-    zapi.system.sendMessage('LAMPREQ:' + this.config.name);
+    zapi.system.sendMessage(this.config.name + ':USAGEREQUEST');
   }
 
   custom() { }
 }
+
+
+
 
 
 export class ScreenDriver_isc_h21 {

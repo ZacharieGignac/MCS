@@ -71,6 +71,7 @@ export var config = {
     requiredPeripheralsCheckInterval: 30000,
     usePresenterTrack: true,
     forcePresenterTrackActivation: false,
+    systemReportApiKey:'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',
     onStandby: {
       setDND: true,
       clearCallHistory: false,

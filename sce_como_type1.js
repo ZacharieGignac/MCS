@@ -64,7 +64,7 @@ export var Manifest = {
     joinMicrosoftTeamsCVI: true,
     keypad: true,
     layoutControls: true,
-    midCallControls: true,
+    midCallControls: false,
     musicMode: false,
     participantList: true,
     selfviewControls: true,
@@ -151,7 +151,7 @@ export class Scenario {
   }
 
   start() {
-
+    zapi.system.setStatus('comotype1Mode','?');
     let status = zapi.system.getAllStatus();
     this.evaluateAll(status);
   }
@@ -411,6 +411,7 @@ export class Scenario {
         //Permanent displays + Clear zone
         if (!presentationActive && !remotePresenterPresent) {
           //console.error('1');
+          zapi.system.setStatus('comotype1Mode',1);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
@@ -420,6 +421,7 @@ export class Scenario {
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
           //console.error('2');
+          zapi.system.setStatus('comotype1Mode',2);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
@@ -429,6 +431,7 @@ export class Scenario {
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
           //console.error('3');
+          zapi.system.setStatus('comotype1Mode',3);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, SECOND);
           setDisplaysRole(presentationDisplays, FIRST);
@@ -438,6 +441,7 @@ export class Scenario {
         }
         else if (remotePresenterPresent && !presentationActive) {
           //console.error('4');
+          zapi.system.setStatus('comotype1Mode',4);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
@@ -447,6 +451,7 @@ export class Scenario {
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('5');
+          zapi.system.setStatus('comotype1Mode',5);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
@@ -459,6 +464,7 @@ export class Scenario {
       else {
         if (!presentationActive && !remotePresenterPresent) {
           //console.error('6');
+          zapi.system.setStatus('comotype1Mode',6);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
@@ -468,6 +474,7 @@ export class Scenario {
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
           //console.error('7');
+          zapi.system.setStatus('comotype1Mode',7);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
@@ -477,6 +484,7 @@ export class Scenario {
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
           //console.error('8');
+          zapi.system.setStatus('comotype1Mode',8);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, SECOND);
           setDisplaysRole(presentationDisplays, FIRST);
@@ -486,6 +494,7 @@ export class Scenario {
         }
         else if (remotePresenterPresent && !presentationActive) {
           //console.error('9');
+          zapi.system.setStatus('comotype1Mode',9);
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
@@ -495,6 +504,7 @@ export class Scenario {
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('10');
+          zapi.system.setStatus('comotype1Mode',10);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
@@ -518,6 +528,7 @@ export class Scenario {
         //WITHOUT Permanent displays + Clear zone
         if (!presentationActive && !remotePresenterPresent) {
           //console.error('11');
+          zapi.system.setStatus('comotype1Mode',11);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
@@ -527,6 +538,7 @@ export class Scenario {
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
           //console.error('12');
+          zapi.system.setStatus('comotype1Mode',12);
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
@@ -541,6 +553,7 @@ export class Scenario {
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
           //console.error('13');
+          zapi.system.setStatus('comotype1Mode',13);
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
@@ -556,6 +569,7 @@ export class Scenario {
         }
         else if (remotePresenterPresent && !presentationActive) {
           //console.error('14');
+          zapi.system.setStatus('comotype1Mode',14);
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
@@ -570,6 +584,7 @@ export class Scenario {
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('15');
+          zapi.system.setStatus('comotype1Mode',15);
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
@@ -588,6 +603,7 @@ export class Scenario {
         //console.error('DOES NOT NEED CLEAR ZONE');
         if (!presentationActive && !remotePresenterPresent) {
           //console.error('16');
+          zapi.system.setStatus('comotype1Mode',16);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
@@ -598,6 +614,7 @@ export class Scenario {
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
           //console.error('17');
+          zapi.system.setStatus('comotype1Mode',17);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
@@ -608,6 +625,7 @@ export class Scenario {
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
           //console.error('18');
+          zapi.system.setStatus('comotype1Mode',18);
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, SECOND);
           setDisplaysRole(presentationDisplays, FIRST);
@@ -618,6 +636,7 @@ export class Scenario {
         }
         else if (remotePresenterPresent && !presentationActive) {
           //console.error('19');
+          zapi.system.setStatus('comotype1Mode',19);
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
@@ -628,6 +647,7 @@ export class Scenario {
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('20');
+          zapi.system.setStatus('comotype1Mode',20);
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);

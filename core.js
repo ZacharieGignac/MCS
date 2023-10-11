@@ -427,6 +427,90 @@ class Core {
 
     this.lastPresenterDetectedStatus = false;
 
+
+    zapi.system.systemReport = {};
+    zapi.system.systemReport.systemVersion = VERSION;
+    zapi.system.sendSystemReport = () => this.sendSystemReport();
+
+
+  }
+
+  safeStringify(obj, cache = new Set()) {
+    return JSON.stringify(obj, (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (cache.has(value)) {
+          // Remove cyclic reference
+          return;
+        }
+        cache.add(value);
+      }
+      return value;
+    });
+  }
+
+  async sendSystemReport() {
+    let systemunitName = await xapi.Config.SystemUnit.Name.get();
+    let codecConfig = await xapi.Config.get();
+    let codecStatus = await xapi.Status.get();
+    let date = new Date();
+
+    console.log(`Sending system report...`);
+    xapi.Command.UserInterface.Message.Alert.Display({
+      Title: 'Rapport système',
+      Text: 'Envoi du rapport en cours...'
+    });
+    let allDevices = zapi.devices.getAllDevices();
+    zapi.system.systemReport.devices = allDevices;
+    zapi.system.systemReport.systemStatus = zapi.system.getAllStatus();
+    zapi.system.systemReport.codecConfig = codecConfig;
+    zapi.system.systemReport.codecStatus = codecStatus;
+
+    var data = this.safeStringify(zapi.system.systemReport);
+    var key = config.system.systemReportApiKey;
+    var url = 'https://api.paste.ee/v1/pastes'
+    var body = {
+      "description": systemunitName + ' - ' + date,
+      "sections": [{
+        "name": "Section1",
+        "syntax": "autodetect",
+        "contents": data
+      }]
+    }
+
+    xapi.Command.HttpClient.Post({
+      AllowInsecureHTTPS: true,
+      Header: ['Content-type: application/json', `X-Auth-Token: ${key}`],
+      ResultBody: 'PlainText',
+      Timeout: 10,
+      Url: url
+    },
+      JSON.stringify(body)
+    ).then(result => {
+      let resultObj = JSON.parse(result.Body);
+      if (resultObj.success == true) {
+        xapi.Command.UserInterface.Message.Alert.Display({
+          Title: 'Rapport système',
+          Text: 'Envoi réussi!<br>Référence: ' + resultObj.id
+        });
+        console.log(resultObj.link);
+      }
+      else {
+        xapi.Command.UserInterface.Message.Alert.Display({
+          Title: 'Rapport système',
+          Text: "Échec de l'envoi."
+        });
+      }
+    }).catch(error => {
+      xapi.Command.UserInterface.Message.Alert.Display({
+        Title: 'Rapport système',
+        Text: "Échec de l'envoi."
+      });
+    });
+
+    delete(zapi.system.systemReport.codecConfig);
+    delete(zapi.system.systemReport.codecStatus);
+
+
   }
 
 
@@ -439,6 +523,9 @@ class Core {
     await this.systemStatus.init();
 
     //Add UI-related mappings
+    self.uiManager.addActionMapping(/^SENDSYSTEMREPORT$/, () => {
+      this.sendSystemReport();
+    });
     self.uiManager.addActionMapping(/^PANELCLOSE$/, () => {
       xapi.Command.UserInterface.Extensions.Panel.Close();
     });

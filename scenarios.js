@@ -21,7 +21,6 @@ function debug(level, text) {
   }
 }
 
-
 export class Scenarios {
   constructor() {
     this.uiPanels = [];
@@ -218,5 +217,4 @@ export class Scenarios {
     zapi.performance.setElapsedEnd('Scenarios.setupFeatures');
   }
 }
-
 

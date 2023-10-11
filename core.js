@@ -1,7 +1,8 @@
 import xapi from 'xapi';
 import { DevicesManager } from './devices';
 import { config, VERSION, PRODUCT } from './config';
-import { Scenarios } from './scenarios'
+import { Scenarios } from './scenarios';
+import { Modules } from './modules';
 import { SystemStatus } from './systemstatus';
 import { zapiv1 } from './zapi';
 
@@ -794,10 +795,13 @@ class Core {
     });
   }
 
-  loadScenarios() {
-    //Load Scenarios
-    let self = this;
+  async loadScenarios() {
     this.scenarios = new Scenarios();
+  }
+
+  async loadModules() {
+    this.modules = new Modules();
+    return(this.modules.init());
   }
 
   handleStandby() {
@@ -983,9 +987,9 @@ async function preInit() {
 async function init() {
   debug(2, `Init started...`);
   core = await new Core();
+  await core.loadModules();
   await core.init();
-
-
+  
   debug(1, 'Waiting 5 secs...');
   await sleep(5000);
 

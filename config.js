@@ -13,7 +13,7 @@ import * as sce_firealarm from './sce_firealarm';
 
 /****************************/
 //Import modules below
-import * as telemetry from './telemetry';
+import * as debug from './debug';
 /****************************/
 
 
@@ -65,13 +65,13 @@ export var config = {
     debugInternalMessages: false,
     messagesPacing: 500,
     initDelay: 1000,
-    newSessionDelay:1000,
+    newSessionDelay: 1000,
     forceStandby: true,
     forceStandbyTime: '04:00',
     requiredPeripheralsCheckInterval: 30000,
     usePresenterTrack: true,
     forcePresenterTrackActivation: false,
-    systemReportApiKey:'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',
+    systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',
     onStandby: {
       setDND: true,
       clearCallHistory: false,
@@ -81,6 +81,16 @@ export var config = {
       enableScenario: 'comotype1'
     }
   },
+
+  scenarios: [
+    sce_standby,
+    sce_como_type1,
+    sce_firealarm,
+  ],
+
+  modules: [
+    debug
+  ],
 
 
   strings: {
@@ -93,18 +103,6 @@ export var config = {
     presenterTrackLocked: '🟢 Cadrage automatique ACTIVÉ 🟢',
     presenterTrackLost: '🔴 Cadrage automatique DÉSACTIVÉ 🔴.<br>Revenez dans la zone de présentation pour le réactiver.'
   },
-
-  scenarios: [
-    sce_standby,
-    sce_como_type1,
-    sce_firealarm,
-  ],
-
-  modules: [
-    telemetry
-  ],
-
-
 
 
   devices: [
@@ -224,7 +222,7 @@ export var config = {
       lowGain: 20,
       mediumGain: 50,
       highGain: 60,
-      boost:70
+      boost: 70
     },
     {
       id: 'audioinput.presenter.bat1',
@@ -242,7 +240,7 @@ export var config = {
       lowGain: 20,
       mediumGain: 50,
       highGain: 60,
-      boost:70
+      boost: 70
     },
     {
       id: 'audioinput.ceilingmic.1',
@@ -260,7 +258,7 @@ export var config = {
       lowGain: 20,
       mediumGain: 40,
       highGain: 60,
-      boost:70
+      boost: 70
     },
     {
       id: 'audioinput.ceilingmic.2',
@@ -278,7 +276,7 @@ export var config = {
       lowGain: 20,
       mediumGain: 40,
       highGain: 60,
-      boost:70
+      boost: 70
     },
     {
       id: 'audioinput.ceilingmic.3',
@@ -296,7 +294,7 @@ export var config = {
       lowGain: 20,
       mediumGain: 40,
       highGain: 60,
-      boost:70
+      boost: 70
     },
 
 
@@ -470,7 +468,7 @@ export var config = {
       device: devicesLibrary.Camera,
       peripheralRequired: true,
       peripheralId: 'FDO2515J291',
-      connector:3
+      connector: 3
 
     },
     {
@@ -480,7 +478,7 @@ export var config = {
       device: devicesLibrary.Camera,
       peripheralRequired: true,
       peripheralId: 'FDO2603J89L',
-      connector:1
+      connector: 1
     },
 
 

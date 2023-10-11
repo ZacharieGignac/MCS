@@ -426,6 +426,7 @@ class Core {
     zapi.audio.getRemoteOutputIds = () => { return self.audio.getRemoteOutputIds() };
 
     this.lastPresenterDetectedStatus = false;
+
   }
 
 
@@ -643,10 +644,14 @@ class Core {
       if (status != this.lastPresenterDetectedStatus) {
         this.lastPresenterDetectedStatus = status;
         if (status == true) {
-          this.displayPresenterTrackLockedMessage();
+          if (zapi.system.getStatus('UsePresenterTrack') == 'on' && zapi.system.getStatus('PresenterTrackWarnings') == 'on') {
+            this.displayPresenterTrackLockedMessage();
+          }
         }
         else {
-          this.displayPresenterTrackLostMessage();
+          if (zapi.system.getStatus('UsePresenterTrack') == 'on' && zapi.system.getStatus('PresenterTrackWarnings') == 'on') {
+            this.displayPresenterTrackLostMessage();
+          }
         }
       }
     }
@@ -700,7 +705,7 @@ class Core {
 
   handleWakeup() {
     debug(1, 'Waking up...');
-    displayTimedProgressBar(config.strings.newSessionTitle, 2000);
+    displayTimedProgressBar(config.strings.newSessionTitle, config.system.newSessionDelay);
     if (this.scenarios.currentScenario == config.system.onStandby.enableScenario) {
       this.scenarios.enableScenario(config.system.onWakeup.enableScenario);
     }

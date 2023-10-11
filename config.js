@@ -65,6 +65,7 @@ export var config = {
     debugInternalMessages: false,
     messagesPacing: 500,
     initDelay: 1000,
+    newSessionDelay:1000,
     forceSleepEnabled: true,
     forceSleepTime: '2:00',
     requiredPeripheralsCheckInterval: 30000,

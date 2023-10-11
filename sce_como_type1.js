@@ -81,6 +81,8 @@ export class Scenario {
 
     zapi.system.onStatusChange(status => { self.onStatusChange(status); });
 
+    this.originalUsePresenterTrack = zapi.system.getStatus('UsePresenterTrack');
+
     /* getting devices from config */
     //Displays
     this.devices.displays = {};
@@ -113,10 +115,13 @@ export class Scenario {
     //Handle PresenterTrack camera change
     xapi.Status.Cameras.PresenterTrack.Status.on(status => {
       if (status == 'Follow') {
-        zapi.system.enablePresenterTrackWarning();
+        if (this.originalUsePresenterTrack == ON) {
+          //zapi.system.enablePresenterTrackWarning();
+          zapi.system.setStatus('UsePresenterTrack', ON);
+        }
       }
       else if (status == 'Off') {
-        zapi.system.disablePresenterTrackWarning();
+        zapi.system.setStatus('UsePresenterTrack', OFF);
       }
     });
 

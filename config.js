@@ -214,7 +214,7 @@ export var config = {
       type: DEVICETYPE.AUDIOINPUT,
       name: 'Micro sans-fil',
       device: devicesLibrary.AudioInput,
-      driver: driversLibrary.AudioInput_codecpro,
+      driver: driversLibrary.AudioInputDriver_codecpro,
       connector: 7,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
@@ -232,7 +232,7 @@ export var config = {
       type: DEVICETYPE.AUDIOINPUT,
       name: 'Micro bâton',
       device: devicesLibrary.AudioInput,
-      driver: driversLibrary.AudioInput_codecpro,
+      driver: driversLibrary.AudioInputDriver_codecpro,
       connector: 8,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
@@ -250,7 +250,7 @@ export var config = {
       type: DEVICETYPE.AUDIOINPUT,
       name: 'Micro plafond 1',
       device: devicesLibrary.AudioInput,
-      driver: driversLibrary.AudioInput_codecpro,
+      driver: driversLibrary.AudioInputDriver_codecpro,
       connector: 1,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
@@ -268,7 +268,7 @@ export var config = {
       type: DEVICETYPE.AUDIOINPUT,
       name: 'Micro plafond 2',
       device: devicesLibrary.AudioInput,
-      driver: driversLibrary.AudioInput_codecpro,
+      driver: driversLibrary.AudioInputDriver_codecpro,
       connector: 2,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
@@ -286,7 +286,7 @@ export var config = {
       type: DEVICETYPE.AUDIOINPUT,
       name: 'Micro plafond 3',
       device: devicesLibrary.AudioInput,
-      driver: driversLibrary.AudioInput_codecpro,
+      driver: driversLibrary.AudioInputDriver_codecpro,
       connector: 3,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
@@ -333,7 +333,7 @@ export var config = {
       name: 'ZONE1',
       type: DEVICETYPE.LIGHT,
       device: devicesLibrary.Light,
-      driver: driversLibrary.Light_isc_h21,
+      driver: driversLibrary.LightDriver_isc_h21,
       sliderEvent: 'changed', //released, changed
       supportsPower: false,
       supportsDim: true,
@@ -345,7 +345,7 @@ export var config = {
       name: 'ZONE2',
       type: DEVICETYPE.LIGHT,
       device: devicesLibrary.Light,
-      driver: driversLibrary.Light_isc_h21,
+      driver: driversLibrary.LightDriver_isc_h21,
       sliderEvent: 'changed', //released, changed
       supportsPower: true,
       supportsDim: true,
@@ -357,7 +357,7 @@ export var config = {
       name: 'ZONE3',
       type: DEVICETYPE.LIGHT,
       device: devicesLibrary.Light,
-      driver: driversLibrary.Light_isc_h21,
+      driver: driversLibrary.LightDriver_isc_h21,
       sliderEvent: 'changed', //released, changed
       supportsPower: true,
       supportsDim: true,

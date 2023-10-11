@@ -171,7 +171,7 @@ export class ScreenDriver_gpio {
   }
 }
 
-export class AudioInput_codecpro {
+export class AudioInputDriver_codecpro {
   constructor(device, config) {
     this.config = config;
     this.device = device;
@@ -233,7 +233,7 @@ export class AudioInput_codecpro {
 }
 
 
-export class Light_isc_h21 {
+export class LightDriver_isc_h21 {
   constructor(device, config) {
     this.config = config;
     this.device = device;

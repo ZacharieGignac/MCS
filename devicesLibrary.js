@@ -261,7 +261,7 @@ export class Display {
     }
   }
 
-  off (delay = this.config.powerOffDelay) {
+  off(delay = this.config.powerOffDelay) {
     this.powerOff(delay);
   }
   powerOff(delay = this.config.powerOffDelay) {
@@ -553,9 +553,11 @@ export class AudioInput {
     this.driver = new config.driver(this, config);
     this.currentGain = undefined;
     this.currentMute = undefined;
+    this.beforeBoostGain = undefined;
     this.widgetModeName = this.config.id + ':MODE';
     this.widgetLevelName = this.config.id + ':LEVEL';
     this.widgetLevelGroupName = this.config.id + ':LEVELGROUP';
+    this.beforeBoostGain = undefined;
 
     //Default UI Handling
     this.modeSwitch = zapi.ui.addWidgetMapping(this.widgetModeName);
@@ -590,6 +592,7 @@ export class AudioInput {
   setDefaults() {
     if (this.config.defaultGain != undefined) {
       this.setGain(this.config.defaultGain);
+      this.beforeBoostGain = this.config.defaultGain;
     }
     if (this.config.defaultMode != undefined) {
       this.setMode(this.config.defaultMode);
@@ -683,6 +686,16 @@ export class AudioInput {
     }
     else {
       this.on();
+    }
+  }
+
+  setBoost(boost) {
+    if (boost == true || boost == 'on') {
+      this.beforeBoostGain = this.currentGain;
+      this.setGain(this.config.boost);
+    }
+    else if (!boost == true || boost == 'off') {
+      this.setGain(this.beforeBoostGain);
     }
   }
 

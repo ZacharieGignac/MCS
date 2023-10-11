@@ -125,8 +125,6 @@ export class Scenario {
       }
     });
 
-
-
   }
 
   enable() {

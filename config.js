@@ -223,7 +223,8 @@ export var config = {
       defaultMode: 'on',
       lowGain: 20,
       mediumGain: 50,
-      highGain: 60
+      highGain: 60,
+      boost:70
     },
     {
       id: 'audioinput.presenter.bat1',
@@ -240,7 +241,8 @@ export var config = {
       defaultMode: 'on',
       lowGain: 20,
       mediumGain: 50,
-      highGain: 60
+      highGain: 60,
+      boost:70
     },
     {
       id: 'audioinput.ceilingmic.1',
@@ -248,7 +250,7 @@ export var config = {
       name: 'Micro plafond 1',
       device: devicesLibrary.AudioInput,
       driver: driversLibrary.AudioInput_codecpro,
-      connector: 8,
+      connector: 1,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
       gainHighLimit: 70,
@@ -257,7 +259,8 @@ export var config = {
       defaultMode: 'on',
       lowGain: 20,
       mediumGain: 40,
-      highGain: 60
+      highGain: 60,
+      boost:70
     },
     {
       id: 'audioinput.ceilingmic.2',
@@ -265,7 +268,7 @@ export var config = {
       name: 'Micro plafond 2',
       device: devicesLibrary.AudioInput,
       driver: driversLibrary.AudioInput_codecpro,
-      connector: 8,
+      connector: 2,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
       gainHighLimit: 70,
@@ -274,7 +277,8 @@ export var config = {
       defaultMode: 'on',
       lowGain: 20,
       mediumGain: 40,
-      highGain: 60
+      highGain: 60,
+      boost:70
     },
     {
       id: 'audioinput.ceilingmic.3',
@@ -282,7 +286,7 @@ export var config = {
       name: 'Micro plafond 3',
       device: devicesLibrary.AudioInput,
       driver: driversLibrary.AudioInput_codecpro,
-      connector: 8,
+      connector: 3,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
       gainHighLimit: 70,
@@ -291,7 +295,8 @@ export var config = {
       defaultMode: 'on',
       lowGain: 20,
       mediumGain: 40,
-      highGain: 60
+      highGain: 60,
+      boost:70
     },
 
 

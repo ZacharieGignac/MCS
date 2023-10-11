@@ -50,7 +50,7 @@ export class LightSceneDriver_isc {
   }
 
   activate() {
-    zapi.system.sendMessage(`LS_${this.config.name}`);
+    zapi.system.sendMessage(`${this.config.name}:ACTIVATE`);
   }
 }
 

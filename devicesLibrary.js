@@ -29,8 +29,8 @@ function mapValue(value, fromMin, fromMax, toMin, toMax) {
 }
 
 export class Camera {
-  constructor() {
-
+  constructor(config) {
+    this.config = config;
   }
 }
 

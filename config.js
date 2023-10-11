@@ -460,20 +460,22 @@ export var config = {
     /* CAMERAS */
     {
       id: 'camera.presenter',
-      type: DEVICETYPE.VIRTUAL,
+      type: DEVICETYPE.CAMERA,
       name: 'Caméra (enseignant)',
-      device: devicesLibrary.Virtual,
+      device: devicesLibrary.Camera,
       peripheralRequired: true,
-      peripheralId: 'FDO2515J291'
+      peripheralId: 'FDO2515J291',
+      connector:3
 
     },
     {
       id: 'camera.audience',
-      type: DEVICETYPE.VIRTUAL,
+      type: DEVICETYPE.CAMERA,
       name: 'Caméra (auditoire)',
-      device: devicesLibrary.Virtual,
+      device: devicesLibrary.Camera,
       peripheralRequired: true,
-      peripheralId: 'FDO2603J89L'
+      peripheralId: 'FDO2603J89L',
+      connector:1
     },
 
 

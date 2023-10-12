@@ -471,6 +471,7 @@ class Core {
     });
     let allDevices = zapi.devices.getAllDevices();
     zapi.system.systemReport.devices = allDevices;
+    zapi.system.systemReport.scenarios = this.scenarios;
     zapi.system.systemReport.systemStatus = zapi.system.getAllStatus();
     zapi.system.systemReport.codecConfig = codecConfig;
     zapi.system.systemReport.codecStatus = codecStatus;
@@ -750,22 +751,29 @@ class Core {
 
 
 
-  processPresenterDetectedStatus(status) {
-    if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('hdmiPassthrough') == 'Active') {
-      if (status != this.lastPresenterDetectedStatus) {
-        this.lastPresenterDetectedStatus = status;
-        if (status == true) {
-          if (zapi.system.getStatus('UsePresenterTrack') == 'on' && zapi.system.getStatus('PresenterTrackWarnings') == 'on') {
-            this.displayPresenterTrackLockedMessage();
+  async processPresenterDetectedStatus(status) {
+    let pts = await xapi.Status.Cameras.PresenterTrack.Status.get();
+    if (pts == 'Follow') {
+      if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('hdmiPassthrough') == 'Active') {
+        if (status != this.lastPresenterDetectedStatus) {
+          this.lastPresenterDetectedStatus = status;
+          if (status == true) {
+            if (zapi.system.getStatus('UsePresenterTrack') == 'on' && zapi.system.getStatus('PresenterTrackWarnings') == 'on') {
+              this.displayPresenterTrackLockedMessage();
+            }
           }
-        }
-        else {
-          if (zapi.system.getStatus('UsePresenterTrack') == 'on' && zapi.system.getStatus('PresenterTrackWarnings') == 'on') {
-            this.displayPresenterTrackLostMessage();
+          else {
+            if (zapi.system.getStatus('UsePresenterTrack') == 'on' && zapi.system.getStatus('PresenterTrackWarnings') == 'on') {
+              this.displayPresenterTrackLostMessage();
+            }
           }
         }
       }
     }
+    else if (pts == 'Off') {
+      xapi.Command.UserInterface.Message.TextLine.Clear();
+    }
+
   }
 
   displayPresenterTrackLockedMessage() {
@@ -801,7 +809,7 @@ class Core {
 
   async loadModules() {
     this.modules = new Modules();
-    return(this.modules.init());
+    return (this.modules.init());
   }
 
   handleStandby() {
@@ -882,7 +890,7 @@ async function getDisconnectedRequiredPeripherals() {
     let matchCount = 0;
 
     for (let p of peripherals.ConnectedDevice) {
-      if (rp.peripheralId == p.SerialNumber && p.Status == 'Connected') {
+      if ((rp.peripheralId == p.SerialNumber || rp.peripheralId == p.ID) && p.Status == 'Connected') {
         matchCount++;
       }
     }
@@ -989,7 +997,7 @@ async function init() {
   core = await new Core();
   await core.loadModules();
   await core.init();
-  
+
   debug(1, 'Waiting 5 secs...');
   await sleep(5000);
 
@@ -1026,6 +1034,7 @@ debug(1, `Debug level is: ${config.system.debugLevel}`);
 
 
 xapi.Status.SystemUnit.Uptime.get().then(uptime => {
+  
   if (uptime > config.system.coldBootWait) {
     debug(1, 'Warm boot detected, running preInit() now.');
     preInit();
@@ -1040,6 +1049,11 @@ xapi.Status.SystemUnit.Uptime.get().then(uptime => {
         Duration: 0,
         Text: `Le système vient de démarrer. Optimisation en cours...<br>Environ ${config.system.coldBootWait - (x * 5)} secondes restantes...`,
         Title: 'Démarrage',
+      });
+      xapi.Status.SystemUnit.Uptime.get().then(uptime => {
+        if (uptime > config.system.coldBootWait) {
+          clearInterval(coldbootWarningInterval);
+        }
       });
     }, 5000);
   }

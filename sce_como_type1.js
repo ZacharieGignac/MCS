@@ -114,6 +114,7 @@ export class Scenario {
 
 
     //Handle PresenterTrack camera change
+    /*
     xapi.Status.Cameras.PresenterTrack.Status.on(status => {
       if (status == 'Follow') {
         if (this.originalUsePresenterTrack == ON) {
@@ -125,6 +126,7 @@ export class Scenario {
         zapi.system.setStatus('UsePresenterTrack', OFF);
       }
     });
+    */
 
   }
 
@@ -171,7 +173,7 @@ export class Scenario {
           this.evaluateAudio(status.status);
           this.evaluateCameras(status.status);
           break;
-        case 'UsePresenterTrack:':
+        case 'UsePresenterTrack':
           this.evaluateCameras(status.status);
           break;
         case 'ClearPresentationZoneSecondary':
@@ -226,10 +228,13 @@ export class Scenario {
 
   evaluateCameras(status) {
     if (status.UsePresenterTrack == ON && (status.call == 'Connected' || status.hdmiPassthrough == 'Active')) {
+      xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: config.system.presenterTrackConnector });
       xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Follow' });
     }
     else {
       xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Off' });
+      let presenterPreset = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERAPRESET, 'system.presentation.main')[0];
+      presenterPreset.activate();
     }
   }
 

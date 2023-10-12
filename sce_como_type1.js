@@ -176,7 +176,6 @@ export class Scenario {
         case 'UsePresenterTrack':
           this.evaluateCameras(status.status);
           break;
-        case 'ClearPresentationZoneSecondary':
         case 'presentation':
         case 'ClearPresentationZone':
         case 'PresenterLocation':
@@ -184,6 +183,7 @@ export class Scenario {
           this.evaluateScreens(status.status);
           this.evaluateLightscene(status.status);
           this.evaluateAudio(status.status);
+          this.evaluateCameras(status.status);
           break;
         case 'AudienceMics':
           this.setAudienceMics(status.value);
@@ -227,16 +227,31 @@ export class Scenario {
   }
 
   evaluateCameras(status) {
-    if (status.UsePresenterTrack == ON && (status.call == 'Connected' || status.hdmiPassthrough == 'Active')) {
-      let camConnector = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERA, 'system.presentation.main')[0].config.connector;
-      xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
-      xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Follow' });
+    if (status.PresenterLocation == 'local') {
+      if (status.UsePresenterTrack == ON && (status.call == 'Connected' || status.hdmiPassthrough == 'Active')) {
+        let camConnector = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERA, 'system.presentation.main')[0].config.connector;
+        xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
+        xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Follow' });
+      }
+      else {
+        xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Off' });
+        let presenterPreset = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERAPRESET, 'system.presentation.main')[0];
+        if (status.AutoCamPresets == ON) {
+          presenterPreset.activate();
+        }
+
+      }
     }
-    else {
+    else if (status.PresenterLocation == 'remote') {
       xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Off' });
-      let presenterPreset = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERAPRESET, 'system.presentation.main')[0];
-      presenterPreset.activate();
+      if (status.call == 'Connected' || status.hdmiPassthrough == 'Active') {
+        let audiencePreset = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERAPRESET, 'system.farend.main')[0];
+        if (status.AutoCamPresets == ON) {
+          audiencePreset.activate();
+        }
+      }
     }
+
   }
 
   async evaluateLightscene(status) {

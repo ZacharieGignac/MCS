@@ -228,7 +228,8 @@ export class Scenario {
 
   evaluateCameras(status) {
     if (status.UsePresenterTrack == ON && (status.call == 'Connected' || status.hdmiPassthrough == 'Active')) {
-      xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: config.system.presenterTrackConnector });
+      let camConnector = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERA, 'system.presentation.main')[0].config.connector;
+      xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
       xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Follow' });
     }
     else {

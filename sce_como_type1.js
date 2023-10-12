@@ -174,6 +174,7 @@ export class Scenario {
           this.evaluateCameras(status.status);
           break;
         case 'UsePresenterTrack':
+        case 'AutoCamPresets':
           this.evaluateCameras(status.status);
           break;
         case 'presentation':

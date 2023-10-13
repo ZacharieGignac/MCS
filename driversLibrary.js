@@ -323,4 +323,106 @@ export class LightDriver_isc {
 }
 
 
+export class AudioReporterDriver_internal {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
+    this.inputs = [];
+    this.maxLevel = undefined;
+    this.maxLevelId = undefined;
+    this.currentReportTime = new Date();
+    this.highestInput = { id: 0 };
+    this.highestInputSince = undefined;
+
+    for (let i = 1; i < this.config.inputs.length; i++) {
+      this.inputs[i] = { id: i, level: 0 };
+    }
+  }
+  start() {
+    for (let input of this.config.inputs) {
+      xapi.Command.Audio.VuMeter.Start({
+        ConnectorId: input,
+        ConnectorType: 'Microphone',
+        Source: 'AfterAEC',
+        IntervalMs: 500
+      });
+    }
+
+    xapi.Event.Audio.Input.Connectors.Microphone.on(report => {
+      this.update(report.id, report.VuMeter);
+    });
+  }
+  stop() {
+
+  }
+  update(id, level) {
+    var lastReportTime = this.currentReportTime;
+    this.currentReportTime = new Date();
+    var elapsed = (this.currentReportTime.getTime() - lastReportTime.getTime());
+
+    this.inputs[id] = { id: id, level: level };  // Update this.inputs[id] before the loop
+
+    let highestLevelObj = null;
+    let secondHighestLevelObj = null;
+    let lowestLevelObj = null;
+    let lowestLevelValue = Infinity;
+    let highestLevelValue = -Infinity;
+    var levelSum = 0;
+    var highestSince;
+
+
+    for (let i = 1; i < this.inputs.length; i++) {  // Start loop at index 1
+      if (this.inputs[i] != undefined) {
+        levelSum = levelSum + this.inputs[i].level;
+        let currentObj = this.inputs[i];
+
+        if (highestLevelObj === null || currentObj.level > highestLevelObj.level) {
+          secondHighestLevelObj = highestLevelObj;
+          highestLevelObj = currentObj;
+          highestLevelValue = currentObj.level;
+        } else if (secondHighestLevelObj === null || (currentObj.level > secondHighestLevelObj.level && currentObj.level < highestLevelObj.level)) {
+          secondHighestLevelObj = currentObj;
+        }
+
+        if (lowestLevelObj === null || currentObj.level < lowestLevelObj.level) {
+          lowestLevelObj = currentObj;
+          lowestLevelValue = currentObj.level;
+        }
+      }
+    }
+
+    var average = levelSum / (this.inputs.length - 1);
+    var differenceBetweenTopAndAverage = highestLevelValue - average;
+    let differenceBetweenTopTwo = highestLevelValue - secondHighestLevelObj.level;
+    let differenceBetweenHighestAndLowest = highestLevelValue - lowestLevelValue;
+
+    if (highestLevelObj.id != this.highestInput.id) {
+      this.highestInput = highestLevelObj;
+      this.highestInputSince = new Date();
+    }
+
+    highestSince = new Date() - this.highestInputSince;
+
+    const audioReport = {
+      id: this.config.id,
+      name: this.config.name,
+      elapsedMs: elapsed,
+      highInputId: parseInt(highestLevelObj.id),
+      highInputLevel: parseInt(highestLevelValue),
+      highestSince: highestSince,
+      lowInputId: parseInt(lowestLevelObj.id),
+      lowinputLevel: lowestLevelValue,
+      average: average,
+      highestAverageDiff: differenceBetweenTopAndAverage,
+      topTwodiff: differenceBetweenTopTwo,
+      highestLowestDiff: differenceBetweenHighestAndLowest,
+      inputs: this.inputs
+    };
+
+
+    this.device.report(audioReport);
+  }
+}
+
+
 

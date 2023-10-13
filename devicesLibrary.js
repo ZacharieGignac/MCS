@@ -715,6 +715,7 @@ export class ControlSystem {
   }
 }
 
+
 export class Screen {
   constructor(config) {
     this.config = config;
@@ -768,7 +769,7 @@ export class Screen {
 }
 
 
-export class Virtual {
+export class SoftwareDevice {
   constructor(config) {
     this.config = config;
   }
@@ -777,6 +778,48 @@ export class Virtual {
     debug(1, `DEVICE ${this.config.id}: RESET`);
   }
 }
+
+
+export class AudioReporter {
+  constructor(config) {
+    this.config = config;
+    this.driver = new config.driver(this, config);
+    this.reportCallbacks = [];
+    if (this.config.start) {
+      this.start();
+    }
+  }
+  report(data) {
+    //console.warn(data);
+    for(let reportReceiver of this.reportCallbacks) {
+      reportReceiver(data);
+    }
+  }
+  start() {
+    this.driver.start();
+  }
+  stop() {
+    this.driver.stop();
+  }
+  onReport(callback) {
+    this.reportCallbacks.push(callback);
+  }
+}
+
+
+export class Shade {
+  constructor(config) {
+
+  }
+}
+
+export class HID {
+  constructor(config) {
+
+  }
+}
+
+
 
 
 

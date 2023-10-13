@@ -41,6 +41,7 @@ const DEVICETYPE = {
   AUDIOOUTPUT: 'AUDIOOUTPUT',
   AUDIOINPUTGROUP: 'AUDIOINPUTGROUP',
   AUDIOOUTPUTGROUP: 'AUDIOOUTPUTGROUP',
+  AUDIOREPORTER:'AUDIOREPORTER',
   SCREEN: 'SCREEN',
   LIGHT: 'LIGHT',
   LIGHTSCENE: 'LIGHTSCENE',
@@ -48,9 +49,7 @@ const DEVICETYPE = {
   CAMERA: 'CAMERA',
   AUDIOSTAT: 'AUDIOSTAT',
   HID: 'HID',
-  TERMINALEMULATION: 'TERMINALEMULATION',
-  VIRTUAL: 'VIRTUAL',
-  CUSTOM: 'CUSTOM'
+  SOFTWAREDEVICE: 'SOFTWAREDEVICE'
 }
 
 
@@ -71,7 +70,7 @@ export var config = {
     requiredPeripheralsCheckInterval: 30000,
     usePresenterTrack: true,
     forcePresenterTrackActivation: false,
-    presenterTrackConnector:3,
+    presenterTrackConnector: 3,
     systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',
     onStandby: {
       setDND: true,
@@ -107,6 +106,16 @@ export var config = {
 
 
   devices: [
+    {
+      id:'system.audioreporter.main',
+      type:DEVICETYPE.AUDIOREPORTER,
+      name:'Internal VuMeter',
+      device:devicesLibrary.AudioReporter,
+      driver:driversLibrary.AudioReporterDriver_internal,
+      inputs:[1,2,3,7],
+      start:true
+    },
+
     /* CONTROL SYSTEM */
     {
       id: 'controlsystem',
@@ -203,8 +212,8 @@ export var config = {
       driver: driversLibrary.ScreenDriver_gpio,
       //alwaysUse: true,
       //pin:1,
-      pin1:1,
-      pin2:2,
+      pin1: 1,
+      pin2: 2,
       defaultPosition: 'up'
     },
 
@@ -472,7 +481,7 @@ export var config = {
       device: devicesLibrary.Camera,
       peripheralRequired: true,
       peripheralId: 'FDO2515J291',
-      connector: 3
+      connector: 1
 
     },
     {
@@ -481,8 +490,8 @@ export var config = {
       name: 'Caméra (auditoire)',
       device: devicesLibrary.Camera,
       peripheralRequired: true,
-      peripheralId: 'FDO2603J89L',
-      connector: 1
+      peripheralId: '88:C9:E8:D1:67:95',
+      connector: 3
     },
 
 
@@ -590,7 +599,6 @@ export var config = {
     PresenterMics: 'on', //Mandatory value
     PresenterDetected: false, //Mandatory value
     ClearPresentationZone: 'off',
-    ClearPresentationZoneSecondary: 'off'
 
     //Scenario-specific status
 

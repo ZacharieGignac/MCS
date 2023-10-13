@@ -208,6 +208,111 @@ class Audio {
 }
 
 
+class AudioReportAnalyzer {
+  constructor(audioReporter) {
+    var self = this;
+    this.audioReporter = audioReporter;
+    this.audioReporter.onReport((report) => { this.reportReceived(report) });
+    this.enabled = false;
+    this.rawAnalysisCallbacks = [];
+    this.loudestGroupAnalysisCallbacks = [];
+    this.customAnalysisCallbacks = [];
+    this.groupBelowLevel = [];
+    this.groups = [];
+    this.lastAnalysisData = undefined;
+  }
+  start() {
+    this.enabled = true;
+  }
+  stop() {
+    this.enabled = false;
+  }
+  reportReceived(report) {
+    this.lastAnalysisData = report;
+    var reportInputDetails = report.inputs;
+    if (this.enabled) {
+
+
+      //Process raw analysis callbacks
+      for (let rac of this.rawAnalysisCallbacks) {
+        rac(report);
+      }
+
+
+      //Find first group that contains the loudest input level
+      var loudestReport = report;
+      loudestReport.group = undefined;
+      delete loudestReport.inputs;
+      for (let group of this.groups) {
+        if (group.inputs.includes(loudestReport.highInputId)) {
+          loudestReport.group = group.group;
+        }
+      }
+
+      for (let lga of this.loudestGroupAnalysisCallbacks) {
+        if (loudestReport.highestSince >= lga.elapsed) {
+          loudestReport.significant = loudestReport.highestAverageDiff > 0 ? true : false;
+          lga.callback(loudestReport);
+        }
+      }
+
+      //Check groupBelowLevel
+      for (let gbl of this.groupBelowLevel) {
+        var allInputsAreBelowLevel = true;
+        for (let group of this.groups) {
+          if (group.group == gbl.group) {
+            for (let input of group.inputs) {
+              for (let rid of reportInputDetails) {
+                if (rid != undefined && rid.id == input) {
+                  if (rid.level >= gbl.level && report.highestSince >= gbl.elapsed) {
+                    allInputsAreBelowLevel = false;
+                  }
+                }
+              }
+            }
+          }
+        }
+        console.log(allInputsAreBelowLevel);
+      }
+
+    }
+  }
+  addSingleGroup(group) {
+    var newGroup = { group: group, inputs: [] };
+    let inputDevices = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.AUDIOINPUT, group);
+    for (let ai of inputDevices) {
+      newGroup.inputs.push(ai.config.connector);
+    }
+    this.groups.push(newGroup);
+  }
+  addGroup(groups) {
+    var inputs = [];
+    if (Array.isArray(groups)) {
+      for (let group of groups) {
+        this.addSingleGroup(group);
+      }
+    }
+    else {
+      this.addSingleGroup(groups);
+    }
+  }
+  onRawAnalysis(callback) {
+    this.rawAnalysisCallbacks.push(callback);
+  }
+  onLoudestGroup(elapsed, callback) {
+    this.loudestGroupAnalysisCallbacks.push({ elapsed: elapsed, callback: callback });
+  }
+  onCustomAnalysis(filter, callback) {
+    this.customAnalysisCallbacks.push({ filter: filter, callback: callback });
+  };
+  onGroupBelowLevel(elapsed, group, level, callback) {
+    this.groupBelowLevel.push({ elapsed: elapsed, group: group, level: level, callback: callback });
+  }
+}
+
+
+
+
 
 
 class WidgetMapping {
@@ -1024,6 +1129,32 @@ async function init() {
 
   //TESTAREA AFTERBOOT
 
+
+
+
+
+  const setupAudioAnalyzer = () => {
+    var presenterVoiceWidget = zapi.ui.addWidgetMapping('presentervoice');
+    let audioReporter = zapi.devices.getDevice('system.audioreporter.main');
+    let ara = new AudioReportAnalyzer(audioReporter);
+    ara.addGroup(['system.audio.presentermics', 'system.audio.audiencemics']);
+    /*
+    ara.onLoudestGroup(2000, analysis => {
+      if (analysis.significant && analysis.group == 'system.audio.presentermics') {
+        presenterVoiceWidget.setValue('Détectée');
+      }
+      else {
+        presenterVoiceWidget.setValue('Non détectée');
+      }
+    });
+    */
+    ara.onGroupBelowLevel(200, 'system.audio.presentermics', 10, (report) => {
+      console.log(report);
+    });
+    ara.start();
+  }
+  setTimeout(setupAudioAnalyzer, 5000);
+
 }
 
 
@@ -1034,7 +1165,7 @@ debug(1, `Debug level is: ${config.system.debugLevel}`);
 
 
 xapi.Status.SystemUnit.Uptime.get().then(uptime => {
-  
+
   if (uptime > config.system.coldBootWait) {
     debug(1, 'Warm boot detected, running preInit() now.');
     preInit();

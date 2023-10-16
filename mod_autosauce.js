@@ -1,10 +1,10 @@
 import xapi from 'xapi';
 
 import { zapiv1 as zapi } from './zapi';
-import { config } from './config';
+import { config as systemconfig } from './config';
 
 export var Manifest = {
-  fileName: 'autoSauce',
+  fileName: 'mod_autoSauce',
   id: 'autosauce',
   friendlyName: 'Auditoire extra sauce!',
   version: '1.0.0',
@@ -12,7 +12,7 @@ export var Manifest = {
 };
 
 export class Module {
-  constructor(api) {
+  constructor() {
 
   }
 

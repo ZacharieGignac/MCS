@@ -1,10 +1,10 @@
 import xapi from 'xapi';
-import { config } from './config';
+import { config as systemconfig } from './config';
 import { zapiv1 as zapi } from './zapi';
 
 
 function debug(level, text) {
-  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
     switch (level) {
       case 1:
         console.log(text);
@@ -71,8 +71,8 @@ export class Scenarios {
     });
 
     debug(1, 'Scenarios Manager starting...');
-    debug(1, `Loading ${config.scenarios.length} scenarios..`);
-    for (let sce of config.scenarios) {
+    debug(1, `Loading ${systemconfig.scenarios.length} scenarios..`);
+    for (let sce of systemconfig.scenarios) {
       let newScenario = {
         manifest: sce.Manifest,
         scenario: new sce.Scenario()
@@ -82,7 +82,7 @@ export class Scenarios {
     }
     debug(1, 'All scenarios loaded.');
     setTimeout(() => {
-      this.enableScenario(config.system.onStandby.enableScenario);
+      this.enableScenario(systemconfig.system.onStandby.enableScenario);
     }, 1000);
     zapi.performance.setElapsedEnd('Scenarios.init');
   }

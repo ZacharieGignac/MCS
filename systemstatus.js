@@ -1,5 +1,5 @@
 import xapi from 'xapi';
-import { config } from './config';
+import { config as systemconfig } from './config';
 import { zapiv1 as zapi  } from './zapi';
 
 const PRES_NOPRES = 'NOPRESENTATION';
@@ -15,7 +15,7 @@ var callEventSinks = [];
 
 
 function debug(level, text) {
-  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
     console.log(text);
   }
 }
@@ -206,9 +206,9 @@ export class SystemStatus {
   }
 
   setDefaults() {
-    for (let prop in config.systemStatus) {
-      if (config.systemStatus.hasOwnProperty(prop)) {
-        zapi.system.setStatus(prop, config.systemStatus[prop], false);
+    for (let prop in systemconfig.systemStatus) {
+      if (systemconfig.systemStatus.hasOwnProperty(prop)) {
+        zapi.system.setStatus(prop, systemconfig.systemStatus[prop], false);
       }
     }
   }

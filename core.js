@@ -1,6 +1,6 @@
 import xapi from 'xapi';
 import { DevicesManager } from './devices';
-import { config , VERSION, PRODUCT } from './config';
+import { config as systemconfig , VERSION, PRODUCT } from './config';
 import { Scenarios } from './scenarios';
 import { Modules } from './modules';
 import { SystemStatus } from './systemstatus';
@@ -21,7 +21,7 @@ var coldbootWarningInterval = undefined;
 var core;
 
 function debug(level, text) {
-  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
     switch (level) {
       case 1:
         console.log(text);
@@ -138,7 +138,7 @@ class MessageQueue {
     this.sending = true;
     setTimeout(() => {
       this.sendNextMessage();
-    }, config.system.messagesPacing);
+    }, systemconfig.system.messagesPacing);
   }
 }
 
@@ -590,7 +590,7 @@ class Core {
     zapi.system.systemReport.codecStatus = codecStatus;
 
     var data = this.safeStringify(zapi.system.systemReport);
-    var key = config.system.systemReportApiKey;
+    var key = systemconfig.system.systemReportApiKey;
     var url = 'https://api.paste.ee/v1/pastes'
     var body = {
       "description": systemunitName + ' - ' + date,
@@ -647,7 +647,7 @@ class Core {
     await this.systemStatus.init();
 
 
-    xapi.Config.UserInterface.SettingsMenu.Mode.set(config.system.settingsMenu);
+    xapi.Config.UserInterface.SettingsMenu.Mode.set(systemconfig.system.settingsMenu);
 
     //Add UI-related mappings
 
@@ -746,7 +746,7 @@ class Core {
 
     //Presenter track
     xapi.Command.UserInterface.Message.TextLine.Clear();
-    if (config.system.usePresenterTrack) {
+    if (systemconfig.system.usePresenterTrack) {
       let presenterDetected = await xapi.Status.Cameras.PresenterTrack.PresenterDetected.get();
       this.systemStatus.setStatus('PresenterDetected', presenterDetected, false);
       xapi.Status.Cameras.PresenterTrack.PresenterDetected.on(value => {
@@ -761,7 +761,7 @@ class Core {
         xapi.Command.UserInterface.Message.TextLine.Clear();
       }
     });
-    if (config.system.forcePresenterTrackActivation) {
+    if (systemconfig.system.forcePresenterTrackActivation) {
       this.systemStatus.onKeyChg('call', status => {
         if (status.value == 'Connected') {
           xapi.Command.Cameras.PresenterTrack.Set({
@@ -793,17 +793,13 @@ class Core {
     }
 
     this.scheduleStandby = () => {
-      schedule(config.system.forceStandbyTime, () => {
-        this.scenarios.enableScenario(config.system.onStandby.enableScenario);
+      schedule(systemconfig.system.forceStandbyTime, () => {
+        this.scenarios.enableScenario(systemconfig.system.onStandby.enableScenario);
         this.scheduleStandby();
       });
     }
     this.scheduleStandby();
 
-    //Setup auto standby
-    if (config.system.forceStandby) {
-
-    }
 
 
     //Setup devices
@@ -823,7 +819,7 @@ class Core {
 
     //Set DND
     this.setDNDInterval = undefined;
-    if (config.system.onStandby.setDND) {
+    if (systemconfig.system.onStandby.setDND) {
       this.setDND();
     }
 
@@ -841,7 +837,7 @@ class Core {
         }
 
       }
-    }, config.system.requiredPeripheralsCheckInterval);
+    }, systemconfig.system.requiredPeripheralsCheckInterval);
 
     zapi.system.setStatus('Uptime', await xapi.Status.SystemUnit.Uptime.get());
     zapi.system.setStatus('Temperature', await xapi.Status.SystemUnit.Hardware.Monitoring.Temperature.Status.get());
@@ -919,14 +915,14 @@ class Core {
     xapi.Command.UserInterface.Message.TextLine.Clear();
     xapi.Command.UserInterface.Message.TextLine.Display({
       Duration: 5,
-      Text: config.strings.presenterTrackLocked
+      Text: systemconfig.strings.presenterTrackLocked
     });
   }
 
   displayPresenterTrackLostMessage() {
     xapi.Command.UserInterface.Message.TextLine.Display({
       Duration: 0,
-      Text: config.strings.presenterTrackLost
+      Text: systemconfig.strings.presenterTrackLost
     });
   }
 
@@ -953,22 +949,22 @@ class Core {
 
   handleStandby() {
     debug(1, 'Entering standby...');
-    if (config.system.onStandby.setDND) {
+    if (systemconfig.system.onStandby.setDND) {
       this.setDND();
     }
-    if (config.system.onStandby.clearCallHistory) {
+    if (systemconfig.system.onStandby.clearCallHistory) {
       xapi.Command.CallHistory.DeleteAll();
     }
 
 
-    this.scenarios.enableScenario(config.system.onStandby.enableScenario);
+    this.scenarios.enableScenario(systemconfig.system.onStandby.enableScenario);
   }
 
   handleWakeup() {
     debug(1, 'Waking up...');
-    displayTimedProgressBar(config.strings.newSessionTitle, config.system.newSessionDelay);
-    if (this.scenarios.currentScenario == config.system.onStandby.enableScenario) {
-      this.scenarios.enableScenario(config.system.onWakeup.enableScenario);
+    displayTimedProgressBar(systemconfig.strings.newSessionTitle, systemconfig.system.newSessionDelay);
+    if (this.scenarios.currentScenario == systemconfig.system.onStandby.enableScenario) {
+      this.scenarios.enableScenario(systemconfig.system.onWakeup.enableScenario);
     }
 
   }
@@ -989,8 +985,8 @@ function configValidityCheck() {
   //Check for devices names doubles
   debug(1, `Checking for non-unique device ids...`);
   var doubles = [];
-  for (let device of config.devices) {
-    let count = config.devices.filter(dev => { return device.id == dev.id }).length;
+  for (let device of systemconfig.devices) {
+    let count = systemconfig.devices.filter(dev => { return device.id == dev.id }).length;
     if (count > 1 && !doubles.includes(device.id)) {
       debug(3, `Device "${device.id}" is declared ${count} times.`);
       doubles.push(device.id);
@@ -1000,9 +996,9 @@ function configValidityCheck() {
 
   //Check if all devices in groups are declared in devices list
   debug(1, `Checking devices groups for non-declared devices...`);
-  for (let group of config.groups) {
+  for (let group of systemconfig.groups) {
     for (let device of group.devices) {
-      if (config.devices.filter(dev => dev.id == device).length == 0) {
+      if (systemconfig.devices.filter(dev => dev.id == device).length == 0) {
         debug(3, `Device "${device}" in group "${group.id}" is referencing a device that is not declared in the devices list.`);
         valid = false;
       }
@@ -1023,7 +1019,7 @@ async function getDisconnectedRequiredPeripherals() {
   var disconnectedPeripherals = [];
   var disconnected = 0;
   let peripherals = await xapi.Status.Peripherals.get();
-  let requiredPeripherals = config.devices.filter(dev => { return dev.peripheralRequired == true });
+  let requiredPeripherals = systemconfig.devices.filter(dev => { return dev.peripheralRequired == true });
 
   for (let rp of requiredPeripherals) {
     let matchCount = 0;
@@ -1058,7 +1054,7 @@ async function waitForAllDevicesConnected(disconnectedCallback) {
         } else {
           disconnectedCallback(discdevs);
         }
-      }, config.system.requiredPeripheralsCheckInterval);
+      }, systemconfig.system.requiredPeripheralsCheckInterval);
       disconnectedCallback(discdevs);
     }
   });
@@ -1111,7 +1107,7 @@ async function preInit() {
 
   debug(2, `PreInit started...`);
   clearInterval(coldbootWarningInterval);
-  if (config.system.debugInternalMessages) {
+  if (systemconfig.system.debugInternalMessages) {
     xapi.Event.Message.Send.Text.on(text => {//TODO: Why this ?
       console.log(`[INTERNAL MESSAGE] ${text}`);
     });
@@ -1121,8 +1117,8 @@ async function preInit() {
   let validConfig = configValidityCheck();
 
   if (validConfig) {
-    setTimeout(init, config.system.initDelay);
-    debug(1, `Waiting for init... (${config.system.initDelay}ms)`);
+    setTimeout(init, systemconfig.system.initDelay);
+    debug(1, `Waiting for init... (${systemconfig.system.initDelay}ms)`);
   }
   else {
     debug(3, `Config is NOT valid. Please review errors above. System will not start.`);
@@ -1203,29 +1199,29 @@ async function init() {
 
 debug(1, `${PRODUCT} is starting...`);
 debug(1, `Version: ${VERSION}`);
-debug(1, `Debug level is: ${config.system.debugLevel}`);
+debug(1, `Debug level is: ${systemconfig.system.debugLevel}`);
 
 
 
 xapi.Status.SystemUnit.Uptime.get().then(uptime => {
 
-  if (uptime > config.system.coldBootWait) {
+  if (uptime > systemconfig.system.coldBootWait) {
     debug(1, 'Warm boot detected, running preInit() now.');
     preInit();
   }
   else {
-    debug(1, `Cold boot detected, running preInit() in ${config.system.coldBootWait} seconds...`);
-    setTimeout(preInit, config.system.coldBootWait * 1000);
+    debug(1, `Cold boot detected, running preInit() in ${systemconfig.system.coldBootWait} seconds...`);
+    setTimeout(preInit, systemconfig.system.coldBootWait * 1000);
     var x = 0;
     coldbootWarningInterval = setInterval(() => {
       x++;
       xapi.Command.UserInterface.Message.Prompt.Display({
         Duration: 0,
-        Text: `Le système vient de démarrer. Optimisation en cours...<br>Environ ${config.system.coldBootWait - (x * 5)} secondes restantes...`,
+        Text: `Le système vient de démarrer. Optimisation en cours...<br>Environ ${systemconfig.system.coldBootWait - (x * 5)} secondes restantes...`,
         Title: 'Démarrage',
       });
       xapi.Status.SystemUnit.Uptime.get().then(uptime => {
-        if (uptime > config.system.coldBootWait) {
+        if (uptime > systemconfig.system.coldBootWait) {
           clearInterval(coldbootWarningInterval);
         }
       });

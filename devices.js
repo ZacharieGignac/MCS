@@ -1,11 +1,11 @@
 import xapi from 'xapi';
-import { config } from './config';
+import { config as systemconfig } from './config';
 import * as devicesLibrary from './devices';
 import { zapiv1 as zapi } from './zapi';
 
 
 function debug(level, text) {
-  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
     switch (level) {
       case 1:
         console.log(text);
@@ -45,11 +45,11 @@ export class DevicesManager {
   }
 
   init() {
-    debug(1, `Checking ${config.devices.length} devices...`);
-    for (let dev of config.devices) {
+    debug(1, `Checking ${systemconfig.devices.length} devices...`);
+    for (let dev of systemconfig.devices) {
       this.allDevices.push(dev);
     }
-    for (let group of config.groups) {
+    for (let group of systemconfig.groups) {
       this.allGroups.push(group);
     }
 

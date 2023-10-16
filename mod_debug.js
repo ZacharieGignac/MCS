@@ -1,10 +1,10 @@
 import xapi from 'xapi';
 
 import { zapiv1 as zapi } from './zapi';
-import { config } from './config';
+import { config as systemconfig } from './config';
 
 export var Manifest = {
-  fileName: 'debug',
+  fileName: 'mod_debug',
   id: 'debug',
   friendlyName: 'Debug',
   version: '1.0.0',
@@ -16,7 +16,7 @@ export class Module {
 
   }
   debug(level, text) {
-    if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+    if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
       switch (level) {
         case 1:
           console.log(text);

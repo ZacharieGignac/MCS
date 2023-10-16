@@ -1,10 +1,10 @@
 import xapi from 'xapi';
-import { config } from './config';
-import { zapiv1  as zapi } from './zapi';
+import { config as systemconfig } from './config';
+import { zapiv1 as zapi } from './zapi';
 
 
 function debug(level, text) {
-  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
     switch (level) {
       case 1:
         console.log(text);
@@ -30,7 +30,7 @@ export class Modules {
     return new Promise((success, failure) => {
       debug(1, `Module manager started!`)
       this.modules = [];
-      for (let mod of config.modules) {
+      for (let mod of systemconfig.modules) {
         debug(1, `Loading module "${mod.Manifest.id}" version ${mod.Manifest.version} (${mod.Manifest.description})`);
         this.modules.push({
           module: mod,

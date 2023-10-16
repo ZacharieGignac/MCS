@@ -1,5 +1,5 @@
 import xapi from 'xapi';
-import { config } from './config';
+import { config as systemconfig } from './config';
 import { zapiv1 as zapi  } from './zapi';
 
 
@@ -15,7 +15,7 @@ const SECOND = 'Second';
 const AUTO = 'Auto';
 
 function debug(level, text) {
-  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
     switch (level) {
       case 1:
         console.log(text);

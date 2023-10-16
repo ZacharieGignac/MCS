@@ -217,7 +217,7 @@ class AudioReportAnalyzer {
     this.rawAnalysisCallbacks = [];
     this.loudestGroupAnalysisCallbacks = [];
     this.customAnalysisCallbacks = [];
-    this.groupBelowLevel = [];
+    this.groupBelowLevelCallbacks = [];
     this.groups = [];
     this.lastAnalysisData = undefined;
   }
@@ -228,6 +228,7 @@ class AudioReportAnalyzer {
     this.enabled = false;
   }
   reportReceived(report) {
+    
     this.lastAnalysisData = report;
     var reportInputDetails = report.inputs;
     if (this.enabled) {
@@ -257,7 +258,7 @@ class AudioReportAnalyzer {
       }
 
       //Check groupBelowLevel
-      for (let gbl of this.groupBelowLevel) {
+      for (let gbl of this.groupBelowLevelCallbacks) {
         var allInputsAreBelowLevel = true;
         for (let group of this.groups) {
           if (group.group == gbl.group) {
@@ -272,10 +273,12 @@ class AudioReportAnalyzer {
             }
           }
         }
-        console.log(allInputsAreBelowLevel);
+        gbl.callback(report);
       }
 
     }
+    
+    
   }
   addSingleGroup(group) {
     var newGroup = { group: group, inputs: [] };
@@ -306,7 +309,7 @@ class AudioReportAnalyzer {
     this.customAnalysisCallbacks.push({ filter: filter, callback: callback });
   };
   onGroupBelowLevel(elapsed, group, level, callback) {
-    this.groupBelowLevel.push({ elapsed: elapsed, group: group, level: level, callback: callback });
+    this.groupBelowLevelCallbacks.push({ elapsed: elapsed, group: group, level: level, callback: callback });
   }
 }
 

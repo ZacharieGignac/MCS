@@ -1,0 +1,13 @@
+<Extensions>
+  <Version>1.11</Version>
+  <Panel>
+    <Order>2</Order>
+    <PanelId>*ACTION$STANDBY</PanelId>
+    <Origin>local</Origin>
+    <Location>HomeScreen</Location>
+    <Icon>Power</Icon>
+    <Color>#D43B52</Color>
+    <Name>Terminer la session</Name>
+    <ActivityType>Custom</ActivityType>
+  </Panel>
+</Extensions>

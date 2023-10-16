@@ -13,7 +13,7 @@ import * as sce_firealarm from './sce_firealarm';
 
 /****************************/
 //Import modules below
-import * as debug from './debug';
+import * as mod_debug from './mod_debug';
 /****************************/
 
 
@@ -91,7 +91,7 @@ export var config = {
   ],
 
   modules: [
-    debug
+    mod_debug
   ],
 
 

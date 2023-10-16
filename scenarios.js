@@ -38,10 +38,29 @@ export class Scenarios {
     zapi.scenarios.enablePreviousScenario = () => { self.enablePreviousScenario(); }
 
     //Add scenarios-related auto-mapping
-    
+
     zapi.ui.addActionMapping(/^ENABLESCENARIO$/, (id) => {
       self.enableScenario(id);
     });
+
+    zapi.ui.addActionMapping(/^ENABLESCENARIOASK$/, () => {
+      xapi.Command.UserInterface.Message.TextInput.Display({
+        Duration:0,
+        FeedbackId:'scenarios_enablescenario_ask',
+        InputType:'SingleLine',
+        KeyboardState:'Open',
+        Placeholder:'Scenario Id',
+        Title:'Enable scenario',
+        Text:'Entrez le "id" du scénario à activer'
+      });
+    });
+
+    xapi.Event.UserInterface.Message.TextInput.Response.on(event => {
+      if (event.FeedbackId == 'scenarios_enablescenario_ask') {
+        this.enableScenario(event.Text);
+      }
+    });
+
 
     //Keep panels list
     xapi.Command.UserInterface.Extensions.List().then(list => {

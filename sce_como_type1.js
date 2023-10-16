@@ -311,7 +311,6 @@ export class Scenario {
 
   async evaluateScreens(status) {
     console.log('ComoType1 evaluating screens...');
-    //TODO: manage farend screen (improbable)
     /******************
      * 
      *  screens configuration

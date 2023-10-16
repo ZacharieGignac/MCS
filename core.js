@@ -228,7 +228,7 @@ class AudioReportAnalyzer {
     this.enabled = false;
   }
   reportReceived(report) {
-    
+
     this.lastAnalysisData = report;
     var reportInputDetails = report.inputs;
     if (this.enabled) {
@@ -277,8 +277,8 @@ class AudioReportAnalyzer {
       }
 
     }
-    
-    
+
+
   }
   addSingleGroup(group) {
     var newGroup = { group: group, inputs: [] };
@@ -641,7 +641,33 @@ class Core {
     await this.uiManager.init();
     await this.systemStatus.init();
 
+
+    xapi.Config.UserInterface.SettingsMenu.Mode.set(config.system.settingsMenu);
+
     //Add UI-related mappings
+
+
+    //Handle hidden admin panel
+    let enableAdmin = self.uiManager.addWidgetMapping('SS$PresenterLocation');
+    enableAdmin.on('pressed', () => {
+      this.adminPanelTimeout = setTimeout(() => {
+        xapi.Command.UserInterface.Extensions.Panel.Open({ PanelId: 'system_admin' });
+      }, 5000);
+    });
+    enableAdmin.on('pressed', () => {
+      setTimeout(() => {
+        clearTimeout(this.adminPanelTimeout);
+      }, 5000);
+    });
+
+    self.uiManager.addActionMapping(/^SETTINGSLOCK$/, () => {
+      xapi.Config.UserInterface.SettingsMenu.Mode.set('Locked');
+    });
+    self.uiManager.addActionMapping(/^SETTINGSUNLOCK$/, () => {
+      xapi.Config.UserInterface.SettingsMenu.Mode.set('Unlocked');
+    });
+
+
     self.uiManager.addActionMapping(/^SENDSYSTEMREPORT$/, () => {
       this.sendSystemReport();
     });
@@ -822,7 +848,7 @@ class Core {
 
 
     //Basic diagnostics
-    zapi.ui.addWidgetMapping('system:DIAGNOSTICS').on('clicked', async () => {
+    self.uiManager.addActionMapping(/^VIEWSYSTEMDIAGNOSTICS$/, async () => {
       this.diags = await xapi.Status.Diagnostics.Message.get();
       this.displayNextDiagnosticsMessages();
     });
@@ -1135,29 +1161,29 @@ async function init() {
 
 
 
-/*
-  const setupAudioAnalyzer = () => {
-    var presenterVoiceWidget = zapi.ui.addWidgetMapping('presentervoice');
-    let audioReporter = zapi.devices.getDevice('system.audioreporter.main');
-    let ara = new AudioReportAnalyzer(audioReporter);
-    ara.addGroup(['system.audio.presentermics', 'system.audio.audiencemics']);
-    
-    ara.onLoudestGroup(2000, analysis => {
-      if (analysis.significant && analysis.group == 'system.audio.presentermics') {
-        presenterVoiceWidget.setValue('Détectée');
-      }
-      else {
-        presenterVoiceWidget.setValue('Non détectée');
-      }
-    });
-    
-    ara.onGroupBelowLevel(200, 'system.audio.presentermics', 10, (report) => {
-      console.log(report);
-    });
-    ara.start();
-  }
-  setTimeout(setupAudioAnalyzer, 5000);
-  */
+  /*
+    const setupAudioAnalyzer = () => {
+      var presenterVoiceWidget = zapi.ui.addWidgetMapping('presentervoice');
+      let audioReporter = zapi.devices.getDevice('system.audioreporter.main');
+      let ara = new AudioReportAnalyzer(audioReporter);
+      ara.addGroup(['system.audio.presentermics', 'system.audio.audiencemics']);
+      
+      ara.onLoudestGroup(2000, analysis => {
+        if (analysis.significant && analysis.group == 'system.audio.presentermics') {
+          presenterVoiceWidget.setValue('Détectée');
+        }
+        else {
+          presenterVoiceWidget.setValue('Non détectée');
+        }
+      });
+      
+      ara.onGroupBelowLevel(200, 'system.audio.presentermics', 10, (report) => {
+        console.log(report);
+      });
+      ara.start();
+    }
+    setTimeout(setupAudioAnalyzer, 5000);
+    */
 
 }
 

@@ -71,6 +71,7 @@ export var config = {
     usePresenterTrack: true,
     forcePresenterTrackActivation: false,
     presenterTrackConnector: 3,
+    settingsMenu:'Locked',
     systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',
     onStandby: {
       setDND: true,
@@ -598,7 +599,7 @@ export var config = {
     AudienceMics: 'on', //Mandatory valuee
     PresenterMics: 'on', //Mandatory value
     PresenterDetected: false, //Mandatory value
-    ClearPresentationZone: 'off',
+    ClearPresentationZone: 'off', //Mandatory value
 
     //Scenario-specific status
 

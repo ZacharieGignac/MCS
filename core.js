@@ -220,7 +220,6 @@ class AudioReportAnalyzer {
     this.rawAnalysisCallbacks = [];
     this.loudestGroupAnalysisCallbacks = [];
     this.customAnalysisCallbacks = [];
-    this.groupBelowLevelCallbacks = [];
     this.groups = [];
     this.lastAnalysisData = undefined;
   }
@@ -260,24 +259,6 @@ class AudioReportAnalyzer {
         }
       }
 
-      //Check groupBelowLevel
-      for (let gbl of this.groupBelowLevelCallbacks) {
-        var allInputsAreBelowLevel = true;
-        for (let group of this.groups) {
-          if (group.group == gbl.group) {
-            for (let input of group.inputs) {
-              for (let rid of reportInputDetails) {
-                if (rid != undefined && rid.id == input) {
-                  if (rid.level >= gbl.level && report.highestSince >= gbl.elapsed) {
-                    allInputsAreBelowLevel = false;
-                  }
-                }
-              }
-            }
-          }
-        }
-        gbl.callback(report);
-      }
 
     }
 
@@ -311,9 +292,6 @@ class AudioReportAnalyzer {
   onCustomAnalysis(filter, callback) {
     this.customAnalysisCallbacks.push({ filter: filter, callback: callback });
   };
-  onGroupBelowLevel(elapsed, group, level, callback) {
-    this.groupBelowLevelCallbacks.push({ elapsed: elapsed, group: group, level: level, callback: callback });
-  }
 }
 
 
@@ -860,6 +838,9 @@ class Core {
       }
     });
 
+
+    this.modules.start();
+
   }
 
   displayNextDiagnosticsMessages() {
@@ -1157,6 +1138,7 @@ async function init() {
 
 
 
+
   //TESTAREA AFTERBOOT
 
 /*
@@ -1186,9 +1168,6 @@ async function init() {
         }
       });
       
-      ara.onGroupBelowLevel(200, 'system.audio.presentermics', 10, (report) => {
-        console.log(report);
-      });
       ara.start();
     }
     setTimeout(setupAudioAnalyzer, 5000);

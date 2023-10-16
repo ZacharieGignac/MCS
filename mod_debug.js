@@ -5,15 +5,15 @@ import { config as systemconfig } from './config';
 
 export var Manifest = {
   fileName: 'mod_debug',
-  id: 'debug',
+  id: 'mod_debug',
   friendlyName: 'Debug',
   version: '1.0.0',
   description: 'System wide debug'
 };
 
 export class Module {
-  constructor(api) {
-
+  constructor() {
+    
   }
   debug(level, text) {
     if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {

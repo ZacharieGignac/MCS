@@ -14,6 +14,7 @@ import * as sce_firealarm from './sce_firealarm';
 /****************************/
 //Import modules below
 import * as mod_debug from './mod_debug';
+import * as mod_autosauce from './mod_autosauce';
 /****************************/
 
 
@@ -23,6 +24,10 @@ import * as mod_debug from './mod_debug';
 import * as devicesLibrary from './devicesLibrary';
 import * as driversLibrary from './driversLibrary';
 /****************************/
+
+
+
+
 
 
 const DEBUGLEVEL = {
@@ -41,7 +46,7 @@ const DEVICETYPE = {
   AUDIOOUTPUT: 'AUDIOOUTPUT',
   AUDIOINPUTGROUP: 'AUDIOINPUTGROUP',
   AUDIOOUTPUTGROUP: 'AUDIOOUTPUTGROUP',
-  AUDIOREPORTER:'AUDIOREPORTER',
+  AUDIOREPORTER: 'AUDIOREPORTER',
   SCREEN: 'SCREEN',
   LIGHT: 'LIGHT',
   LIGHTSCENE: 'LIGHTSCENE',
@@ -57,6 +62,18 @@ export const PRODUCT = 'PrepOS (dev)';
 export const VERSION = '0.0.1';
 
 export var config = {
+  scenarios: [
+    sce_standby,
+    sce_como_type1,
+    sce_firealarm,
+  ],
+
+  modules: [
+    mod_debug,
+    mod_autosauce
+  ],
+
+
   version: VERSION,
   system: {
     coldBootWait: 120,
@@ -71,8 +88,8 @@ export var config = {
     usePresenterTrack: true,
     forcePresenterTrackActivation: false,
     presenterTrackConnector: 3,
-    settingsMenu:'Locked',
-    disableAutoLightsWhenWidgetInteraction:true,
+    settingsMenu: 'Locked',
+    disableAutoLightsWhenWidgetInteraction: true,
     systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',
     onStandby: {
       setDND: true,
@@ -83,17 +100,6 @@ export var config = {
       enableScenario: 'comotype1'
     }
   },
-
-  scenarios: [
-    sce_standby,
-    sce_como_type1,
-    sce_firealarm,
-  ],
-
-  modules: [
-    mod_debug
-  ],
-
 
   strings: {
     systemStart: 'Démarrage du système',
@@ -109,13 +115,14 @@ export var config = {
 
   devices: [
     {
-      id:'system.audioreporter.main',
-      type:DEVICETYPE.AUDIOREPORTER,
-      name:'Internal VuMeter',
-      device:devicesLibrary.AudioReporter,
-      driver:driversLibrary.AudioReporterDriver_internal,
-      inputs:[1,2,3,7],
-      start:true
+      id: 'system.audioreporter.main',
+      type: DEVICETYPE.AUDIOREPORTER,
+      name: 'Internal VuMeter',
+      device: devicesLibrary.AudioReporter,
+      driver: driversLibrary.AudioReporterDriver_internal,
+      inputs: [1, 2, 3, 7, 8],
+      sampleMs:100,
+      start: true
     },
 
     /* CONTROL SYSTEM */
@@ -229,14 +236,14 @@ export var config = {
       driver: driversLibrary.AudioInputDriver_codecpro,
       connector: 7,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
-      gainLowLimit: 0,
+      gainLowLimit: 20,
       gainHighLimit: 70,
-      defaultGain: 20,
+      defaultGain: 60,
       gainStep: 1,
       defaultMode: 'on',
-      lowGain: 20,
-      mediumGain: 50,
-      highGain: 60,
+      lowGain: 60,
+      mediumGain: 65,
+      highGain: 70,
       boost: 70
     },
     {
@@ -540,6 +547,18 @@ export var config = {
     webpageUrl: `http://youtube....`,
     displayFarendMessaeg: true
   },
+
+  mod_autosauce_config: {
+    boosts: [
+      {
+        silent: 'system.audio.presentermics',
+        boost: 'system.audio.audiencemics',
+        audioReporter:'system.audioreporter.main',
+        silentElapsed:200
+      }
+    ]
+  },
+
   groups: [
     {
       id: 'system.presentation.main',

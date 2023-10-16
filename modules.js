@@ -47,4 +47,12 @@ export class Modules {
   isModuleAvailable(id) {
     return (this.modules.filter(mod => mod.module.Manifest.id == id).length > 0 ? true : false);
   }
+  start() {
+    for (let module of this.modules) {
+      try {
+        module.inst.start();
+      }
+      catch{}
+    }
+  }
 }

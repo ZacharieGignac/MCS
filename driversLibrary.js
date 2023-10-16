@@ -342,7 +342,7 @@ export class AudioReporterDriver_internal {
         ConnectorId: input,
         ConnectorType: 'Microphone',
         Source: 'AfterAEC',
-        IntervalMs: 500
+        IntervalMs: this.config.intervalMs
       });
     }
 

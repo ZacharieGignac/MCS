@@ -56,7 +56,8 @@ export var zapiv1 = {
     setElapsedStart: () => { },
     setElapsedEnd: () => { },
     inc: () => { },
-    dec: () => { }
+    dec: () => { },
+    reset: () => { }
   },
   audio:{
     getLocalInputId: () => { },

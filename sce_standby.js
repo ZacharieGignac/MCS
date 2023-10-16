@@ -1,9 +1,5 @@
 import xapi from 'xapi';
-import { zapiv1 } from './zapi';
-
-var zapi = zapiv1;
-
-//TODO: stop any presentation
+import { zapiv1 as zapi } from './zapi';
 
 export var Manifest = {
   fileName: 'sce_standby',

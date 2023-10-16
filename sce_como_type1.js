@@ -1,18 +1,7 @@
 import xapi from 'xapi';
 import { config } from './config';
-import { zapiv1 } from './zapi';
+import { zapiv1 as zapi  } from './zapi';
 
-
-
-/* NOTES
-handle presentertrack activation
-
-
-
-
-*/
-
-var zapi = zapiv1;
 
 const DEVICETYPE = zapi.devices.DEVICETYPE;
 const ON = 'on';
@@ -191,6 +180,9 @@ export class Scenario {
           break;
         case 'PresenterMics':
           this.setPresenterMics(status.value);
+          break;
+        case 'AutoLights':
+          this.evaluateLightscene(status.status);
           break;
 
       }

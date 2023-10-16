@@ -1,12 +1,12 @@
 import xapi from 'xapi';
 import { DevicesManager } from './devices';
-import { config, VERSION, PRODUCT } from './config';
+import { config , VERSION, PRODUCT } from './config';
 import { Scenarios } from './scenarios';
 import { Modules } from './modules';
 import { SystemStatus } from './systemstatus';
-import { zapiv1 } from './zapi';
+import { zapiv1 as zapi } from './zapi';
 
-var zapi = zapiv1;
+
 
 const DEBUGLEVEL = {
   LOW: 3,
@@ -540,7 +540,7 @@ class Core {
     zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test) };
     zapi.performance.inc = (name, num) => { performance.inc(name, num) };
     zapi.performance.dec = (name, num) => { performance.dec(name, num) };
-    zapi.performace.reset = () => { performance.reset(); };
+    zapi.performance.reset = () => { performance.reset(); };
     zapi.system.sendMessage = (message) => { self.messageQueue.send(message) };
     zapi.audio.getLocalInputId = (name) => { return self.audio.getLocalInputId(name) };
     zapi.audio.getLocalOutputId = (name) => { return self.audio.getLocalOutputId(name) };

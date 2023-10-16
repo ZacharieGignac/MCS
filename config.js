@@ -72,6 +72,7 @@ export var config = {
     forcePresenterTrackActivation: false,
     presenterTrackConnector: 3,
     settingsMenu:'Locked',
+    disableAutoLightsWhenWidgetInteraction:true,
     systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',
     onStandby: {
       setDND: true,
@@ -230,7 +231,7 @@ export var config = {
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
       gainHighLimit: 70,
-      defaultGain: 50,
+      defaultGain: 20,
       gainStep: 1,
       defaultMode: 'on',
       lowGain: 20,
@@ -248,7 +249,7 @@ export var config = {
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
       gainLowLimit: 0,
       gainHighLimit: 70,
-      defaultGain: 50,
+      defaultGain: 20,
       gainStep: 1,
       defaultMode: 'on',
       lowGain: 20,

@@ -1,8 +1,7 @@
 import xapi from 'xapi';
 import { config } from './config';
-import { zapiv1 } from './zapi';
+import { zapiv1  as zapi } from './zapi';
 
-var zapi = zapiv1;
 
 function debug(level, text) {
   if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {

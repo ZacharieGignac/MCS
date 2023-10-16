@@ -1,11 +1,13 @@
 import xapi from 'xapi';
-import { config } from './config';
-import { zapiv1 } from './zapi';
+import { config as systemconfig } from './config';
+import { zapiv1 as zapi } from './zapi';
 
-var zapi = zapiv1;
+const ON = 'on';
+const OFF = 'off';
+
 
 function debug(level, text) {
-  if (config.system.debugLevel != 0 && level >= config.system.debugLevel) {
+  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
     switch (level) {
       case 1:
         console.log(text);
@@ -39,16 +41,22 @@ export class Camera {
 export class LightScene {
   constructor(config) {
     this.config = config;
-    this.driver = new config.driver(this, config);
+    this.driver = new this.config.driver(this, config);
     zapi.ui.addActionMapping(/^LIGHTSCENE$/, (id) => {
       if (id == this.config.id) {
-        this.activate();
+        this.activateUi();
       }
     });
   }
   activate() {
     debug(1, `DEVICE ${this.config.id}: activate`);
     this.driver.activate();
+  }
+  activateUi() {
+    this.activate();
+    if (systemconfig.system.disableAutoLightsWhenWidgetInteraction) {
+      zapi.system.setStatus('AutoLights', OFF);
+    }
   }
 }
 
@@ -218,7 +226,7 @@ export class Display {
     }
 
     // Load driver
-    this.driver = new config.driver(this, config);
+    this.driver = new this.config.driver(this, config);
 
     this.setDefaults();
 
@@ -382,7 +390,7 @@ export class Display {
 export class Light {
   constructor(config) {
     this.config = config;
-    this.driver = new config.driver(this, config);
+    this.driver = new this.config.driver(this, config);
     this.currentPowerStatus = undefined;
     this.widgetLevelName = this.config.id + ':LEVEL';
     this.widgetPowerName = this.config.id + ':POWER';
@@ -415,6 +423,9 @@ export class Light {
       if (!this.config.supportsPower) {
         this.powerSwitch.setValue('on');
       }
+      if (systemconfig.system.disableAutoLightsWhenWidgetInteraction) {
+        zapi.system.setStatus('AutoLights', OFF);
+      }
     });
 
     this.powerOnButton = zapi.ui.addWidgetMapping(this.widgetPowerOn);
@@ -424,6 +435,9 @@ export class Light {
       }
       else {
         this.dim(this.beforeOffLevel);
+      }
+      if (systemconfig.system.disableAutoLightsWhenWidgetInteraction) {
+        zapi.system.setStatus('AutoLights', OFF);
       }
     });
 
@@ -436,7 +450,9 @@ export class Light {
         this.beforeOffLevel = this.currentDimLevel;
         this.dim(0);
       }
-
+      if (systemconfig.system.disableAutoLightsWhenWidgetInteraction) {
+        zapi.system.setStatus('AutoLights', OFF);
+      }
     });
 
 
@@ -550,7 +566,7 @@ export class CameraPreset {
 export class AudioInput {
   constructor(config) {
     this.config = config;
-    this.driver = new config.driver(this, config);
+    this.driver = new this.config.driver(this, config);
     this.currentGain = undefined;
     this.currentMute = undefined;
     this.beforeBoostGain = undefined;
@@ -721,7 +737,7 @@ export class Screen {
     this.config = config;
     var self = this;
     this._currentPosition = undefined;
-    this.driver = new config.driver(this, config);
+    this.driver = new this.config.driver(this, config);
 
     this.setDefaults();
 
@@ -783,7 +799,7 @@ export class SoftwareDevice {
 export class AudioReporter {
   constructor(config) {
     this.config = config;
-    this.driver = new config.driver(this, config);
+    this.driver = new this.config.driver(this, config);
     this.reportCallbacks = [];
     if (this.config.start) {
       this.start();
@@ -791,7 +807,7 @@ export class AudioReporter {
   }
   report(data) {
     //console.warn(data);
-    for(let reportReceiver of this.reportCallbacks) {
+    for (let reportReceiver of this.reportCallbacks) {
       reportReceiver(data);
     }
   }

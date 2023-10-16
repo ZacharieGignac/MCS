@@ -1,7 +1,6 @@
 import xapi from 'xapi';
-import { zapiv1 } from './zapi';
+import { zapiv1 as zapi } from './zapi';
 
-var zapi = zapiv1;
 
 export var Manifest = {
   fileName: 'sce_firealarm',

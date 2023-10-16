@@ -1,9 +1,7 @@
 import xapi from 'xapi';
 
-import { zapiv1 } from './zapi';
+import { zapiv1 as zapi } from './zapi';
 import { config } from './config';
-
-var zapi = zapiv1;
 
 export var Manifest = {
   fileName: 'debug',

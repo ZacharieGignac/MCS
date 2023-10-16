@@ -1,8 +1,6 @@
 import xapi from 'xapi';
 import { config } from './config';
-import { zapiv1 } from './zapi';
-
-var zapi = zapiv1;
+import { zapiv1 as zapi  } from './zapi';
 
 const PRES_NOPRES = 'NOPRESENTATION';
 const PRES_LOCALPREVIEW = 'LOCALPREVIEW';

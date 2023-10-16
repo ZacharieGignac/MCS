@@ -34,8 +34,10 @@ export class Scenarios {
     var self = this;
 
     //Setup ZAPI
-    zapi.scenarios.enableScenario = (id) => { self.enableScenario(id); }
-    zapi.scenarios.enablePreviousScenario = () => { self.enablePreviousScenario(); }
+    zapi.scenarios.enableScenario = (id) => { self.enableScenario(id); };
+    zapi.scenarios.enablePreviousScenario = () => { self.enablePreviousScenario(); };
+    zapi.scenarios.getPreviousScenario = () => { return this.previousScenario; };
+    zapi.scenarios.getScenario = (id) => { return this.getScenario(id); };
 
     //Add scenarios-related auto-mapping
 

@@ -28,10 +28,6 @@ export var zapiv1 = {
       SOFTWAREDEVICE:'SOFTWAREDEVICE'
     }
   },
-  groups: {
-    getGroup: () => { },
-    getAllGroups: () => { }
-  },
   scenarios: {
     getScenarios: () => { },
     enableScenario: () => { },
@@ -39,7 +35,8 @@ export var zapiv1 = {
     getPreviousScenario: () => { }
   },
   modules: {
-
+    isModuleAvailable: () => { },
+    getModule: () => { }
   },
   system: {
     resetSystemStatus: () => { },
@@ -64,7 +61,9 @@ export var zapiv1 = {
   audio:{
     getLocalInputId: () => { },
     getLocalOutputId: () => { },
-    getRemoteInputsIds: () => { }
+    getRemoteInputsIds: () => { },
+    getRemoteOutputIds: () => { },
+    addAudioReportAnalyzer: () => { }
   },
   ui: {
     addActionMapping: () => { },

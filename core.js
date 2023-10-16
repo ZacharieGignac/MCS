@@ -56,7 +56,6 @@ class Performance {
     this.elapsedStarts[name] = new Date();
   }
   setElapsedEnd(name) {
-
     this.counters[name] = new Date() - this.elapsedStarts[name];
     this.counters[name] = this.counters[name] + 'ms';
     delete this.elapsedStarts[name];
@@ -85,6 +84,10 @@ class Performance {
     else {
       this.counters[name] = num;
     }
+  }
+  reset() {
+    this.counters = [];
+    this.elapsedStarts = [];
   }
 }
 var performance = new Performance();
@@ -537,11 +540,13 @@ class Core {
     zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test) };
     zapi.performance.inc = (name, num) => { performance.inc(name, num) };
     zapi.performance.dec = (name, num) => { performance.dec(name, num) };
+    zapi.performace.reset = () => { performance.reset(); };
     zapi.system.sendMessage = (message) => { self.messageQueue.send(message) };
     zapi.audio.getLocalInputId = (name) => { return self.audio.getLocalInputId(name) };
     zapi.audio.getLocalOutputId = (name) => { return self.audio.getLocalOutputId(name) };
     zapi.audio.getRemoteInputsIds = () => { return self.audio.getRemoteInputsIds() };
     zapi.audio.getRemoteOutputIds = () => { return self.audio.getRemoteOutputIds() };
+    zapi.audio.addAudioReportAnalyzer = (audioReporter) => { return new AudioReportAnalyzer(audioReporter) };
 
     this.lastPresenterDetectedStatus = false;
 
@@ -1158,7 +1163,15 @@ async function init() {
 
   //TESTAREA AFTERBOOT
 
-
+/*
+      var presenterVoiceWidget = zapi.ui.addWidgetMapping('presentervoice');
+      let audioReporter = zapi.devices.getDevice('system.audioreporter.main');
+      let ara = zapi.audio.addAudioReportAnalyzer(audioReporter);
+      ara.onRawAnalysis(a => {
+        console.log(a);
+      });
+      ara.start();
+*/
 
 
   /*

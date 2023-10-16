@@ -1135,13 +1135,13 @@ async function init() {
 
 
 
-
+/*
   const setupAudioAnalyzer = () => {
     var presenterVoiceWidget = zapi.ui.addWidgetMapping('presentervoice');
     let audioReporter = zapi.devices.getDevice('system.audioreporter.main');
     let ara = new AudioReportAnalyzer(audioReporter);
     ara.addGroup(['system.audio.presentermics', 'system.audio.audiencemics']);
-    /*
+    
     ara.onLoudestGroup(2000, analysis => {
       if (analysis.significant && analysis.group == 'system.audio.presentermics') {
         presenterVoiceWidget.setValue('Détectée');
@@ -1150,13 +1150,14 @@ async function init() {
         presenterVoiceWidget.setValue('Non détectée');
       }
     });
-    */
+    
     ara.onGroupBelowLevel(200, 'system.audio.presentermics', 10, (report) => {
       console.log(report);
     });
     ara.start();
   }
   setTimeout(setupAudioAnalyzer, 5000);
+  */
 
 }
 

@@ -1,6 +1,7 @@
 import xapi from 'xapi';
 import { config as systemconfig } from './config';
 import { zapiv1 as zapi  } from './zapi';
+import { debug } from './debug';
 
 
 const DEVICETYPE = zapi.devices.DEVICETYPE;
@@ -13,24 +14,6 @@ const DUALPRESENTATIONONLY = 'DualPresentationOnly';
 const FIRST = 'First';
 const SECOND = 'Second';
 const AUTO = 'Auto';
-
-function debug(level, text) {
-  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
-    switch (level) {
-      case 1:
-        console.log(text);
-        break;
-      case 2:
-        console.warn(text);
-        break;
-      case 3:
-        console.error(text);
-        break;
-    }
-
-  }
-}
-
 
 export var Manifest = {
   fileName: 'sce_como_type1',

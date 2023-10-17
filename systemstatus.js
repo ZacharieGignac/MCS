@@ -1,6 +1,7 @@
 import xapi from 'xapi';
 import { config as systemconfig } from './config';
 import { zapiv1 as zapi  } from './zapi';
+import { debug } from './debug';
 
 const PRES_NOPRES = 'NOPRESENTATION';
 const PRES_LOCALPREVIEW = 'LOCALPREVIEW';
@@ -14,11 +15,6 @@ var eventSinks = [];
 var callEventSinks = [];
 
 
-function debug(level, text) {
-  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
-    console.log(text);
-  }
-}
 
 function compareObjects(obj1, obj2) {
   const obj1Keys = Object.keys(obj1);

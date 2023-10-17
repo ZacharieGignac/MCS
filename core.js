@@ -5,6 +5,7 @@ import { Scenarios } from './scenarios';
 import { Modules } from './modules';
 import { SystemStatus } from './systemstatus';
 import { zapiv1 as zapi } from './zapi';
+import { debug } from './debug';
 
 
 
@@ -15,27 +16,14 @@ const DEBUGLEVEL = {
   NONE: 0
 }
 
+const str = systemconfig.strings;
+
 const INITSTEPDELAY = 500;
 
 var coldbootWarningInterval = undefined;
 var core;
 
-function debug(level, text) {
-  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
-    switch (level) {
-      case 1:
-        console.log(text);
-        break;
-      case 2:
-        console.warn(text);
-        break;
-      case 3:
-        console.error(text);
-        break;
-    }
 
-  }
-}
 
 function schedule(time, action) {
   let [alarmH, alarmM] = time.split(':');
@@ -557,8 +545,8 @@ class Core {
 
     console.log(`Sending system report...`);
     xapi.Command.UserInterface.Message.Alert.Display({
-      Title: 'Rapport système',
-      Text: 'Envoi du rapport en cours...'
+      Title: str.sendReportTitle,
+      Text: str.sendReportText
     });
     let allDevices = zapi.devices.getAllDevices();
     zapi.system.systemReport.devices = allDevices;
@@ -591,21 +579,21 @@ class Core {
       let resultObj = JSON.parse(result.Body);
       if (resultObj.success == true) {
         xapi.Command.UserInterface.Message.Alert.Display({
-          Title: 'Rapport système',
-          Text: 'Envoi réussi!<br>Référence: ' + resultObj.id
+          Title: str.sendReportTitle,
+          Text: str.sendReportSuccess + resultObj.id
         });
         console.log(resultObj.link);
       }
       else {
         xapi.Command.UserInterface.Message.Alert.Display({
-          Title: 'Rapport système',
-          Text: "Échec de l'envoi."
+          Title: str.sendReportTitle,
+          Text: str.sendReportFailure
         });
       }
     }).catch(error => {
       xapi.Command.UserInterface.Message.Alert.Display({
-        Title: 'Rapport système',
-        Text: "Échec de l'envoi."
+        Title: str.sendReportTitle,
+        Text: str.sendReportFailure
       });
     });
 
@@ -664,22 +652,22 @@ class Core {
 
       var msg = undefined;
       if (presentationStatus != 'NOPRESENTATION' && callStatus == 'Idle') {
-        msg = 'Ceci mettra fin à votre présentation.<br>Terminer la session ?';
+        msg = str.endSessionPresentation;
       }
       else if (presentationStatus == 'NOPRESENTATION' && callStatus == 'Connected') {
-        msg = 'Ceci mettra fin aux communications.<br>Terminer la session ?';
+        msg = str.endSessionCall;
       }
       else if (presentationStatus != 'NOPRESENTATION' && callStatus == 'Connected') {
-        msg = 'Ceci mettra fin à votre présentation et aux communications.<br>Terminer la session ?';
+        msg = str.endSessionCallPresentation;
       }
 
       if (msg != undefined) {
         xapi.Command.UserInterface.Message.Prompt.Display({
-          Title: 'Terminer la session ?',
+          Title: str.endSessionTitle,
           Text: msg,
           FeedbackId: 'system_ask_standby',
-          "Option.1": 'Oui (Terminer la session)',
-          "Option.2": 'Non (Annuler)'
+          "Option.1": str.endSessionChoiceYes,
+          "Option.2": str.endSessionChoiceNo
         });
         xapi.Event.UserInterface.Message.Prompt.Response.on(event => {
           if (event.FeedbackId == 'system_ask_standby') {
@@ -914,8 +902,8 @@ class Core {
     }
     xapi.Command.UserInterface.Message.Alert.Display({
       Duration: 0,
-      Title: '🚩 Problème du système 🚩',
-      Text: `Contactez votre soutien technique.<br>Périphériques indisponibles:<br>${devs.join(', ')}`
+      Title: str.devicesMissingTitle,
+      Text: str.devicesMissingText + devs.join(', ')
     });
   }
 
@@ -1053,15 +1041,15 @@ async function preInit() {
   xapi.Command.Standby.Deactivate();
   xapi.Command.UserInterface.Message.Prompt.Display({
     Duration: 0,
-    Text: 'Le système démarre. Un instant svp.',
-    Title: 'Démarrage du système',
+    Text: str.systemStartingText,
+    Title: str.systemStartingTitle
   });
   await sleep(INITSTEPDELAY);
 
   xapi.Command.UserInterface.Message.Prompt.Display({
     Duration: 0,
     Text: '',
-    Title: 'En attente des périphériques...',
+    Title: str.devicesWaitingTitle,
   });
   await sleep(INITSTEPDELAY);
 
@@ -1074,15 +1062,15 @@ async function preInit() {
     xapi.Command.UserInterface.Message.Prompt.Display({
       Duration: 0,
       Text: devices.join(', '),
-      Title: 'En attente des périphériques...',
+      Title: str.devicesWaitingTitle,
     });
   });
 
 
   xapi.Command.UserInterface.Message.Prompt.Display({
     Duration: 0,
-    Text: 'Tous les périphériques sont connectés. Un instant svp...',
-    Title: 'Démarrage du système',
+    Text: str.devicesAllConnectedText,
+    Title: str.devicesAllConnectedTitle,
   });
   await sleep(INITSTEPDELAY);
 
@@ -1196,8 +1184,8 @@ xapi.Status.SystemUnit.Uptime.get().then(uptime => {
       x++;
       xapi.Command.UserInterface.Message.Prompt.Display({
         Duration: 0,
-        Text: `Le système vient de démarrer. Optimisation en cours...<br>Environ ${systemconfig.system.coldBootWait - (x * 5)} secondes restantes...`,
-        Title: 'Démarrage',
+        Text: str.systemStartingColdBootText + `<br>Environ ${systemconfig.system.coldBootWait - (x * 5)} secondes restantes...`,
+        Title: str.systemStartingColdBootTitle,
       });
       xapi.Status.SystemUnit.Uptime.get().then(uptime => {
         if (uptime > systemconfig.system.coldBootWait) {

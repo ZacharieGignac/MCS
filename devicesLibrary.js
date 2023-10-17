@@ -1,27 +1,13 @@
 import xapi from 'xapi';
 import { config as systemconfig } from './config';
 import { zapiv1 as zapi } from './zapi';
+import { debug } from './debug';
 
 const ON = 'on';
 const OFF = 'off';
 
 
-function debug(level, text) {
-  if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
-    switch (level) {
-      case 1:
-        console.log(text);
-        break;
-      case 2:
-        console.warn(text);
-        break;
-      case 3:
-        console.error(text);
-        break;
-    }
 
-  }
-}
 function mapValue(value, fromMin, fromMax, toMin, toMax) {
   if (value < fromMin) value = fromMin;
   if (value > fromMax) value = fromMax;

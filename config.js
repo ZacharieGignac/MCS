@@ -129,13 +129,14 @@ export var config = {
     {
       id: 'controlsystem',
       type: DEVICETYPE.CONTROLSYSTEM,
-      name: 'RaspberryPi / Crestron',
+      name: 'CTRLSYS',
       device: devicesLibrary.ControlSystem,
       driver: driversLibrary.ControlSystemDriver_isc_h21,
       syncRestart: true,
       restartString: 'HW_RESTART',
       peripheralRequired: true,
-      peripheralId: 'FOC2447N5FW'
+      peripheralId: 'FOC2447N5FW',
+      heartbeatInterval:5000
     },
 
 

@@ -438,3 +438,25 @@ export class ControlSystemDriver_isc_h21 {
   }
 }
 
+export class ControlSystemDriver_isc {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
+
+    //Handle sync restart
+    if (this.config.syncRestart) {
+      xapi.Event.BootEvent.Action.on(action => {
+        if (action == 'Restart') {
+          zapi.system.sendMessage(`${this.config.name}:HWRESET`);
+        }
+      });
+    }
+
+    if (this.config.heartbeatInterval != undefined) {
+      setInterval(() => {
+        zapi.system.sendMessage(`${this.config.name}:HEARTBEAT;CODEC`);
+      },this.config.heartbeatInterval);
+    }
+  }
+}
+

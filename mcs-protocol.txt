@@ -82,7 +82,7 @@ Le système de controle est toujours nommé "CTRLSYS"
 Hardware reset (normalement un reboot):
   CTRLSYS:HWRESET
 
-Software reset (normalement le redémarrage du logiciel:
+Software reset (normalement le redémarrage du logiciel):
   CTRLSYS:SWRESET
 
 Heartbeat (codec->ctrlsys)

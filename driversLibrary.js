@@ -444,3 +444,20 @@ export class ControlSystemDriver_isc {
   }
 }
 
+export class ShadeDriver_basic_isc {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setPosition(position) {
+    position = position.toUpperCase();
+    zapi.system.sendMessage(this.config.name + ':' + position);
+    debug(1, `DRIVER ShadeDriver_basic_isc (${this.config.id}): setPosition: ${position}`);
+  }
+
+  custom() {
+
+  }
+}
+

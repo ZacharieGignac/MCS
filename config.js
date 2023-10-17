@@ -250,6 +250,16 @@ export var config = {
       defaultPosition: 'up'
     },
 
+    /* Shades */
+    {
+      id: 'shades',
+      type: DEVICETYPE.SHADE,
+      name: 'SHADES-EAST',
+      device: devicesLibrary.Shade,
+      driver: driversLibrary.ShadeDriver_basic_isc,
+      defaultPosition: 'up'
+    },
+
 
     /* AUDIO INPUTS */
     {

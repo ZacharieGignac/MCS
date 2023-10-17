@@ -812,7 +812,53 @@ export class AudioReporter {
 
 export class Shade {
   constructor(config) {
+    this.config = config;
+    var self = this;
+    this._currentPosition = undefined;
+    this.driver = new this.config.driver(this, config);
 
+    this.setDefaults();
+
+    //Default WidgetMapping
+    var downButton = zapi.ui.addWidgetMapping(this.config.id + ':DOWN');
+    var upButton = zapi.ui.addWidgetMapping(this.config.id + ':UP');
+
+    downButton.on('clicked', () => {
+      self.down();
+    });
+
+    upButton.on('clicked', () => {
+      self.up();
+    });
+  }
+
+  setDefaults() {
+    this.setPosition(this.config.defaultPosition);
+  }
+
+  setPosition(position) {
+    position = position.toLowerCase();
+    if (position != this._currentPosition) {
+      this._currentPosition = position;
+      this.driver.setPosition(position)
+    }
+  }
+
+  up() {
+    debug(1, `DEVICE ${this.config.id}: Going UP`);
+    zapi.performance.inc('DEVICE.' + this.config.id + '.up');
+    this.setPosition('up');
+  }
+
+  down() {
+    debug(1, `DEVICE ${this.config.id}: Going DOWN`);
+    zapi.performance.inc('DEVICE.' + this.config.id + '.down');
+    this.setPosition('down');
+  }
+
+  reset() {
+    debug(1, `DEVICE ${this.config.id}: RESET`);
+    this.setDefaults();
   }
 }
 

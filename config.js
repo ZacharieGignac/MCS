@@ -14,6 +14,7 @@ import * as sce_firealarm from './sce_firealarm';
 /****************************/
 //Import modules below
 import * as mod_autosauce from './mod_autosauce';
+import * as mod_hidcameraman from './mod_hidcameraman';
 /****************************/
 
 
@@ -69,7 +70,58 @@ export var config = {
 
   modules: [
     //mod_autosauce
+    mod_hidcameraman
   ],
+
+
+  firealarm_config: {
+    forceSystemShutdown: false,
+    lockTouchpanel: true,
+    displayWebpage: true,
+    webpageUrl: `http://youtube....`,
+    displayFarendMessaeg: true
+  },
+
+  mod_autosauce_config: {
+    boosts: [
+      {
+        silent: 'system.audio.presentermics',
+        boost: 'system.audio.audiencemics',
+        audioReporter: 'system.audioreporter.main',
+        silentElapsed: 200
+      }
+    ]
+  },
+
+  mod_hidcameraman_config: {
+    setup: false,
+    keys: [
+      {
+        key: 'KEY_F5',
+        type: 'Pressed',
+        action: 'presentertrack_toggle' //presentertrack_toggle, presentertrack_enable, presentertrack_disable, callpreset
+
+      },
+      {
+        key: 'KEY_PAGEDOWN',
+        type: 'Pressed',
+        action: 'callpreset',
+        preset: 'Auditoire'
+      },
+      {
+        key: 'KEY_PAGEUP',
+        type: 'Pressed',
+        action: 'callpreset',
+        preset: 'Présentateur'
+      },
+      {
+        key: 'KEY_B',
+        type: 'Pressed',
+        action: 'callpreset',
+        preset: 'Tableau'
+      },
+    ]
+  },
 
 
   version: VERSION,
@@ -570,28 +622,7 @@ export var config = {
   ],
 
 
-  normal_config: {
-    mysetting: true
-  },
 
-  firealarm_config: {
-    forceSystemShutdown: false,
-    lockTouchpanel: true,
-    displayWebpage: true,
-    webpageUrl: `http://youtube....`,
-    displayFarendMessaeg: true
-  },
-
-  mod_autosauce_config: {
-    boosts: [
-      {
-        silent: 'system.audio.presentermics',
-        boost: 'system.audio.audiencemics',
-        audioReporter: 'system.audioreporter.main',
-        silentElapsed: 200
-      }
-    ]
-  },
 
   groups: [
     {

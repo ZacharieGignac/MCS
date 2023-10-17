@@ -422,5 +422,19 @@ export class AudioReporterDriver_internal {
   }
 }
 
+export class ControlSystemDriver_isc_h21 {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
 
+    //Handle sync restart
+    if (this.config.syncRestart) {
+      xapi.Event.BootEvent.Action.on(action => {
+        if (action == 'Restart') {
+          zapi.system.sendMessage(`HW_RESTART`);
+        }
+      });
+    }
+  }
+}
 

@@ -70,7 +70,7 @@ export var config = {
 
   modules: [
     mod_debug,
-    mod_autosauce
+    //mod_autosauce
   ],
 
 
@@ -131,6 +131,9 @@ export var config = {
       type: DEVICETYPE.CONTROLSYSTEM,
       name: 'RaspberryPi / Crestron',
       device: devicesLibrary.ControlSystem,
+      driver: driversLibrary.ControlSystemDriver_isc_h21,
+      syncRestart: true,
+      restartString: 'HW_RESTART',
       peripheralRequired: true,
       peripheralId: 'FOC2447N5FW'
     },

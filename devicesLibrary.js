@@ -82,7 +82,7 @@ export class AudioInputGroup {
       debug(1, `DEVICE ${this.config.id}: connectToRemoteOutputs`);
     }
     catch (e) {
-      debug(2, `DEVICE ${this.config.id} connectToRemoteOutputs error: ${e}`);
+      debug(1, `DEVICE ${this.config.id} connectToRemoteOutputs error: ${e}`);
     }
   }
 
@@ -98,7 +98,7 @@ export class AudioInputGroup {
       debug(1, `DEVICE ${this.config.id}: disconnectFromRemoteOutputs`);
     }
     catch (e) {
-      debug(2, `DEVICE ${this.config.id} disconnectFromRemoteOutputs error: ${e}`);
+      debug(1, `DEVICE ${this.config.id} disconnectFromRemoteOutputs error: ${e}`);
     }
   }
 
@@ -111,7 +111,7 @@ export class AudioInputGroup {
       debug(1, `DEVICE ${this.config.id}: ConnectToLocalOutput: ${li.id}`);
     }
     catch (e) {
-      debug(2, `DEVICE ${this.config.id} ConnectToLocalOutput error: ${e}`);
+      debug(1, `DEVICE ${this.config.id} ConnectToLocalOutput error: ${e}`);
     }
   }
 
@@ -124,7 +124,7 @@ export class AudioInputGroup {
       debug(1, `DEVICE ${this.config.id}: DisconnectFromLocalOutput: ${li.id}`);
     }
     catch (e) {
-      debug(2, `DEVICE ${this.config.id} DisconnectFromLocalOutput error: ${e}`);
+      debug(1, `DEVICE ${this.config.id} DisconnectFromLocalOutput error: ${e}`);
     }
   }
 }
@@ -150,7 +150,7 @@ export class AudioOutputGroup {
       debug(1, `DEVICE ${this.config.id}: ConnectLocalInput: ${li.id}`);
     }
     catch (e) {
-      debug(2, `DEVICE ${this.config.id} ConnectLocalInput error: ${e}`);
+      debug(1, `DEVICE ${this.config.id} ConnectLocalInput error: ${e}`);
     }
   }
 
@@ -163,7 +163,7 @@ export class AudioOutputGroup {
       debug(1, `DEVICE ${this.config.id}: disConnectLocalInput: ${li.id}`);
     }
     catch (e) {
-      debug(2, `DEVICE ${this.config.id} DisconnectLocalInput error: ${e}`);
+      debug(1, `DEVICE ${this.config.id} DisconnectLocalInput error: ${e}`);
     }
   }
 
@@ -179,7 +179,7 @@ export class AudioOutputGroup {
       debug(1, `DEVICE ${this.config.id}: ConnectRemoteInputs`);
     }
     catch (e) {
-      debug(2, `DEVICE ${this.config.id} connectRemoteInputs error: ${e}`);
+      debug(1, `DEVICE ${this.config.id} connectRemoteInputs error: ${e}`);
     }
   }
 
@@ -196,7 +196,7 @@ export class AudioOutputGroup {
       debug(1, `DEVICE ${this.config.id}: DisconnectRemoteInputs`);
     }
     catch (e) {
-      debug(2, `DEVICE ${this.config.id} disConnectRemoteInputs error: ${e}`);
+      debug(1, `DEVICE ${this.config.id} disConnectRemoteInputs error: ${e}`);
     }
 
   }
@@ -725,6 +725,7 @@ export class AudioInput {
 export class ControlSystem {
   constructor(config) {
     this.config = config;
+    this.driver = new this.config.driver(this, config);
   }
   reset() {
     debug(1, `DEVICE ${this.config.id}: RESET`);

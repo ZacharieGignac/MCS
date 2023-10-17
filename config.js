@@ -13,7 +13,6 @@ import * as sce_firealarm from './sce_firealarm';
 
 /****************************/
 //Import modules below
-import * as mod_debug from './mod_debug';
 import * as mod_autosauce from './mod_autosauce';
 /****************************/
 
@@ -69,7 +68,6 @@ export var config = {
   ],
 
   modules: [
-    mod_debug,
     //mod_autosauce
   ],
 
@@ -102,14 +100,36 @@ export var config = {
   },
 
   strings: {
-    systemStart: 'Démarrage du système',
-    newSessionTitle: `Préparation de votre session`,
-    endSessionTitle: 'Fin de la session',
-    endSessionText: 'À la prochaine!',
-    deviceMonitoringWaitForDevicesTitle: 'Périphériques',
-    deviceMonitoringWaitForDevicesText: 'En attente des périphériques: %DEVICES%',
-    presenterTrackLocked: '🟢 Cadrage automatique ACTIVÉ 🟢',
-    presenterTrackLost: '🔴 Cadrage automatique DÉSACTIVÉ 🔴.<br>Revenez dans la zone de présentation pour le réactiver.'
+    systemStartingColdBootTitle: 'Démarrage', //Titre du message quand le système vient d'allumer (Cold boot)
+    systemStartingColdBootText: 'Le système vient de démarrer. Optimisation en cours...', //Texte du message quand le système vient d'allumer (Cold boot)
+    systemStartingTitle: 'Démarrage du système', //Titre du mesasge quand les macros viennent de démarrer (Warm boot)
+    systemStartingText: 'Le système démarre. Un instant svp.', //Texte du message quand les macros viennent de démarrer (Warm boot)
+
+    newSessionTitle: `Préparation de votre session`, //Titre du message quand le système sort de veille (en dessous il y a une progressbar, délais de ~2 à ~5 secondes)
+
+    endSessionTitle: 'Terminer la session ?', //Titre du message de confirmation de fermeture de session (S'affichage uniquement si aucun appel ni présentation)
+    endSessionPresentation: 'Ceci mettra fin à votre présentation.<br>Terminer la session ?', //Texte du message de confirmation de fermeture de session si une présentation est active
+    endSessionCall: 'Ceci mettra fin aux communications.<br>Terminer la session ?', //Texte du message de confirmation de fermeture de session si un appel est connecté
+    endSessionCallPresentation: 'Ceci mettra fin à votre présentation et aux communications.<br>Terminer la session ?', //Texte du message de confirmation de fermeture de session si une présentation est active ET qu'un appel est connecté
+    endSessionChoiceYes: 'Oui (Terminer la session)', //Texte du bouton "Oui"
+    endSessionChoiceNo: 'Non (Annuler)', //Texte du bouton "Non"
+
+    deviceMonitoringWaitForDevicesTitle: 'Périphériques', //Titre du message affiché lors de l'attente des périphériques (au boot)
+    deviceMonitoringWaitForDevicesText: 'En attente des périphériques: %DEVICES%', //Texte du message affiché lors de l'attente des périphériques (au boot),
+
+    devicesMissingTitle: '🚩 Problème du système 🚩', //Titre du message d'erreur lorsqu'un périphérique cesse de répondre
+    devicesMissingText: 'Contactez votre soutien technique.<br>Périphériques indisponibles:<br>', //Texte du message d'erreur lorsqu'un périphérique cesse de répondre
+    devicesWaitingTitle: 'En attente des périphériques...', //Texte du message lors de l'attente des périphériques
+    devicesAllConnectedTitle: 'Démarrage du système', //Titre du message lorsque tous les appareils se sont connectés
+    devicesAllConnectedText: 'Tous les périphériques sont connectés. Un instant svp...', //Texte du mnessage lorsque tous les appareils se sont connectés
+
+    presenterTrackLocked: '🟢 Cadrage automatique ACTIVÉ 🟢', //Texte affiché lorsque le PresenterTracking trouve le présentateur (affiché quelques secondes)
+    presenterTrackLost: '🔴 Cadrage automatique DÉSACTIVÉ 🔴.<br>Revenez dans la zone de présentation pour le réactiver.', //Texte affiché lorsque le PresenterTrack ne trouve plus le présentateur (affiché en continu)
+
+    sendReportTitle: 'Rapport système', //Titre de la fonctionnalité d'envoi de rapport d'erreur
+    sendReportText: 'Envoi du rapport en cours...', //Texte de la fonctionnalité d'envoi de rapport d'erreur lors de l'envoi
+    sendReportSuccess: 'Envoi réussi!<br>Référence: ', //Texte de la fonctionnalité d'envoi de rapport d'erreur, succès
+    sendReportFailure: `Échec de l'envoi.` //Texte de la fonctionnalité d'envoi de rapport d'erreur, échec
   },
 
 
@@ -121,7 +141,7 @@ export var config = {
       device: devicesLibrary.AudioReporter,
       driver: driversLibrary.AudioReporterDriver_internal,
       inputs: [1, 2, 3, 7, 8],
-      sampleMs:100,
+      sampleMs: 100,
       start: true
     },
 
@@ -136,7 +156,7 @@ export var config = {
       restartString: 'HW_RESTART',
       peripheralRequired: true,
       peripheralId: 'FOC2447N5FW',
-      heartbeatInterval:5000
+      heartbeatInterval: 5000
     },
 
 
@@ -557,8 +577,8 @@ export var config = {
       {
         silent: 'system.audio.presentermics',
         boost: 'system.audio.audiencemics',
-        audioReporter:'system.audioreporter.main',
-        silentElapsed:200
+        audioReporter: 'system.audioreporter.main',
+        silentElapsed: 200
       }
     ]
   },

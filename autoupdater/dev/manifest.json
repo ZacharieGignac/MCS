@@ -2,12 +2,6 @@
   "version": 1,
   "channel": "dev",
   "updates": [
-        {
-      "version": 2,
-      "type": "auto",
-      "mode": "add",
-      "file": "dev-v2.zip"
-    },
     {
       "version": 1,
       "type": "auto",

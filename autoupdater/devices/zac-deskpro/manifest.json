@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "channel": "devices/zac-deskpro",
+  "updates": [
+        {
+      "version": 2,
+      "type": "auto",
+      "mode": "add",
+      "file": "config-1.zip"
+    }
+  ]
+}

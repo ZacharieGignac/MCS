@@ -3,7 +3,7 @@
   "channel": "devices/zac-deskpro",
   "updates": [
         {
-      "version": 2,
+      "version": 1,
       "type": "auto",
       "mode": "add",
       "file": "config-1.zip"

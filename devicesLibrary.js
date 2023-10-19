@@ -187,6 +187,10 @@ export class AudioOutputGroup {
 
   }
 
+  async setInputGain(audioInputGroup, gain) {
+    console.log(audioInputGroup);
+  }
+
 }
 
 
@@ -560,6 +564,7 @@ export class AudioInput {
     this.widgetLevelName = this.config.id + ':LEVEL';
     this.widgetLevelGroupName = this.config.id + ':LEVELGROUP';
     this.beforeBoostGain = undefined;
+    this.storedGain = this.config.defaultGain;
 
     //Default UI Handling
     this.modeSwitch = zapi.ui.addWidgetMapping(this.widgetModeName);
@@ -576,6 +581,9 @@ export class AudioInput {
     if (this.config.lowGain || this.config.mediumGain || this.config.highGain) {
       this.levelGroup = zapi.ui.addWidgetMapping(this.widgetLevelGroupName);
       this.levelGroup.on('released', value => {
+        if (value == 'off') {
+          this.setGain(0, true);
+        }
         if (value == 'low') {
           this.setGain(this.config.lowGain);
         }
@@ -602,13 +610,15 @@ export class AudioInput {
 
   }
 
-  setGain(gain) {
+  setGain(gain, ignoreLimits = false) {
     debug(1, `DEVICE ${this.config.id}: setGain: ${gain}`);
-    if (gain < this.config.gainLowLimit) {
-      gain = this.config.gainLowLimit;
-    }
-    if (gain > this.config.gainHighLimit) {
-      gain = this.config.gainHighLimit;
+    if (!ignoreLimits) {
+      if (gain < this.config.gainLowLimit) {
+        gain = this.config.gainLowLimit;
+      }
+      if (gain > this.config.gainHighLimit) {
+        gain = this.config.gainHighLimit;
+      }
     }
 
     this.currentGain = gain;
@@ -616,7 +626,10 @@ export class AudioInput {
     let mappedGain = mapValue(gain, this.config.gainLowLimit, this.config.gainHighLimit, 0, 255);
     this.levelSlider.setValue(mappedGain);
     if (this.config.lowGain || this.config.mediumGain || this.config.highGain) {
-      if (gain <= this.config.lowGain) {
+      if (gain == 0) {
+        this.levelGroup.setValue('off');
+      }
+      else if (gain <= this.config.lowGain) {
         this.levelGroup.setValue('low');
       }
       else if (gain > this.config.lowGain && gain < this.config.highGain) {
@@ -625,6 +638,7 @@ export class AudioInput {
       else if (gain >= this.config.highGain) {
         this.levelGroup.setValue('high');
       }
+      
     }
   }
 
@@ -699,6 +713,13 @@ export class AudioInput {
     else if (!boost == true || boost == 'off') {
       this.setGain(this.beforeBoostGain);
     }
+  }
+
+  storeGain() {
+    this.storedGain = this.currentGain;
+  }
+  restoreGain() {
+    setGain(this.storedGain);
   }
 
   reset() {

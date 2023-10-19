@@ -39,6 +39,7 @@ export class Scenario {
   start() {
 
     xapi.Command.Presentation.Stop();
+    xapi.Command.Audio.Volume.SetToDefault();
     
     let devices = zapi.devices.getAllDevices();
 

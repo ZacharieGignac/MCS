@@ -94,7 +94,7 @@ export class AudioInputGroup {
         InputId: this.inputId,
         OutputId: lo.inputId
       });
-      debug(1, `DEVICE ${this.config.id}: ConnectToLocalOutput: ${li.id}`);
+      debug(1, `DEVICE ${this.config.id}: ConnectToLocalOutput: ${li.config.id}`);
     }
     catch (e) {
       debug(1, `DEVICE ${this.config.id} ConnectToLocalOutput error: ${e}`);
@@ -107,7 +107,7 @@ export class AudioInputGroup {
         InputId: this.inputId,
         OutputId: lo.outputId
       });
-      debug(1, `DEVICE ${this.config.id}: DisconnectFromLocalOutput: ${li.id}`);
+      debug(1, `DEVICE ${this.config.id}: DisconnectFromLocalOutput: ${li.config.id}`);
     }
     catch (e) {
       debug(1, `DEVICE ${this.config.id} DisconnectFromLocalOutput error: ${e}`);
@@ -133,7 +133,7 @@ export class AudioOutputGroup {
         InputId: li.inputId,
         OutputId: this.outputId
       });
-      debug(1, `DEVICE ${this.config.id}: ConnectLocalInput: ${li.id}`);
+      debug(1, `DEVICE ${this.config.id}: ConnectLocalInput: ${li.config.id}`);
     }
     catch (e) {
       debug(1, `DEVICE ${this.config.id} ConnectLocalInput error: ${e}`);
@@ -146,7 +146,7 @@ export class AudioOutputGroup {
         InputId: li.inputId,
         OutputId: this.outputId
       });
-      debug(1, `DEVICE ${this.config.id}: disConnectLocalInput: ${li.id}`);
+      debug(1, `DEVICE ${this.config.id}: disConnectLocalInput: ${li.config.id}`);
     }
     catch (e) {
       debug(1, `DEVICE ${this.config.id} DisconnectLocalInput error: ${e}`);
@@ -185,6 +185,20 @@ export class AudioOutputGroup {
       debug(1, `DEVICE ${this.config.id} disConnectRemoteInputs error: ${e}`);
     }
 
+  }
+  async updateInputGain(li, gain) {
+    try {
+      console.log(`inputid: ${li.inputId}, outputid:${this.outputId}, gain: ${gain}`);
+      xapi.Command.Audio.LocalOutput.UpdateInputGain({
+        InputId: li.inputId,
+        OutputId: this.outputId,
+        InputGain:gain
+      });
+      debug(1, `DEVICE ${this.config.id}: updateInputGain: ${li.config.id}`);
+    }
+    catch (e) {
+      debug(1, `DEVICE ${this.config.id} updateInputGain error: ${e}`);
+    }
   }
 
   async setInputGain(audioInputGroup, gain) {
@@ -638,7 +652,7 @@ export class AudioInput {
       else if (gain >= this.config.highGain) {
         this.levelGroup.setValue('high');
       }
-      
+
     }
   }
 
@@ -719,7 +733,7 @@ export class AudioInput {
     this.storedGain = this.currentGain;
   }
   restoreGain() {
-    setGain(this.storedGain);
+    this.setGain(this.storedGain);
   }
 
   reset() {

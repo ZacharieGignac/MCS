@@ -142,7 +142,7 @@ export var config = {
     disableAutoLightsWhenWidgetInteraction: true,
     systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',
     onStandby: {
-      setDND: true,
+      setDND: false,
       clearCallHistory: false,
       enableScenario: 'standby'
     },
@@ -150,7 +150,16 @@ export var config = {
       enableScenario: 'comotype1'
     }
   },
-
+  audio: {
+    extra: {
+      enabled: true,
+      outputGroup: 'system.audio.extra.output',
+      inputGroup: 'system.audio.extra.inputs',
+      setGainZero:['system.audio.presentermics'], //Utilisez ceci pour mettre le gain à OFF des microphones dans chacun de ces groupes.
+      setStatusOff:['AudienceMics'], //Utilisez ceci pour mettre un status à 'off', comme "AudienceMics"
+      overVolume: 75
+    }
+  },
   strings: {
     systemStartingColdBootTitle: 'Démarrage', //Titre du message quand le système vient d'allumer (Cold boot)
     systemStartingColdBootText: 'Le système vient de démarrer. Optimisation en cours...', //Texte du message quand le système vient d'allumer (Cold boot)
@@ -592,16 +601,24 @@ export var config = {
 
     /* AUDIO INPUT GROUPS */
     {
-      id: 'aig.computers',
+      id: 'aig.presentationsources',
       name: 'PC',
       type: DEVICETYPE.AUDIOINPUTGROUP,
-      device: devicesLibrary.AudioInputGroup
+      device: devicesLibrary.AudioInputGroup,
+      extraGain:10 //Needed for "Extra"
     },
     {
       id: 'aig.microphones.all',
       name: 'Microphone',
       type: DEVICETYPE.AUDIOINPUTGROUP,
       device: devicesLibrary.AudioInputGroup
+    },
+    {
+      id: 'aig.reinforcement',
+      name: 'Reinforcement',
+      type: DEVICETYPE.AUDIOINPUTGROUP,
+      device: devicesLibrary.AudioInputGroup,
+      extraGain:15 //Needed for "Extra"
     },
 
 
@@ -617,6 +634,12 @@ export var config = {
       name: 'Monitor',
       type: DEVICETYPE.AUDIOOUTPUTGROUP,
       device: devicesLibrary.AudioOutputGroup
+    },
+    {
+      id: 'aog.extra',
+      name: 'RoomExtra',
+      type: DEVICETYPE.AUDIOOUTPUTGROUP,
+      device: devicesLibrary.AudioOutputGroup
     }
 
   ],
@@ -625,6 +648,7 @@ export var config = {
 
 
   groups: [
+    //Default general groups
     {
       id: 'system.presentation.main',
       devices: ['display.projector', 'screen', 'display.projector.secondary', 'screen.secondary', 'campreset.presenter', 'lightscene.presentation', 'camera.presenter', 'aog.room']
@@ -638,6 +662,8 @@ export var config = {
       id: 'system.byod.main',
       devices: ['display.byod']
     },
+
+    //Audio input configuration
     {
       id: 'system.audio.allmics',
       devices: ['audioinput.presenter.sf1', 'audioinput.presenter.bat1', 'audioinput.ceilingmic.1', 'audioinput.ceilingmic.2', 'audioinput.ceilingmic.3']
@@ -647,9 +673,15 @@ export var config = {
       devices: ['audioinput.presenter.sf1', 'audioinput.presenter.bat1']
     },
     {
+      id: 'system.audio.presentationsources',
+      devices: ['aig.presentationsources']
+    },
+    {
       id: 'system.audio.audiencemics',
       devices: ['audioinput.ceilingmic.1', 'audioinput.ceilingmic.2', 'audioinput.ceilingmic.3']
     },
+
+    //Lightscenes groups
     {
       id: 'system.lightscene.standby',
       devices: ['lightscene.100%']
@@ -665,7 +697,17 @@ export var config = {
     {
       id: 'system.lightscene.writing',
       devices: ['lightscene.75%']
-    }
+    },
+
+    //Extra groups
+    {
+      id: 'system.audio.extra.output',
+      devices: ['aog.extra']
+    },
+    {
+      id: 'system.audio.extra.inputs',
+      devices: ['aig.presentationsources', 'aig.reinforcement']
+    },
 
   ],
 
@@ -685,6 +727,7 @@ export var config = {
     PresenterMics: 'on', //Mandatory value
     PresenterDetected: false, //Mandatory value
     ClearPresentationZone: 'off', //Mandatory value
+    AudioExtra: 'normal' //Mandatory value (normal, louder, loudest)
 
     //Scenario-specific status
 

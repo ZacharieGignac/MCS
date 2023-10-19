@@ -1,6 +1,6 @@
 import xapi from 'xapi';
 import { DevicesManager } from './devices';
-import { config as systemconfig , VERSION, PRODUCT } from './config';
+import { config as systemconfig, VERSION, PRODUCT } from './config';
 import { Scenarios } from './scenarios';
 import { Modules } from './modules';
 import { SystemStatus } from './systemstatus';
@@ -605,15 +605,128 @@ class Core {
 
 
 
+  async handleOverVolume() {
+    if (!this.audioExtraMode) {
+      xapi.Command.UserInterface.Message.Prompt.Display({
+        Duration: 0,
+        Title: 'Volume élevé',
+        Text: `Il est recommandé de désactiver tous les microphones lorsque le système est utilisé à un volume si élevé.<br>Voulez-vous désactiver les microphones ?`,
+        FeedbackId: 'system_overvolume',
+        "Option.1": 'Oui, désactiver',
+        "Option.2": 'Non, ne pas désactiver'
+      });
+    }
+  }
+  async handleUnderVolume() {
+    if (this.audioExtraMode && this.audioExtraModeRestoreGains) {
+      xapi.Command.UserInterface.Message.Prompt.Display({
+        Duration: 0,
+        Title: 'Volume normal',
+        Text: `Le système est de nouveau utilisé à un volume normal.<br>Voulez-vous réactiver les microphones ?`,
+        FeedbackId: 'system_undervolume',
+        "Option.1": 'Oui, réactiver',
+        "Option.2": 'Non, laisser désactivés'
+      });
+    }
+    else {
+      this.audioExtraMode = false;
+    }
+  }
+  async handleOverVolumePromptResponse(response) {
+    this.audioExtraMode = true;
+    if (response.OptionId == '1') {
+      this.audioExtraModeRestoreGains = true;
+      this.setExtraModeGain();
+      this.setExtraModeStatus();
+    }
+    else {
+      this.audioExtraModeRestoreGains = false;
+    }
+    //Connect inputs
+    this.enableExtraOutput();
+
+  }
+  async handleUnderVolumePromptResponse(response) {
+    this.audioExtraMode = false;
+    if (response.OptionId == '1') {
+      if (this.audioExtraModeRestoreGains) {
+        this.resetExtraModeGain();
+        this.resetExtraModeStatus();
+      }
+    }
+    this.disableExtraOutput();
+  }
+
+  async enableExtraOutput() {
+
+    this.audioExtraModeInputs.forEach(input => {
+      this.audioExtraModeOutput.connectLocalInput(input);
+      this.audioExtraModeOutput.updateInputGain(input, input.config.extraGain);
+    });
+  }
+
+  async disableExtraOutput() {
+    this.audioExtraModeInputs.forEach(input => {
+      this.audioExtraModeOutput.disconnectLocalInput(input);
+    });
+  }
+
+  async handleOverVolumePromptClear() {
+    this.audioExtraMode = false;
+    xapi.Command.Audio.Volume.Set({ Level: systemconfig.audio.extra.overVolume });
+  }
+  async handleUnderVolumePromptClear() {
+    this.audioExtraMode = true;
+    xapi.Command.Audio.Volume.Set({ Level: systemconfig.audio.extra.overVolume + 1 });
+  }
+
+  async setExtraModeGain() {
+    for (let g of systemconfig.audio.extra.setGainZero) {
+      let inputs = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.AUDIOINPUT, g);
+      for (let i of inputs) {
+        i.storeGain();
+        i.setGain(0, true);
+      }
+    }
+  }
+  async setExtraModeStatus() {
+    for (let s of systemconfig.audio.extra.setStatusOff) {
+      zapi.system.setStatus(s, 'off');
+    }
+  }
+  async resetExtraModeGain() {
+    for (let g of systemconfig.audio.extra.setGainZero) {
+      let inputs = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.AUDIOINPUT, g);
+      for (let i of inputs) {
+        i.restoreGain();
+      }
+    }
+  }
+  async resetExtraModeStatus() {
+    for (let s of systemconfig.audio.extra.setStatusOff) {
+      zapi.system.setStatus(s, 'on');
+    }
+  }
+
+
   async init() {
     var self = this;
     this.uiManager = new UiManager();
     this.systemStatus = new SystemStatus();
+    this.audioExtraMode = false;
+    this.audioExtraModeRestoreGains = false;
+    this.audioExtraModeOutput = undefined;
+    this.audioExtraModeInputs = [];
     await this.uiManager.init();
     await this.systemStatus.init();
 
 
     xapi.Config.UserInterface.SettingsMenu.Mode.set(systemconfig.system.settingsMenu);
+
+
+
+
+
 
     //Add UI-related mappings
 
@@ -829,6 +942,39 @@ class Core {
 
     this.modules.start();
 
+
+
+    //Handle *extra* room loudspeaker volume
+    if (systemconfig.audio.extra.enabled) {
+      this.audioExtraModeOutput = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.AUDIOOUTPUTGROUP, systemconfig.audio.extra.outputGroup)[0];
+      this.audioExtraModeInputs = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.AUDIOINPUTGROUP, systemconfig.audio.extra.inputGroup);
+
+      xapi.Event.UserInterface.Message.Prompt.Response.on(response => {
+        if (response.FeedbackId == 'system_overvolume') {
+          this.handleOverVolumePromptResponse(response);
+        }
+        else if (response.FeedbackId == 'system_undervolume') {
+          this.handleUnderVolumePromptResponse(response);
+        }
+      });
+      xapi.Event.UserInterface.Message.Prompt.Cleared.on((response) => {
+        if (response.FeedbackId == 'system_overvolume') {
+          this.handleOverVolumePromptClear();
+        }
+        else if (response.FeedbackId == 'system_undervolume') {
+          this.handleUnderVolumePromptClear();
+        }
+      });
+      xapi.Status.Audio.Volume.on(vol => {
+        if (vol > systemconfig.audio.extra.overVolume) {
+          this.handleOverVolume();
+        }
+        else if (vol < systemconfig.audio.extra.overVolume) {
+          this.handleUnderVolume();
+        }
+      });
+    }
+
   }
 
   displayNextDiagnosticsMessages() {
@@ -924,7 +1070,7 @@ class Core {
     if (systemconfig.system.onStandby.clearCallHistory) {
       xapi.Command.CallHistory.DeleteAll();
     }
-
+    this.disableExtraOutput();
 
     this.scenarios.enableScenario(systemconfig.system.onStandby.enableScenario);
   }
@@ -1127,17 +1273,19 @@ async function init() {
 
 
 
+
+
   //TESTAREA AFTERBOOT
 
-/*
-      var presenterVoiceWidget = zapi.ui.addWidgetMapping('presentervoice');
-      let audioReporter = zapi.devices.getDevice('system.audioreporter.main');
-      let ara = zapi.audio.addAudioReportAnalyzer(audioReporter);
-      ara.onRawAnalysis(a => {
-        console.log(a);
-      });
-      ara.start();
-*/
+  /*
+        var presenterVoiceWidget = zapi.ui.addWidgetMapping('presentervoice');
+        let audioReporter = zapi.devices.getDevice('system.audioreporter.main');
+        let ara = zapi.audio.addAudioReportAnalyzer(audioReporter);
+        ara.onRawAnalysis(a => {
+          console.log(a);
+        });
+        ara.start();
+  */
 
 
   /*
@@ -1160,6 +1308,9 @@ async function init() {
     }
     setTimeout(setupAudioAnalyzer, 5000);
     */
+
+
+
 
 }
 

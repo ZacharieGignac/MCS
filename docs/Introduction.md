@@ -2,7 +2,7 @@
 MCS est une collection de macros pour les systèmes Cisco Webex, constituant un système intégré, modulaire, flexible et simple à utiliser, destiné à être utilisé comme point central de contrôle dans une salle de cours ou de réunion. La logique de la salle ainsi que son interface utilisateur peuvent donc être centralisés sur un seul appareil qui utilise un langage de programmation connu et moderne.
 
 ## Aspects principaux
-* Utilisation de seulement 1 macro active, laissant ainsi place à 9 autres macros activées
+* Utilisation de seulement 1 macro active, laissant ainsi place à 9 macros libres
 * Unifier la configuration de l'ensemble du système en un seul fichier
 * Ajouter des fonctionnalités accessible à l'ensemble du système par un concept de **modules**
 * Supporter plusieurs comportements **complètement distinct** sur le même système par un concept de **scénario** (par exmeple, "mode manuel" et "mode automatique"

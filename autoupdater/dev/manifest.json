@@ -7,6 +7,30 @@
       "type": "auto",
       "mode": "add",
       "file": "https://github.com/ZacharieGignac/MCS/blob/main/autoupdater/dev/version1.zip?raw=true"
+    },
+        {
+      "version": 3,
+      "type": "auto",
+      "mode": "add",
+      "file": "https://github.com/ZacharieGignac/MCS/blob/main/autoupdater/dev/version1.zip?raw=true"
+    },
+        {
+      "version": 2,
+      "type": "auto",
+      "mode": "add",
+      "file": "https://github.com/ZacharieGignac/MCS/blob/main/autoupdater/dev/version1.zip?raw=true"
+    },
+        {
+      "version": 5,
+      "type": "auto",
+      "mode": "add",
+      "file": "https://github.com/ZacharieGignac/MCS/blob/main/autoupdater/dev/version1.zip?raw=true"
+    },
+        {
+      "version": 4,
+      "type": "auto",
+      "mode": "add",
+      "file": "https://github.com/ZacharieGignac/MCS/blob/main/autoupdater/dev/version1.zip?raw=true"
     }
   ]
 }

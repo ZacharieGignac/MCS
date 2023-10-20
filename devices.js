@@ -51,7 +51,7 @@ export class DevicesManager {
 
     }
 
-    
+
     zapi.ui.addActionMapping(/^ACTIVATECAMPRESET$/, (params) => {
       this.activateCameraPreset(params);
     });
@@ -74,7 +74,7 @@ export class DevicesManager {
         return found[0].inst;
       }
       else {
-        debug(3,`Cannot get device with id "${id}". Are you sure you got the right id (case sensitive) ?"`);
+        debug(3, `Cannot get device with id "${id}". Are you sure you got the right id (case sensitive) ?"`);
         return [];
       }
     }
@@ -84,7 +84,7 @@ export class DevicesManager {
         return found[0];
       }
       else {
-        debug(3,`Cannot get device with id "${id}". Are you sure you got the right id (case sensitive) ?"`);
+        debug(3, `Cannot get device with id "${id}". Are you sure you got the right id (case sensitive) ?"`);
         return [];
       }
     }

@@ -35,7 +35,7 @@ export class Modules {
       try {
         module.inst.start();
       }
-      catch{}
+      catch { }
     }
   }
 }

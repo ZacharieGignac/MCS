@@ -1,6 +1,6 @@
 import xapi from 'xapi';
 import { config as systemconfig } from './config';
-import { zapiv1 as zapi  } from './zapi';
+import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 const PRES_NOPRES = 'NOPRESENTATION';
@@ -193,7 +193,7 @@ export class SystemStatus {
 
       //Display current status at 30 seconds interval
       setInterval(() => {
-        console.warn(this._systemStatus);
+        debug(2, this._systemStatus);
       }, 240000);
 
       this.setDefaults();
@@ -263,8 +263,8 @@ export class SystemStatus {
       callback: f
     });
   }
-  
+
   displayStatus() {
-    console.warn(this._systemStatus);
+    debug(2, this._systemStatus);
   }
 }

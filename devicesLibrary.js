@@ -125,7 +125,7 @@ export class AudioOutputGroup {
     });
   }
   test() {
-    console.error('IT WORKS!');
+
   }
   connectLocalInput(li) {
     try {
@@ -188,21 +188,16 @@ export class AudioOutputGroup {
   }
   async updateInputGain(li, gain) {
     try {
-      console.log(`inputid: ${li.inputId}, outputid:${this.outputId}, gain: ${gain}`);
       xapi.Command.Audio.LocalOutput.UpdateInputGain({
         InputId: li.inputId,
         OutputId: this.outputId,
-        InputGain:gain
+        InputGain: gain
       });
       debug(1, `DEVICE ${this.config.id}: updateInputGain: ${li.config.id}`);
     }
     catch (e) {
       debug(1, `DEVICE ${this.config.id} updateInputGain error: ${e}`);
     }
-  }
-
-  async setInputGain(audioInputGroup, gain) {
-    console.log(audioInputGroup);
   }
 
 }
@@ -828,7 +823,6 @@ export class AudioReporter {
     }
   }
   report(data) {
-    //console.warn(data);
     for (let reportReceiver of this.reportCallbacks) {
       reportReceiver(data);
     }

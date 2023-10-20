@@ -29,13 +29,13 @@ export class Scenarios {
 
     zapi.ui.addActionMapping(/^ENABLESCENARIOASK$/, () => {
       xapi.Command.UserInterface.Message.TextInput.Display({
-        Duration:0,
-        FeedbackId:'scenarios_enablescenario_ask',
-        InputType:'SingleLine',
-        KeyboardState:'Open',
-        Placeholder:'Scenario Id',
-        Title:'Enable scenario',
-        Text:'Entrez le "id" du scénario à activer'
+        Duration: 0,
+        FeedbackId: 'scenarios_enablescenario_ask',
+        InputType: 'SingleLine',
+        KeyboardState: 'Open',
+        Placeholder: 'Scenario Id',
+        Title: 'Enable scenario',
+        Text: 'Entrez le "id" du scénario à activer'
       });
     });
 
@@ -85,7 +85,7 @@ export class Scenarios {
     if (this.currentScenario != id) {
       var match = this.scenariosLibrary.filter(sce => { return sce.manifest.id == id });
       if (match.length > 1) {
-        console.error(`SCENARIOS ERROR!!! More than one scenario use id "${id}". No scenario will be enabled.`);
+        debug(3, `SCENARIOS ERROR!!! More than one scenario use id "${id}". No scenario will be enabled.`);
       }
       else {
         currManifest = match[0].manifest;

@@ -128,7 +128,7 @@ export var config = {
   version: VERSION,
   system: {
     coldBootWait: 120,
-    debugLevel: DEBUGLEVEL.HIGH,
+    debugLevel: DEBUGLEVEL.MEDIUM,
     debugInternalMessages: false,
     messagesPacing: 500,
     initDelay: 1000,
@@ -156,8 +156,8 @@ export var config = {
       enabled: true,
       outputGroup: 'system.audio.extra.output',
       inputGroup: 'system.audio.extra.inputs',
-      setGainZero:['system.audio.presentermics'], //Utilisez ceci pour mettre le gain à OFF des microphones dans chacun de ces groupes.
-      setStatusOff:['AudienceMics'], //Utilisez ceci pour mettre un status à 'off', comme "AudienceMics"
+      setGainZero: ['system.audio.presentermics'], //Utilisez ceci pour mettre le gain à OFF des microphones dans chacun de ces groupes.
+      setStatusOff: ['AudienceMics'], //Utilisez ceci pour mettre un status à 'off', comme "AudienceMics"
       overVolume: 75
     }
   },
@@ -606,7 +606,7 @@ export var config = {
       name: 'PC',
       type: DEVICETYPE.AUDIOINPUTGROUP,
       device: devicesLibrary.AudioInputGroup,
-      extraGain:10 //Needed for "Extra"
+      extraGain: 10 //Needed for "Extra"
     },
     {
       id: 'aig.microphones.all',
@@ -619,7 +619,7 @@ export var config = {
       name: 'Reinforcement',
       type: DEVICETYPE.AUDIOINPUTGROUP,
       device: devicesLibrary.AudioInputGroup,
-      extraGain:15 //Needed for "Extra"
+      extraGain: 15 //Needed for "Extra"
     },
 
 

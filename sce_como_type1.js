@@ -1,6 +1,6 @@
 import xapi from 'xapi';
 import { config as systemconfig } from './config';
-import { zapiv1 as zapi  } from './zapi';
+import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 
@@ -285,7 +285,7 @@ export class Scenario {
   }
 
   async evaluateScreens(status) {
-    console.log('ComoType1 evaluating screens...');
+    debug(1, 'ComoType1 evaluating screens...');
     /******************
      * 
      *  screens configuration
@@ -313,7 +313,7 @@ export class Scenario {
   }
 
   async evaluateDisplays(status) {
-    console.log('ComoType1 evaluating displays...');
+    debug(1, 'ComoType1 evaluating displays...');
     /******************
      * 
      *  Displays configuration
@@ -678,6 +678,6 @@ export class Scenario {
 
 
   test() {
-    console.log('test from SCE_Normal');
+
   }
 };

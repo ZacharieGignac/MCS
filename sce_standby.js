@@ -40,7 +40,7 @@ export class Scenario {
 
     xapi.Command.Presentation.Stop();
     xapi.Command.Audio.Volume.SetToDefault();
-    
+
     let devices = zapi.devices.getAllDevices();
 
     for (let d of devices) {
@@ -51,19 +51,19 @@ export class Scenario {
     }
 
     zapi.system.resetSystemStatus();
-      let lightscenes = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.standby');
-      if (lightscenes.length > 0) {
-        for (let lightscene of lightscenes) {
-          let lsdevice = zapi.devices.getDevice(lightscene.config.id);
-          if (lsdevice) {
-            lsdevice.activate();
-          }
+    let lightscenes = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.standby');
+    if (lightscenes.length > 0) {
+      for (let lightscene of lightscenes) {
+        let lsdevice = zapi.devices.getDevice(lightscene.config.id);
+        if (lsdevice) {
+          lsdevice.activate();
         }
       }
-      xapi.Command.Standby.Activate();
+    }
+    xapi.Command.Standby.Activate();
   }
 
   test() {
-    console.log('test from SCE_Standby');
+
   }
 };

@@ -543,7 +543,7 @@ class Core {
     let codecStatus = await xapi.Status.get();
     let date = new Date();
 
-    console.log(`Sending system report...`);
+    debug(1, `Sending system report...`);
     xapi.Command.UserInterface.Message.Alert.Display({
       Title: str.sendReportTitle,
       Text: str.sendReportText
@@ -582,7 +582,7 @@ class Core {
           Title: str.sendReportTitle,
           Text: str.sendReportSuccess + resultObj.id
         });
-        console.log(resultObj.link);
+        debug(1, resultObj.link);
       }
       else {
         xapi.Command.UserInterface.Message.Alert.Display({
@@ -1226,8 +1226,8 @@ async function preInit() {
   debug(2, `PreInit started...`);
   clearInterval(coldbootWarningInterval);
   if (systemconfig.system.debugInternalMessages) {
-    xapi.Event.Message.Send.Text.on(text => {//TODO: Why this ?
-      console.log(`[INTERNAL MESSAGE] ${text}`);
+    xapi.Event.Message.Send.Text.on(text => {
+      debug(1, `[INTERNAL MESSAGE] ${text}`);
     });
   }
 
@@ -1261,10 +1261,10 @@ async function init() {
 
 
   setTimeout(() => {
-    console.warn(`POST-BOOT PERFORMANCE REPORT:`);
-    console.warn(performance);
-    console.warn(`POST-BOOT SYSTEM STATUS REPORT:`);
-    console.warn(zapi.system.getAllStatus());
+    debug(2, `POST-BOOT PERFORMANCE REPORT:`);
+    debug(2, performance);
+    debug(2, `POST-BOOT SYSTEM STATUS REPORT:`);
+    debug(2, zapi.system.getAllStatus());
   }, 5000);
 
 

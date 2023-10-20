@@ -439,7 +439,7 @@ export class ControlSystemDriver_isc {
     if (this.config.heartbeatInterval != undefined) {
       setInterval(() => {
         zapi.system.sendMessage(`${this.config.name}:HEARTBEAT;CODEC`);
-      },this.config.heartbeatInterval);
+      }, this.config.heartbeatInterval);
     }
   }
 }

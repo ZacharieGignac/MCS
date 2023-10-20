@@ -857,20 +857,7 @@ class Core {
         }
       });
     }
-    zapi.system.enablePresenterTrackWarning = () => {
-      debug(1, `Enabling presenter tracking`);
-      this.systemStatus.setStatus('PresenterTrackWarnings', 'on');
-      xapi.Command.Cameras.PresenterTrack.Set({
-        Mode: 'Follow'
-      });
-    }
-    zapi.system.disablePresenterTrackWarning = () => {
-      debug(1, `Disabling presenter tracking`);
-      this.systemStatus.setStatus('PresenterTrackWarnings', 'off');
-      xapi.Command.Cameras.PresenterTrack.Set({
-        Mode: 'Off'
-      });
-    }
+
 
     this.scheduleStandby = () => {
       schedule(systemconfig.system.forceStandbyTime, () => {

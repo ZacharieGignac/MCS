@@ -85,21 +85,6 @@ export class Scenario {
     this.devices.audioinputs.audiencemics = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.AUDIOINPUT, 'system.audio.audiencemics');
 
 
-    //Handle PresenterTrack camera change
-    /*
-    xapi.Status.Cameras.PresenterTrack.Status.on(status => {
-      if (status == 'Follow') {
-        if (this.originalUsePresenterTrack == ON) {
-          //zapi.system.enablePresenterTrackWarning();
-          zapi.system.setStatus('UsePresenterTrack', ON);
-        }
-      }
-      else if (status == 'Off') {
-        zapi.system.setStatus('UsePresenterTrack', OFF);
-      }
-    });
-    */
-
   }
 
   enable() {

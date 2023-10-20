@@ -44,8 +44,6 @@ export var zapiv1 = {
     getAllStatus: () => { },
     onStatusChange: () => { },
     onStatusKeyChange: () => { },
-    enablePresenterTrackWarnings: () => { },
-    disablePresenterTrackWarnings: () => { },
     sendMessage:() => { },
     systemReport:{},
     sendSystemReport:() => {}

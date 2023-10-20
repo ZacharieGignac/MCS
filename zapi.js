@@ -23,8 +23,6 @@ export var zapiv1 = {
       LIGHTSCENE: 'LIGHTSCENE',
       SHADE:'SHADE',
       CAMERA: 'CAMERA',
-      AUDIOSTAT: 'AUDIOSTAT',
-      HID: 'HID',
       SOFTWAREDEVICE:'SOFTWAREDEVICE'
     }
   },

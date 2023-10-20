@@ -19,20 +19,20 @@ export class Module {
   start() {
     for (let boost of systemconfig.mod_autosauce_config.boosts) {
       debug(1, `mod_autosauce: Adding boost for group ${boost.boost} when ${boost.silent} is silent.`);
-      this.boosts.push(new Boost(boost.silent, boost.boost, boost.silentElapsed, boost.audioReporter));
+      this.boosts.push(new Boost(boost.silent, boost.boost, boost.silentElapsed, boost.diffLevel, boost.audioReporter));
     }
   }
 };
 
 class Boost {
-  constructor(silentGroup, boostGroup, silentElapsed, audioReporter) {
+  constructor(silentGroup, boostGroup, silentElapsed, diffLevel, audioReporter) {
     this.currentBoostMode = false;
     let ar = zapi.devices.getDevice(audioReporter);
     let ara = zapi.audio.addAudioReportAnalyzer(ar);
     let boostInputs = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.AUDIOINPUT, boostGroup);
     ara.addGroup([silentGroup, boostGroup]);
     ara.onLoudestGroup(silentElapsed, report => {
-      if (report.group != silentGroup && report.highestSince > silentElapsed) {
+      if (report.group != silentGroup && report.highestSince > silentElapsed && report.highestLowestDiff < diffLevel) {
         if (this.currentBoostMode == false) {
           this.currentBoostMode = true;
           boostInputs.forEach(input => {

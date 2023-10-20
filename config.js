@@ -69,7 +69,7 @@ export var config = {
   ],
 
   modules: [
-    //mod_autosauce
+    mod_autosauce,
     mod_hidcameraman
   ],
 
@@ -88,7 +88,8 @@ export var config = {
         silent: 'system.audio.presentermics',
         boost: 'system.audio.audiencemics',
         audioReporter: 'system.audioreporter.main',
-        silentElapsed: 200
+        diffLevel: 10,
+        silentElapsed: 300
       }
     ]
   },

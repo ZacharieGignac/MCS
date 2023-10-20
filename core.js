@@ -618,7 +618,7 @@ class Core {
     }
   }
   async handleUnderVolume() {
-    if (this.audioExtraMode && this.audioExtraModeRestoreGains) {
+    if (this.audioExtraMode && this.audioExtraModeRestoreGains && !this.audioExtraSkipPrompt) {
       xapi.Command.UserInterface.Message.Prompt.Display({
         Duration: 0,
         Title: 'Volume normal',
@@ -717,6 +717,7 @@ class Core {
     this.audioExtraModeRestoreGains = false;
     this.audioExtraModeOutput = undefined;
     this.audioExtraModeInputs = [];
+    this.audioExtraSkipPrompt = false;
     await this.uiManager.init();
     await this.systemStatus.init();
 
@@ -1064,6 +1065,7 @@ class Core {
 
   handleStandby() {
     debug(1, 'Entering standby...');
+    this.audioExtraSkipPrompt = true;
     if (systemconfig.system.onStandby.setDND) {
       this.setDND();
     }
@@ -1077,6 +1079,7 @@ class Core {
 
   handleWakeup() {
     debug(1, 'Waking up...');
+    this.audioExtraSkipPrompt = false;
     displayTimedProgressBar(systemconfig.strings.newSessionTitle, systemconfig.system.newSessionDelay);
     if (this.scenarios.currentScenario == systemconfig.system.onStandby.enableScenario) {
       this.scenarios.enableScenario(systemconfig.system.onWakeup.enableScenario);

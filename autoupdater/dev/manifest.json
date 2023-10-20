@@ -6,7 +6,7 @@
       "version": 1,
       "type": "auto",
       "mode": "add",
-      "file": "version1.zip"
+      "file": "https://github.com/ZacharieGignac/MCS/blob/main/autoupdater/dev/version1.zip?raw=true"
     }
   ]
 }

@@ -192,9 +192,11 @@ export class SystemStatus {
       }
 
       //Display current status at 30 seconds interval
-      setInterval(() => {
-        debug(2, this._systemStatus);
-      }, 240000);
+      if (systemconfig.system.showStatusAndPerformanceReports) {
+        setInterval(() => {
+          debug(2, this._systemStatus);
+        }, 240000);
+      }
 
       this.setDefaults();
       success();

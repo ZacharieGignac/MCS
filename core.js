@@ -1246,18 +1246,21 @@ async function init() {
   core.loadScenarios();
   performance.setElapsedEnd('Boot');
 
+  if (systemconfig.system.showStatusAndPerformanceReports) {
+    setTimeout(() => {
+      debug(2, `POST-BOOT PERFORMANCE REPORT:`);
+      debug(2, performance);
+      debug(2, `POST-BOOT SYSTEM STATUS REPORT:`);
+      debug(2, zapi.system.getAllStatus());
+    }, 5000);
+    setInterval(() => {
+      console.warn(performance);
+    }, 240000);
+  }
 
-  setTimeout(() => {
-    debug(2, `POST-BOOT PERFORMANCE REPORT:`);
-    debug(2, performance);
-    debug(2, `POST-BOOT SYSTEM STATUS REPORT:`);
-    debug(2, zapi.system.getAllStatus());
-  }, 5000);
 
 
-  setInterval(() => {
-    console.warn(performance);
-  }, 240000);
+
 
 
 

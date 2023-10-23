@@ -126,7 +126,7 @@ export var config = {
   version: VERSION,
   system: {
     coldBootWait: 120,                            // Temps (secondes) qui détermine un "cold boot"
-    debugLevel: DEBUGLEVEL.HIGH,                // Niveau de débug (LOW, MEDIUM, HIGH)
+    debugLevel: DEBUGLEVEL.MEDIUM,                // Niveau de débug (LOW, MEDIUM, HIGH)
     debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
     messagesPacing: 500,                          // Temps (ms) entre les messages de type "xpi.Command.Message"
     initDelay: 1000,                              // Temps (ms) avant l'initialisation du système
@@ -140,6 +140,7 @@ export var config = {
     settingsMenu: 'Locked',                       // <Locked, Unlocked> Détermine si le panneau de paramètre est vérouillé
     disableAutoLightsWhenWidgetInteraction: true, // <true, false> Détermine si le contrôle automatique de l'éclairage est automatiquement désactivé lorsqu'un widget de Light ou LightScene est touché par l'utilisateur
     systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',                    // Clé d'api de "paste.ee" utilisé pour l'envoi de rapport système
+    showStatusAndPerformanceReports:false,        //Affiche le rapport de status après le boot et à interval (pour le developement)
     onStandby: {
       setDND: false,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
       clearCallHistory: false,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby
@@ -216,36 +217,36 @@ export var config = {
 
     /* CONTROL SYSTEM */
     {
-      id: 'controlsystem',
-      type: DEVICETYPE.CONTROLSYSTEM,
-      name: 'CTRLSYS',
-      device: devicesLibrary.ControlSystem,
-      driver: driversLibrary.ControlSystemDriver_isc_h21,
-      syncRestart: true,
-      restartString: 'HW_RESTART',
-      peripheralRequired: true,
-      peripheralId: 'FOC2447N5FW',
-      heartbeatInterval: 5000
+      id: 'controlsystem',                                //Identification unique
+      type: DEVICETYPE.CONTROLSYSTEM,                     //Type = 'CONTROLSYSTEM'
+      name: 'CTRLSYS',                                    //Nom, utilisé par le driver pour la communication
+      device: devicesLibrary.ControlSystem,               //Classe à utiliser
+      driver: driversLibrary.ControlSystemDriver_isc_h21, //Driver à utiliser par le device
+      syncRestart: true,                                  //Défini si le système de contrôle sera redémarré en même temps que le codec (si supporté)
+      restartString: 'HW_RESTART',                        //Commande à envoyer au système de contrôle pour le redémarrage
+      peripheralRequired: true,                           //Défini si ce device est requis pour l'utilisation du système. Sa présence est vérifiée au démarrage et à interval régulier
+      peripheralId: 'FOC2447N5FW',                        //Numéro de série ou MACADDR du device (Status/Peripherals)
+      heartbeatInterval: 5000                             //Interval à laquelle le driver signalera sa présence au système de contrôle
     },
 
 
     /* DISPLAYS */
     {
-      id: 'display.projector',
-      type: DEVICETYPE.DISPLAY,
-      name: 'PROJ',
-      device: devicesLibrary.Display,
-      driver: driversLibrary.DisplayDriver_isc_h21,
-      connector: 1,
-      supportsPower: true,
-      supportsBlanking: false,
-      supportsSource: false,
-      supportsUsageHours: false,
-      defaultPower: 'off',
-      defaultBlanking: false,
-      blankBeforePowerOff: true,
-      powerOffDelay: 6000,
-      usageHoursRequestInterval: 100000,
+      id: 'display.projector',                      //Identification unique
+      type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
+      name: 'PROJ',                                 //Nom, utilisé par le driver pour la communication
+      device: devicesLibrary.Display,               //Classe à utiliser
+      driver: driversLibrary.DisplayDriver_isc_h21, //Driver à utiliser par le device
+      connector: 1,                                 //Connecteur HDMI de sortie sur le codec
+      supportsPower: true,                          //Défini si l'affichage supporte les commandes d'alimentation (ON, OFF)
+      supportsBlanking: false,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
+      supportsSource: false,                        //Défini si l'affichage supporte le changement de source (HDMI1, HDMI2, SDI)
+      supportsUsageHours: false,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
+      defaultPower: 'off',                          //Alimentation par défaut lors du démarrage du système (ON, OFF)
+      defaultBlanking: false,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
+      blankBeforePowerOff: true,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
+      powerOffDelay: 6000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
+      usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
     },
     {
       id: 'display.projector.secondary',
@@ -299,12 +300,12 @@ export var config = {
 
     /* MOTORIZED SCREENS */
     {
-      id: 'screen',
-      type: DEVICETYPE.SCREEN,
-      name: 'SCREEN',
-      device: devicesLibrary.Screen,
-      driver: driversLibrary.ScreenDriver_isc_h21,
-      defaultPosition: 'up'
+      id: 'screen',                                 //Identification unique
+      type: DEVICETYPE.SCREEN,                      //Type = 'SCREEN'
+      name: 'SCREEN',                               //Nom, utilisé par le drivwer pour la communication
+      device: devicesLibrary.Screen,                //Classe à utiliser
+      driver: driversLibrary.ScreenDriver_isc_h21,  //Driver à utiliser par le device
+      defaultPosition: 'up'                         //Position par défaut lors du démarrage du système
     },
     {
       id: 'screen.secondary',
@@ -321,34 +322,34 @@ export var config = {
 
     /* Shades */
     {
-      id: 'shades',
-      type: DEVICETYPE.SHADE,
-      name: 'SHADES-EAST',
-      device: devicesLibrary.Shade,
-      driver: driversLibrary.ShadeDriver_basic_isc,
-      defaultPosition: 'up'
+      id: 'shades',                                 //Identification unique
+      type: DEVICETYPE.SHADE,                       //Type = 'SHADE'
+      name: 'SHADES-EAST',                          //Nom, utilisé par le driver pour la communication
+      device: devicesLibrary.Shade,                 //Classe à utiliser
+      driver: driversLibrary.ShadeDriver_basic_isc, //Driver à utiliser par le device
+      defaultPosition: 'up'                         //Position par défaut lors du démarrage du système
     },
 
 
     /* AUDIO INPUTS */
     {
-      id: 'audioinput.presenter.sf1',
-      type: DEVICETYPE.AUDIOINPUT,
-      name: 'Micro sans-fil',
-      device: devicesLibrary.AudioInput,
-      driver: driversLibrary.AudioInputDriver_codecpro,
-      connector: 7,
-      input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
-      bias: 0,
-      gainLowLimit: 20,
-      gainHighLimit: 70,
-      defaultGain: 60,
-      gainStep: 1,
-      defaultMode: 'on',
-      lowGain: 60,
-      mediumGain: 65,
-      highGain: 70,
-      boost: 70
+      id: 'audioinput.presenter.sf1',                   //Identification unique
+      type: DEVICETYPE.AUDIOINPUT,                      //Type = 'AUDIOINPUT'
+      name: 'Micro sans-fil',                           //Nom
+      device: devicesLibrary.AudioInput,                //Classe à utiliser
+      driver: driversLibrary.AudioInputDriver_codecpro, //Driver à utiliser par le device
+      connector: 7,                                     //Connecteur d'entrée du codec
+      input: 'microphone',                              //Type d'entrée, microphone, hdmi, ethernet. Ethernet requiert la propriété "channel". (non testé)
+      bias: 0,                                          //Biais de niveau audio, peut être positif ou négatif. Utilisé par l'analyze d'entrée audio
+      gainLowLimit: 20,                                 //Limite basse du gain de l'entrée
+      gainHighLimit: 70,                                //Limite supérieure du gain de l'entrée
+      defaultGain: 60,                                  //Gain par défaut au démarrage du système
+      gainStep: 1,                                      //Gain ajouté ou retiré de la valeur actuelle lorsque les fonctionas increase() et decrease() sont appelées
+      defaultMode: 'on',                                //Mode par défaut lors du démarrage du système
+      lowGain: 60,                                      //Gain "bas" (utilisé par les widgets de type "button group")
+      mediumGain: 65,                                   //Gain "moyen" (utilisé par les widgets de type "button group")
+      highGain: 70,                                     //Gain "haut" (utilisé par les widgets de type "button group")
+      boost: 70                                         //Gain "Boost, utilisé par le module "AutoSauce"
     },
     {
       id: 'audioinput.presenter.bat1',
@@ -429,11 +430,11 @@ export var config = {
 
     /* CAMERA PRESETS */
     {
-      id: 'campreset.presenter',
-      name: 'Présentateur',
-      type: DEVICETYPE.CAMERAPRESET,
-      device: devicesLibrary.CameraPreset,
-      presetName: 'Présentateur'
+      id: 'campreset.presenter',            //identification unique
+      name: 'Présentateur',                 //Nom
+      type: DEVICETYPE.CAMERAPRESET,        //Type = 'CAMERAPRESET'
+      device: devicesLibrary.CameraPreset,  //Classe à utiliser
+      presetName: 'Présentateur'            //Nom du preset dans le codec
     },
     {
       id: 'campreset.board',
@@ -453,16 +454,16 @@ export var config = {
 
     /* LIGHTS */
     {
-      id: 'light.presenter',
-      name: 'ZONE1',
-      type: DEVICETYPE.LIGHT,
-      device: devicesLibrary.Light,
-      driver: driversLibrary.LightDriver_isc_h21,
-      sliderEvent: 'changed', //released, changed
-      supportsPower: false,
-      supportsDim: true,
-      defaultPower: 'on',
-      defaultDim: 100
+      id: 'light.presenter',                      //Identification unique
+      name: 'ZONE1',                              //Nom, utilisé par le driver pour la communication
+      type: DEVICETYPE.LIGHT,                     //Type = 'LIGHT'
+      device: devicesLibrary.Light,               //Classe à utiliser
+      driver: driversLibrary.LightDriver_isc_h21, //Driver utilisé par la classe
+      sliderEvent: 'changed',                     //<changed, released> Événement à utiliser pour le changement du widget "slider". l'événement "changed" s'execute quand on glisse le widget (peut être demandant pour certain systèmes), "released" s'execute lorsqu'on lève le doigt
+      supportsPower: false,                       //Défini si l'éclairage supporte les commandes d'alimentation. Si false, une lumière éteinte est dim à 0
+      supportsDim: true,                          //Défini si l'éclairage supporte les commandes de tamisage
+      defaultPower: 'on',                         //Défini l'état d'alimentation par défaut au démarrage du système
+      defaultDim: 100                             //Défini le tamisage par défaut au démarrage du système
     },
     {
       id: 'light.board',
@@ -723,21 +724,20 @@ export var config = {
 
   systemStatus: {
     //System status
-    Product: PRODUCT,
-    Version: VERSION,
-    PresenterLocation: 'local', //Mandatory value
-    PresenterTrackWarnings: 'on', //Mandatory value
-    UsePresenterTrack: 'on', //Mandatory value
-    AutoDisplays: 'on', //Mandatory value
-    AutoScreens: 'on', //Mandatory value
-    AutoLights: 'on', //Mandatory value
-    AutoCamPresets: 'on', //Mandatory value
-    AutoCamSelection: 'off', //Mandatory value
-    AudienceMics: 'on', //Mandatory valuee
-    PresenterMics: 'on', //Mandatory value
-    PresenterDetected: false, //Mandatory value
-    ClearPresentationZone: 'off', //Mandatory value
-    AudioExtra: 'normal' //Mandatory value (normal, louder, loudest)
+    Product: PRODUCT, //System, nom du produit
+    Version: VERSION, //System, version du produit
+    PresenterLocation: 'local', //System, <local, remote>, emplacement du présentateur
+    PresenterTrackWarnings: 'on', //System, <on, off>, affichage des messages d'avertissement PresenterTrack
+    UsePresenterTrack: 'on', //System, <on, off>, utilisation de PresenterTrack
+    AutoDisplays: 'on', //System, <on, off>, gestion des affichages automatique (doit être pris en charge dans le scénario)
+    AutoScreens: 'on', //System, <on, off>, gestion des toiles motorisées automatique (doit être pris en charge dans le scénario)
+    AutoLights: 'on', //System, <on, off>, gestion de l'éclairage automatique (doit être pris en charge dans le scénario)
+    AutoCamPresets: 'on', //System, <on, off> gestion des presets de caméra automatique (doit être pris en charge dans le scénario)
+    AutoCamSelection: 'off', //System, <on, off> selection de la caméra automatique (doit être pris en charge dans le scénario)
+    AudienceMics: 'on', //System, <on, off> Utilisation des microphones de l'auditoire (doit être pris en charge dans le scénario)
+    PresenterMics: 'on', //System, <on, off> Utilisation des microphones du présentateur (doit êter pris en charge dans le scénario)
+    PresenterDetected: false, //System, <true, false>, indique si le présentateur est détecté par le système (utilise le statut de PresenterTrack)
+    ClearPresentationZone: 'off', //System, <on, off>, indique si la zone de présentateur doit être dégagée (doit être pris en charge dans le scénario)
 
     //Scenario-specific status
 

@@ -239,3 +239,18 @@ Ci-dessous une description de chaque type de device inclus par défaut.
       usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
     }
 ```
+### ControlSystem (Processeur Crestron, Raspberry Pi)
+```JS
+    {
+      id: 'controlsystem',                                //Identification unique
+      type: DEVICETYPE.CONTROLSYSTEM,                     //Type = 'CONTROLSYSTEM'
+      name: 'CTRLSYS',                                    //Nom, utilisé par le driver pour la communication
+      device: devicesLibrary.ControlSystem,               //Classe à utiliser
+      driver: driversLibrary.ControlSystemDriver_isc_h21, //Driver à utiliser par le device
+      syncRestart: true,                                  //Défini si le système de contrôle sera redémarré en même temps que le codec (si supporté)
+      restartString: 'HW_RESTART',                        //Commande à envoyer au système de contrôle pour le redémarrage
+      peripheralRequired: true,                           //Défini si ce device est requis pour l'utilisation du système. Sa présence est vérifiée au démarrage et à interval régulier
+      peripheralId: 'FOC2447N5FW',                        //Numéro de série ou MACADDR du device (Status/Peripherals)
+      heartbeatInterval: 5000                             //Interval à laquelle le driver signalera sa présence au système de contrôle
+    }
+```

@@ -178,3 +178,33 @@ Cette section est un array de tout les imports des modules. Si l'import n'est pa
   },
 ```
 Cette section contient tous les messages pour l'interface utilisateur
+
+### Configuration, section "systemStatus"
+```JS
+  systemStatus: {
+    //System status
+    Product: PRODUCT, //System, nom du produit
+    Version: VERSION, //System, version du produit
+    PresenterLocation: 'local', //System, <local, remote>, emplacement du présentateur
+    PresenterTrackWarnings: 'on', //System, <on, off>, affichage des messages d'avertissement PresenterTrack
+    UsePresenterTrack: 'on', //System, <on, off>, utilisation de PresenterTrack
+    AutoDisplays: 'on', //System, <on, off>, gestion des affichages automatique (doit être pris en charge dans le scénario)
+    AutoScreens: 'on', //System, <on, off>, gestion des toiles motorisées automatique (doit être pris en charge dans le scénario)
+    AutoLights: 'on', //System, <on, off>, gestion de l'éclairage automatique (doit être pris en charge dans le scénario)
+    AutoCamPresets: 'on', //System, <on, off> gestion des presets de caméra automatique (doit être pris en charge dans le scénario)
+    AutoCamSelection: 'off', //System, <on, off> selection de la caméra automatique (doit être pris en charge dans le scénario)
+    AudienceMics: 'on', //System, <on, off> Utilisation des microphones de l'auditoire (doit être pris en charge dans le scénario)
+    PresenterMics: 'on', //System, <on, off> Utilisation des microphones du présentateur (doit êter pris en charge dans le scénario)
+    PresenterDetected: false, //System, <true, false>, indique si le présentateur est détecté par le système (utilise le statut de PresenterTrack)
+    ClearPresentationZone: 'off', //System, <on, off>, indique si la zone de présentateur doit être dégagée (doit être pris en charge dans le scénario)
+
+    //Scenario-specific status
+
+  }
+```
+Cette section contient les pairs clé/valeurs qui seront automatiquement incluses dans la structure de donnée "systemStatus". Les clés identifiées "System" sont obligatoires pour le bon fonctionnement du système. Aucun événement de changement de valeur ne sera déclanché pour l'initialisation de ces valeurs.
+
+Ces valeurs seront automatiquement restaurées lorsque le système tombe en veille. Le changement de ces valeurs enclanche un processus d'événement si la valeur est différente de la valeur actuelle, ou si le déclanchement d'événement est forcé (documenté dans l'API)
+
+Il est possible de "connecter" ces valeurs à un widget dans l'interface tactile sans programmation. Si un widget a un "id" commençant par "SS$", suivi du nom d'une clé de systemStatus, le widget sera automatiquement connecté à cette clé. Par exemple, un widget de type "toggle", nommé "SS$AudienceMics" affichera le statut actuel des microphones de l'auditoire, et changera la valeur si changé par l'utilisateur. Un widget de type "button group", nommé "SS$PresenterLocation", changera l'emplacement du présentateur tout en affichant l'emplacement actuel.
+

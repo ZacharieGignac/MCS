@@ -33,6 +33,11 @@ export class LightScene {
         this.activateUi();
       }
     });
+    var activateButton = zapi.ui.addWidgetMapping(this.config.id + ':ACTIVATE');
+    activateButton.on('clicked', () => {
+      this.activate();
+    });
+
   }
   activate() {
     debug(1, `DEVICE ${this.config.id}: activate`);

@@ -254,3 +254,25 @@ Ci-dessous une description de chaque type de device inclus par défaut.
       heartbeatInterval: 5000                             //Interval à laquelle le driver signalera sa présence au système de contrôle
     }
 ```
+### Screen (toile motorisée)
+```JS
+    {
+      id: 'screen',                                 //Identification unique
+      type: DEVICETYPE.SCREEN,                      //Type = 'SCREEN'
+      name: 'SCREEN',                               //Nom, utilisé par le drivwer pour la communication
+      device: devicesLibrary.Screen,                //Classe à utiliser
+      driver: driversLibrary.ScreenDriver_isc_h21,  //Driver à utiliser par le device
+      defaultPosition: 'up'                         //Position par défaut lors du démarrage du système
+    }
+```
+### Shade (toiles de fenêtres)
+```JS
+    {
+      id: 'shades',                                 //Identification unique
+      type: DEVICETYPE.SHADE,                       //Type = 'SHADE'
+      name: 'SHADES-EAST',                          //Nom, utilisé par le driver pour la communication
+      device: devicesLibrary.Shade,                 //Classe à utiliser
+      driver: driversLibrary.ShadeDriver_basic_isc, //Driver à utiliser par le device
+      defaultPosition: 'up'                         //Position par défaut lors du démarrage du système
+    }
+```

@@ -416,3 +416,13 @@ Cet appareil prends automatiquement en charge certaines actions.
       extraGain: 10                           //Gain quand le mode "Extra" connecte ce group d'entrée à un groupe de sortie
     }
 ```
+
+### AudioOutputGroup (Groupe de sortie audio, tel qu'affiché dans AudioConsole)
+```JS
+    {
+      id: 'aog.room',                         //Identification unique
+      name: 'Room',                           //Nom du groupe dans "AudioConsole"
+      type: DEVICETYPE.AUDIOOUTPUTGROUP,      //Type = 'AUDIOOUTPUTGROUP'
+      device: devicesLibrary.AudioOutputGroup //Classe à utiliser
+    }
+```

@@ -870,6 +870,7 @@ class Core {
 
 
     //Setup devices
+    debug(2, `Starting Devices Manager...`);
     this.devicesManager = new DevicesManager();
     this.devicesManager.init();
 
@@ -1234,14 +1235,16 @@ async function preInit() {
 
 async function init() {
   debug(2, `Init started...`);
+  debug(2, `Starting core...`);
   core = await new Core();
+  debug(2, `Loading modules...`);
   await core.loadModules();
   await core.init();
 
   debug(1, 'Waiting 5 secs...');
   await sleep(5000);
 
-  debug(2, `Init finished. Loading scenarios...`);
+  debug(2, `Loading scenarios...`);
   xapi.Command.UserInterface.Message.Prompt.Clear();
   core.loadScenarios();
   performance.setElapsedEnd('Boot');
@@ -1302,6 +1305,7 @@ async function init() {
     setTimeout(setupAudioAnalyzer, 5000);
     */
 
+    debug(2,'System started.');
 
 
 

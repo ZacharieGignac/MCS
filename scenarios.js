@@ -142,7 +142,7 @@ export class Scenarios {
       }
     }
     else {
-      debug(2, `Can't enable scenario "${id}" because this scenario is already the current enabled scenario.`);
+      debug(1, `Can't enable scenario "${id}" because this scenario is already the current enabled scenario.`);
     }
     debug(1, `Current scenario is: ${this.currentScenario}`);
     zapi.performance.setElapsedEnd('Scenarios.enableScenario');

@@ -357,7 +357,7 @@ Qui contrôle les devices de type "Light"
       id: 'lightscene.100%',                          //Identification unique
       name: 'STANDBY',                                //Nom
       type: DEVICETYPE.LIGHTSCENE,                    //Type = 'LIGHTSCENE'
-      device: devicesLibrary.LightScene,              //Driver à utiliser
+      device: devicesLibrary.LightScene,              //Classe à utiliser
       driver: driversLibrary.LightSceneDriver_lights, //Driver utilisé par la classe. Ce driver contrôle des drivers de type "Light"
       lights: [                                       //Array contenant les "Light" à contrôler et leur paramètres
         {
@@ -392,3 +392,17 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 * **lightscene.100%:ACTIVATE** : Bouton, active la scène d'éclairage
 Cet appareil prends automatiquement en charge certaines actions.
 * **LIGHTSCENE:lightscene.100%**
+
+### Caméra
+```JS
+{
+      id: 'camera.presenter',         //Identification unique
+      type: DEVICETYPE.CAMERA,        //Type = 'CAMERA'
+      name: 'Caméra (enseignant)',    //Nom
+      device: devicesLibrary.Camera,  //Classe à utiliser
+      peripheralRequired: true,       //Périphérique requis
+      peripheralId: 'FDO2515J291',    //Numéro de série de la caméra
+      connector: 1                    //Connecteur d'entrée sur le codec
+
+    }
+```

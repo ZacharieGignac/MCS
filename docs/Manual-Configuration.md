@@ -426,3 +426,16 @@ Cet appareil prends automatiquement en charge certaines actions.
       device: devicesLibrary.AudioOutputGroup //Classe à utiliser
     }
 ```
+### AudioReporter (Rapporteur de niveau sonore)
+```JS
+    {
+      id: 'system.audioreporter.main',                      //Identification unique
+      type: DEVICETYPE.AUDIOREPORTER,                       //Type = 'AUDIOREPORTER'
+      name: 'Internal VuMeter',                             //Nom
+      device: devicesLibrary.AudioReporter,                 //Classe à utiliser
+      driver: driversLibrary.AudioReporterDriver_internal,  //Driver utilisé par la classe (VuMeter interne)
+      inputs: [1, 2, 3, 7, 8],                              //Entrées audio à observer
+      sampleMs: 100,                                        //Temps (ms) entre chaque observation
+      start: true                                           //Démarrage de l'observation
+    }
+```

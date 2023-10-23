@@ -609,11 +609,11 @@ class Core {
     if (!this.audioExtraMode) {
       xapi.Command.UserInterface.Message.Prompt.Display({
         Duration: 0,
-        Title: 'Volume élevé',
-        Text: `Il est recommandé de désactiver tous les microphones lorsque le système est utilisé à un volume si élevé.<br>Voulez-vous désactiver les microphones ?`,
+        Title: str.audioExtraHighVolumeTitle,
+        Text: str.audioExtraHighVolumeText,
         FeedbackId: 'system_overvolume',
-        "Option.1": 'Oui, désactiver',
-        "Option.2": 'Non, ne pas désactiver'
+        "Option.1": str.audioExtraHighVolumeYes,
+        "Option.2": str.audioExtraHighVolumeNo
       });
     }
   }
@@ -621,11 +621,11 @@ class Core {
     if (this.audioExtraMode && this.audioExtraModeRestoreGains && !this.audioExtraSkipPrompt) {
       xapi.Command.UserInterface.Message.Prompt.Display({
         Duration: 0,
-        Title: 'Volume normal',
-        Text: `Le système est de nouveau utilisé à un volume normal.<br>Voulez-vous réactiver les microphones ?`,
+        Title: str.audioExtraNormalVolumeTitle,
+        Text: str.audioExtraNormalVolumeText,
         FeedbackId: 'system_undervolume',
-        "Option.1": 'Oui, réactiver',
-        "Option.2": 'Non, laisser désactivés'
+        "Option.1": str.audioExtraNormalVolumeYes,
+        "Option.2": str.audioExtraNormalVolumeNo
       });
     }
     else {

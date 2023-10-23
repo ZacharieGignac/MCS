@@ -189,7 +189,16 @@ export var config = {
     sendReportTitle: 'Rapport système', //Titre de la fonctionnalité d'envoi de rapport d'erreur
     sendReportText: 'Envoi du rapport en cours...', //Texte de la fonctionnalité d'envoi de rapport d'erreur lors de l'envoi
     sendReportSuccess: 'Envoi réussi!<br>Référence: ', //Texte de la fonctionnalité d'envoi de rapport d'erreur, succès
-    sendReportFailure: `Échec de l'envoi.` //Texte de la fonctionnalité d'envoi de rapport d'erreur, échec
+    sendReportFailure: `Échec de l'envoi.`, //Texte de la fonctionnalité d'envoi de rapport d'erreur, échec
+
+    audioExtraHighVolumeTitle: `Volume élevé`, //Titre du message d'avertissement de volume élevé
+    audioExtraHighVolumeText: `Il est recommandé de désactiver tous les microphones lorsque le système est utilisé à un volume si élevé.<br>Voulez-vous désactiver les microphones ?`, //texte du message d'avertissement de volume élevé
+    audioExtraHighVolumeYes: `Oui, désactiver`, //Option "oui" pour le message d'avertissement de volume élevé
+    audioExtraHighVolumeNo: `Non, ne pas désactiver`, //Option "non" pour le message d'avertissement de volume élevé
+    audioExtraNormalVolumeTitle: `Volume normal`, //Titre du message d'avertissement de volume normal
+    audioExtraNormalVolumeText: `Le système est de nouveau utilisé à un volume normal.<br>Voulez-vous réactiver les microphones ?`, //Texte du message d'avertissement de volume normal
+    audioExtraNormalVolumeYes: `Oui, réactiver`, //Option "oui" pour le message d'avertissement de volume normal
+    audioExtraNormalVolumeNo: `Non, laisser désactivés` //Option "non" pour le message d'avertissement de volume normal
   },
 
 
@@ -330,7 +339,7 @@ export var config = {
       driver: driversLibrary.AudioInputDriver_codecpro,
       connector: 7,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
-      bias:0,
+      bias: 0,
       gainLowLimit: 20,
       gainHighLimit: 70,
       defaultGain: 60,
@@ -349,7 +358,7 @@ export var config = {
       driver: driversLibrary.AudioInputDriver_codecpro,
       connector: 8,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
-      bias:0,
+      bias: 0,
       gainLowLimit: 0,
       gainHighLimit: 70,
       defaultGain: 20,

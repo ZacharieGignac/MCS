@@ -71,6 +71,25 @@ export const VERSION = '0.0.1';
 ```
 Définition du nom de produit et de la version. Il n'est pas recommandé de modifier ces variables.
 
+### Configuration, section "scenarios"
+```JS
+  scenarios: [
+    sce_standby,
+    sce_como_type1,
+    sce_firealarm,
+  ],
+```
+Cette section est un array de tout les imports des scénarios. Si l'import n'est pas dans ce array, le scénario ne sera pas disponible
+
+### Configuration, section "modules"
+```JS
+  modules: [
+    mod_autosauce,
+    mod_hidcameraman
+  ]
+```
+Cette section est un array de tout les imports des modules. Si l'import n'est pas dans ce array, le module ne sera pas disponible
+
 ### Configuration, section "system"
 ```JS
   system: {
@@ -113,3 +132,6 @@ Définition du nom de produit et de la version. Il n'est pas recommandé de modi
     }
   }
 ```
+
+### Configuration, section "strings"
+

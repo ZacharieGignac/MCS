@@ -395,7 +395,7 @@ Cet appareil prends automatiquement en charge certaines actions.
 
 ### Caméra
 ```JS
-{
+    {
       id: 'camera.presenter',         //Identification unique
       type: DEVICETYPE.CAMERA,        //Type = 'CAMERA'
       name: 'Caméra (enseignant)',    //Nom
@@ -403,6 +403,16 @@ Cet appareil prends automatiquement en charge certaines actions.
       peripheralRequired: true,       //Périphérique requis
       peripheralId: 'FDO2515J291',    //Numéro de série de la caméra
       connector: 1                    //Connecteur d'entrée sur le codec
+    }
+```
 
+### AudioInputGroup (Groupe d'entrée audio, tel qu'affiché dans AudioConsole)
+```JS
+    {
+      id: 'aig.presentationsources',          //Identification unique
+      name: 'PC',                             //Nom du groupe dans "AudioConsole"
+      type: DEVICETYPE.AUDIOINPUTGROUP,       //Type = 'AUDIOINPUTGROUP'
+      device: devicesLibrary.AudioInputGroup, //Classe à utiliser
+      extraGain: 10                           //Gain quand le mode "Extra" connecte ce group d'entrée à un groupe de sortie
     }
 ```

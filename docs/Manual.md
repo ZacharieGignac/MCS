@@ -350,3 +350,42 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 * **light.presenter:POWERON** : Bouton, allume l'éclairage
 * **light.presenter:POWEROFF** : Bouton, éteint l'éclairage
 
+### LightScene (Scène d'éclairage)
+Qui contrôle les devices de type "Light"
+```JS
+    {
+      id: 'lightscene.100%',                          //Identification unique
+      name: 'STANDBY',                                //Nom
+      type: DEVICETYPE.LIGHTSCENE,                    //Type = 'LIGHTSCENE'
+      device: devicesLibrary.LightScene,              //Driver à utiliser
+      driver: driversLibrary.LightSceneDriver_lights, //Driver utilisé par la classe. Ce driver contrôle des drivers de type "Light"
+      lights: [                                       //Array contenant les "Light" à contrôler et leur paramètres
+        {
+          id: 'light.presenter',                      //"id" du device de type "Light"
+          power: 'on',                                //Statut d'alimentation
+          dim: 100                                    //Statut de tamisage
+        },
+        {
+          id: 'light.board',
+          power: 'on',
+          dim: 100                                    
+        },
+        {
+          id: 'light.audience',
+          power: 'on',
+          dim: 100
+        }
+      ]
+    }
+```
+Qui appelle une scène d'éclairage externe. Par exemple, dans un panneau d'éclairage, crestron, etc...
+```JS
+    {
+      id:'lightscene.100%',                         //Identification unique
+      name:'LIGHTSCENE_100',                        //Nom de la scène d'éclairage à activer (dans le système d'éclairage)
+      type: DEVICETYPE.LIGHTSCENE,                  //Type = 'LIGHTSCENE'
+      device: devicesLibrary.LightScene,            //Driver à utiliser
+      driver: driversLibrary.LightSceneDriver_isc,  //Driver utilisé par la classe
+    }
+```
+

@@ -53,8 +53,32 @@ Retourne la source actuelle
 Retourne le nombre d'heure d'utilisation
 
 ## Screen
+### void setDefaults(void)
+Active la position par défaut spécifiée dans la configuration
+
+### void setPosition(position)
+Défini la position de la toile
+* **position** : string, position 'up', 'down'
+
+## void up(void)
+Défini la position de la toile à 'up'
+
+## void down(void)
+Défini la position de la toile à 'down'
 
 ## Shade
+### void setDefaults(void)
+Active la position par défaut spécifiée dans la configuration
+
+### void setPosition(position)
+Défini la position de la toile
+* **position** : string, position 'up', 'down'
+
+## void up(void)
+Défini la position de la toile à 'up'
+
+## void down(void)
+Défini la position de la toile à 'down'
 
 ## LightScene
 ### void activate(void)

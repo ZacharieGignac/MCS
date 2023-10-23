@@ -239,6 +239,11 @@ Ci-dessous une description de chaque type de device inclus par défaut.
       usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
     }
 ```
+Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
+* **PROJ:POWERON**: Bouton, allume l'affichage
+* **PROJ:POWEROFF**: Bouton, éteint l'affichage
+* **PROJ_POWER**: Toggle, affiche le statut de l'affichage et contrôle son alimentation
+
 ### ControlSystem (Processeur Crestron, Raspberry Pi)
 ```JS
     {
@@ -254,6 +259,7 @@ Ci-dessous une description de chaque type de device inclus par défaut.
       heartbeatInterval: 5000                             //Interval à laquelle le driver signalera sa présence au système de contrôle
     }
 ```
+
 ### Screen (toile motorisée)
 ```JS
     {
@@ -265,6 +271,7 @@ Ci-dessous une description de chaque type de device inclus par défaut.
       defaultPosition: 'up'                         //Position par défaut lors du démarrage du système
     }
 ```
+
 ### Shade (toiles de fenêtres)
 ```JS
     {
@@ -274,5 +281,28 @@ Ci-dessous une description de chaque type de device inclus par défaut.
       device: devicesLibrary.Shade,                 //Classe à utiliser
       driver: driversLibrary.ShadeDriver_basic_isc, //Driver à utiliser par le device
       defaultPosition: 'up'                         //Position par défaut lors du démarrage du système
+    }
+```
+
+### AudioInput (entrée audio du codec)
+```JS
+    {
+      id: 'audioinput.presenter.sf1',                   //Identification unique
+      type: DEVICETYPE.AUDIOINPUT,                      //Type = 'AUDIOINPUT'
+      name: 'Micro sans-fil',                           //Nom
+      device: devicesLibrary.AudioInput,                //Classe à utiliser
+      driver: driversLibrary.AudioInputDriver_codecpro, //Driver à utiliser par le device
+      connector: 7,                                     //Connecteur d'entrée du codec
+      input: 'microphone',                              //Type d'entrée, microphone, hdmi, ethernet. Ethernet requiert la propriété "channel". (non testé)
+      bias: 0,                                          //Biais de niveau audio, peut être positif ou négatif. Utilisé par l'analyze d'entrée audio
+      gainLowLimit: 20,                                 //Limite basse du gain de l'entrée
+      gainHighLimit: 70,                                //Limite supérieure du gain de l'entrée
+      defaultGain: 60,                                  //Gain par défaut au démarrage du système
+      gainStep: 1,                                      //Gain ajouté ou retiré de la valeur actuelle lorsque les fonctionas increase() et decrease() sont appelées
+      defaultMode: 'on',                                //Mode par défaut lors du démarrage du système
+      lowGain: 60,                                      //Gain "bas" (utilisé par les widgets de type "button group")
+      mediumGain: 65,                                   //Gain "moyen" (utilisé par les widgets de type "button group")
+      highGain: 70,                                     //Gain "haut" (utilisé par les widgets de type "button group")
+      boost: 70                                         //Gain "Boost, utilisé par le module "AutoSauce"
     }
 ```

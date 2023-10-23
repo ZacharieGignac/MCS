@@ -208,3 +208,34 @@ Ces valeurs seront automatiquement restaurées lorsque le système tombe en veil
 
 Il est possible de "connecter" ces valeurs à un widget dans l'interface tactile sans programmation. Si un widget a un "id" commençant par "SS$", suivi du nom d'une clé de systemStatus, le widget sera automatiquement connecté à cette clé. Par exemple, un widget de type "toggle", nommé "SS$AudienceMics" affichera le statut actuel des microphones de l'auditoire, et changera la valeur si changé par l'utilisateur. Un widget de type "button group", nommé "SS$PresenterLocation", changera l'emplacement du présentateur tout en affichant l'emplacement actuel.
 
+## Section devices
+La section "devices" contient tous les appareils (virtuels ou physiques) que le système contrôle. Le système est livré avec une bibliothèque de devices standards, disponibles dans le fichier "devicesLibrary.js". Il est possible d'ajouter d'autres devices à partir d'autres fichiers.
+
+Quelques propriétés sont utilisés par tout les devices:
+* **id**: Identifiant unique pour le device. Il est recommandé d'utiliser un string sans espaces
+* **type**: Type d'appareil. Une liste standard est définie par "DEVICEYTYPE". Il est possible d'utiliser n'importe quel string comme type
+* **name**: Nom de l'appareil. Ce nom est souvent utilisé par les device drivers pour la communication avec d'autres systèmes
+* **device**: Classe qui gère cet appareil. Plusieurs classes sont fournies dans le fichier devicesLibrary.js
+* **driver**: Driver pour la classe de device. La classe gère ce driver à l'interne
+
+Ci-dessous une description de chaque type de device inclus par défaut.
+### Display
+```JS
+    {
+      id: 'display.projector',                      //identification unique
+      type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
+      name: 'PROJ',                                 //Nom, utilisé par le driver pour la communication
+      device: devicesLibrary.Display,               //Classe à utiliser
+      driver: driversLibrary.DisplayDriver_isc_h21, //Driver à utiliser par le device
+      connector: 1,                                 //Connecteur HDMI de sortie sur le codec
+      supportsPower: true,                          //Défini si l'affichage supporte les commandes d'alimentation (ON, OFF)
+      supportsBlanking: false,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
+      supportsSource: false,                        //Défini si l'affichage supporte le changement de source (HDMI1, HDMI2, SDI)
+      supportsUsageHours: false,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
+      defaultPower: 'off',                          //Alimentation par défaut lors du démarrage du système (ON, OFF)
+      defaultBlanking: false,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
+      blankBeforePowerOff: true,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
+      powerOffDelay: 6000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
+      usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
+    }
+```

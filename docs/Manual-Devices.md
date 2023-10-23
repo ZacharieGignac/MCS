@@ -24,25 +24,27 @@ Active les paramètres par défaut définis dans la configuration comme l'alimen
 Allume ou éteint l'affichage
 * **power** : string, 'on', 'off'
 * **delay** : number, délais (ms) avant la fermeture de l'affichage. Si non spécifié, le délais par défaut de la configuration sera utilisé
-* 
+  
 ### void on(void) / void powerOn(void)
 Allume l'affichage
 
 ### void off(delay) / void powerOff(delay)
-* **delay** : number, délais (ms) avant la fermeture de l'affichage. Si non spécifié, le délais par défaut de la configuration sera utilisé
 Éteint l'affichage
+* **delay** : number, délais (ms) avant la fermeture de l'affichage. Si non spécifié, le délais par défaut de la configuration sera utilisé
 
 ### string getPower(void)
 Retourne l'état d'alimentation actuel, 'on' ou 'off'
 
 ### void setBlanking(blanking)
-* **blanking** : boolean, active ou non le blanking.
+Activation / désactivation du blanking
+* **blanking** : boolean, true = activé, false = désactivé
 
 ### boolean getBlanking(void)
 Retourne l'état de blanking actuel
 
 ### void setSource(source)
-* **source** : string, défini la source à afficher
+Défini la source à afficher
+* **source** : string, source à afficher
 
 ### string getSource(void)
 Retourne la source actuelle

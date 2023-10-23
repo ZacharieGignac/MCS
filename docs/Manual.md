@@ -240,9 +240,9 @@ Ci-dessous une description de chaque type de device inclus par défaut.
     }
 ```
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
-* **display.projector:POWERON**: Bouton, allume l'affichage
-* **display.projector:POWEROFF**: Bouton, éteint l'affichage
-* **display.projector:POWER**: Toggle, affiche le statut de l'affichage et contrôle son alimentation
+* **display.projector:POWERON** : Bouton, allume l'affichage
+* **display.projector:POWEROFF** : Bouton, éteint l'affichage
+* **display.projector:POWER** : Toggle, affiche le statut de l'affichage et contrôle son alimentation
 
 ### ControlSystem (Processeur Crestron, Raspberry Pi)
 ```JS
@@ -272,8 +272,8 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
     }
 ```
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
-* **screen:UP**: Bouton, monte la toile
-* **screen:DOWN**: Bouton, descends la toile
+* **screen:UP** : Bouton, monte la toile
+* **screen:DOWN** : Bouton, descends la toile
 
 ### Shade (toiles de fenêtres)
 ```JS
@@ -287,8 +287,8 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
     }
 ```
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
-* **shades:UP**: Bouton, monte la toile
-* **shades:DOWN**: Bouton, descends la toile
+* **shades:UP** : Bouton, monte la toile
+* **shades:DOWN** : Bouton, descends la toile
 
 ### AudioInput (entrée audio du codec)
 ```JS
@@ -313,6 +313,6 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
     }
 ```
 Cet appareil prends automatiquement en chatge certain widgets. Les widgets doivent avoir une identification particulière.
-* **audioinput.presenter.sf1:MODE**: Toggle, affiche et configure le mode de l'entrée à "ON" ou "OFF"
-* **audioinput.presenter.sf1:LEVEL**: Slider, affiche et configure le gain de l'entrée. Automatiquement scalé entre 0 et 255 -> gainLowLimite et gainHighLimit
-* **audioinput.presenter.sf1:LEVELGROUP**: Button group, affiche et configure le gain de l'entrée, en utilisant lowGain, mediumGain, highGain
+* **audioinput.presenter.sf1:MODE** : Toggle, affiche et configure le mode de l'entrée à "ON" ou "OFF"
+* **audioinput.presenter.sf1:LEVEL** : Slider, affiche et configure le gain de l'entrée. Automatiquement scalé entre 0 et 255 -> gainLowLimite et gainHighLimit
+* **audioinput.presenter.sf1:LEVELGROUP** : Button group, affiche et configure le gain de l'entrée, en utilisant lowGain, mediumGain, highGain

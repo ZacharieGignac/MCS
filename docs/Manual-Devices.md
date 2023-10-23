@@ -87,6 +87,23 @@ Active la scène d'éclairage.
 Active la scène d'éclairage et configure le status "AutoLights" à "OFF". Cette function doit être utilisée lorsque l'action provient d'un widget activé par l'utilisateur.
 
 ## Light
+### void setDefaults(void)
+Active les paramètres par défaut définis dans la configration comme l'état d'alimentation et le niveau de tamisage
+
+### void on(void)
+Allume le dispositif d'éclairage
+
+### void off(void)
+Éteint le dispositif d'éclairage
+
+### void setPower(power) / void power(power)
+Défini l'état d'alimentation du dispotifif d'éclairage
+* **power** : string, alimentation 'on', 'off'
+
+### void dim(level, force=false)
+Défini le niveau de tamisage du dispositif d'éclairage
+* **level** : number, pourcentage de tamisage (0-100)
+* **force** : boolean, détermine si le tamisage est mis à jour même si la valeur actuelle est égale à la nouvelle valeur
 
 ## AudioInput
 

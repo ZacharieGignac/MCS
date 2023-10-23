@@ -393,10 +393,15 @@ class UiManager {
         targetWidgetId = w.widgetId.split('|')[1];
       }
       if (targetWidgetId == widgetId) {
-        xapi.Command.UserInterface.Extensions.Widget.SetValue({
-          WidgetId: w.widgetId,
-          Value: value
-        });
+        try {
+          xapi.Command.UserInterface.Extensions.Widget.SetValue({
+            WidgetId: w.widgetId,
+            Value: value
+          });
+        }
+        catch(e) {
+          debug(3,e);
+        }
       }
     }
   }
@@ -1305,7 +1310,7 @@ async function init() {
     setTimeout(setupAudioAnalyzer, 5000);
     */
 
-    debug(2,'System started.');
+  debug(2, 'System started.');
 
 
 

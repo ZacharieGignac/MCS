@@ -219,7 +219,7 @@ Quelques propriétés sont utilisés par tout les devices:
 * **driver**: Driver pour la classe de device. La classe gère ce driver à l'interne
 
 Ci-dessous une description de chaque type de device inclus par défaut.
-### Display
+### Display (projecteur, téléviseur)
 ```JS
     {
       id: 'display.projector',                      //identification unique

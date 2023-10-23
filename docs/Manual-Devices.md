@@ -10,11 +10,45 @@ Voici les "functions" exposées pour chacun des type de devices:
 Aucunes.
 
 ## ControlSystem
+Aucunes.
 
 ## CameraPreset
-
+### void activate(void)
+Active le preset de caméra
 
 ## Display
+### void setDefaults(void)
+Active les paramètres par défaut définis dans la configuration comme l'alimentation, la source et le blanking
+
+### void setPower(power, delay)
+Allume ou éteint l'affichage
+* **power** : string, 'on', 'off'
+* **delay** : number, délais (ms) avant la fermeture de l'affichage. Si non spécifié, le délais par défaut de la configuration sera utilisé
+* 
+### void on(void) / void powerOn(void)
+Allume l'affichage
+
+### void off(delay) / void powerOff(delay)
+* **delay** : number, délais (ms) avant la fermeture de l'affichage. Si non spécifié, le délais par défaut de la configuration sera utilisé
+Éteint l'affichage
+
+### string getPower(void)
+Retourne l'état d'alimentation actuel, 'on' ou 'off'
+
+### void setBlanking(blanking)
+* **blanking** : boolean, active ou non le blanking.
+
+### boolean getBlanking(void)
+Retourne l'état de blanking actuel
+
+### void setSource(source)
+* **source** : string, défini la source à afficher
+
+### string getSource(void)
+Retourne la source actuelle
+
+### number getUsageHours(void)
+Retourne le nombre d'heure d'utilisation
 
 ## Screen
 

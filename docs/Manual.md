@@ -312,7 +312,40 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
       boost: 70                                         //Gain "Boost, utilisé par le module "AutoSauce"
     }
 ```
-Cet appareil prends automatiquement en chatge certain widgets. Les widgets doivent avoir une identification particulière.
+Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
 * **audioinput.presenter.sf1:MODE** : Toggle, affiche et configure le mode de l'entrée à "ON" ou "OFF"
 * **audioinput.presenter.sf1:LEVEL** : Slider, affiche et configure le gain de l'entrée. Automatiquement scalé entre 0 et 255 -> gainLowLimite et gainHighLimit
 * **audioinput.presenter.sf1:LEVELGROUP** : Button group, affiche et configure le gain de l'entrée, en utilisant mute, lowGain, mediumGain, highGain. L'identification des 4 boutons doivent êtres "off, low, medium, high"
+
+### CameraPreset (preset de caméra)
+```JS
+    {
+      id: 'campreset.presenter',            //identification unique
+      name: 'Présentateur',                 //Nom
+      type: DEVICETYPE.CAMERAPRESET,        //Type = 'CAMERAPRESET'
+      device: devicesLibrary.CameraPreset,  //Classe à utiliser
+      presetName: 'Présentateur'            //Nom du preset dans le codec
+    }
+```
+
+### Light (Zone d'éclairage, luminaire)
+```JS
+    {
+      id: 'light.presenter',                      //Identification unique
+      name: 'ZONE1',                              //Nom, utilisé par le driver pour la communication
+      type: DEVICETYPE.LIGHT,                     //Type = 'LIGHT'
+      device: devicesLibrary.Light,               //Classe à utiliser
+      driver: driversLibrary.LightDriver_isc_h21, //Driver utilisé par la classe
+      sliderEvent: 'changed',                     //<changed, released> Événement à utiliser pour le changement du widget "slider". l'événement "changed" s'execute quand on glisse le widget (peut être demandant pour certain systèmes), "released" s'execute lorsqu'on lève le doigt
+      supportsPower: false,                       //Défini si l'éclairage supporte les commandes d'alimentation. Si false, une lumière éteinte est dim à 0
+      supportsDim: true,                          //Défini si l'éclairage supporte les commandes de tamisage
+      defaultPower: 'on',                         //Défini l'état d'alimentation par défaut au démarrage du système
+      defaultDim: 100                             //Défini le tamisage par défaut au démarrage du système
+    }
+```
+Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une iedntification particulière.
+* **light.presenter:LEVEL** : Slider, affiche et configure le niveau de tamisage de l'éclairage
+* **light.presenter:POWER** : Toggle, affiche et configure l'alimentation de l'éclairage
+* **light.presenter:POWERON** : Bouton, allume l'éclairage
+* **light.presenter:POWEROFF** : Bouton, éteint l'éclairage
+

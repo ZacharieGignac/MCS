@@ -108,6 +108,7 @@ Cette section est un array de tout les imports des modules. Si l'import n'est pa
     settingsMenu: 'Locked',                       // <Locked, Unlocked> Détermine si le panneau de paramètre est vérouillé
     disableAutoLightsWhenWidgetInteraction: true, // <true, false> Détermine si le contrôle automatique de l'éclairage est automatiquement désactivé lorsqu'un widget de Light ou LightScene est touché par l'utilisateur
     systemReportApiKey: 'key',                    // Clé d'api de "paste.ee" utilisé pour l'envoi de rapport système
+    showStatusAndPerformanceReports:false,        //Affiche le rapport de status après le boot et à interval (pour le developement)
     onStandby: {
       setDND: false,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
       clearCallHistory: false,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby

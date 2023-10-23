@@ -344,7 +344,7 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
       defaultDim: 100                             //Défini le tamisage par défaut au démarrage du système
     }
 ```
-Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une iedntification particulière.
+Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
 * **light.presenter:LEVEL** : Slider, affiche et configure le niveau de tamisage de l'éclairage
 * **light.presenter:POWER** : Toggle, affiche et configure l'alimentation de l'éclairage
 * **light.presenter:POWERON** : Bouton, allume l'éclairage
@@ -388,4 +388,7 @@ Qui appelle une scène d'éclairage externe. Par exemple, dans un panneau d'écl
       driver: driversLibrary.LightSceneDriver_isc,  //Driver utilisé par la classe
     }
 ```
-
+Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
+* **lightscene.100%:ACTIVATE** : Bouton, active la scène d'éclairage
+Cet appareil prends automatiquement en charge certaines actions.
+* **LIGHTSCENE:lightscene.100%**

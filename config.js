@@ -125,28 +125,28 @@ export var config = {
 
   version: VERSION,
   system: {
-    coldBootWait: 120,
-    debugLevel: DEBUGLEVEL.MEDIUM,
-    debugInternalMessages: false,
-    messagesPacing: 500,
-    initDelay: 1000,
-    newSessionDelay: 1000,
-    forceStandby: true,
-    forceStandbyTime: '04:00',
-    requiredPeripheralsCheckInterval: 30000,
-    usePresenterTrack: true,
-    forcePresenterTrackActivation: false,
-    presenterTrackConnector: 3,
-    settingsMenu: 'Locked',
-    disableAutoLightsWhenWidgetInteraction: true,
-    systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',
+    coldBootWait: 120,                            // Temps (secondes) qui détermine un "cold boot"
+    debugLevel: DEBUGLEVEL.HIGH,                // Niveau de débug (LOW, MEDIUM, HIGH)
+    debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
+    messagesPacing: 500,                          // Temps (ms) entre les messages de type "xpi.Command.Message"
+    initDelay: 1000,                              // Temps (ms) avant l'initialisation du système
+    newSessionDelay: 5000,                        // Temps (ms) pour l'ouverture d'une nouvelle session. Une progressbar s'affiche.
+    forceStandby: true,                           // <true, false> Forcer un standby à une heure précise, peu importe si un appel ou une présentation sont actifs
+    forceStandbyTime: '04:00',                    // Heure à laquelle le standby sera forcé
+    requiredPeripheralsCheckInterval: 30000,      // Temps (ms) entre les vérifications des périphériques identifiés comme "requiredPeripheral"
+    usePresenterTrack: true,                      // <true, false> Défini si PresenterTrack est utilisé. Une autre valeur identique se trouve dans systemStatus
+    forcePresenterTrackActivation: false,         // <true, false> Est-ce que l'activation du PresenterTrack est forcée par le système, peu importe si le scénario actif le supporte ou pas
+    presenterTrackConnector: 3,                   // Numéro du connecteur d'entrée sur lequel est connecté la caméra utilisée par le PresenterTrack
+    settingsMenu: 'Locked',                       // <Locked, Unlocked> Détermine si le panneau de paramètre est vérouillé
+    disableAutoLightsWhenWidgetInteraction: true, // <true, false> Détermine si le contrôle automatique de l'éclairage est automatiquement désactivé lorsqu'un widget de Light ou LightScene est touché par l'utilisateur
+    systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',                    // Clé d'api de "paste.ee" utilisé pour l'envoi de rapport système
     onStandby: {
-      setDND: false,
-      clearCallHistory: false,
-      enableScenario: 'standby'
+      setDND: false,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
+      clearCallHistory: false,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby
+      enableScenario: 'standby'                   // Scénario à activer lors du standby. Le système est livré avec un scénario conseillé nommé "standby", fichier "sce_standby"
     },
     onWakeup: {
-      enableScenario: 'comotype1'
+      enableScenario: 'comotype1'                 // Scénario à activer lors de la sortie du standby (wakeup).
     }
   },
   audio: {
@@ -330,6 +330,7 @@ export var config = {
       driver: driversLibrary.AudioInputDriver_codecpro,
       connector: 7,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
+      bias:0,
       gainLowLimit: 20,
       gainHighLimit: 70,
       defaultGain: 60,
@@ -348,6 +349,7 @@ export var config = {
       driver: driversLibrary.AudioInputDriver_codecpro,
       connector: 8,
       input: 'microphone', //microphone, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioInput_codecpro
+      bias:0,
       gainLowLimit: 0,
       gainHighLimit: 70,
       defaultGain: 20,

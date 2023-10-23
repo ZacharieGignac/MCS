@@ -338,9 +338,19 @@ export class AudioReporterDriver_internal {
 
   }
   update(id, level) {
+    level = parseInt(level);
     var lastReportTime = this.currentReportTime;
     this.currentReportTime = new Date();
     var elapsed = (this.currentReportTime.getTime() - lastReportTime.getTime());
+
+    let audioInputDevice = zapi.devices.getDevicesByType(zapi.devices.DEVICETYPE.AUDIOINPUT).filter(ai => ai.config.connector == id);
+    if (audioInputDevice.length == 1) {
+      if (audioInputDevice[0].config.bias != undefined) {
+        let bias = parseInt(audioInputDevice[0].config.bias);
+        level += bias;
+      }
+    }
+    
 
     this.inputs[id] = { id: id, level: level };  // Update this.inputs[id] before the loop
 

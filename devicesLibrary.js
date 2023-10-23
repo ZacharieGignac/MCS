@@ -891,13 +891,6 @@ export class Shade {
   }
 }
 
-export class HID {
-  constructor(config) {
-
-  }
-}
-
-
 
 
 

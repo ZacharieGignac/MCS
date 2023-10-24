@@ -77,7 +77,13 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `resetSystemStatus`: Réinitialise l'état du système.
 - `endSession`: Termine la session en cours.
 - `setStatus`: Définit l'état du système.
-- ...
+- `getStatus`:
+- `getAllStatus`:
+- `onStatusChange`
+- `onStatusKeyChange`
+- `sendMessage`
+- `systemReport`
+- `sendSystemReport`
 
 ### Propriétés
 
@@ -90,7 +96,8 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `setElapsedStart`: Définit le début du temps écoulé.
 - `setElapsedEnd`: Définit la fin du temps écoulé.
 - `inc`: Incrémente une valeur.
-- ...
+- `dec`:
+- `reset`
 
 ## Audio (Audio)
 
@@ -99,7 +106,8 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `getLocalInputId`: Récupère l'ID d'entrée audio local.
 - `getLocalOutputId`: Récupère l'ID de sortie audio local.
 - `getRemoteInputsIds`: Récupère les IDs d'entrées audio à distance.
-- ...
+- `getRemoteOutputIds`:
+- `addAudioReportAnalyzer`:
 
 ## Interface Utilisateur (UI)
 

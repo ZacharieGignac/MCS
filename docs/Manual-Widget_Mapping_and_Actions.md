@@ -2,10 +2,16 @@
 Il est préférable et fortement recommandé d'utiliser les mécanismes du système pour définir la valeur d'un widget ou pour écouter les événements d'un widget. Ces fonctions sont décrites dans la documentation de l'API.
 
 # Nomenclature
-Le système a quelques nomenclatures spéciales pour les widgets, et un mécanisme pour contourner une limitation dans la version actuelle quand plusieurs widgets ont le même "id", les préfixes. Une autre nomenclature indique au système de relier le widget à un statut système (systemStatus). Le système possède aussi une nomenclature spéciale pour les actions, un mécanisme qui permet de connecter des widgets à des fonctions du système, ou d'un scénario.
+Le système a quelques nomenclatures spéciales pour les widgets, et un mécanisme pour contourner une limitation dans la version actuelle quand plusieurs widgets ont le même "id", les préfixes. 
+
+Une autre nomenclature indique au système de relier le widget à un statut système (systemStatus). 
+
+Le système possède aussi une nomenclature spéciale pour les actions, un mécanisme qui permet de connecter des widgets à des fonctions du système, ou d'un scénario.
 
 ## Les préfixes
-Les widgets peuvent comporter un préfixe sans altérer leur nom fondamental. Un caractère de démarcation est utilisé entre le préfixe et le nom réel du widget: "|". En date d'aujourd'hui (24 octobre 2023), il est préférable de ne pas avoir plusieurs widgets avec le même id.
+Les widgets peuvent comporter un préfixe sans altérer leur nom fondamental. Un caractère de démarcation est utilisé entre le préfixe et le nom réel du widget: "|". 
+
+En date d'aujourd'hui (24 octobre 2023), il est préférable de ne pas avoir plusieurs widgets avec le même id.
 
 Par exemple, les widgets suivants sont équivalents pour le système, lorsqu'on utilise ses fonctionnalités pour définir la valeur d'un widget, ou lorsqu'on utilise un mapping:
 * monWidget

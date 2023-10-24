@@ -53,3 +53,17 @@ Certain devices incluent des mapping de widgets automatique. Il est important de
 * **Définir le niveau (gain) et l'afficher (slider): id:LEVEL
 * **Définir le niveau (gain) et l'afficher (button group): id:LEVELGROUP
 
+# Status système (systemStatus)
+Il est possible de connecter facilement une valeur de la structure globale "systemStatus" à un widget.
+
+Tous les widgets possédant le préfixe "SS$" seront automatiquement connectés de façon bidirectionnel avec les valeurs de systemStatus.
+
+Évidemment, les valeurs de systemStatus doivent être compatibles avec le widget. On ne peut placer assigner la valeur "boeuf" à un widget de type "toggle". 
+
+Les valeurs bool de systemStatus sont automatiquement converties en valeurs 'on' et 'off'. Pour convertir automatiquement les valeurs 'on' et 'off' du widget en bool vers systemStatus, il est nécessaire de d'ajuster le préfixe à "SS?".
+
+Exemples:
+* **SS$PresenterLocation** (button group avec 2 boutons: 'local', 'remote'): Affiche et défini l'emplacement du présentateur
+* **SS$AudienceMics** (toggle): Affiche et défini l'emplacement du présentateur
+* **SS$Version** (texte): Affiche la version actuelle du système
+* **SS?PresenterDetected** (toggle): Affiche si le présentateur est détecté, même si la valeur de systemStatus est de type "bool". Cette valeur est automatiquement convertie

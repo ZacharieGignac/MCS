@@ -18,13 +18,13 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 
 
 ## ZAPI Version 1
-- [Dispositifs (Devices)](#dispositifs-devices)
-- [Scénarios (Scenarios)](#scénarios-scenarios)
-- [Modules (Modules)](#modules-modules)
-- [Système (System)](#système-system)
-- [Performance (Performance)](#performance-performance)
-- [Audio (Audio)](#audio-audio)
-- [Interface Utilisateur (UI)](#interface-utilisateur-ui)
+- [Dispositifs (devices)](#dispositifs-devices)
+- [Scénarios (scenarios)](#scénarios-scenarios)
+- [Modules (modules)](#modules-modules)
+- [Système (system)](#système-system)
+- [Performance (performance)](#performance-performance)
+- [Audio (audio)](#audio-audio)
+- [Interface Utilisateur (ui)](#interface-utilisateur-ui)
 
 ### Constantes de type de dispositif
 

@@ -41,18 +41,18 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `CONTROLSYSTEM`: Système de contrôle
 - `DISPLAY`: Affichage
 - `CAMERAPRESET`: Préréglage de caméra
-- `VIDEOOUTPUT`
-- `AUDIOINPUT`
-- `AUDIOOUTPUT`
-- `AUDIOINPUTGROUP`
-- `AUDIOOUTPUTGROUP`
-- `AUDIOREPORTER`
-- `SCREEN`
-- `LIGHT`
-- `LIGHTSCENE`
-- `SHADE`
-- `CAMERA`
-- `SOFTWAREDEVICE`
+- `VIDEOOUTPUT`: Sortie vidéo
+- `AUDIOINPUT`: Entrée audio
+- `AUDIOOUTPUT`: Sortie audio
+- `AUDIOINPUTGROUP`: Groupe d'entrée audio
+- `AUDIOOUTPUTGROUP`: Groupe de sortie audio
+- `AUDIOREPORTER`: Rapporteur de niveau audio
+- `SCREEN`: Toile motorisée
+- `LIGHT`: Éclairage (zone, luminaire)
+- `LIGHTSCENE`: Scène d'éclairage
+- `SHADE`: Toile de fenêtre
+- `CAMERA`: Caméra
+- `SOFTWAREDEVICE`: Appareil "logiciel" ou "virtuel"
 
 ## Scénarios (Scenarios)
 

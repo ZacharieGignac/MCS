@@ -14,7 +14,9 @@ var _callbacks = [];
 var eventSinks = [];
 var callEventSinks = [];
 
-
+function toOnOff(value) {
+  return value ? 'on' : 'off';
+}
 
 function compareObjects(obj1, obj2) {
   const obj1Keys = Object.keys(obj1);
@@ -224,7 +226,14 @@ export class SystemStatus {
       else {
         debug(1, `SystemStatus: CHANGED (skip notify) Key="${key}", Value="${value}"`);
       }
-      zapi.ui.setWidgetValue('SS$' + key, value);
+      if (typeof value == 'boolean') {
+        zapi.ui.setWidgetValue('SS?' + key, toOnOff(value));
+      }
+      else {
+        zapi.ui.setWidgetValue('SS$' + key, value);
+      }
+
+
     }
     else {
       debug(1, `SystemStatus: CHANGED (filtered, identical values) Key="${key}" Value="${value}"`);

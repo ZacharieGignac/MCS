@@ -534,6 +534,10 @@ export class Light {
     }
   }
 
+  setPower(power) {
+    this.power(power);
+  }
+
   dim(level, force = false) {
     if (this.config.supportsDim) {
       if (this.currentDimLevel != level || force) {
@@ -656,8 +660,8 @@ export class AudioInput {
     }
   }
 
-  setLevel(level) {
-    this.setGain(level);
+  setLevel(level, ignoreLimits = false) {
+    this.setGain(level, ignoreLimits);
   }
 
   getGain() {

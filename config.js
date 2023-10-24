@@ -126,7 +126,7 @@ export var config = {
   version: VERSION,
   system: {
     coldBootWait: 120,                            // Temps (secondes) qui détermine un "cold boot"
-    debugLevel: DEBUGLEVEL.MEDIUM,                // Niveau de débug (LOW, MEDIUM, HIGH)
+    debugLevel: DEBUGLEVEL.HIGH,                // Niveau de débug (LOW, MEDIUM, HIGH)
     debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
     messagesPacing: 500,                          // Temps (ms) entre les messages de type "xpi.Command.Message"
     initDelay: 1000,                              // Temps (ms) avant l'initialisation du système
@@ -205,14 +205,14 @@ export var config = {
 
   devices: [
     {
-      id: 'system.audioreporter.main',
-      type: DEVICETYPE.AUDIOREPORTER,
-      name: 'Internal VuMeter',
-      device: devicesLibrary.AudioReporter,
-      driver: driversLibrary.AudioReporterDriver_internal,
-      inputs: [1, 2, 3, 7, 8],
-      sampleMs: 100,
-      start: true
+      id: 'system.audioreporter.main',                      //Identification unique
+      type: DEVICETYPE.AUDIOREPORTER,                       //Type = 'AUDIOREPORTER'
+      name: 'Internal VuMeter',                             //Nom
+      device: devicesLibrary.AudioReporter,                 //Classe à utiliser
+      driver: driversLibrary.AudioReporterDriver_internal,  //Driver utilisé par la classe (VuMeter interne)
+      inputs: [1, 2, 3, 7, 8],                              //Entrées audio à observer
+      sampleMs: 100,                                        //Temps (ms) entre chaque observation
+      start: true                                           //Démarrage de l'observation
     },
 
     /* CONTROL SYSTEM */
@@ -493,21 +493,21 @@ export var config = {
 
     /* LIGHTSCENES */
     {
-      id: 'lightscene.100%',
-      name: 'STANDBY',
-      type: DEVICETYPE.LIGHTSCENE,
-      device: devicesLibrary.LightScene,
-      driver: driversLibrary.LightSceneDriver_lights,
-      lights: [
+      id: 'lightscene.100%',                          //Identification unique
+      name: 'STANDBY',                                //Nom
+      type: DEVICETYPE.LIGHTSCENE,                    //Type = 'LIGHTSCENE'
+      device: devicesLibrary.LightScene,              //Classe à utiliser
+      driver: driversLibrary.LightSceneDriver_lights, //Driver utilisé par la classe. Ce driver contrôle des drivers de type "Light"
+      lights: [                                       //Array contenant les "Light" à contrôler et leur paramètres
         {
-          id: 'light.presenter',
-          power: 'on',
-          dim: 100
+          id: 'light.presenter',                      //"id" du device de type "Light"
+          power: 'on',                                //Statut d'alimentation
+          dim: 100                                    //Statut de tamisage
         },
         {
           id: 'light.board',
           power: 'on',
-          dim: 100
+          dim: 100                                    
         },
         {
           id: 'light.audience',
@@ -515,6 +515,13 @@ export var config = {
           dim: 100
         }
       ]
+    },
+    {
+      id:'lightscene.100%-2',                         //Identification unique
+      name:'LIGHTSCENE_100',                        //Nom de la scène d'éclairage à activer (dans le système d'éclairage)
+      type: DEVICETYPE.LIGHTSCENE,                  //Type = 'LIGHTSCENE'
+      device: devicesLibrary.LightScene,            //Driver à utiliser
+      driver: driversLibrary.LightSceneDriver_isc,  //Driver utilisé par la classe
     },
     {
       id: 'lightscene.50%',
@@ -590,13 +597,13 @@ export var config = {
 
     /* CAMERAS */
     {
-      id: 'camera.presenter',
-      type: DEVICETYPE.CAMERA,
-      name: 'Caméra (enseignant)',
-      device: devicesLibrary.Camera,
-      peripheralRequired: true,
-      peripheralId: 'FDO2515J291',
-      connector: 1
+      id: 'camera.presenter',         //Identification unique
+      type: DEVICETYPE.CAMERA,        //Type = 'CAMERA'
+      name: 'Caméra (enseignant)',    //Nom
+      device: devicesLibrary.Camera,  //Classe à utiliser
+      peripheralRequired: true,       //Périphérique requis
+      peripheralId: 'FDO2515J291',    //Numéro de série de la caméra
+      connector: 1                    //Connecteur d'entrée sur le codec
 
     },
     {
@@ -612,11 +619,11 @@ export var config = {
 
     /* AUDIO INPUT GROUPS */
     {
-      id: 'aig.presentationsources',
-      name: 'PC',
-      type: DEVICETYPE.AUDIOINPUTGROUP,
-      device: devicesLibrary.AudioInputGroup,
-      extraGain: 10 //Needed for "Extra"
+      id: 'aig.presentationsources',          //Identification unique
+      name: 'PC',                             //Nom du groupe dans "AudioConsole"
+      type: DEVICETYPE.AUDIOINPUTGROUP,       //Type = 'AUDIOINPUTGROUP'
+      device: devicesLibrary.AudioInputGroup, //Classe à utiliser
+      extraGain: 10                           //Gain quand le mode "Extra" connecte ce group d'entrée à un groupe de sortie
     },
     {
       id: 'aig.microphones.all',
@@ -635,10 +642,10 @@ export var config = {
 
     /* AUDIO OUTPUT GROUPS */
     {
-      id: 'aog.room',
-      name: 'Room',
-      type: DEVICETYPE.AUDIOOUTPUTGROUP,
-      device: devicesLibrary.AudioOutputGroup
+      id: 'aog.room',                         //Identification unique
+      name: 'Room',                           //Nom du groupe dans "AudioConsole"
+      type: DEVICETYPE.AUDIOOUTPUTGROUP,      //Type = 'AUDIOOUTPUTGROUP'
+      device: devicesLibrary.AudioOutputGroup //Classe à utiliser
     },
     {
       id: 'aog.monitor',
@@ -738,6 +745,7 @@ export var config = {
     PresenterMics: 'on', //System, <on, off> Utilisation des microphones du présentateur (doit êter pris en charge dans le scénario)
     PresenterDetected: false, //System, <true, false>, indique si le présentateur est détecté par le système (utilise le statut de PresenterTrack)
     ClearPresentationZone: 'off', //System, <on, off>, indique si la zone de présentateur doit être dégagée (doit être pris en charge dans le scénario)
+    test:true
 
     //Scenario-specific status
 

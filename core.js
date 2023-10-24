@@ -34,6 +34,13 @@ function schedule(time, action) {
   return setTimeout(action, difference * 1000);
 }
 
+function toOnOff(value) {
+  return value ? 'on' : 'off';
+}
+function toBool(value) {
+  return value.toLowerCase() == 'on' ? true : false;
+}
+
 
 class Performance {
   constructor() {
@@ -399,8 +406,8 @@ class UiManager {
             Value: value
           });
         }
-        catch(e) {
-          debug(3,e);
+        catch (e) {
+          debug(3, e);
         }
       }
     }
@@ -438,6 +445,9 @@ class UiManager {
       }
       if (eventId.startsWith('SS$')) {
         zapi.system.setStatus(eventId, event.Extensions.Widget.Action.Value);
+      }
+      else if (eventId.startsWith('SS?')) {
+        zapi.system.setStatus(eventId, toBool(event.Extensions.Widget.Action.Value));
       }
     }
   }

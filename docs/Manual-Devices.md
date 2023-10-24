@@ -40,21 +40,21 @@ Activation / désactivation du blanking
 * **blanking** : boolean, true = activé, false = désactivé
 
 ### boolean getBlanking(void)
-Retourne l'état de blanking actuel
+Retourne l'état de blanking actuel.
 
 ### void setSource(source)
 Défini la source à afficher
 * **source** : string, source à afficher
 
 ### string getSource(void)
-Retourne la source actuelle
+Retourne la source actuelle.
 
 ### number getUsageHours(void)
-Retourne le nombre d'heure d'utilisation
+Retourne le nombre d'heure d'utilisation.
 
 ## Screen
 ### void setDefaults(void)
-Active la position par défaut spécifiée dans la configuration
+Active la position par défaut spécifiée dans la configuration.
 
 ### void setPosition(position)
 Défini la position de la toile
@@ -68,7 +68,7 @@ Défini la position de la toile à 'down'
 
 ## Shade
 ### void setDefaults(void)
-Active la position par défaut spécifiée dans la configuration
+Active la position par défaut spécifiée dans la configuration.
 
 ### void setPosition(position)
 Défini la position de la toile
@@ -88,7 +88,7 @@ Active la scène d'éclairage et configure le status "AutoLights" à "OFF". Cett
 
 ## Light
 ### void setDefaults(void)
-Active les paramètres par défaut définis dans la configration comme l'état d'alimentation et le niveau de tamisage
+Active les paramètres par défaut définis dans la configration comme l'état d'alimentation et le niveau de tamisage.
 
 ### void on(void)
 Allume le dispositif d'éclairage
@@ -106,9 +106,71 @@ Défini le niveau de tamisage du dispositif d'éclairage
 * **force** : boolean, détermine si le tamisage est mis à jour même si la valeur actuelle est égale à la nouvelle valeur
 
 ## AudioInput
+### void setDefaults(void)
+Active les paramètres par défaut définis dans la configuration comme le mode et le gain.
+
+### void setGain(gain, ignoreLimits)
+* **gain** : number, gain de l'entrée (0-70)
+* **ignoreLimits** : boolean, ignore les limites de gain (low, high) spécifiés dans la configuration. Si cette valeur est "false" et que le gain spécifié plus haut ou plus bas que les limites, le gain sera configuré à la limite
+
+### void setLevel(gain, ignoreLimits)
+Alias de setGain
+
+### number getGain(void)
+Retourne le gain actuel de l'entrée audio
+
+### number getLevel(void)
+Alias de getGain
+
+### void increaseGain(void)
+Augmente le gain de l'entrée d'un nombre de "db" spécifié dans la configuration par la propriété "gainStep".
+
+### void increaseLevel(void)
+Alias de increaseGain
+
+### void decreaseGain(void)
+Diminue le gain de l'entrée d'un nombre de "db" spécifié dans la configuration par la propriété "gainStep".
+
+### void decreaseLevel(void)
+Alias de decreaseGain
+
+### void setBoost(void)
+Configure le gain de l'entrée audio au niveau spécifié dans la configuration par la propriété "boost".
+
 
 ## AudioInputGroup
+### void connectToRemoteOutputs(void)
+Connecte le groupe d'entrée audio aux sorties audio des sites distants.
+
+### void disconnectFromRemoteOutputs(void)
+Déconnecte le groupe d'entrée audio aux sorties audio des sites distants.
+
+### void connectToLocalOutput(audioOutputGroup)
+Connecte le groupe d'entrée audio à un groupe de sortie audio local
+* **audioOutputGroup** : AudioOutputGroup, groupe de sortie audio local
+
+### void disconnectFromLocalOutput(audioOutputGroup)
+Déconnecte le groupe d'entrée audio à un groupe de sortie audio local
+* **audioOutputGroup** : AudioOutputGroup, groupe de sortie audio local
 
 ## AudioOutputGroup
+### void connectLocalInput(audioInputGroup)
+Connecte le groupe de sortie audio à un groupe d'entrée audio locale
+* **audioInputGroup** : AudioInputGroup, groupe d'entrée audio locale
+
+### void disconnectLocalInput(audioInputGroup)
+Déconnecte le groupe de sortie audio à un groupe d'entrée audio locale
+* **audioInputGroup** : AudioInputGroup, groupe d'entrée audio locale
+
+### void connectRemoteInputs(void)
+Connecte les entrées audio distantes au groupe de sortie audio local
+
+### void disconnectRemoteInputs(void)
+Déconnecte les entrées audio distantes au groupe de sortie audio local
+
+### void updateInputGain(audioInputGroup, audioOutputGroup)
+Défini le gain dans le lien entre le groupe d'entrée local et le groupe de sortie local
+* **audioInputGroup** : AudioInputGroup, groupe d'entrée audio local
+* **audioOutputGroup** : AudioOutputGroup, groupe de sortie audio local
 
 ## AudioReporter

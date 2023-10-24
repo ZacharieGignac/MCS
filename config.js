@@ -81,12 +81,13 @@ export var config = {
   },
 
   mod_autosauce_config: {
+    calibration:false,
     boosts: [
       {
         silent: 'system.audio.presentermics',
         boost: 'system.audio.audiencemics',
         audioReporter: 'system.audioreporter.main',
-        diffLevel: 10,
+        diffLevel: 20,
         silentElapsed: 300
       }
     ]

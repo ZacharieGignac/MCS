@@ -32,6 +32,9 @@ class Boost {
     let boostInputs = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.AUDIOINPUT, boostGroup);
     ara.addGroup([silentGroup, boostGroup]);
     ara.onLoudestGroup(silentElapsed, report => {
+      if(systemconfig.mod_autosauce_config.calibration) {
+        console.log(`Diff: ${report.highestLowestDiff} / ${diffLevel}, Elapsed: ${report.highestSince} / ${silentElapsed}`);
+      }
       if (report.group != silentGroup && report.highestSince > silentElapsed && report.highestLowestDiff < diffLevel) {
         if (this.currentBoostMode == false) {
           this.currentBoostMode = true;
@@ -40,7 +43,8 @@ class Boost {
           });
         }
       }
-      else {
+      else if (report.group == silentGroup && report.highestSince > silentElapsed && report.highestLowestDiff > diffLevel) {
+
         if (this.currentBoostMode == true) {
           this.currentBoostMode = false;
           boostInputs.forEach(input => {

@@ -1,3 +1,20 @@
+# Table des Matières
+- [Intéraction avec les widgets](#intéraction-avec-les-widgets)
+- [Nomenclature](#nomenclature)
+  - [Les préfixes](#les-préfixes)
+- [Widget Mapping](#widget-mapping)
+  - [Devices](#devices)
+    - [Display](#display)
+    - [Screen](#screen)
+    - [Shade](#shade)
+    - [Light](#light)
+    - [LightScene](#lightscene)
+    - [AudioInput](#audioinput)
+- [Status système (systemStatus)](#status-système-systemstatus)
+- [Action et Actions](#action-et-actions)
+  - [Actions système](#actions-système)
+  - [Exemples](#exemples)
+    
 # Intéraction avec les widgets
 Il est préférable et fortement recommandé d'utiliser les mécanismes du système pour définir la valeur d'un widget ou pour écouter les événements d'un widget. Ces fonctions sont décrites dans la documentation de l'API.
 

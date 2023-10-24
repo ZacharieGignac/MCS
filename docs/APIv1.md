@@ -16,17 +16,96 @@ L'api est maintenat accessible via l'objet "zapi".
 
 Même si cette fonctionnalité doit être utilisée avec grande prudence, il est possible d'overrider n'importe quelle fonction ou objet de zapi, ainsi permettre à des modules de modifier le comportement de l'api. Il est important de ne pas modifier les arguments des appels de functions au risque de causer une erreur irrécupérable.
 
-# Description de l'API version 1
-## devices
 
-## scenarios
+## ZAPI Version 1
+- [Dispositifs (Devices)](#dispositifs-devices)
+- [Scénarios (Scenarios)](#scénarios-scenarios)
+- [Modules (Modules)](#modules-modules)
+- [Système (System)](#système-system)
+- [Performance (Performance)](#performance-performance)
+- [Audio (Audio)](#audio-audio)
+- [Interface Utilisateur (UI)](#interface-utilisateur-ui)
 
-## modules
+## Dispositifs (Devices)
 
-## system
+### Méthodes
 
-## performance
+- `getDevice`: Récupère un dispositif spécifique.
+- `getAllDevices`: Récupère tous les dispositifs.
+- `getDevicesByType`: Récupère les dispositifs par type.
+- `getDevicesByTypeInGroup`: Récupère les dispositifs par type dans un groupe spécifique.
+- `activateCameraPreset`: Active un préréglage de caméra spécifique. Prend `presetId` en paramètre.
 
-## audio
+### Constantes de type de dispositif
 
-## ui
+- `CONTROLSYSTEM`: Système de contrôle
+- `DISPLAY`: Affichage
+- `CAMERAPRESET`: Préréglage de caméra
+- `VIDEOOUTPUT`
+- `AUDIOINPUT`
+- `AUDIOOUTPUT`
+- `AUDIOINPUTGROUP`
+- `AUDIOOUTPUTGROUP`
+- `AUDIOREPORTER`
+- `SCREEN`
+- `LIGHT`
+- `LIGHTSCENE`
+- `SHADE`
+- `CAMERA`
+- `SOFTWAREDEVICE`
+
+## Scénarios (Scenarios)
+
+### Méthodes
+
+- `getScenarios`: Récupère tous les scénarios.
+- `enableScenario`: Active un scénario spécifique.
+- `enablePreviousScenario`: Active le scénario précédent.
+- `getPreviousScenario`: Récupère le scénario précédent.
+
+## Modules (Modules)
+
+### Méthodes
+
+- `isModuleAvailable`: Vérifie si un module est disponible.
+- `getModule`: Récupère un module spécifique.
+
+## Système (System)
+
+### Méthodes
+
+- `resetSystemStatus`: Réinitialise l'état du système.
+- `endSession`: Termine la session en cours.
+- `setStatus`: Définit l'état du système.
+- ...
+
+### Propriétés
+
+- `systemReport`: Rapport du système.
+
+## Performance (Performance)
+
+### Méthodes
+
+- `setElapsedStart`: Définit le début du temps écoulé.
+- `setElapsedEnd`: Définit la fin du temps écoulé.
+- `inc`: Incrémente une valeur.
+- ...
+
+## Audio (Audio)
+
+### Méthodes
+
+- `getLocalInputId`: Récupère l'ID d'entrée audio local.
+- `getLocalOutputId`: Récupère l'ID de sortie audio local.
+- `getRemoteInputsIds`: Récupère les IDs d'entrées audio à distance.
+- ...
+
+## Interface Utilisateur (UI)
+
+### Méthodes
+
+- `addActionMapping`: Ajoute un mappage d'action.
+- `addWidgetMapping`: Ajoute un mappage de widget.
+- `setWidgetValue`: Définit la valeur d'un widget.
+- `getAllWidgets`: Récupère tous les widgets.

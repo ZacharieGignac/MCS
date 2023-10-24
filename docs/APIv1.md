@@ -43,7 +43,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `SHADE`: Toile de fenêtre
 - `CAMERA`: Caméra
 - `SOFTWAREDEVICE`: Appareil "logiciel" ou "virtuel"
-- 
+  
 ## Dispositifs (Devices)
 
 ### Méthodes

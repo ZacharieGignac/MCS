@@ -14,7 +14,7 @@ import { zapiv1 as zapi } from './zapi';
 
 L'api est maintenat accessible via l'objet "zapi".
 
-Même si cette fonctionnalité doit être utilisée avec grande prudence, il est possible d'overrider n'importe quelle fonction ou objet de zapi, ainsi permettre à des modules de modifier le comportement de l'api. Il est important de ne pas modifier les arguments des appels de functions au risque de causer une erreur irrécupérable.
+Même si cette fonctionnalité doit être utilisée avec grande prudence, il est possible d'overrider (surcharger) n'importe quelle fonction ou objet de zapi, ainsi permettre à des modules de modifier le comportement de l'api. Il est important de ne pas modifier les arguments des appels de functions au risque de causer une erreur irrécupérable.
 
 
 ## ZAPI Version 1

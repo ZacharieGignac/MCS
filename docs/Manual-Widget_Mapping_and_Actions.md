@@ -60,7 +60,7 @@ Tous les widgets possédant le préfixe "SS$" seront automatiquement connectés 
 
 Évidemment, les valeurs de systemStatus doivent être compatibles avec le widget. On ne peut placer assigner la valeur "boeuf" à un widget de type "toggle". 
 
-Les valeurs bool de systemStatus sont automatiquement converties en valeurs 'on' et 'off'. Pour convertir automatiquement les valeurs 'on' et 'off' du widget en bool vers systemStatus, il est nécessaire de d'ajuster le préfixe à "SS?".
+Les valeurs bool de systemStatus sont automatiquement converties en valeurs 'on' et 'off'. Pour convertir automatiquement les valeurs 'on' et 'off' du widget en bool vers systemStatus, il est nécessaire d'ajuster le préfixe à "SS?".
 
 En d'autres mots, si une valeur de systemStatus est de type boolean, il est OBLIGATOIRE d'utiliser le préfixe "SS?" au lieu de "SS$" pour activer l'auto-mapping d'un widget.
 

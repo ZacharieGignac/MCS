@@ -48,11 +48,16 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 
 ### Méthodes
 
-- `getDevice`: Récupère un dispositif spécifique.
-- `getAllDevices`: Récupère tous les dispositifs.
-- `getDevicesByType`: Récupère les dispositifs par type.
-- `getDevicesByTypeInGroup`: Récupère les dispositifs par type dans un groupe spécifique.
-- `activateCameraPreset`: Active un préréglage de caméra spécifique. Prend `presetId` en paramètre.
+- `device getDevice`: Récupère un dispositif spécifique.
+  - `id`: id du device
+- `devices[] getAllDevices`: Récupère tous les dispositifs.
+- `devices[] getDevicesByType`: Récupère les dispositifs par type.
+  - `type`: type de devices
+- `devices[] getDevicesByTypeInGroup`: Récupère les dispositifs par type dans un groupe spécifique.
+  - `type`: type de devices
+  - `group`: groupe
+- `activateCameraPreset`: Active un préréglage de caméra spécifique.
+  - `name`: Nom du preset
 
 ## Scénarios (Scenarios)
 

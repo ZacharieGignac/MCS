@@ -60,10 +60,10 @@ Active la position par défaut spécifiée dans la configuration
 Défini la position de la toile
 * **position** : string, position 'up', 'down'
 
-## void up(void)
+### void up(void)
 Défini la position de la toile à 'up'
 
-## void down(void)
+### void down(void)
 Défini la position de la toile à 'down'
 
 ## Shade
@@ -74,10 +74,10 @@ Active la position par défaut spécifiée dans la configuration
 Défini la position de la toile
 * **position** : string, position 'up', 'down'
 
-## void up(void)
+### void up(void)
 Défini la position de la toile à 'up'
 
-## void down(void)
+### void down(void)
 Défini la position de la toile à 'down'
 
 ## LightScene

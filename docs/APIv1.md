@@ -26,16 +26,6 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - [Audio (Audio)](#audio-audio)
 - [Interface Utilisateur (UI)](#interface-utilisateur-ui)
 
-## Dispositifs (Devices)
-
-### Méthodes
-
-- `getDevice`: Récupère un dispositif spécifique.
-- `getAllDevices`: Récupère tous les dispositifs.
-- `getDevicesByType`: Récupère les dispositifs par type.
-- `getDevicesByTypeInGroup`: Récupère les dispositifs par type dans un groupe spécifique.
-- `activateCameraPreset`: Active un préréglage de caméra spécifique. Prend `presetId` en paramètre.
-
 ### Constantes de type de dispositif
 
 - `CONTROLSYSTEM`: Système de contrôle
@@ -53,6 +43,16 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `SHADE`: Toile de fenêtre
 - `CAMERA`: Caméra
 - `SOFTWAREDEVICE`: Appareil "logiciel" ou "virtuel"
+- 
+## Dispositifs (Devices)
+
+### Méthodes
+
+- `getDevice`: Récupère un dispositif spécifique.
+- `getAllDevices`: Récupère tous les dispositifs.
+- `getDevicesByType`: Récupère les dispositifs par type.
+- `getDevicesByTypeInGroup`: Récupère les dispositifs par type dans un groupe spécifique.
+- `activateCameraPreset`: Active un préréglage de caméra spécifique. Prend `presetId` en paramètre.
 
 ## Scénarios (Scenarios)
 

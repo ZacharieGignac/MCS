@@ -93,4 +93,19 @@ Le système supporte aussi les préfixes comme décrit au début de ce document,
 * **ENABLESCENARIO:id** : Active un scénario
 * **ENABLESCENARIOASK** : Affiche une boite de dialogue demandant d'entrer un "id" de scénario et l'active
 
+## Exemples
+Activer le preset de caméra nommé "Tableau"
 
+```ACTION$ACTIVATECAMPRESET:Tableau```
+
+Appeler la scène d'éclairage "normal"
+
+```ACTION$LIGHTSCENE:normal```
+
+Appeler la scène d'éclairage "normal" et fermer le panel en cours
+
+```ACTIONS$LIGHTSCENE:normal&PANELCLOSE```
+
+Activer le preset de caméra nommé "Tableau" et ouvrir le panneau "Controle" à page "Camera"
+
+```ACTIONS$ACTIVATECAMPRESET:Tableau&PANELOPEN:Controle,Camera```

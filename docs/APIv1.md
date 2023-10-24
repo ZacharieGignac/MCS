@@ -44,7 +44,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `CAMERA`: Caméra
 - `SOFTWAREDEVICE`: Appareil "logiciel" ou "virtuel"
   
-## Dispositifs (Devices)
+## Dispositifs (devices)
 
 ### Méthodes
 
@@ -59,7 +59,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `activateCameraPreset`: Active un préréglage de caméra spécifique.
   - `name`: Nom du preset
 
-## Scénarios (Scenarios)
+## Scénarios (scenarios)
 
 ### Méthodes
 
@@ -68,14 +68,14 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `enablePreviousScenario`: Active le scénario précédent.
 - `getPreviousScenario`: Récupère le scénario précédent.
 
-## Modules (Modules)
+## Modules (modules)
 
 ### Méthodes
 
 - `isModuleAvailable`: Vérifie si un module est disponible.
 - `getModule`: Récupère un module spécifique.
 
-## Système (System)
+## Système (system)
 
 ### Méthodes
 
@@ -94,7 +94,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 
 - `systemReport`: Rapport du système.
 
-## Performance (Performance)
+## Performance (performance)
 
 ### Méthodes
 
@@ -104,7 +104,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `dec`:
 - `reset`
 
-## Audio (Audio)
+## Audio (audio)
 
 ### Méthodes
 
@@ -114,7 +114,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `getRemoteOutputIds`:
 - `addAudioReportAnalyzer`:
 
-## Interface Utilisateur (UI)
+## Interface Utilisateur (ui)
 
 ### Méthodes
 

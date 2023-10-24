@@ -174,3 +174,12 @@ Défini le gain dans le lien entre le groupe d'entrée local et le groupe de sor
 * **audioOutputGroup** : AudioOutputGroup, groupe de sortie audio local
 
 ## AudioReporter
+### void start(void)
+Démarre l'observation des entrées audio et démarre les rapports
+
+### void stop(void)
+Arrête l'observation des entrées audio et stop les rapports
+
+### void onReport(callback)
+Ajoute un callback pour les rapports. Chaque fois qu'un rapport est disponible, le rapport sera envoyé à tous les callbacks
+* **callback** : function(rapport), envoi du rapport

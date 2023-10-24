@@ -69,3 +69,28 @@ Exemples:
 * **SS$AudienceMics** (toggle): Affiche et défini l'emplacement du présentateur
 * **SS$Version** (texte): Affiche la version actuelle du système
 * **SS?PresenterDetected** (toggle): Affiche si le présentateur est détecté, même si la valeur de systemStatus est de type "bool". Cette valeur est automatiquement convertie
+
+# Action et Actions
+Le système possède un mécanisme de mapping d'action, c'est à dire le déclanchement d'actions (function) à partir d'une identifiation de widget.
+
+Plusieurs actions de base sont disponibles et il est possible d'en ajouter d'autres à partir de l'API.
+
+Pour signifier au système que le widget doit déclancher une action, le "id" du widget doit être préfixé de "ACTION$" si seulement une action doit être appelée et de "ACTIONS$" si plusieurs actions doivent être appelées.
+
+Le système supporte aussi les préfixes comme décrit au début de ce document, donc un widget préfixé "test|ACTION$" est valide.
+
+## Actions système
+* **SETTINGSLOCK** : Vérouille les paramètres système
+* **SETTINGSUNLOCK** : Dévérouille les paramètres systèmes
+* **PANELOPEN:panelId,pageId** : Ouvre le panel, et accessoirement affiche la page demandée
+* **PANELCLOSE** : Ferme le panel présentement affiché
+* **STANDBY** : Met le système en veille
+* **RESETDEVICES** : Appelle la fonction "reset()" de tous les devices
+* **SENDSYSTEMREPORT** : Envoi le rapport du système
+* **VIEWSYSTEMDIAGNOSTICS** : Affiche les messages de diagnostic du système
+* **ACTIVATECAMPRESET:presetName** : Active un preset de caméra
+* **LIGHTSCENE:id** : Active une scène d'éclairage
+* **ENABLESCENARIO:id** : Active un scénario
+* **ENABLESCENARIOASK** : Affiche une boite de dialogue demandant d'entrer un "id" de scénario et l'active
+
+

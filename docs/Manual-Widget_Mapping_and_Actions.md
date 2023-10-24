@@ -54,7 +54,7 @@ Certain devices incluent des mapping de widgets automatique. Il est important de
 * **Définir le niveau (gain) et l'afficher (button group): id:LEVELGROUP
 
 # Status système (systemStatus)
-Il est possible de connecter facilement une valeur de la structure globale "systemStatus" à un widget.
+Il est possible de connecter automatiquement une valeur de la structure globale "systemStatus" à un widget.
 
 Tous les widgets possédant le préfixe "SS$" seront automatiquement connectés de façon bidirectionnel avec les valeurs de systemStatus.
 

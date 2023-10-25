@@ -137,16 +137,24 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 ### Méthodes
 
 - `getLocalInputId`: Récupère l'ID d'entrée audio local.
+  - `name` : Nom du groupe d'entrée dans audio console.
 - `getLocalOutputId`: Récupère l'ID de sortie audio local.
-- `getRemoteInputsIds`: Récupère les IDs d'entrées audio à distance.
-- `getRemoteOutputIds`:
-- `addAudioReportAnalyzer`:
+  - `name` : Nom du groupe de sortie dans audio console.
+- `getRemoteInputsIds`: Récupère les IDs d'entrées audio du site distant.
+- `getRemoteOutputIds`: Récupère les IDs de sortie audio du site distant.
+- `addAudioReportAnalyzer`: Récupère un nouvel analyseur de rapport audio.
 
 ## Interface Utilisateur (ui)
 
 ### Méthodes
 
 - `addActionMapping`: Ajoute un mappage d'action.
+  - `regex` : Regex qui match l'action.
+  - `callback` : Fonction appelée lors de l'action.
 - `addWidgetMapping`: Ajoute un mappage de widget.
+  - `èvent` : Événement du widget.
+  - `callback` : Fonction appelée lors de l'événement.
 - `setWidgetValue`: Définit la valeur d'un widget.
+  - `widgetId` : Identification du widget.
+  - `value` : Valeur du widget.
 - `getAllWidgets`: Récupère tous les widgets.

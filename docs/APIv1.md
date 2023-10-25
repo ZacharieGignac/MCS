@@ -94,12 +94,11 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
   - `callback` : Fonction qui sera executée lors du changement du statut particulier.
 - `sendMessage` : Envoie un message texte _xapi.Command.Message.Send.Text_ en respectant une cadence prédéfinie.
   - `text` : Texte à envoyer.
-- `systemReport` : Envoie un rapport système.
-- `sendSystemReport` : Structure de donnée qui sera envoyée lors de l'envoi rapport système. Il est possible d'ajouter des données dans cette structure, par exemple: `sendSystemReport['myData'] = { payload:'test!', anotherProperty:'Ok!' }`
+- `sendSystemReport` : Envoie le rapport système.
 
 ### Propriétés
 
-- `systemReport`: Rapport du système.
+- `systemReport`: Structure de donnée qui sera envoyée lors de l'envoi rapport système. Il est possible d'ajouter des données dans cette structure, par exemple: `sendSystemReport['myData'] = { payload:'test!', anotherProperty:'Ok!' }`
 
 ## Performance (performance)
 

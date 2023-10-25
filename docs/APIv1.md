@@ -79,16 +79,23 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 
 ### Méthodes
 
-- `resetSystemStatus`: Réinitialise l'état du système.
+- `resetSystemStatus`: Réinitialise de tous les status.
 - `endSession`: Termine la session en cours.
-- `setStatus`: Définit l'état du système.
-- `getStatus`:
-- `getAllStatus`:
-- `onStatusChange`
-- `onStatusKeyChange`
-- `sendMessage`
-- `systemReport`
-- `sendSystemReport`
+- `setStatus`: Définit un statut à une certain valeur.
+  - `key` : Clé du statut.
+  - `value` : Valeur du statut.
+- `getStatus`: Récupère la valeur d'un statut.
+  - `key` : Clé du statut.
+- `getAllStatus`: Récupère tout les statuts.
+- `onStatusChange` : Ajoute un écouteur d'événement lors du changement de n'importe quel statut.
+  - `callback` : Fonction qui sera executée lors d'un changement de statut.
+- `onStatusKeyChange` : Ajoute un écouteur d'événement lors du changement d'un statut particulier.
+  - `key` : Clé du statut.
+  - `callback` : Fonction qui sera executée lors du changement du statut particulier.
+- `sendMessage` : Envoie un message texte _xapi.Command.Message.Send.Text_ en respectant une cadence prédéfinie.
+  - `text` : Texte à envoyer.
+- `systemReport` : Envoie un rapport système.
+- `sendSystemReport` : Structure de donnée qui sera envoyée lors de l'envoi rapport système. Il est possible d'ajouter des données dans cette structure, par exemple: `sendSystemReport['myData'] = { payload:'test!', anotherProperty:'Ok!' }`
 
 ### Propriétés
 

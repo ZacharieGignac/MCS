@@ -13,6 +13,12 @@
       "type": "auto",
       "mode": "add",
       "file": "dev-v2.zip"    
+    },
+    {
+      "version": 3,
+      "type": "auto",
+      "mode": "add",
+      "file": "dev-v3.zip"    
     }
   ]
 }

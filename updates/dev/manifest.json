@@ -6,25 +6,7 @@
       "version": 1,
       "type": "auto",
       "mode": "add",
-      "file": "dev-v1.zip"    
-    },    
-    {
-      "version": 2,
-      "type": "auto",
-      "mode": "add",
-      "file": "dev-v2.zip"    
-    },
-    {
-      "version": 3,
-      "type": "auto",
-      "mode": "add",
-      "file": "dev-v3.zip"    
-    },
-    {
-      "version": 4,
-      "type": "auto",
-      "mode": "add",
-      "file": "dev-v4.zip"    
-    }    
+      "file": "dev-initial.zip"    
+    } 
   ]
 }

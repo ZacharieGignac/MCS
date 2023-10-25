@@ -19,6 +19,12 @@
       "type": "auto",
       "mode": "add",
       "file": "dev-v3.zip"    
-    }
+    },
+    {
+      "version": 4,
+      "type": "auto",
+      "mode": "add",
+      "file": "dev-v4.zip"    
+    }    
   ]
 }

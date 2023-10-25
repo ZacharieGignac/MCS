@@ -46,7 +46,12 @@ export var zapiv1 = {
     onStatusKeyChange: () => { },
     sendMessage:() => { },
     systemReport:{},
-    sendSystemReport:() => {}
+    sendSystemReport:() => {},
+    events:{
+      on: () => {},
+      off: () => {},
+      emit: () => {}
+    }
   },
   performance: {
     setElapsedStart: () => { },

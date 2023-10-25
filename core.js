@@ -22,6 +22,7 @@ const INITSTEPDELAY = 500;
 
 var coldbootWarningInterval = undefined;
 var core;
+var systemEvents;
 
 
 
@@ -507,16 +508,44 @@ class UiManager {
   }
 }
 
+class SystemEvents {
+  constructor() {
+    this.events = {};
+  }
+
+  on(event, callback) {
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+    this.events[event].push(callback);
+  }
+
+  off(event, callback) {
+    if (!this.events[event]) return;
+    const index = this.events[event].indexOf(callback);
+    if (index !== -1) {
+      this.events[event].splice(index, 1);
+    }
+  }
+
+  emit(event, ...args) {
+    if (!this.events[event]) return;
+    this.events[event].forEach(callback => callback(...args));
+  }
+}
 
 
 
 class Core {
   constructor() {
+    zapi.system.events.emit('system_corestarted');
     var that = this;
     var self = this;
     this.messageQueue = new MessageQueue();
     this.audio = new Audio();
 
+
+    //Building zapi
     zapi.performance.setElapsedStart = (test) => { performance.setElapsedStart(test) };
     zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test) };
     zapi.performance.inc = (name, num) => { performance.inc(name, num) };
@@ -528,6 +557,10 @@ class Core {
     zapi.audio.getRemoteInputsIds = () => { return self.audio.getRemoteInputsIds() };
     zapi.audio.getRemoteOutputIds = () => { return self.audio.getRemoteOutputIds() };
     zapi.audio.addAudioReportAnalyzer = (audioReporter) => { return new AudioReportAnalyzer(audioReporter) };
+
+
+
+
 
     this.lastPresenterDetectedStatus = false;
 
@@ -621,6 +654,7 @@ class Core {
 
 
   async handleOverVolume() {
+    zapi.system.events.emit('system_volumeoverlimit');
     if (!this.audioExtraMode) {
       xapi.Command.UserInterface.Message.Prompt.Display({
         Duration: 0,
@@ -633,6 +667,7 @@ class Core {
     }
   }
   async handleUnderVolume() {
+    zapi.system.events.emit('system_volumeunderlimit');
     if (this.audioExtraMode && this.audioExtraModeRestoreGains && !this.audioExtraSkipPrompt) {
       xapi.Command.UserInterface.Message.Prompt.Display({
         Duration: 0,
@@ -725,6 +760,7 @@ class Core {
 
 
   async init() {
+    zapi.system.events.emit('system_coreinit');
     var self = this;
     this.uiManager = new UiManager();
     this.systemStatus = new SystemStatus();
@@ -876,6 +912,7 @@ class Core {
 
     this.scheduleStandby = () => {
       schedule(systemconfig.system.forceStandbyTime, () => {
+        zapi.system.events.emit('system_forcestandby');
         this.scenarios.enableScenario(systemconfig.system.onStandby.enableScenario);
         this.scheduleStandby();
       });
@@ -908,14 +945,17 @@ class Core {
 
     //Starts devices monitoring
     this.devicesMonitoringInterval = setInterval(async () => {
+      zapi.system.events.emit('system_peripheralscheck');
       let missingDevices = await getDisconnectedRequiredPeripherals();
       if (missingDevices.length > 0) {
+        zapi.system.events.emit('system_peripheralsmissing', missingDevices);
         this.deviceMissingState = true;
         this.devicesMonitoringMissing(missingDevices);
       }
       else {
         if (this.deviceMissingState == true) {
           this.deviceMissingState = false;
+          zapi.system.events.emit('system_peripheralsok');
           xapi.Command.UserInterface.Message.Alert.Clear();
         }
 
@@ -1189,6 +1229,14 @@ async function requiredPeripheralsConnected(callback) {
 }
 
 async function preInit() {
+  debug(2, `Starting System Events Manager...`);
+  systemEvents = new SystemEvents();
+  zapi.system.events.on = (event, callback) => { systemEvents.on(event, callback); };
+  zapi.system.events.off = (event, callback) => { systemEvents.off(event, callback); };
+  zapi.system.events.emit = (event, ...args) => { systemEvents.emit(event, ...args); };
+
+  zapi.system.events.emit('system_preinit');
+
   /* Wakeup system */
   xapi.Command.Standby.Deactivate();
   xapi.Command.UserInterface.Message.Prompt.Display({
@@ -1227,6 +1275,9 @@ async function preInit() {
   await sleep(INITSTEPDELAY);
 
   debug(2, `PreInit started...`);
+
+
+
   clearInterval(coldbootWarningInterval);
   if (systemconfig.system.debugInternalMessages) {
     xapi.Event.Message.Send.Text.on(text => {
@@ -1238,10 +1289,12 @@ async function preInit() {
   let validConfig = configValidityCheck();
 
   if (validConfig) {
+    zapi.system.events.emit('system_configvalid');
     setTimeout(init, systemconfig.system.initDelay);
     debug(1, `Waiting for init... (${systemconfig.system.initDelay}ms)`);
   }
   else {
+    zapi.system.events.emit('system_configinvalid');
     debug(3, `Config is NOT valid. Please review errors above. System will not start.`);
   }
 
@@ -1249,8 +1302,10 @@ async function preInit() {
 }
 
 async function init() {
+  zapi.system.events.emit('system_init');
   debug(2, `Init started...`);
   debug(2, `Starting core...`);
+
   core = await new Core();
   debug(2, `Loading modules...`);
   await core.loadModules();
@@ -1319,9 +1374,6 @@ async function init() {
     }
     setTimeout(setupAudioAnalyzer, 5000);
     */
-
-  debug(2, 'System started.');
-
 
 
 }

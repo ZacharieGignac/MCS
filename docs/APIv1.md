@@ -101,6 +101,15 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `systemReport`: Structure de donnée qui sera envoyée lors de l'envoi rapport système. Il est possible d'ajouter des données dans cette structure, par exemple: `sendSystemReport['myData'] = { payload:'test!', anotherProperty:'Ok!' }`
 
 ## Événemements (system.events)
+- `events`
+  - `on` : Ajoute un écouteur d'événement.
+    - `id` : Identication de l'événement.
+    - `callback` : Fonction appelée lors de l'événement.
+  - `off` : Retire un événement.
+    - `id` : Identification de l'événement.
+  - `emit`: Emet un événement.
+    - `id` : Identification de l'événement.
+    - `...args` : Arguments de l'événement.
 
 ### Méthodes
 

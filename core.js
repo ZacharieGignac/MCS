@@ -1384,6 +1384,7 @@ debug(1, `Debug level is: ${systemconfig.system.debugLevel}`);
 
 
 
+
 xapi.Status.SystemUnit.Uptime.get().then(uptime => {
 
   if (uptime > systemconfig.system.coldBootWait) {
@@ -1394,11 +1395,12 @@ xapi.Status.SystemUnit.Uptime.get().then(uptime => {
     debug(1, `Cold boot detected, running preInit() in ${systemconfig.system.coldBootWait} seconds...`);
     setTimeout(preInit, systemconfig.system.coldBootWait * 1000);
     var x = 0;
+    let waitChar = '🟦';
     coldbootWarningInterval = setInterval(() => {
       x++;
       xapi.Command.UserInterface.Message.Prompt.Display({
         Duration: 0,
-        Text: str.systemStartingColdBootText + `<br>Environ ${systemconfig.system.coldBootWait - (x * 5)} secondes restantes...`,
+        Text: str.systemStartingColdBootText + '<br>' + waitChar.repeat(x),
         Title: str.systemStartingColdBootTitle,
       });
       xapi.Status.SystemUnit.Uptime.get().then(uptime => {

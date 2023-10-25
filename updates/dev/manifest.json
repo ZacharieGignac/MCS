@@ -3,7 +3,7 @@
   "channel": "dev", 
   "updates": [    
     {
-      "version": 1,
+      "version": -1,
       "type": "auto",
       "mode": "add",
       "file": "dev-initial.zip"    

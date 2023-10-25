@@ -427,29 +427,29 @@ class UiManager {
   parseUiEvent(event) {
     performance.inc('UiManager.ParsedUiEvents');
     var eventId;
-    if (event.Extensions?.Widget?.Action?.Type == 'pressed') {
-      eventId = event.Extensions.Widget.Action.WidgetId;
-      this.processMatchAction(eventId);
 
-    }
-    else if (event.Extensions?.Panel?.Clicked) {
-      eventId = event.Extensions.Panel.Clicked.PanelId;
-      this.processMatchAction(eventId);
-    }
+    if (event.Extensions && event.Extensions.Widget && event.Extensions.Widget.Action) {
+      if (event.Extensions.Widget.Action.Type === 'pressed') {
+        eventId = event.Extensions.Widget.Action.WidgetId;
+        this.processMatchAction(eventId);
+      }
 
-    if (event.Extensions?.Widget?.Action) {
       this.processWidgetMappingsEvent(event.Extensions.Widget.Action);
       //UGLY FIX
       eventId = event.Extensions.Widget.Action.WidgetId;
-      if (eventId.includes('|')) {
+      if (eventId && eventId.includes('|')) {
         eventId = eventId.split('|')[1];
       }
-      if (eventId.startsWith('SS$')) {
+      if (eventId && eventId.startsWith('SS$')) {
         zapi.system.setStatus(eventId, event.Extensions.Widget.Action.Value);
       }
-      else if (eventId.startsWith('SS?')) {
+      else if (eventId && eventId.startsWith('SS?')) {
         zapi.system.setStatus(eventId, toBool(event.Extensions.Widget.Action.Value));
       }
+    }
+    else if (event.Extensions && event.Extensions.Panel && event.Extensions.Panel.Clicked) {
+      eventId = event.Extensions.Panel.Clicked.PanelId;
+      this.processMatchAction(eventId);
     }
   }
 

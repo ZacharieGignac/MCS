@@ -100,6 +100,10 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 
 - `systemReport`: Structure de donnée qui sera envoyée lors de l'envoi rapport système. Il est possible d'ajouter des données dans cette structure, par exemple: `sendSystemReport['myData'] = { payload:'test!', anotherProperty:'Ok!' }`
 
+## Événemements (system.events)
+
+### Méthodes
+
 ## Performance (performance)
 
 ### Méthodes

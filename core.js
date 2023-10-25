@@ -8,7 +8,6 @@ import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 
-
 const DEBUGLEVEL = {
   LOW: 3,
   MEDIUM: 2,
@@ -871,7 +870,7 @@ class Core {
           let tempDevice = zapi.devices.getDevice(d);
           tempDevice.reset();
         }
-        catch { }
+        catch (e) {  }
       }
     });
 

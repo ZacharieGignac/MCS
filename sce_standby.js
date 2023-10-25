@@ -47,7 +47,7 @@ export class Scenario {
       try {
         d.reset();
       }
-      catch { }
+      catch (e) { }
     }
 
     zapi.system.resetSystemStatus();

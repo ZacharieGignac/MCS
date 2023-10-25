@@ -1,0 +1,14 @@
+# Événements système
+- `system_preinit` : Le sytème fait sa pré-initialisation
+- `system_init` : Le système fait son initialisation
+- `system_configvalid` : La configuration est valide
+- `system_configinvalid` : La configuration est invalide
+- `system_corestarted` : Core démarré
+- `system_coreinit` : Core initialisé
+- `system_forcestandby` : Le système force le standby (sur horaire)
+- `system_peripheralscheck` : Le système effectue une vérification des périphériques
+- `system_peripheralsmissing` : Certain périphériques sont manquants
+  - `devices[]` : Liste des périphériques manquants
+- `system_peripheralsok` : Tous les périphériques sont présents
+- `system_volumeoverlimit` : Le volume système est au dessus de la limite
+- `system_volumeunderlimit` : Le volume système est en-dessous de la limite

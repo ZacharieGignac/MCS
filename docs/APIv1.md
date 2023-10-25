@@ -104,11 +104,20 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 
 ### Méthodes
 
-- `setElapsedStart`: Définit le début du temps écoulé.
-- `setElapsedEnd`: Définit la fin du temps écoulé.
+- `setElapsedStart`: Définit le début d'un chronomètre.
+  - `id` : Identification du chronomètre.
+- `setElapsedEnd`: Définit la fin d'un chronomètre.
+  - `id` : Identification du chronomètre.
 - `inc`: Incrémente une valeur.
-- `dec`:
-- `reset`
+  - `id`: : Identification de la valeur.
+- `dec`: Décrémente une valeur.
+  - Identification de la valeur.
+- `setCounter` : Ajoute un compteur.
+  - `id` : Identification du compteur.
+  - `value` : Valeur du compteur.
+- `getCounter` : Récupère un compteur.
+  - `id` : Identication du compteur.
+- `reset` : Remet à zéro toute les métriques de performance.
 
 ## Audio (audio)
 

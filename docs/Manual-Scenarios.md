@@ -20,7 +20,7 @@ export var Manifest = {
   description: `Exemple de scénario qui ne veut vraiment pas que le volume soit au dessus de 70%, et autres choses.`,
   panels: {
     hide: ['*'],
-    show: ['comotype1_settings']
+    show: ['example_settings']
   },
   features: {
     cameraControls: true,
@@ -29,6 +29,7 @@ export var Manifest = {
     joinGoogleMeet: false,
     joinWebex: true,
     joinZoom: false,
+    joinMicrosoftTeamsCVI: false,
     keypad: true,
     layoutControls: true,
     midCallControls: false,
@@ -36,8 +37,7 @@ export var Manifest = {
     participantList: true,
     selfviewControls: true,
     start: true,
-    videoMute: true,
-    joinMicrosoftTeamsCVI: false
+    videoMute: true
   }
 };
 
@@ -95,3 +95,33 @@ export class Scenario {
   }
 }
 ```
+
+## Section `export var Manifest`
+- `fileName` : Nom du fichier.
+- `id` : Identification unique du scénario. Cet identifiant est utilisé pour référencer le scénario, pour l'activer/désactiver.
+- `friendlyName` : Nom lisible.
+- `version` : Version du scénario.
+- `description` : Description du scénario.
+- `panels` : Permet de cacher ou d'afficher des "panels" ou des "action buttons".
+  - `hide` : Array des panels/buttons à cacher. Si une étoile (*) est placée dans ce array, tous les panneaux seront cachés.
+  - `show` : Array des panels/buttons à afficher.
+- `features` : Permet d'afficher ou non les différentes fonctionnalités du système
+  - `cameraControls` : Contrôles de caméra
+  - `endCallButton` : Bouton "terminer l'appel"
+  - `hdmiPassthrough` : Fonctionnalité "BYOD"
+  - `joinGoogleMeet` : Joindre Google Meet
+  - `joinWebex` : Joindre Webex
+  - `joinZoom` : Joindre Zoom
+  - `joinMicrosoftTeamsCVI` : Joindre Microsoft Teams (CVI)
+  - `keypad` : Clavier numérique pendant l'appel
+  - `layoutControls` : Contrôle de la disposition
+  - `midCallControls` : Fonctionnalités de hold, transfer, resume
+  - `musicMode` : Mode musique
+  - `participantList` : Liste des participants
+  - `selfviewControls` : Controle du selfview
+  - `start` : Bouton appel
+  - `videoMute` : Désactivation de la vidéo
+  - `shareStart` : Partage d'écran
+ 
+
+

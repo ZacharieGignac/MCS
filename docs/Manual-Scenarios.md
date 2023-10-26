@@ -123,5 +123,34 @@ export class Scenario {
   - `videoMute` : Désactivation de la vidéo
   - `shareStart` : Partage d'écran
  
+## Section `export class Scenario`
+Cette classe est le scénario. Elle sera instanciée au démarrage du système.
+
+### constructor (obligatoire)
+On peut initialiser des propriétés ici, mais en aucun cas n'agir sur le système. À cette étape, le scénario n'est pas considéré actif. Certaines fonctions du système ne peuvent être disponibles à ce moment.
+
+### enable (obligatoire)
+Cette function est appelée lorsque le système active le scénario. Une promesse doit être retournée et le premier argument executé avec la valeur `true` si le scénario s'est activé correctement.
+```JS
+  enable() {
+    //Retourne une promesse et déclaire que le scénario est activé
+    return new Promise(success => {
+      success(true);
+    });
+  }
+```
+Dans cet exemple, vu qu'il n'y a pas de condition au démarrage du scénario, l'argument `success` est toujours executé avec la valeur `true`. Si `success` est executé avec la valeur `false`, le système n'activera pas le scénario, et le scénario précédent sera activé automatiquement. Si tous les scénarios refusent de s'activer, le système sera en erreur.
+
+```JS
+  enable() {
+    //Retourne une promesse et déclaire que le scénario est activé
+    return new Promise(success => {
+      success(false);
+    });
+  }
+```
+Dans cet exemple, le scénario ne s'activera jamais.
+
+
 
 

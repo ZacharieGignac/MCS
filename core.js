@@ -785,14 +785,14 @@ class Core {
     //Handle hidden admin panel
     let enableAdmin = self.uiManager.addWidgetMapping('SS$PresenterLocation');
     enableAdmin.on('pressed', () => {
+      console.error('RELEASED!!!');
       this.adminPanelTimeout = setTimeout(() => {
         xapi.Command.UserInterface.Extensions.Panel.Open({ PanelId: 'system_admin' });
       }, 5000);
     });
     enableAdmin.on('released', () => {
-      setTimeout(() => {
-        clearTimeout(this.adminPanelTimeout);
-      }, 5000);
+      console.error('RELEASED!!!');
+      clearTimeout(this.adminPanelTimeout);
     });
 
     self.uiManager.addActionMapping(/^SETTINGSLOCK$/, () => {
@@ -870,7 +870,7 @@ class Core {
           let tempDevice = zapi.devices.getDevice(d);
           tempDevice.reset();
         }
-        catch (e) {  }
+        catch (e) { }
       }
     });
 
@@ -1374,7 +1374,7 @@ async function init() {
     setTimeout(setupAudioAnalyzer, 5000);
     */
 
-    zapi.test('test un deux trois!');
+  zapi.test('test un deux trois!');
 }
 
 

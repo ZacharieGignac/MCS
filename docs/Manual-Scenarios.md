@@ -141,6 +141,8 @@ Cette function est appelée lorsque le système active le scénario. Une promess
 ```
 Dans cet exemple, vu qu'il n'y a pas de condition à l'activation du scénario, l'argument `success` est toujours executé avec la valeur `true`. Si `success` est executé avec la valeur `false`, le système n'activera pas le scénario, et le scénario précédent sera activé automatiquement. Si tous les scénarios refusent de s'activer, le système sera en erreur.
 
+Une fois la valeur `true` retournée, la valeur `this.enabled` sera aussi à `true`, permettant au scénario de déterminer si il est présentement actif.
+
 La promesse permet au scénario d'effectuer des tâches asynchrones. Le système attends la résolution de cette promesse pour continuer.
 
 ```JS
@@ -164,6 +166,8 @@ Cette function est appelée lorsque le système désactive le scénario. Une pro
   }
 ```
 Dans cet exemple, vu qu'il n'y a pas de condition à la désactivation du scénario, l'argument `success` est toujours executé avec la valeur `true`. Si `success` est executé avec la valeur `false`, le système ne désactivera pas le scénario.
+
+Une fois la valeur `true` retournée, la valeur `this.enabled` sera à `false`, permettant au scénario de déterminer si il est présentement actif.
 
 ### start (obligatoire)
 Cette function est executée quand le scénario est activé et que le scénario précédent est désactivé. Toute les fonctionnalités du système sont disponibles, les modules sont chargés, les scénarios sont chargés, le système est stabilisé.

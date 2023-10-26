@@ -785,13 +785,11 @@ class Core {
     //Handle hidden admin panel
     let enableAdmin = self.uiManager.addWidgetMapping('SS$PresenterLocation');
     enableAdmin.on('pressed', () => {
-      console.error('RELEASED!!!');
       this.adminPanelTimeout = setTimeout(() => {
         xapi.Command.UserInterface.Extensions.Panel.Open({ PanelId: 'system_admin' });
       }, 5000);
     });
     enableAdmin.on('released', () => {
-      console.error('RELEASED!!!');
       clearTimeout(this.adminPanelTimeout);
     });
 

@@ -52,14 +52,14 @@ export class Scenario {
   }
 
   enable() {
-    //Retourne une promesse et déclaire que le scénario est activé
+    //Retourne une promesse et déclaire que le scénario peut être désactivé
     return new Promise(success => {
       success(true);
     });
   }
 
   disable() {
-    //Retourne une promesse et déclaire que le scénario est désactivé
+    //Retourne une promesse et déclaire que le scénario peut être désactivé
     return new Promise(success => {
       success(true);
     });
@@ -133,17 +133,19 @@ On peut initialiser des propriétés ici, mais en aucun cas n'agir sur le systè
 Cette function est appelée lorsque le système active le scénario. Une promesse doit être retournée et le premier argument executé avec la valeur `true` si le scénario s'est activé correctement.
 ```JS
   enable() {
-    //Retourne une promesse et déclaire que le scénario est activé
+    //Retourne une promesse et déclaire que le scénario peut être activé
     return new Promise(success => {
       success(true);
     });
   }
 ```
-Dans cet exemple, vu qu'il n'y a pas de condition au démarrage du scénario, l'argument `success` est toujours executé avec la valeur `true`. Si `success` est executé avec la valeur `false`, le système n'activera pas le scénario, et le scénario précédent sera activé automatiquement. Si tous les scénarios refusent de s'activer, le système sera en erreur.
+Dans cet exemple, vu qu'il n'y a pas de condition à l'activation du scénario, l'argument `success` est toujours executé avec la valeur `true`. Si `success` est executé avec la valeur `false`, le système n'activera pas le scénario, et le scénario précédent sera activé automatiquement. Si tous les scénarios refusent de s'activer, le système sera en erreur.
+
+La promesse permet au scénario d'effectuer des tâches asynchrones. Le système attends la résolution de cette promesse pour continuer.
 
 ```JS
   enable() {
-    //Retourne une promesse et déclaire que le scénario est activé
+    //Retourne une promesse et déclaire que le scénario ne peut pas s'activer
     return new Promise(success => {
       success(false);
     });
@@ -151,6 +153,21 @@ Dans cet exemple, vu qu'il n'y a pas de condition au démarrage du scénario, l'
 ```
 Dans cet exemple, le scénario ne s'activera jamais.
 
+### disable (obligatoire)
+Cette function est appelée lorsque le système désactive le scénario. Une promesse doit être retournée et le premier argument executé avec la valeur `true` si le scénario s'est désactivé correctement.
+```JS
+  disable() {
+    //Retourne une promesse et déclaire que le scénario peut être désactivé
+    return new Promise(success => {
+      success(true);
+    });
+  }
+```
+Dans cet exemple, vu qu'il n'y a pas de condition à la désactivation du scénario, l'argument `success` est toujours executé avec la valeur `true`. Si `success` est executé avec la valeur `false`, le système ne désactivera pas le scénario.
 
+### start (obligatoire)
+Cette function est executée quand le scénario est activé et que le scénario précédent est désactivé. Toute les fonctionnalités du système sont disponibles, les modules sont chargés, les scénarios sont chargés, le système est stabilisé.
 
+## Activation d'un scénario
+Le système a besoin d'au moins 1 scénario pour fonctionner. Lorsque le système tombe en veille, il activera le scénario indiqué dans la configuration `config.system.onStandby.enableScenario`. Lorsqu'il se réveille, il activara le scénario indiqué dans la configuration `config.system.onWakeup.enableScenario`
 

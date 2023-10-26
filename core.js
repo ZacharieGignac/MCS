@@ -789,7 +789,7 @@ class Core {
         xapi.Command.UserInterface.Extensions.Panel.Open({ PanelId: 'system_admin' });
       }, 5000);
     });
-    enableAdmin.on('pressed', () => {
+    enableAdmin.on('released', () => {
       setTimeout(() => {
         clearTimeout(this.adminPanelTimeout);
       }, 5000);
@@ -1374,7 +1374,7 @@ async function init() {
     setTimeout(setupAudioAnalyzer, 5000);
     */
 
-
+    zapi.test('test un deux trois!');
 }
 
 

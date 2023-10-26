@@ -26,7 +26,8 @@ export var Manifest = {
     participantList: false,
     selfviewControls: false,
     start: false,
-    videoMute: false
+    videoMute: false,
+    joinMicrosoftTeamsCVI: false
   }
 };
 

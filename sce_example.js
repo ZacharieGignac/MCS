@@ -26,8 +26,8 @@ export var Manifest = {
     participantList: true,
     selfviewControls: true,
     start: true,
-    videoMute: true
-    //ajouter icone pour MS TEAMS CVI
+    videoMute: true,
+    joinMicrosoftTeamsCVI: false
   }
 };
 

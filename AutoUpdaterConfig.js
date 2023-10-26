@@ -11,7 +11,7 @@ let autoupdaterconfig = {
     "branches": [
         {
             "id": "dev",
-            "version": 4,
+            "version": 1,
             "url": "https://raw.githubusercontent.com/ZacharieGignac/MCS/main/updates/dev/%FILE%?raw=true"
         }
     ]

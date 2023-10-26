@@ -7,10 +7,10 @@ export var Manifest = {
   id: 'example',
   friendlyName: `Scénario example`,
   version: '1.0.0',
-  description: `Exemple de scénario qui ne veut vraiment pas que le volume soit au dessus de 70%.`,
+  description: `Exemple de scénario qui ne veut vraiment pas que le volume soit au dessus de 70%, et autres choses.`,
   panels: {
     hide: ['*'],
-    show: ['']
+    show: ['comotype1_settings']
   },
   features: {
     cameraControls: true,
@@ -33,54 +33,54 @@ export var Manifest = {
 
 export class Scenario {
   constructor() {
-    this.alertMessage;
-    xapi.Status.RoomAnalytics.T3Alarm.Detected.on(value => {
-      console.log(`Current T3 value is: ${value}`);
-      if (value == 'True') {
-        console.warn('🔥🚨 WARNING: FIRE ALARM DETECTED 🚨🔥');
-        if (!this.enabled) {
-          zapi.scenarios.enableScenario('firealarm');
-        }
-      }
-      else {
-        if (this.enabled) {
-          zapi.scenarios.enablePreviousScenario();
-        }
-      }
+    //Écoute l'événement de changement de volume
+    xapi.Status.Audio.Volume.on(vol => {
+      this.checkVolume(vol);
     });
-  }
-
-  test() {
-    console.log('test from SCE_FireAlarm');
+    //Écoute les changements de statut
+    zapi.system.onStatusChange((status) => { this.onStatusChange(status) });
   }
 
   enable() {
+    //Retourne une promesse et déclaire que le scénario est activé
     return new Promise(success => {
       success(true);
     });
   }
 
   disable() {
-    clearInterval(this.alertMessage);
-    xapi.Command.UserInterface.Message.Prompt.Clear();
-    xapi.Command.UserInterface.WebView.Clear();
+    //Retourne une promesse et déclaire que le scénario est désactivé
     return new Promise(success => {
       success(true);
     });
   }
 
   start() {
-    this.alertMessage = setInterval(() => {
-      xapi.Command.UserInterface.Message.Prompt.Display({
-        Title: `🚨🔥 ALARME D'INCENDIE 🔥🚨`,
-        Text: 'DIRIGEZ-VOUS VERS LA SORTIE LA PLUS PROCHE<br>RENDEZ-VOUS AU POINT DE RASSEMBLEMENT'
-      });
-    }, 1000);
-    xapi.Command.UserInterface.WebView.Display({
-      Mode: 'Fullscreen',
-      Target: 'OSD',
-      Title: 'ALARME INCENDIE',
-      Url: 'https://www.nfpa.org/-/media/Images/Blog-Images/Blog-Post-Attachments/NFPA-Today/EvacuationBlog_web.ashx?h=400&w=800&la=en&hash=C8C18868074E7BA20202DEBD170D2737'
-    });
+    //Pas besoin de cette function. Cette function est appelée par le scenario manager lorsque le scénario est activé et que le précédent est désactivé.
+  }
+
+  //Vérification du niveau lors du changement de volume
+  checkVolume(vol) {
+    //Vérifie si le scénario est activé
+    if (this.enabled) {
+      if (vol > 70) {
+        //Replace le volume à 70%
+        xapi.Command.Audio.Volume.Set({ Level: 70 });
+      }
+    }
+  }
+
+  //Vérification du changement de statut
+  onStatusChange(status) {
+    //Vérifie si le scénario est activé
+    if (this.enabled) {
+      //Si le présentateur est "remote", laisse un délais de 500ms avant de remettre à "local"
+      if (status.key == 'PresenterLocation' && status.value == 'remote') {
+        setTimeout(() => {
+          zapi.system.setStatus('PresenterLocation', 'local');
+        }, 500);
+      }
+    }
+
   }
 }

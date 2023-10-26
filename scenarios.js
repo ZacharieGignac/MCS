@@ -98,6 +98,7 @@ export class Scenarios {
         else {
           debug(1, `Disabling current scenario: ${this.currentScenario}`);
           currScenario = this.getScenario(this.currentScenario).scenario;
+          currScenario.enabled = false;
           disableResult = await currScenario.disable();
         }
 
@@ -109,6 +110,7 @@ export class Scenarios {
           }
 
           let scenarioToEnable = this.getScenario(id).scenario;
+          scenarioToEnable.enabled = true;
           let enableResult = await scenarioToEnable.enable();
           if (enableResult) {
             debug(1, `Scenario "${id}" enable success!`);

@@ -19,19 +19,17 @@ export var Manifest = {
 
 export class Scenario {
   constructor(api) {
-    this.enabled = false;
+
   }
 
   enable() {
     return new Promise(success => {
-      this.enabled = true;
       success(true);
     });
   }
 
   disable() {
     return new Promise(success => {
-      this.enabled = false;
       success(true);
     });
   }

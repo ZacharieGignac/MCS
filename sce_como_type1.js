@@ -49,7 +49,6 @@ export class Scenario {
   constructor() {
     var self = this;
     this.devices = {};
-    this.enabled = false;
 
 
     zapi.system.onStatusChange(status => { self.onStatusChange(status); });
@@ -89,7 +88,6 @@ export class Scenario {
 
   enable() {
     return new Promise(async success => {
-      this.enabled = true;
       this.devices.displays.farend.forEach(display => {
         display.setBlanking(false);
         display.powerOn();
@@ -103,7 +101,6 @@ export class Scenario {
 
   disable() {
     return new Promise(async success => {
-      this.enabled = false;
       success(true);
     });
   }

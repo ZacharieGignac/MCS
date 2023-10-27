@@ -1,3 +1,4 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
 
 import { zapiv1 as zapi } from './zapi';
@@ -22,7 +23,7 @@ export class Module {
       this.boosts.push(new Boost(boost.silent, boost.boost, boost.silentElapsed, boost.diffLevel, boost.audioReporter));
     }
   }
-};
+}
 
 class Boost {
   constructor(silentGroup, boostGroup, silentElapsed, diffLevel, audioReporter) {

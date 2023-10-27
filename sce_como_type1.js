@@ -1,5 +1,5 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
-import { config as systemconfig } from './config';
 import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
@@ -333,7 +333,7 @@ export class Scenario {
           display.off();
         });
       }
-    }
+    };
 
     const powerOnDisplays = (displays) => {
       if (status.AutoDisplays == ON) {
@@ -341,7 +341,7 @@ export class Scenario {
           display.on();
         });
       }
-    }
+    };
 
     const blankDisplays = (displays) => {
       if (status.AutoDisplays == ON) {
@@ -349,7 +349,7 @@ export class Scenario {
           display.setBlanking(true);
         });
       }
-    }
+    };
 
     const unblankDisplays = (displays) => {
       if (status.AutoDisplays == ON) {
@@ -357,7 +357,7 @@ export class Scenario {
           display.setBlanking(false);
         });
       }
-    }
+    };
 
     const matrixBlankDisplay = displays => {
       if (status.AutoDisplays == ON) {
@@ -367,7 +367,7 @@ export class Scenario {
           RemoteMain: 4
         });
       }
-    }
+    };
 
     const matrixRemoteToDisplay = (display) => {
       if (status.AutoDisplays == ON) {
@@ -387,7 +387,7 @@ export class Scenario {
           });
         }, 1000);
       }
-    }
+    };
 
 
     var presentationDisplays = this.devices.displays.presentation;
@@ -524,7 +524,7 @@ export class Scenario {
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
           powerOffDisplays(presentationDisplays);
-          matrixBlankDisplay(presentationDisplays)
+          matrixBlankDisplay(presentationDisplays);
           matrixReset(farendDisplays);
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
@@ -662,4 +662,4 @@ export class Scenario {
   test() {
 
   }
-};
+}

@@ -1,3 +1,4 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
 import { DevicesManager } from './devices';
 import { config as systemconfig, VERSION, PRODUCT } from './config';
@@ -13,13 +14,13 @@ const DEBUGLEVEL = {
   MEDIUM: 2,
   HIGH: 1,
   NONE: 0
-}
+};
 
 const str = systemconfig.strings;
 
 const INITSTEPDELAY = 500;
 
-var coldbootWarningInterval = undefined;
+var coldbootWarningInterval;
 var core;
 var systemEvents;
 
@@ -208,9 +209,8 @@ class Audio {
 
 class AudioReportAnalyzer {
   constructor(audioReporter) {
-    var self = this;
     this.audioReporter = audioReporter;
-    this.audioReporter.onReport((report) => { this.reportReceived(report) });
+    this.audioReporter.onReport((report) => { this.reportReceived(report); });
     this.enabled = false;
     this.rawAnalysisCallbacks = [];
     this.loudestGroupAnalysisCallbacks = [];
@@ -227,7 +227,6 @@ class AudioReportAnalyzer {
   reportReceived(report) {
 
     this.lastAnalysisData = report;
-    var reportInputDetails = report.inputs;
     if (this.enabled) {
 
 
@@ -268,7 +267,6 @@ class AudioReportAnalyzer {
     this.groups.push(newGroup);
   }
   addGroup(groups) {
-    var inputs = [];
     if (Array.isArray(groups)) {
       for (let group of groups) {
         this.addSingleGroup(group);
@@ -286,7 +284,7 @@ class AudioReportAnalyzer {
   }
   onCustomAnalysis(filter, callback) {
     this.customAnalysisCallbacks.push({ filter: filter, callback: callback });
-  };
+  }
 }
 
 
@@ -374,10 +372,10 @@ class UiManager {
         }
         xapi.Event.UserInterface.on(event => { this.forwardUiEvents(event); });
         this.onUiEvent((event) => this.parseUiEvent(event));
-        zapi.ui.addActionMapping = (regex, func) => { this.addActionMapping(regex, func) }
-        zapi.ui.setWidgetValue = (widgetId, value) => { this.setWidgetValue(widgetId, value) }
-        zapi.ui.getAllWidgets = () => { return this.getAllWidgets() }
-        zapi.ui.addWidgetMapping = (widgetId) => { return this.addWidgetMapping(widgetId) }
+        zapi.ui.addActionMapping = (regex, func) => { this.addActionMapping(regex, func); };
+        zapi.ui.setWidgetValue = (widgetId, value) => { this.setWidgetValue(widgetId, value); };
+        zapi.ui.getAllWidgets = () => { return this.getAllWidgets(); };
+        zapi.ui.addWidgetMapping = (widgetId) => { return this.addWidgetMapping(widgetId); };
         success();
       });
     });
@@ -538,24 +536,23 @@ class SystemEvents {
 class Core {
   constructor() {
     zapi.system.events.emit('system_corestarted');
-    var that = this;
     var self = this;
     this.messageQueue = new MessageQueue();
     this.audio = new Audio();
 
 
     //Building zapi
-    zapi.performance.setElapsedStart = (test) => { performance.setElapsedStart(test) };
-    zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test) };
-    zapi.performance.inc = (name, num) => { performance.inc(name, num) };
-    zapi.performance.dec = (name, num) => { performance.dec(name, num) };
+    zapi.performance.setElapsedStart = (test) => { performance.setElapsedStart(test); };
+    zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test); };
+    zapi.performance.inc = (name, num) => { performance.inc(name, num); };
+    zapi.performance.dec = (name, num) => { performance.dec(name, num); };
     zapi.performance.reset = () => { performance.reset(); };
-    zapi.system.sendMessage = (message) => { self.messageQueue.send(message) };
-    zapi.audio.getLocalInputId = (name) => { return self.audio.getLocalInputId(name) };
-    zapi.audio.getLocalOutputId = (name) => { return self.audio.getLocalOutputId(name) };
-    zapi.audio.getRemoteInputsIds = () => { return self.audio.getRemoteInputsIds() };
-    zapi.audio.getRemoteOutputIds = () => { return self.audio.getRemoteOutputIds() };
-    zapi.audio.addAudioReportAnalyzer = (audioReporter) => { return new AudioReportAnalyzer(audioReporter) };
+    zapi.system.sendMessage = (message) => { self.messageQueue.send(message); };
+    zapi.audio.getLocalInputId = (name) => { return self.audio.getLocalInputId(name); };
+    zapi.audio.getLocalOutputId = (name) => { return self.audio.getLocalOutputId(name); };
+    zapi.audio.getRemoteInputsIds = () => { return self.audio.getRemoteInputsIds(); };
+    zapi.audio.getRemoteOutputIds = () => { return self.audio.getRemoteOutputIds(); };
+    zapi.audio.addAudioReportAnalyzer = (audioReporter) => { return new AudioReportAnalyzer(audioReporter); };
 
 
 
@@ -604,7 +601,7 @@ class Core {
 
     var data = this.safeStringify(zapi.system.systemReport);
     var key = systemconfig.system.systemReportApiKey;
-    var url = 'https://api.paste.ee/v1/pastes'
+    var url = 'https://api.paste.ee/v1/pastes';
     var body = {
       "description": systemunitName + ' - ' + date,
       "sections": [{
@@ -612,7 +609,7 @@ class Core {
         "syntax": "autodetect",
         "contents": data
       }]
-    }
+    };
 
     xapi.Command.HttpClient.Post({
       AllowInsecureHTTPS: true,
@@ -812,7 +809,7 @@ class Core {
       let presentationStatus = status.presentation.type;
       let callStatus = status.call;
 
-      var msg = undefined;
+      var msg;
       if (presentationStatus != 'NOPRESENTATION' && callStatus == 'Idle') {
         msg = str.endSessionPresentation;
       }
@@ -913,7 +910,7 @@ class Core {
         this.scenarios.enableScenario(systemconfig.system.onStandby.enableScenario);
         this.scheduleStandby();
       });
-    }
+    };
     this.scheduleStandby();
 
 
@@ -1131,7 +1128,7 @@ class Core {
     this.eventPresenterLocationSet(location);
   }
   setDND() {
-    this.setDNDInterval = setInterval(() => { this.setDND() }, 82800000);
+    this.setDNDInterval = setInterval(() => { this.setDND(); }, 82800000);
     xapi.Command.Conference.DoNotDisturb.Activate({ Timeout: 1440 });
   }
 
@@ -1216,13 +1213,6 @@ async function waitForAllDevicesConnected(disconnectedCallback) {
       disconnectedCallback(discdevs);
     }
   });
-}
-
-async function requiredPeripheralsDisconnected(callback) {
-
-}
-async function requiredPeripheralsConnected(callback) {
-
 }
 
 async function preInit() {
@@ -1409,6 +1399,9 @@ xapi.Status.SystemUnit.Uptime.get().then(uptime => {
     }, 5000);
   }
 });
+
+
+
 
 
 

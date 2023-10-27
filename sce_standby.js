@@ -1,3 +1,4 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
 import { zapiv1 as zapi } from './zapi';
 
@@ -64,4 +65,4 @@ export class Scenario {
   test() {
 
   }
-};
+}

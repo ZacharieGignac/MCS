@@ -1,3 +1,4 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
 import { config as systemconfig } from './config';
 import { zapiv1 as zapi } from './zapi';
@@ -99,7 +100,7 @@ export class AudioInputGroup {
         InputId: this.inputId,
         OutputId: lo.inputId
       });
-      debug(1, `DEVICE ${this.config.id}: ConnectToLocalOutput: ${li.config.id}`);
+      debug(1, `DEVICE ${this.config.id}: ConnectToLocalOutput: ${lo.config.id}`);
     }
     catch (e) {
       debug(1, `DEVICE ${this.config.id} ConnectToLocalOutput error: ${e}`);
@@ -112,7 +113,7 @@ export class AudioInputGroup {
         InputId: this.inputId,
         OutputId: lo.outputId
       });
-      debug(1, `DEVICE ${this.config.id}: DisconnectFromLocalOutput: ${li.config.id}`);
+      debug(1, `DEVICE ${this.config.id}: DisconnectFromLocalOutput: ${lo.config.id}`);
     }
     catch (e) {
       debug(1, `DEVICE ${this.config.id} DisconnectFromLocalOutput error: ${e}`);
@@ -413,7 +414,7 @@ export class Light {
           this.dim(this.beforeOffLevel);
         }
         else {
-          this.beforeOffLevel = this.currentDimLevel
+          this.beforeOffLevel = this.currentDimLevel;
           this.dim(0);
         }
       }
@@ -728,7 +729,7 @@ export class AudioInput {
       this.beforeBoostGain = this.currentGain;
       this.setGain(this.config.boost);
     }
-    else if (!boost == true || boost == 'off') {
+    else if (boost == false || boost == 'off') {
       this.setGain(this.beforeBoostGain);
     }
   }
@@ -788,7 +789,7 @@ export class Screen {
     position = position.toLowerCase();
     if (position != this._currentPosition) {
       this._currentPosition = position;
-      this.driver.setPosition(position)
+      this.driver.setPosition(position);
     }
   }
 
@@ -878,7 +879,7 @@ export class Shade {
     position = position.toLowerCase();
     if (position != this._currentPosition) {
       this._currentPosition = position;
-      this.driver.setPosition(position)
+      this.driver.setPosition(position);
     }
   }
 
@@ -899,14 +900,3 @@ export class Shade {
     this.setDefaults();
   }
 }
-
-
-
-
-
-
-
-
-
-
-

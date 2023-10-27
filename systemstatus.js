@@ -1,3 +1,4 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
 import { config as systemconfig } from './config';
 import { zapiv1 as zapi } from './zapi';
@@ -9,8 +10,6 @@ const PRES_LOCALSHARE = 'LOCALSHARE';
 const PRES_REMOTE = 'REMOTE';
 const PRES_REMOTELOCALPREVIEW = 'REMOTELOCALPREVIEW';
 
-var _systemStatus = {};
-var _callbacks = [];
 var eventSinks = [];
 var callEventSinks = [];
 
@@ -18,7 +17,7 @@ function toOnOff(value) {
   return value ? 'on' : 'off';
 }
 
-function compareObjects(obj1, obj2) {
+function areObjectsIdentical(obj1, obj2) {
   const obj1Keys = Object.keys(obj1);
   const obj2Keys = Object.keys(obj2);
 
@@ -26,22 +25,24 @@ function compareObjects(obj1, obj2) {
     return false;
   }
   for (const key of obj1Keys) {
-    const value1 = obj1[key];
-    const value2 = obj2[key];
     if (!obj2.hasOwnProperty(key)) {
       return false;
     }
-    if (value1 !== value2) {
-      return false;
-    }
-    if (typeof value1 === 'object' && typeof value2 === 'object') {
+    const value1 = obj1[key];
+    const value2 = obj2[key];
+    
+    if (typeof value1 === 'object' && value1 !== null && typeof value2 === 'object' && value2 !== null) {
       if (!areObjectsIdentical(value1, value2)) {
         return false;
       }
+    } else if (value1 !== value2) {
+      return false;
     }
   }
   return true;
 }
+
+
 
 async function checkPresentationStatus() {
   const presStatus = await presentation.getStatus();
@@ -90,7 +91,7 @@ export var call = {
   onChange: function (callback) {
     callEventSinks.push(callback);
   }
-}
+};
 
 export var presentation = {
   onChange: function (callback) {
@@ -134,7 +135,7 @@ export var presentation = {
       });
     });
   }
-}
+};
 
 export class SystemStatus {
   constructor() {
@@ -142,12 +143,12 @@ export class SystemStatus {
     this._systemStatus = {};
     this._systemStatus.presentation = {};
     this._callbacks = [];
-    zapi.system.setStatus = (key, value, notify) => { self.setStatus(key, value, notify) };
-    zapi.system.getAllStatus = () => { return self.getAllStatus() };
-    zapi.system.onStatusChange = (callback) => { self.onChange(callback) };
-    zapi.system.onStatusKeyChange = (key, callback) => { self.onKeyChg(key, callback) };
-    zapi.system.getStatus = (key) => { return self.getStatus(key) };
-    zapi.system.resetSystemStatus = () => { self.setDefaults() };
+    zapi.system.setStatus = (key, value, notify) => { self.setStatus(key, value, notify); };
+    zapi.system.getAllStatus = () => { return self.getAllStatus(); };
+    zapi.system.onStatusChange = (callback) => { self.onChange(callback); };
+    zapi.system.onStatusKeyChange = (key, callback) => { self.onKeyChg(key, callback); };
+    zapi.system.getStatus = (key) => { return self.getStatus(key); };
+    zapi.system.resetSystemStatus = () => { self.setDefaults(); };
 
   }
 
@@ -165,23 +166,23 @@ export class SystemStatus {
       this.setStatus('call', callStatus, false);
 
       //Set special "hdmipassthrough" status
-      let hpt = await xapi.Status.Video.Output.HDMI.Passthrough.Status.get()
+      let hpt = await xapi.Status.Video.Output.HDMI.Passthrough.Status.get();
       this.setStatus('hdmiPassthrough', hpt);
       xapi.Status.Video.Output.HDMI.Passthrough.Status.on(hptstatus => {
         this.setStatus('hdmiPassthrough', hptstatus);
       });
 
       presentation.onChange(status => {
-        if (!compareObjects(this._systemStatus.presentation, status)) {
+        if (!areObjectsIdentical(this._systemStatus.presentation, status)) {
           debug(1, 'Updating presentation status');
           this.setStatus('presentation', status);
         }
       });
       call.onChange(call => {
-        if (!compareObjects(this._systemStatus.call, call)) {
+        if (!areObjectsIdentical(this._systemStatus.call, call)) {
           debug(1, 'Updating call status');
           this.setStatus('call', call);
-        };
+        }
       });
 
       /* Handle UI automapping */

@@ -1,3 +1,4 @@
+/* jshint esversion:8 */
 //Version: 0.0.1 (beta)
 
 import xapi from 'xapi';
@@ -12,7 +13,7 @@ function schedule(time, action) {
   now = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
   let difference = parseInt(alarmH) * 3600 + parseInt(alarmM) * 60 - now;
   if (difference <= 0) difference += 24 * 3600;
-  clearTimeout(scheduleTimeout)
+  clearTimeout(scheduleTimeout);
   scheduleTimeout = setTimeout(action, difference * 1000);
 }
 
@@ -61,17 +62,6 @@ async function writeConfig(config) {
 }
 
 
-let configtemplate = {
-  manifestVersion: 1,
-  branches: [
-    {
-      version: 0,
-      branch: 'https://raw.githubusercontent.com/ZacharieGignac/MCS/main/autoupdater/dev/%FILE%?raw=true'
-    },
-  ]
-}
-//writeConfig(configtemplate);
-
 function sanitizeJSON(unsanitized){	
     return unsanitized.replace(/\n/g, "").replace(/\r/g, ""); 
 }
@@ -109,7 +99,7 @@ async function updatebranch(manifestVersion, branch, manual = false) {
                 xapi.Command.Provisioning.Service.Fetch({ Mode: update.mode, URL: updatefile }).then(() => {
                   resolve();
                 }).catch(err => {
-                  displaytext(3, `updatebranch error: ${err}`)
+                  displaytext(3, `updatebranch error: ${err}`);
                   displaytext(3, `Update error. Reverting version in branch.`);
                   updateConfigBranchVersion(branch.id, branchCurrentVersion);
                   resolve();
@@ -190,3 +180,6 @@ async function init() {
 
 
 init();
+
+
+

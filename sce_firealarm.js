@@ -1,3 +1,4 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
 import { zapiv1 as zapi } from './zapi';
 
@@ -33,7 +34,7 @@ export var Manifest = {
 
 export class Scenario {
   constructor() {
-    this.alertMessage;
+    this.alertMessage = undefined;
     xapi.Status.RoomAnalytics.T3Alarm.Detected.on(value => {
       console.log(`Current T3 value is: ${value}`);
       if (value == 'True') {

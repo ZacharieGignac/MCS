@@ -1,5 +1,5 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
-import { config as systemconfig } from './config';
 import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
@@ -80,14 +80,15 @@ export class DisplayDriver_isc {
     this.device = device;
     if (config.supportsUsageHours) {
       xapi.Event.Message.Send.Text.on(text => {
-        let split = text.split(':');
-        if (split[0] == config.name) {
-          let split = split[1](';');
-          if (split[0] == 'USAGEREPLY') {
-            this.device.fbUsageHours(split[1]);
-          }
-        }
-      });
+  let splitText = text.split(':');
+  if (splitText[0] == config.name) {
+    let splitMessage = splitText[1].split(';');
+    if (splitMessage[0] == 'USAGEREPLY') {
+      this.device.fbUsageHours(splitMessage[1]);
+    }
+  }
+});
+
     }
   }
 
@@ -218,7 +219,7 @@ export class AudioInputDriver_codecpro {
     }
   }
 
-  off(mute) {
+  setMode(mute) {
     if (mute.toLowerCase() == 'off') {
       this.mute();
     }

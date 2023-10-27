@@ -2,7 +2,6 @@ import xapi from 'xapi';
 
 import { zapiv1 as zapi } from './zapi';
 import { config as systemconfig } from './config';
-import { debug } from './debug';
 
 export var Manifest = {
   fileName: 'mod_hidcameraman',

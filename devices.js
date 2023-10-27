@@ -1,6 +1,6 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
 import { config as systemconfig } from './config';
-import * as devicesLibrary from './devices';
 import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
@@ -18,12 +18,12 @@ export class DevicesManager {
     var self = this;
 
     //Setup ZAPI
-    zapi.devices.getAllDevices = () => { return self.getAllDevices(); }
-    zapi.devices.getDevice = (id) => { return self.getDevice(id); }
-    zapi.devices.getDevicesByType = (type) => { return self.getDevicesByType(type); }
-    zapi.devices.getDevicesInGroup = (group) => { return self.getDevicesInGroup(group); }
-    zapi.devices.getDevicesByTypeInGroup = (type, group) => { return self.getDevicesByTypeInGroup(type, group); }
-    zapi.devices.activateCameraPreset = (presetId) => { self.activateCameraPreset(presetId); }
+    zapi.devices.getAllDevices = () => { return self.getAllDevices(); };
+    zapi.devices.getDevice = (id) => { return self.getDevice(id); };
+    zapi.devices.getDevicesByType = (type) => { return self.getDevicesByType(type); };
+    zapi.devices.getDevicesInGroup = (group) => { return self.getDevicesInGroup(group); };
+    zapi.devices.getDevicesByTypeInGroup = (type, group) => { return self.getDevicesByTypeInGroup(type, group); };
+    zapi.devices.activateCameraPreset = (presetId) => { self.activateCameraPreset(presetId); };
 
   }
 

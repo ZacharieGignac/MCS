@@ -1,3 +1,4 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
 
 /*****************************/
@@ -37,7 +38,7 @@ const DEBUGLEVEL = {
   MEDIUM: 2,
   HIGH: 1,
   NONE: 0
-}
+};
 
 const DEVICETYPE = {
   CONTROLSYSTEM: 'CONTROLSYSTEM',
@@ -55,7 +56,7 @@ const DEVICETYPE = {
   SHADE: 'SHADE',
   CAMERA: 'CAMERA',
   SOFTWAREDEVICE: 'SOFTWAREDEVICE'
-}
+};
 
 
 export const PRODUCT = 'MCS (dev)';

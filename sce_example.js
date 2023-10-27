@@ -1,3 +1,4 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
 import { zapiv1 as zapi } from './zapi';
 
@@ -38,7 +39,7 @@ export class Scenario {
       this.checkVolume(vol);
     });
     //Écoute les changements de statut
-    zapi.system.onStatusChange((status) => { this.onStatusChange(status) });
+    zapi.system.onStatusChange((status) => { this.onStatusChange(status); });
   }
 
   enable() {

@@ -1,3 +1,4 @@
+/* jshint esversion:8 */
 import xapi from 'xapi';
 import { config as systemconfig } from './config';
 import { zapiv1 as zapi } from './zapi';
@@ -51,7 +52,7 @@ export class Scenarios {
       const panels = list.Extensions.Panel;
       for (let panel of panels) {
         this.uiPanels.push(panel.PanelId);
-      };
+      }
     });
 
     debug(1, 'Scenarios Manager starting...');
@@ -60,7 +61,7 @@ export class Scenarios {
       let newScenario = {
         manifest: sce.Manifest,
         scenario: new sce.Scenario()
-      }
+      };
       this.scenariosLibrary.push(newScenario);
       debug(1, `Scenario loaded: ${newScenario.manifest.friendlyName}, version ${newScenario.manifest.version}`);
     }
@@ -78,9 +79,9 @@ export class Scenarios {
   async enableScenario(id) {
 
     zapi.performance.setElapsedStart('Scenarios.enableScenario');
-    var currManifest = undefined;
-    var currScenario = undefined;
-    var disableResult = undefined;
+    var currManifest;
+    var currScenario;
+    var disableResult;
     this.previousScenario = this.currentScenario;
     debug(1, `EnableScenario request. Current scenario is "${this.currentScenario}", requested scenario is "${id}"`);
     if (this.currentScenario != id) {

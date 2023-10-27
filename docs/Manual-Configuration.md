@@ -486,7 +486,7 @@ Le groupe devrait contenir les appareils suivants:
 - Les toiles motorisées `Screen`
 - La caméra à utiliser `Camera`
 - Le preset de caméra `CameraPreset`
-- La scène d'éclairage
+- La scène d'éclairage `LightScene`
 - Le groupe de sortie audio utilisé pour le son des sites distants `AudioOutputGroup`
 
 #### Groupe "system.byod.main"

@@ -1,0 +1,12 @@
+{ 
+  "version": 1,  
+  "channel": "comotype1_stable", 
+  "updates": [    
+    {
+      "version": 1,
+      "type": "auto",
+      "mode": "add",
+      "file": "comotype1_stable_v1.zip"
+    } 
+  ]
+}

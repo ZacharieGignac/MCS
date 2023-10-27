@@ -1,6 +1,5 @@
 # MCS
-"MODULAR CONTROL SYSTEM". Nom temporaire.
+"MODULAR CONTROL SYSTEM". Original.
 
-Non, je l'appelerai pas PrepOS, ni PrepUL.
-
-Si je meurs, y'a pas encore de documentation. Bonne chance!
+## Statut
+Fonctionnel, phase de test

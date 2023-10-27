@@ -10,7 +10,7 @@ export var Manifest = {
   description: `Exemple de scénario qui ne veut vraiment pas que le volume soit au dessus de 70%, et autres choses.`,
   panels: {
     hide: ['*'],
-    show: ['comotype1_settings']
+    show: ['example_settings']
   },
   features: {
     cameraControls: true,
@@ -19,6 +19,7 @@ export var Manifest = {
     joinGoogleMeet: false,
     joinWebex: true,
     joinZoom: false,
+    joinMicrosoftTeamsCVI: false,
     keypad: true,
     layoutControls: true,
     midCallControls: false,
@@ -26,8 +27,7 @@ export var Manifest = {
     participantList: true,
     selfviewControls: true,
     start: true,
-    videoMute: true,
-    joinMicrosoftTeamsCVI: false
+    videoMute: true
   }
 };
 
@@ -42,14 +42,14 @@ export class Scenario {
   }
 
   enable() {
-    //Retourne une promesse et déclaire que le scénario est activé
+    //Retourne une promesse et déclaire que le scénario peut être désactivé
     return new Promise(success => {
       success(true);
     });
   }
 
   disable() {
-    //Retourne une promesse et déclaire que le scénario est désactivé
+    //Retourne une promesse et déclaire que le scénario peut être désactivé
     return new Promise(success => {
       success(true);
     });

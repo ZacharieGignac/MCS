@@ -76,6 +76,7 @@ export class Scenarios {
   }
 
   async enableScenario(id) {
+
     zapi.performance.setElapsedStart('Scenarios.enableScenario');
     var currManifest = undefined;
     var currScenario = undefined;
@@ -89,7 +90,7 @@ export class Scenarios {
       }
       else {
         currManifest = match[0].manifest;
-        /* Disabling current scenario */
+        // Disabling current scenario
         if (this.currentScenario == undefined) {
           debug(1, `No scenario loaded. Enabling default scenario: ${id}`);
           currScenario = undefined;
@@ -148,6 +149,7 @@ export class Scenarios {
     }
     debug(1, `Current scenario is: ${this.currentScenario}`);
     zapi.performance.setElapsedEnd('Scenarios.enableScenario');
+    
   }
 
   enablePreviousScenario() {

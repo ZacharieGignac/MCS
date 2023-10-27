@@ -1372,7 +1372,7 @@ async function init() {
     setTimeout(setupAudioAnalyzer, 5000);
     */
 
-  zapi.test('test un deux trois!');
+  
 }
 
 

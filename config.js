@@ -4,8 +4,8 @@ import xapi from 'xapi';
 //Import scenarios here with syntax: import * as SCE_Name from './SCE_Name';
 import * as sce_standby from './sce_standby';
 import * as sce_como_type1 from './sce_como_type1';
-import * as sce_firealarm from './sce_firealarm';
-import * as sce_example from './sce_example';
+//import * as sce_firealarm from './sce_firealarm';
+//import * as sce_example from './sce_example'; //Example
 //Add scenarios to config.scenarios below.
 /****************************/
 
@@ -15,8 +15,8 @@ import * as sce_example from './sce_example';
 /****************************/
 //Import modules below
 import * as mod_autosauce from './mod_autosauce';
-import * as mod_hidcameraman from './mod_hidcameraman';
-import * as mod_example from './mod_example';
+//import * as mod_hidcameraman from './mod_hidcameraman';
+//import * as mod_example from './mod_example'; //Example
 /****************************/
 
 
@@ -65,14 +65,14 @@ export var config = {
   scenarios: [
     sce_standby,
     sce_como_type1,
-    sce_firealarm,
-    sce_example
+    //sce_firealarm,
+    //sce_example 
   ],
 
   modules: [
     mod_autosauce,
-    mod_hidcameraman,
-    mod_example
+    //mod_hidcameraman,
+    //mod_example
   ],
 
 
@@ -152,7 +152,7 @@ export var config = {
       enableScenario: 'standby'                   // Scénario à activer lors du standby. Le système est livré avec un scénario conseillé nommé "standby", fichier "sce_standby"
     },
     onWakeup: {
-      enableScenario: 'example'                 // Scénario à activer lors de la sortie du standby (wakeup).
+      enableScenario: 'comotype1'                 // Scénario à activer lors de la sortie du standby (wakeup).
     }
   },
   audio: {

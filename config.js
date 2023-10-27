@@ -58,7 +58,7 @@ const DEVICETYPE = {
 }
 
 
-export const PRODUCT = 'PrepOS (dev)';
+export const PRODUCT = 'MCS (dev)';
 export const VERSION = '0.0.1';
 
 export var config = {

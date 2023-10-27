@@ -7,6 +7,12 @@
       "type": "auto",
       "mode": "add",
       "file": "comotype1_test_v1.zip"
-    } 
+    },
+    {
+      "version": 2,
+      "type": "auto",
+      "mode": "add",
+      "file": "comotype1_test_v2.zip"
+    }
   ]
 }

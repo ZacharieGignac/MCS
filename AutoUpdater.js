@@ -164,6 +164,12 @@ async function update() {
 
 
 async function init() {
+  xapi.Event.Message.Send.Text.on(text => {
+    if (text == 'update now') {
+      console.warn(`Updating NOW: Received request by terminal command.`);
+      update();
+    }
+  });
   await readConfig();
   if (currentConfig.scheduleUpdate) {
     displaytext(1, `Scheduling automatic updates for ${currentConfig.updateTime}`);
@@ -174,6 +180,9 @@ async function init() {
     setTimeout(() => {
       update();
     }, currentConfig.updateStartDelay * 1000);
+  }
+  else {
+    console.warn(`Skipping updates on start.`);
   }
 
 }

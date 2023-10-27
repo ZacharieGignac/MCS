@@ -1,6 +1,6 @@
 { 
   "version": 1,  
-  "channel": "comotype1_stable", 
+  "channel": "comotype1/stable", 
   "updates": [    
     {
       "version": 1,

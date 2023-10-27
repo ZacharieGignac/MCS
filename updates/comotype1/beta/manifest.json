@@ -1,12 +1,12 @@
 { 
   "version": 1,  
-  "channel": "comotype1/test", 
+  "channel": "comotype1/beta", 
   "updates": [    
     {
       "version": 1,
       "type": "auto",
       "mode": "add",
-      "file": "comotype1_test_v1.zip"
+      "file": "comotype1_beta_v1.zip"
     } 
   ]
 }

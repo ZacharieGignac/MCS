@@ -1,7 +1,8 @@
 /* jshint esversion:8 */
 import xapi from 'xapi';
 import { DevicesManager } from './devices';
-import { config as systemconfig, VERSION, PRODUCT } from './config';
+import { config as systemconfig } from './config';
+import { PRODUCT, VERSION } from './config';
 import { Scenarios } from './scenarios';
 import { Modules } from './modules';
 import { SystemStatus } from './systemstatus';
@@ -90,6 +91,8 @@ var performance = new Performance();
 performance.setElapsedStart('Boot');
 var progress = 0;
 var timedProgressBar;
+
+
 function displayTimedProgressBar(title, time) {
   timedProgressBar = setInterval(() => {
     var done = '🟦'.repeat(progress);
@@ -137,7 +140,6 @@ class MessageQueue {
     }, systemconfig.system.messagesPacing);
   }
 }
-
 
 
 class Audio {
@@ -205,6 +207,8 @@ class Audio {
     });
   }
 }
+
+
 
 
 class AudioReportAnalyzer {
@@ -289,9 +293,6 @@ class AudioReportAnalyzer {
 
 
 
-
-
-
 class WidgetMapping {
   constructor(widgetId) {
     this.callbacks = [];
@@ -342,6 +343,37 @@ class WidgetMapping {
 }
 
 
+
+
+
+
+
+class SystemEvents {
+  constructor() {
+    this.events = {};
+  }
+
+  on(event, callback) {
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+    this.events[event].push(callback);
+  }
+
+  off(event, callback) {
+    if (!this.events[event]) return;
+    const index = this.events[event].indexOf(callback);
+    if (index !== -1) {
+      this.events[event].splice(index, 1);
+    }
+  }
+
+  emit(event, ...args) {
+    if (!this.events[event]) return;
+    this.events[event].forEach(callback => callback(...args));
+  }
+}
+
 class UiManager {
   constructor() {
     this.allWidgets = [];
@@ -352,9 +384,19 @@ class UiManager {
   }
 
   async init() {
-    return new Promise(success => {
+
+
+    return new Promise(async success => {
+      xapi.Event.UserInterface.on(event => { this.forwardUiEvents(event); });
+      this.onUiEvent((event) => this.parseUiEvent(event));
+      zapi.ui.addActionMapping = (regex, func) => { this.addActionMapping(regex, func); };
+      zapi.ui.setWidgetValue = (widgetId, value) => { this.setWidgetValue(widgetId, value); };
+      zapi.ui.getAllWidgets = () => { return this.getAllWidgets(); };
+      zapi.ui.addWidgetMapping = (widgetId) => { return this.addWidgetMapping(widgetId); };
+
       //Build widgets cache
-      xapi.Command.UserInterface.Extensions.List({}).then(list => {
+      let list = await xapi.Command.UserInterface.Extensions.List();
+
         for (let panel of list.Extensions.Panel) {
           if (panel.Page) {
             for (let page of panel.Page) {
@@ -370,14 +412,7 @@ class UiManager {
             }
           }
         }
-        xapi.Event.UserInterface.on(event => { this.forwardUiEvents(event); });
-        this.onUiEvent((event) => this.parseUiEvent(event));
-        zapi.ui.addActionMapping = (regex, func) => { this.addActionMapping(regex, func); };
-        zapi.ui.setWidgetValue = (widgetId, value) => { this.setWidgetValue(widgetId, value); };
-        zapi.ui.getAllWidgets = () => { return this.getAllWidgets(); };
-        zapi.ui.addWidgetMapping = (widgetId) => { return this.addWidgetMapping(widgetId); };
         success();
-      });
     });
   }
 
@@ -504,34 +539,6 @@ class UiManager {
     }
   }
 }
-
-class SystemEvents {
-  constructor() {
-    this.events = {};
-  }
-
-  on(event, callback) {
-    if (!this.events[event]) {
-      this.events[event] = [];
-    }
-    this.events[event].push(callback);
-  }
-
-  off(event, callback) {
-    if (!this.events[event]) return;
-    const index = this.events[event].indexOf(callback);
-    if (index !== -1) {
-      this.events[event].splice(index, 1);
-    }
-  }
-
-  emit(event, ...args) {
-    if (!this.events[event]) return;
-    this.events[event].forEach(callback => callback(...args));
-  }
-}
-
-
 
 class Core {
   constructor() {
@@ -938,6 +945,7 @@ class Core {
     }
 
     //Starts devices monitoring
+
     this.devicesMonitoringInterval = setInterval(async () => {
       zapi.system.events.emit('system_peripheralscheck');
       let missingDevices = await getDisconnectedRequiredPeripherals();
@@ -955,6 +963,7 @@ class Core {
 
       }
     }, systemconfig.system.requiredPeripheralsCheckInterval);
+
 
     zapi.system.setStatus('Uptime', await xapi.Status.SystemUnit.Uptime.get());
     zapi.system.setStatus('Temperature', await xapi.Status.SystemUnit.Hardware.Monitoring.Temperature.Status.get());
@@ -1362,7 +1371,7 @@ async function init() {
     setTimeout(setupAudioAnalyzer, 5000);
     */
 
-  
+
 }
 
 
@@ -1399,24 +1408,4 @@ xapi.Status.SystemUnit.Uptime.get().then(uptime => {
     }, 5000);
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

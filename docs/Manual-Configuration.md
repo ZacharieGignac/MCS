@@ -466,10 +466,10 @@ Le groupe d'écran de présentation pourrait être défini comme suit pour une s
 }
 ```
 
-## Noms de groupes
+### Noms de groupes
 Certains noms de groupe sont "par défaut". Ces groupes sont recommandés pour unifier certains aspects des salles, et les scénarios devraient autant que possible utiliser les groupes par défaut. Les noms de ces groupes commencent toujours par "system"
 
-### Groupe "system.presentation.main"
+#### Groupe "system.presentation.main"
 Défini le groupe d'appareils de présentation principal.
 
 Le groupe devrait contenir les appareils suivants:
@@ -481,7 +481,7 @@ Le groupe devrait contenir les appareils suivants:
 - La scène d'éclairage `LightScene`
 - Le groupe de sortie audio utilisé pour le son de la présentation `AudioOutputGroup`
 
-### Groupe "system.farend.main"
+#### Groupe "system.farend.main"
 - Les affichages `Display`
 - Les toiles motorisées `Screen`
 - La caméra à utiliser `Camera`
@@ -489,38 +489,38 @@ Le groupe devrait contenir les appareils suivants:
 - La scène d'éclairage
 - Le groupe de sortie audio utilisé pour le son des sites distants `AudioOutputGroup`
 
-### Groupe "system.byod.main"
+#### Groupe "system.byod.main"
 - Les affichages `Display`
 
-### Groupe "system.audio.allmics"
+#### Groupe "system.audio.allmics"
 - Tous les microphones `AudioInput`
 
-### Groupe "system.audio.presentermics"
+#### Groupe "system.audio.presentermics"
 - Tous les microphones des présentateurs `AudioInput`
 
-### Groupe "system.audio.audiencemics"
+#### Groupe "system.audio.audiencemics"
 - Tous les microphones de l'auditoire `AudioInput`
 
-### Groupe "system.audio.presentationsources"
+#### Groupe "system.audio.presentationsources"
 - Groupes d'entrées audio des sources de présentation `AudioInputGroup`
 
-### Groupe "system.lightscene.standby"
+#### Groupe "system.lightscene.standby"
 - Scène d'éclairage en standby `LightScene`
 
-### Groupe "system.lightscene.idle"
+#### Groupe "system.lightscene.idle"
 - Scène d'éclairage en mode normal, allumé, sans appel, sans présentation `LightScene`
 
-### Groupe "system.lightscene.presentation"
+#### Groupe "system.lightscene.presentation"
 - Scène d'éclairage en mode présentation `LightScene`
 
-### Groupe "system.lightscene.writing
+#### Groupe "system.lightscene.writing
 - Scène d'éclairage en mode "Écrire au tableau" `LightScene`
 
-### Groupe "system.lightscene.emergency"
+#### Groupe "system.lightscene.emergency"
 - Scène d'éclairage en cas d'urgence (feu) `LightScene`
 
-### Groupe "system.audio.extra.output"
+#### Groupe "system.audio.extra.output"
 - Groupe de sortie audio supplémentaire quand le volume est au-dessus d'un certain niveau `AudioOutputGroup`
 
-### Groupe "system.audio.extra.inputs"
+#### Groupe "system.audio.extra.inputs"
 - Groupes d'entrées audio à connecter à "system.audio.extra.output" `AudioInputGroup`

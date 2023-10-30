@@ -1392,6 +1392,8 @@ xapi.Status.SystemUnit.Uptime.get().then(uptime => {
       xapi.Status.SystemUnit.Uptime.get().then(uptime => {
         if (uptime > systemconfig.system.coldBootWait) {
           clearInterval(coldbootWarningInterval);
+          xapi.Command.Macros.Runtime.Restart();
+
         }
       });
     }, 5000);

@@ -89,28 +89,18 @@ class Performance {
 }
 var performance = new Performance();
 performance.setElapsedStart('Boot');
-var progress = 0;
-var timedProgressBar;
 
 
-function displayTimedProgressBar(title, time) {
-  timedProgressBar = setInterval(() => {
-    var done = '🟦'.repeat(progress);
-    var notdone = '⬛'.repeat(20 - progress);
-    xapi.Command.UserInterface.Message.Prompt.Display({
-      title: title,
-      text: done + notdone,
-      FeedbackId: 'TimedProgressBar'
-    });
-    progress++;
 
-    if (progress == 21) {
-      progress = 0;
-      done = '';
-      clearInterval(timedProgressBar);
-      xapi.Command.UserInterface.Message.Prompt.Clear({ FeedbackId: 'TimedProgressBar' });
-    }
-  }, time / 20);
+function displayNewSessionMessage() {
+  xapi.Command.UserInterface.Message.Prompt.Display({
+    title: systemconfig.strings.newSessionTitle,
+    text: `Veuillez patienter ${systemconfig.system.newSessionDelay / 1000} secondes.`,
+  });
+
+  setTimeout(() => {
+    xapi.Command.UserInterface.Message.Prompt.Clear();
+  },systemconfig.system.newSessionDelay);
 }
 
 
@@ -397,22 +387,22 @@ class UiManager {
       //Build widgets cache
       let list = await xapi.Command.UserInterface.Extensions.List();
 
-        for (let panel of list.Extensions.Panel) {
-          if (panel.Page) {
-            for (let page of panel.Page) {
-              if (page.Row) {
-                for (let row of page.Row) {
-                  if (row.Widget) {
-                    for (let widget of row.Widget) {
-                      this.allWidgets.push({ widgetId: widget.WidgetId, type: widget.Type });
-                    }
+      for (let panel of list.Extensions.Panel) {
+        if (panel.Page) {
+          for (let page of panel.Page) {
+            if (page.Row) {
+              for (let row of page.Row) {
+                if (row.Widget) {
+                  for (let widget of row.Widget) {
+                    this.allWidgets.push({ widgetId: widget.WidgetId, type: widget.Type });
                   }
                 }
               }
             }
           }
         }
-        success();
+      }
+      success();
     });
   }
 
@@ -1126,11 +1116,10 @@ class Core {
   handleWakeup() {
     debug(1, 'Waking up...');
     this.audioExtraSkipPrompt = false;
-    displayTimedProgressBar(systemconfig.strings.newSessionTitle, systemconfig.system.newSessionDelay);
+    displayNewSessionMessage();
     if (this.scenarios.currentScenario == systemconfig.system.onStandby.enableScenario) {
       this.scenarios.enableScenario(systemconfig.system.onWakeup.enableScenario);
     }
-
   }
 
   setPresenterLocation(location) {

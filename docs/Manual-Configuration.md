@@ -318,14 +318,27 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 * **audioinput.presenter.sf1:LEVEL** : Slider, affiche et configure le gain de l'entrée. Automatiquement scalé entre 0 et 255 -> gainLowLimite et gainHighLimit
 * **audioinput.presenter.sf1:LEVELGROUP** : Button group, affiche et configure le gain de l'entrée, en utilisant mute, lowGain, mediumGain, highGain. L'identification des 4 boutons doivent êtres "off, low, medium, high"
 
-### CameraPreset (preset de caméra)
+### CameraPreset
+#### Pour caméra Cisco
 ```JS
     {
       id: 'campreset.presenter',            //identification unique
       name: 'Présentateur',                 //Nom
       type: DEVICETYPE.CAMERAPRESET,        //Type = 'CAMERAPRESET'
       device: devicesLibrary.CameraPreset,  //Classe à utiliser
+      presetType: 'preset',                 //Pour les caméras Cisco, utilisez "preset"
       presetName: 'Présentateur'            //Nom du preset dans le codec
+    }
+```
+#### Pour autres caméras
+```JS
+    {
+      id: 'campreset.presenter',            //identification unique
+      name: 'Présentateur',                 //Nom
+      type: DEVICETYPE.CAMERAPRESET,        //Type = 'CAMERAPRESET'
+      device: devicesLibrary.CameraPreset,  //Classe à utiliser
+      presetType: 'source',                 //Pour les caméras non-cisco, utilisez "source"
+      presetSource: 1                       //Connecteur HDMI
     }
 ```
 

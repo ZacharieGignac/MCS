@@ -566,8 +566,14 @@ export class CameraPreset {
     });
   }
   activate() {
-    debug(1, `DEVICE ${this.config.id}: Activating preset`);
-    zapi.devices.activateCameraPreset(this.config.presetName);
+    if (this.config.presetType == 'preset') {
+      debug(1, `DEVICE ${this.config.id}: Activating preset`);
+      zapi.devices.activateCameraPreset(this.config.presetName);
+    }
+    else if (this.config.presetType == 'source') {
+      zapi.devices.setMainVideoSource(this.config.presetSource);
+    }
+
   }
 }
 

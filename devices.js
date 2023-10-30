@@ -24,6 +24,7 @@ export class DevicesManager {
     zapi.devices.getDevicesInGroup = (group) => { return self.getDevicesInGroup(group); };
     zapi.devices.getDevicesByTypeInGroup = (type, group) => { return self.getDevicesByTypeInGroup(type, group); };
     zapi.devices.activateCameraPreset = (presetId) => { self.activateCameraPreset(presetId); };
+    zapi.devices.setMainVideoSource = (source) => { self.setMainVideoSource(source); };
 
   }
 
@@ -122,15 +123,28 @@ export class DevicesManager {
   }
 
   async activateCameraPreset(presetName) {
-    let allPresets = await xapi.Command.Camera.Preset.List();
-    let preset = allPresets.Preset.filter(p => p.Name == presetName)[0];
-    let presetDetails = await xapi.Command.Camera.Preset.Show({ PresetId: preset.PresetId });
-    let presetCamId = presetDetails.CameraId;
-    let connectors = await xapi.Config.Video.Input.Connector.get();
-    let camConnectorDetails = connectors.filter(connector => connector.CameraControl.CameraId == presetCamId)[0];
-    let camConnector = camConnectorDetails.id;
+    try {
+      let allPresets = await xapi.Command.Camera.Preset.List();
+      let preset = allPresets.Preset.filter(p => p.Name == presetName)[0];
+      let presetDetails = await xapi.Command.Camera.Preset.Show({ PresetId: preset.PresetId });
+      let presetCamId = presetDetails.CameraId;
+      let connectors = await xapi.Config.Video.Input.Connector.get();
+      let camConnectorDetails = connectors.filter(connector => connector.CameraControl.CameraId == presetCamId)[0];
+      let camConnector = camConnectorDetails.id;
 
-    xapi.Command.Camera.Preset.Activate({ PresetId: preset.PresetId });
-    xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
+      xapi.Command.Camera.Preset.Activate({ PresetId: preset.PresetId });
+      xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
+    }
+    catch(e) {
+      debug(3,`activateCameraPreset() error; ${e}`);
+    }
+  }
+  async setMainVideoSource(source) {
+    try {
+      xapi.Command.Video.Input.SetMainVideoSource({ConnectorId: source});
+    }
+    catch(e) {
+      debug(3,`setMainVideoSource() error: ${e}`);
+    }
   }
 }

@@ -440,21 +440,24 @@ export var config = {
       name: 'Présentateur',                 //Nom
       type: DEVICETYPE.CAMERAPRESET,        //Type = 'CAMERAPRESET'
       device: devicesLibrary.CameraPreset,  //Classe à utiliser
-      presetName: 'Présentateur'            //Nom du preset dans le codec
+      presetName: 'Présentateur',            //Nom du preset dans le codec
+      presetType: 'preset'
     },
     {
       id: 'campreset.board',
       name: 'Preset Tableau',
       type: DEVICETYPE.CAMERAPRESET,
       device: devicesLibrary.CameraPreset,
-      presetName: 'Tableau'
+      presetName: 'Tableau',
+      presetType: 'preset'
     },
     {
       id: 'campreset.audience',
       name: 'Preset Tableau',
       type: DEVICETYPE.CAMERAPRESET,
       device: devicesLibrary.CameraPreset,
-      presetName: 'Auditoire'
+      presetSource: 2,
+      presetType: 'source'
     },
 
 

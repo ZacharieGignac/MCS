@@ -2,7 +2,7 @@ let autoupdaterconfig = {
     "showLogs": true,
     "showWarns": true,
     "showErrors": true,
-    "updateOnMacroStart": true,
+    "updateOnMacroStart": false,
     "updateStartDelay": 15,
     "updateInstallDelay": 15,
     "scheduleUpdate": false,
@@ -11,8 +11,8 @@ let autoupdaterconfig = {
     "branches": [
         {
             "id": "dev",
-            "version": 1,
-            "url": "https://raw.githubusercontent.com/ZacharieGignac/MCS/main/updates/dev/%FILE%?raw=true"
+            "version": 2,
+            "url": "https://raw.githubusercontent.com/ZacharieGignac/MCS/main/updates/comotype1/test/%FILE%?raw=true"
         }
     ]
 }

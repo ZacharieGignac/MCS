@@ -22,6 +22,7 @@ export class Modules {
         });
       }
       debug(1, `Finished loading ${this.modules.length} modules.`);
+      zapi.system.events.emit('system_modules_init');
       success();
     });
   }

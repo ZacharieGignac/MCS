@@ -58,6 +58,7 @@ export class DevicesManager {
     });
 
     zapi.performance.setElapsedEnd('DevicesManager.init');
+    zapi.system.events.emit('system_devices_init');
   }
 
   getAllDevices() {

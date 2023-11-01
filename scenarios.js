@@ -70,6 +70,7 @@ export class Scenarios {
       this.enableScenario(systemconfig.system.onStandby.enableScenario);
     }, 1000);
     zapi.performance.setElapsedEnd('Scenarios.init');
+    zapi.system.events.emit('system_scenarios_init');
   }
 
   getScenario(id) {

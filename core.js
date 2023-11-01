@@ -1111,6 +1111,7 @@ class Core {
     this.disableExtraOutput();
 
     this.scenarios.enableScenario(systemconfig.system.onStandby.enableScenario);
+    zapi.system.events.emit('system_standby');
   }
 
   handleWakeup() {
@@ -1120,6 +1121,7 @@ class Core {
     if (this.scenarios.currentScenario == systemconfig.system.onStandby.enableScenario) {
       this.scenarios.enableScenario(systemconfig.system.onWakeup.enableScenario);
     }
+    zapi.system.events.emit('system_wakup');
   }
 
   setPresenterLocation(location) {

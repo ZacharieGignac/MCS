@@ -262,6 +262,7 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 ```
 
 ### Screen (toile motorisée)
+#### En utilisant un système de contrôle externe
 ```JS
     {
       id: 'screen',                                 //Identification unique
@@ -270,6 +271,20 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
       device: devicesLibrary.Screen,                //Classe à utiliser
       driver: driversLibrary.ScreenDriver_isc_h21,  //Driver à utiliser par le device
       defaultPosition: 'up'                         //Position par défaut lors du démarrage du système
+      alwaysUse: false,                             //Déclare que cette toile n'est PAS un obstacle à l'utilisation de la surface d'écriture
+    }
+```
+#### En utilisant les GPIO du CodecPro
+```JS
+    {
+      id: 'screen.gpio',                          //Identification unique
+      type: DEVICETYPE.SCREEN,                    //Type = 'SCREEN'
+      name: 'SCREEN2',                            //Nom
+      device: devicesLibrary.Screen,              //Classe à utiliser
+      driver: driversLibrary.ScreenDriver_gpio,   //Driver à utiliser par le device (GPIO)
+      pin1: 1,                                    //Pin GPIO pour monter la toile
+      pin2: 2,                                    //Pin GPIO pour descendre la toile
+      defaultPosition: 'up'                       //Position par défaut
     }
 ```
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.

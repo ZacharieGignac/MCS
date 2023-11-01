@@ -66,9 +66,9 @@ Certain devices incluent des mapping de widgets automatique. Il est important de
 * **Activer la scène d'éclairage** (bouton): id:ACTIVATE
 
 ### AudioInput
-* **Définir le mode (on, off) et l'afficher (toggle): id:MODE
-* **Définir le niveau (gain) et l'afficher (slider): id:LEVEL
-* **Définir le niveau (gain) et l'afficher (button group): id:LEVELGROUP
+* **Définir le mode (on, off) et l'afficher** (toggle): id:MODE
+* **Définir le niveau (gain) et l'afficher** (slider): id:LEVEL
+* **Définir le niveau (gain) et l'afficher** (button group): id:LEVELGROUP
 
 # Status système (systemStatus)
 Il est possible de connecter automatiquement une valeur de la structure globale "systemStatus" à un widget.

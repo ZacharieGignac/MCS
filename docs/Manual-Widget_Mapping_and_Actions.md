@@ -73,9 +73,9 @@ Certain devices incluent des mapping de widgets automatique. Il est important de
 # Status système (systemStatus)
 Il est possible de connecter automatiquement une valeur de la structure globale "systemStatus" à un widget.
 
-Tous les widgets possédant le préfixe "SS$" seront automatiquement connectés de façon bidirectionnel avec les valeurs de systemStatus.
+Tous les widgets possédant le préfixe "SS$" seront automatiquement connectés de façon bidirectionnelle avec les valeurs de systemStatus.
 
-Évidemment, les valeurs de systemStatus doivent être compatibles avec le widget. On ne peut placer assigner la valeur "boeuf" à un widget de type "toggle". 
+Évidemment, les valeurs de systemStatus doivent être compatibles avec le widget. On ne peut assigner la valeur "boeuf" à un widget de type "toggle". 
 
 Les valeurs bool de systemStatus sont automatiquement converties en valeurs 'on' et 'off'. Pour convertir automatiquement les valeurs 'on' et 'off' du widget en bool vers systemStatus, il est nécessaire d'ajuster le préfixe à "SS?".
 

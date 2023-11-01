@@ -19,7 +19,7 @@
 Il est préférable et fortement recommandé d'utiliser les mécanismes du système pour définir la valeur d'un widget ou pour écouter les événements d'un widget. Ces fonctions sont décrites dans la documentation de l'API.
 
 # Nomenclature
-Le système a quelques nomenclatures spéciales pour les widgets, et un mécanisme pour contourner une limitation dans la version actuelle quand plusieurs widgets ont le même "id", les préfixes. 
+Le système a quelques nomenclatures spéciales pour les widgets, et un mécanisme pour contourner une limitation dans la version actuelle quand plusieurs widgets ont le même "id"; les préfixes. 
 
 Une autre nomenclature indique au système de relier le widget à un statut système (systemStatus). 
 

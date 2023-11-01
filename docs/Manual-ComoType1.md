@@ -1,4 +1,4 @@
-# Comodal (Type 1)
+# Comodal (Type 1): sce_comotype1
 Ce scénario est destiné aux salles comodales tel qu'installées en 2021. C'est un remplacement direct du logiciel d'origine.
 
 Voici la configuration de la salle et les appareils supportés;

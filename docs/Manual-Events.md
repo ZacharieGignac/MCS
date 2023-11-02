@@ -42,7 +42,7 @@ On utilise la fonction `zapi.system.events.on` pour recevoir un événement. Il 
 ```JS
 let myEvent = zapi.system.events.on('my_event_with_one_arg', arg => {
   console.log(arg);
-}
+});
 ```
 
 ## Arrêter la réception d'un événement

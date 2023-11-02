@@ -18,6 +18,7 @@ import * as sce_como_type1 from './sce_como_type1';
 import * as mod_autosauce from './mod_autosauce';
 //import * as mod_hidcameraman from './mod_hidcameraman';
 //import * as mod_example from './mod_example'; //Example
+import * as mod_psacamcontrols from './mod_psacamcontrols';
 /****************************/
 
 
@@ -72,6 +73,7 @@ export var config = {
 
   modules: [
     mod_autosauce,
+    mod_psacamcontrols
     //mod_hidcameraman,
     //mod_example
   ],
@@ -83,6 +85,12 @@ export var config = {
     displayWebpage: true,
     webpageUrl: `http://youtube....`,
     displayFarendMessaeg: true
+  },
+
+  mod_psacamcontrols_config: {
+    panSpeed:12,
+    tiltSpeed:12,
+    zoomSpeed:12
   },
 
   mod_autosauce_config: {

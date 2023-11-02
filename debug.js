@@ -1,6 +1,5 @@
 import { config as systemconfig } from './config';
 
-
 export function debug(level, text) {
   if (systemconfig.system.debugLevel != 0 && level >= systemconfig.system.debugLevel) {
     switch (level) {

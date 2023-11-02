@@ -1,7 +1,19 @@
 # Comodal (Type 1): sce_comotype1
 Ce scénario est destiné aux salles comodales tel qu'installées en 2021. C'est un remplacement direct du logiciel d'origine.
 
-Voici la configuration de la salle et les appareils supportés;
+Les groupes nommés, même si ils ne contiennent aucun appareil, **DOIVENT** être présent dans la configuration.
+
+Liste complète des groupes:
+- `system.presentation.main`
+- `system.farend.main`
+- `system.byod.main`
+- `system.lightscene.idle`
+- `system.lightscene.presentation`
+- `system.lightscene.writing`
+- `system.audio.presentermics`
+- `system.audio.audiencemics`
+
+Voici la configuration de la salle et les appareils supportés
 
 ## Affichages
 ### Présentation (obligatoire)

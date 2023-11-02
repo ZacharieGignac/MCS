@@ -147,6 +147,7 @@ export var config = {
     disableAutoLightsWhenWidgetInteraction: true, // <true, false> Détermine si le contrôle automatique de l'éclairage est automatiquement désactivé lorsqu'un widget de Light ou LightScene est touché par l'utilisateur
     systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',                    // Clé d'api de "paste.ee" utilisé pour l'envoi de rapport système
     showStatusAndPerformanceReports:false,        //Affiche le rapport de status après le boot et à interval (pour le developement)
+    mainVideoSource:1,
     onStandby: {
       setDND: false,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
       clearCallHistory: false,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby

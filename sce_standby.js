@@ -1,6 +1,7 @@
 /* jshint esversion:8 */
 import xapi from 'xapi';
 import { zapiv1 as zapi } from './zapi';
+import { config as systemconfig } from './config';
 
 export var Manifest = {
   fileName: 'sce_standby',
@@ -39,6 +40,8 @@ export class Scenario {
 
     xapi.Command.Presentation.Stop();
     xapi.Command.Audio.Volume.SetToDefault();
+
+    xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: systemconfig.system.mainVideoSource });
 
     let devices = zapi.devices.getAllDevices();
 

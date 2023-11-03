@@ -565,10 +565,10 @@ export class CameraPreset {
       this.activate();
     });
   }
-  activate() {
+  activate(skipSetVideoSource = false) {
     if (this.config.presetType == 'preset') {
       debug(1, `DEVICE ${this.config.id}: Activating preset`);
-      zapi.devices.activateCameraPreset(this.config.presetName);
+      zapi.devices.activateCameraPreset(this.config.presetName, skipSetVideoSource);
     }
     else if (this.config.presetType == 'source') {
       zapi.devices.setMainVideoSource(this.config.presetSource);

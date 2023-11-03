@@ -123,7 +123,7 @@ export class DevicesManager {
     return devices;
   }
 
-  async activateCameraPreset(presetName) {
+  async activateCameraPreset(presetName, skipSetVideoSource = false) {
     try {
       let allPresets = await xapi.Command.Camera.Preset.List();
       let preset = allPresets.Preset.filter(p => p.Name == presetName)[0];
@@ -134,18 +134,20 @@ export class DevicesManager {
       let camConnector = camConnectorDetails.id;
 
       xapi.Command.Camera.Preset.Activate({ PresetId: preset.PresetId });
-      xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
+      if (!skipSetVideoSource) {
+        xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
+      }
     }
-    catch(e) {
-      debug(3,`activateCameraPreset() error; ${e}`);
+    catch (e) {
+      debug(3, `activateCameraPreset() error; ${e}`);
     }
   }
   async setMainVideoSource(source) {
     try {
-      xapi.Command.Video.Input.SetMainVideoSource({ConnectorId: source});
+      xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: source });
     }
-    catch(e) {
-      debug(3,`setMainVideoSource() error: ${e}`);
+    catch (e) {
+      debug(3, `setMainVideoSource() error: ${e}`);
     }
   }
 }

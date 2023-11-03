@@ -58,6 +58,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
   - `group`: groupe
 - `activateCameraPreset`: Active un préréglage de caméra spécifique.
   - `name`: Nom du preset
+  - `skipSetVideoSource` <`false`> : Quand `true`, ne change pas le "MainVideoSource"
 
 ## Scénarios (scenarios)
 

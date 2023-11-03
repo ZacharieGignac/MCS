@@ -28,7 +28,8 @@ Aucunes.
 Aucunes.
 
 ### CameraPreset
-- `void activate(void)`: Active le preset de caméra
+- `void activate(skipSetVideoSource)`: Active le preset de caméra
+  - `skipSetVideoSource` <`false`>: Quand `true`, ne modifie pas le "MainVideoSource"
 
 ### Display
 - `void setDefaults(void)`: Active les paramètres par défaut définis dans la configuration comme l'alimentation, la source et le blanking

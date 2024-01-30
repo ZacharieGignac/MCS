@@ -80,14 +80,14 @@ export class DisplayDriver_isc {
     this.device = device;
     if (config.supportsUsageHours) {
       xapi.Event.Message.Send.Text.on(text => {
-  let splitText = text.split(':');
-  if (splitText[0] == config.name) {
-    let splitMessage = splitText[1].split(';');
-    if (splitMessage[0] == 'USAGEREPLY') {
-      this.device.fbUsageHours(splitMessage[1]);
-    }
-  }
-});
+        let splitText = text.split(':');
+        if (splitText[0] == config.name) {
+          let splitMessage = splitText[1].split(';');
+          if (splitMessage[0] == 'USAGEREPLY') {
+            this.device.fbUsageHours(splitMessage[1]);
+          }
+        }
+      });
 
     }
   }
@@ -181,16 +181,23 @@ export class ScreenDriver_gpio {
   }
 
   setPosition(position) {
+
     debug(1, `DRIVER ScreenDriver_gpio (${this.config.id}): setPosition: ${position}`);
     var config = {};
+    let args = {};
     if (this.gpiotype == 'single') {
-      config['Pin' + this.pin] = position == 'up' ? 'Low' : 'High';
+      var voltage = position == 'up' ? 'High' : 'Low';
+      args['Pin' + this.pin] = voltage;
     }
     else if (this.gpiotype == 'pair') {
-      config['Pin' + this.pin1] = position == 'up' ? 'Low' : 'High';
-      config['Pin' + this.pin2] = position == 'up' ? 'High' : 'Low';
+      let voltage1 = position == 'up' ? 'High' : 'Low';
+      let voltage2 = position == 'up' ? 'Low' : 'High';
+      args['Pin' + this.pin1] = voltage1;
+      args['Pin' + this.pin2] = voltage2;
     }
-    xapi.Command.GPIO.ManualState.Set(config);
+    xapi.Command.GPIO.ManualState.Set(args);
+
+
   }
 
   custom() {
@@ -351,7 +358,7 @@ export class AudioReporterDriver_internal {
         level += bias;
       }
     }
-    
+
 
     this.inputs[id] = { id: id, level: level };  // Update this.inputs[id] before the loop
 

@@ -18,7 +18,7 @@ import * as sce_como_type1 from './sce_como_type1';
 import * as mod_autosauce from './mod_autosauce';
 //import * as mod_hidcameraman from './mod_hidcameraman';
 //import * as mod_example from './mod_example'; //Example
-import * as mod_psacamcontrols from './mod_psacamcontrols';
+//import * as mod_psacamcontrols from './mod_psacamcontrols';
 /****************************/
 
 
@@ -73,7 +73,7 @@ export var config = {
 
   modules: [
     mod_autosauce,
-    mod_psacamcontrols
+    //mod_psacamcontrols
     //mod_hidcameraman,
     //mod_example
   ],
@@ -88,13 +88,13 @@ export var config = {
   },
 
   mod_psacamcontrols_config: {
-    panSpeed:12,
-    tiltSpeed:12,
-    zoomSpeed:12
+    panSpeed: 12,
+    tiltSpeed: 12,
+    zoomSpeed: 12
   },
 
   mod_autosauce_config: {
-    calibration:false,
+    calibration: false,
     boosts: [
       {
         silent: 'system.audio.presentermics',
@@ -140,11 +140,11 @@ export var config = {
   version: VERSION,
   system: {
     coldBootWait: 120,                            // Temps (secondes) qui détermine un "cold boot"
-    debugLevel: DEBUGLEVEL.HIGH,                // Niveau de débug (LOW, MEDIUM, HIGH)
+    debugLevel: DEBUGLEVEL.HIGH,                  // Niveau de débug (LOW, MEDIUM, HIGH)
     debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
     messagesPacing: 500,                          // Temps (ms) entre les messages de type "xpi.Command.Message"
     initDelay: 1000,                              // Temps (ms) avant l'initialisation du système
-    newSessionDelay: 5000,                        // Temps (ms) pour l'ouverture d'une nouvelle session. Une progressbar s'affiche.
+    newSessionDelay: 5000,                        // Temps (ms) pour l'ouverture d'une nouvelle session.
     forceStandby: true,                           // <true, false> Forcer un standby à une heure précise, peu importe si un appel ou une présentation sont actifs
     forceStandbyTime: '04:00',                    // Heure à laquelle le standby sera forcé
     requiredPeripheralsCheckInterval: 30000,      // Temps (ms) entre les vérifications des périphériques identifiés comme "requiredPeripheral"
@@ -154,8 +154,8 @@ export var config = {
     settingsMenu: 'Locked',                       // <Locked, Unlocked> Détermine si le panneau de paramètre est vérouillé
     disableAutoLightsWhenWidgetInteraction: true, // <true, false> Détermine si le contrôle automatique de l'éclairage est automatiquement désactivé lorsqu'un widget de Light ou LightScene est touché par l'utilisateur
     systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',                    // Clé d'api de "paste.ee" utilisé pour l'envoi de rapport système
-    showStatusAndPerformanceReports:false,        //Affiche le rapport de status après le boot et à interval (pour le developement)
-    mainVideoSource:1,
+    showStatusAndPerformanceReports: false,        //Affiche le rapport de status après le boot et à interval (pour le developement)
+    mainVideoSource: 1,
     onStandby: {
       setDND: false,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
       clearCallHistory: false,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby
@@ -239,13 +239,14 @@ export var config = {
       driver: driversLibrary.ControlSystemDriver_isc_h21, //Driver à utiliser par le device
       syncRestart: true,                                  //Défini si le système de contrôle sera redémarré en même temps que le codec (si supporté)
       restartString: 'HW_RESTART',                        //Commande à envoyer au système de contrôle pour le redémarrage
-      peripheralRequired: true,                           //Défini si ce device est requis pour l'utilisation du système. Sa présence est vérifiée au démarrage et à interval régulier
+      peripheralRequired: false,                           //Défini si ce device est requis pour l'utilisation du système. Sa présence est vérifiée au démarrage et à interval régulier
       peripheralId: 'FOC2447N5FW',                        //Numéro de série ou MACADDR du device (Status/Peripherals)
       heartbeatInterval: 5000                             //Interval à laquelle le driver signalera sa présence au système de contrôle
     },
 
 
     /* DISPLAYS */
+    /*
     {
       id: 'display.projector',                      //Identification unique
       type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
@@ -263,6 +264,26 @@ export var config = {
       powerOffDelay: 6000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
       usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
     },
+    */
+    {
+      id: 'display.projector',                      //Identification unique
+      type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
+      name: 'PROJ',                                 //Nom, utilisé par le driver pour la communication
+      device: devicesLibrary.Display,               //Classe à utiliser
+      driver: driversLibrary.DisplayDriver_serial_sonybpj, //Driver à utiliser par le device
+      connector: 1,                                 //Connecteur HDMI de sortie sur le codec
+      supportsPower: true,                          //Défini si l'affichage supporte les commandes d'alimentation (ON, OFF)
+      supportsBlanking: true,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
+      supportsSource: false,                        //Défini si l'affichage supporte le changement de source (HDMI1, HDMI2, SDI)
+      supportsUsageHours: false,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
+      defaultPower: 'off',                          //Alimentation par défaut lors du démarrage du système (ON, OFF)
+      defaultBlanking: false,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
+      blankBeforePowerOff: true,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
+      powerOffDelay: 6000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
+      usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
+      port: 1                                        //Numéro du port série
+    },
+    /*
     {
       id: 'display.projector.secondary',
       type: DEVICETYPE.DISPLAY,
@@ -281,6 +302,7 @@ export var config = {
       powerOffDelay: 6000,
       usageHoursRequestInterval: 100000,
     },
+    */
     {
       id: 'display.monitor',
       type: DEVICETYPE.DISPLAY,
@@ -319,8 +341,10 @@ export var config = {
       type: DEVICETYPE.SCREEN,                      //Type = 'SCREEN'
       name: 'SCREEN',                               //Nom, utilisé par le drivwer pour la communication
       device: devicesLibrary.Screen,                //Classe à utiliser
-      driver: driversLibrary.ScreenDriver_isc_h21,  //Driver à utiliser par le device
-      defaultPosition: 'up'                         //Position par défaut lors du démarrage du système
+      driver: driversLibrary.ScreenDriver_gpio,  //Driver à utiliser par le device
+      defaultPosition: 'up',                         //Position par défaut lors du démarrage du système
+      pin: 1,
+      defaultPosition: 'up'
     },
     {
       id: 'screen.secondary',
@@ -330,8 +354,10 @@ export var config = {
       driver: driversLibrary.ScreenDriver_gpio,
       //alwaysUse: true,
       //pin:1,
-      pin1: 1,
-      pin2: 2,
+      //pin1: 1,
+      //pin2: 2,
+      gpiotype: 'single',
+      pin: 1,
       defaultPosition: 'up'
     },
 
@@ -525,7 +551,7 @@ export var config = {
         {
           id: 'light.board',
           power: 'on',
-          dim: 100                                    
+          dim: 100
         },
         {
           id: 'light.audience',
@@ -535,8 +561,8 @@ export var config = {
       ]
     },
     {
-      id:'lightscene.100%-2',                         //Identification unique
-      name:'LIGHTSCENE_100',                        //Nom de la scène d'éclairage à activer (dans le système d'éclairage)
+      id: 'lightscene.100%-2',                         //Identification unique
+      name: 'LIGHTSCENE_100',                        //Nom de la scène d'éclairage à activer (dans le système d'éclairage)
       type: DEVICETYPE.LIGHTSCENE,                  //Type = 'LIGHTSCENE'
       device: devicesLibrary.LightScene,            //Driver à utiliser
       driver: driversLibrary.LightSceneDriver_isc,  //Driver utilisé par la classe
@@ -619,7 +645,7 @@ export var config = {
       type: DEVICETYPE.CAMERA,        //Type = 'CAMERA'
       name: 'Caméra (enseignant)',    //Nom
       device: devicesLibrary.Camera,  //Classe à utiliser
-      peripheralRequired: true,       //Périphérique requis
+      peripheralRequired: false,       //Périphérique requis
       peripheralId: 'FDO2515J291',    //Numéro de série de la caméra
       connector: 1                    //Connecteur d'entrée sur le codec
 
@@ -629,7 +655,7 @@ export var config = {
       type: DEVICETYPE.CAMERA,
       name: 'Caméra (auditoire)',
       device: devicesLibrary.Camera,
-      peripheralRequired: true,
+      peripheralRequired: false,
       peripheralId: '88:C9:E8:D1:67:95',
       connector: 3
     },
@@ -687,7 +713,7 @@ export var config = {
     //Default general groups
     {
       id: 'system.presentation.main',
-      devices: ['display.projector', 'screen', 'display.projector.secondary', 'screen.secondary', 'campreset.presenter', 'lightscene.presentation', 'camera.presenter', 'aog.room']
+      devices: ['display.projector', 'screen', 'campreset.presenter', 'lightscene.presentation', 'camera.presenter', 'aog.room']
     },
 
     {
@@ -763,7 +789,7 @@ export var config = {
     PresenterMics: 'on', //System, <on, off> Utilisation des microphones du présentateur (doit êter pris en charge dans le scénario)
     PresenterDetected: false, //System, <true, false>, indique si le présentateur est détecté par le système (utilise le statut de PresenterTrack)
     ClearPresentationZone: 'off', //System, <on, off>, indique si la zone de présentateur doit être dégagée (doit être pris en charge dans le scénario)
-    test:true
+    test: true
 
     //Scenario-specific status
 

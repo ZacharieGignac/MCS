@@ -83,16 +83,20 @@
           <Options>size=4</Options>
           <ValueSpace>
             <Value>
+              <Key>off</Key>
+              <Name>Muet</Name>
+            </Value>
+            <Value>
               <Key>low</Key>
               <Name>Normal</Name>
             </Value>
             <Value>
               <Key>medium</Key>
-              <Name>Plus fort</Name>
+              <Name>Fort</Name>
             </Value>
             <Value>
               <Key>high</Key>
-              <Name>Encore plus fort</Name>
+              <Name>Très fort</Name>
             </Value>
           </ValueSpace>
         </Widget>
@@ -102,19 +106,23 @@
         <Widget>
           <WidgetId>comotype1|audioinput.presenter.bat1:LEVELGROUP</WidgetId>
           <Type>GroupButton</Type>
-          <Options>size=4</Options>
+          <Options>size=4;columns=4</Options>
           <ValueSpace>
+            <Value>
+              <Key>off</Key>
+              <Name>Muet</Name>
+            </Value>
             <Value>
               <Key>low</Key>
               <Name>Normal</Name>
             </Value>
             <Value>
               <Key>medium</Key>
-              <Name>Plus fort</Name>
+              <Name>Fort</Name>
             </Value>
             <Value>
               <Key>high</Key>
-              <Name>Encore plus fort</Name>
+              <Name>Très fort</Name>
             </Value>
           </ValueSpace>
         </Widget>
@@ -175,48 +183,33 @@
     <Page>
       <Name>Aide</Name>
       <Row>
-        <Name>Centre de services en TI et en pédagogie (CSTIP)</Name>
+        <Name>Contact</Name>
         <Widget>
-          <WidgetId>widget_14</WidgetId>
+          <WidgetId>widget_21</WidgetId>
           <Name>Centre de services en TI et en pédagogie (CSTIP)</Name>
           <Type>Text</Type>
-          <Options>size=4;fontSize=normal;align=center</Options>
+          <Options>size=4;fontSize=normal;align=right</Options>
         </Widget>
       </Row>
       <Row>
-        <Name>Row</Name>
-        <Widget>
-          <WidgetId>widget_15</WidgetId>
-          <Name>Courriel</Name>
-          <Type>Text</Type>
-          <Options>size=1;fontSize=normal;align=left</Options>
-        </Widget>
+        <Name>Courriel</Name>
         <Widget>
           <WidgetId>widget_17</WidgetId>
           <Name>aide@cstip.ulaval.ca</Name>
           <Type>Text</Type>
-          <Options>size=3;fontSize=normal;align=right</Options>
+          <Options>size=4;fontSize=normal;align=right</Options>
         </Widget>
       </Row>
       <Row>
-        <Name>Row</Name>
-        <Widget>
-          <WidgetId>widget_16</WidgetId>
-          <Name>Téléphone</Name>
-          <Type>Text</Type>
-          <Options>size=2;fontSize=normal;align=left</Options>
-        </Widget>
+        <Name>Téléphone</Name>
         <Widget>
           <WidgetId>widget_20</WidgetId>
           <Name>418-656-2131            Poste 12345</Name>
           <Type>Text</Type>
-          <Options>size=2;fontSize=normal;align=right</Options>
+          <Options>size=4;fontSize=normal;align=right</Options>
         </Widget>
       </Row>
-      <Row>
-        <Name>Row</Name>
-      </Row>
-      <Options>hideRowNames=1</Options>
+      <Options>hideRowNames=0</Options>
     </Page>
   </Panel>
 </Extensions>

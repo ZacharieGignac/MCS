@@ -114,7 +114,6 @@ export class Scenario {
   onStatusChange(status) {
     if (this.enabled) {
       switch (status.key) {
-
         case 'hdmiPassthrough':
           this.evaluateCameras(status.status);
           break;
@@ -513,7 +512,8 @@ export class Scenario {
 
     //Without permanent displays for presentation
     else {
-      //console.error('NO PRERMANENT DISPLASYS!');
+      //console.error('NO PRERMANENT DISPLAYS!');
+      
       if (needClearZone) {
         //console.error('NEED CLEAR ZONE');
         //WITHOUT Permanent displays + Clear zone

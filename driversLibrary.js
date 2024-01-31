@@ -124,7 +124,7 @@ export class DisplayDriver_isc {
 
 export class DisplayDriver_serial_sonybpj {
   constructor(device, config) {
-    this.pacing = 1000;
+    this.pacing = 2000;
     this.repeat = 8000;
     this.queue = [];
     this.sending = false;
@@ -145,21 +145,18 @@ export class DisplayDriver_serial_sonybpj {
     };
     let self = this;
 
-    this.powerInterval = setInterval(() => {
-      if (self.currentPower == 'on') {
-        self.serialSend(self.serialCommands.POWERON);
-      }
-      else {
-        self.serialSend(self.serialCommands.POWEROFF);
-      }
-    }, self.repeat);
-
-    this.blankInterval = setInterval(() => {
+    this.stateInterval = setInterval(() => {
       if (self.currentBlanking == true) {
         self.serialSend(self.serialCommands.BLANK);
       }
       else {
         self.serialSend(self.serialCommands.UNBLANK);
+      }
+      if (self.currentPower == 'on') {
+        self.serialSend(self.serialCommands.POWERON);
+      }
+      else {
+        self.serialSend(self.serialCommands.POWEROFF);
       }
     }, self.repeat);
   }
@@ -205,21 +202,21 @@ export class DisplayDriver_serial_sonybpj {
       this.sendNextMessage();
     }
   }
-  sendNextMessage(command) {
+  sendNextMessage() {
     if (this.queue.length === 0) {
       this.sending = false;
       return;
     }
     const message = this.queue.shift();
     this.sending = true;
-
-      xapi.Command.SerialPort.PeripheralControl.Send({
-        PortId: this.config.port,
-        ResponseTerminator: this.serialCommands.TERMINATOR,
-        Text: message
-      }).catch(e => {
-        debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): ${e.message}`);
-      });
+    xapi.Command.SerialPort.PeripheralControl.Send({
+      PortId: this.config.port,
+      ResponseTerminator: this.serialCommands.TERMINATOR,
+      ResponseTimeout:200,
+      Text: message
+    }).catch(e => {
+      debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): ${e.message}`);
+    });
 
 
     setTimeout(() => {

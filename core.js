@@ -790,6 +790,7 @@ class Core {
     self.uiManager.addActionMapping(/^SETTINGSLOCK$/, () => {
       xapi.Config.UserInterface.SettingsMenu.Mode.set('Locked');
     });
+    
     self.uiManager.addActionMapping(/^SETTINGSUNLOCK$/, () => {
       xapi.Config.UserInterface.SettingsMenu.Mode.set('Unlocked');
     });

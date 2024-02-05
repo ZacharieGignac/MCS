@@ -5,8 +5,6 @@ import xapi from 'xapi';
 //Import scenarios here with syntax: import * as SCE_Name from './SCE_Name';
 import * as sce_standby from './sce_standby';
 import * as sce_como_type1 from './sce_como_type1';
-//import * as sce_firealarm from './sce_firealarm';
-//import * as sce_example from './sce_example'; //Example
 //Add scenarios to config.scenarios below.
 /****************************/
 
@@ -16,9 +14,6 @@ import * as sce_como_type1 from './sce_como_type1';
 /****************************/
 //Import modules below
 import * as mod_autosauce from './mod_autosauce';
-//import * as mod_hidcameraman from './mod_hidcameraman';
-//import * as mod_example from './mod_example'; //Example
-//import * as mod_psacamcontrols from './mod_psacamcontrols';
 /****************************/
 
 
@@ -67,31 +62,11 @@ export var config = {
   scenarios: [
     sce_standby,
     sce_como_type1,
-    //sce_firealarm,
-    //sce_example 
   ],
 
   modules: [
     mod_autosauce,
-    //mod_psacamcontrols
-    //mod_hidcameraman,
-    //mod_example
   ],
-
-
-  firealarm_config: {
-    forceSystemShutdown: false,
-    lockTouchpanel: true,
-    displayWebpage: true,
-    webpageUrl: `http://youtube....`,
-    displayFarendMessaeg: true
-  },
-
-  mod_psacamcontrols_config: {
-    panSpeed: 12,
-    tiltSpeed: 12,
-    zoomSpeed: 12
-  },
 
   mod_autosauce_config: {
     calibration: false,
@@ -106,40 +81,10 @@ export var config = {
     ]
   },
 
-  mod_hidcameraman_config: {
-    setup: false,
-    keys: [
-      {
-        key: 'KEY_F5',
-        type: 'Pressed',
-        action: 'presentertrack_toggle' //presentertrack_toggle, presentertrack_enable, presentertrack_disable, callpreset
-
-      },
-      {
-        key: 'KEY_PAGEDOWN',
-        type: 'Pressed',
-        action: 'callpreset',
-        preset: 'Auditoire'
-      },
-      {
-        key: 'KEY_PAGEUP',
-        type: 'Pressed',
-        action: 'callpreset',
-        preset: 'Présentateur'
-      },
-      {
-        key: 'KEY_B',
-        type: 'Pressed',
-        action: 'callpreset',
-        preset: 'Tableau'
-      },
-    ]
-  },
-
-
   version: VERSION,
   system: {
-    coldBootWait: 120,                            // Temps (secondes) qui détermine un "cold boot"
+    coldBootTime: 120,                            // Temps (secondes) qui détermine un "cold boot"
+    coldBootWait: 120,                            // Temps (secondes) à attendre après un "cold boot"
     debugLevel: DEBUGLEVEL.HIGH,                  // Niveau de débug (LOW, MEDIUM, HIGH)
     debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
     messagesPacing: 500,                          // Temps (ms) entre les messages de type "xpi.Command.Message"
@@ -157,8 +102,8 @@ export var config = {
     showStatusAndPerformanceReports: false,        //Affiche le rapport de status après le boot et à interval (pour le developement)
     mainVideoSource: 1,
     onStandby: {
-      setDND: false,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
-      clearCallHistory: false,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby
+      setDND: true,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
+      clearCallHistory: true,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby
       enableScenario: 'standby'                   // Scénario à activer lors du standby. Le système est livré avec un scénario conseillé nommé "standby", fichier "sce_standby"
     },
     onWakeup: {
@@ -167,7 +112,7 @@ export var config = {
   },
   audio: {
     extra: {
-      enabled: true,
+      enabled: false,
       outputGroup: 'system.audio.extra.output',
       inputGroup: 'system.audio.extra.inputs',
       setGainZero: ['system.audio.presentermics'], //Utilisez ceci pour mettre le gain à OFF des microphones dans chacun de ces groupes.
@@ -220,52 +165,6 @@ export var config = {
 
   devices: [
     {
-      id: 'system.audioreporter.main',                      //Identification unique
-      type: DEVICETYPE.AUDIOREPORTER,                       //Type = 'AUDIOREPORTER'
-      name: 'Internal VuMeter',                             //Nom
-      device: devicesLibrary.AudioReporter,                 //Classe à utiliser
-      driver: driversLibrary.AudioReporterDriver_internal,  //Driver utilisé par la classe (VuMeter interne)
-      inputs: [1, 2, 3, 7, 8],                              //Entrées audio à observer
-      sampleMs: 100,                                        //Temps (ms) entre chaque observation
-      start: true                                           //Démarrage de l'observation
-    },
-
-    /* CONTROL SYSTEM */
-    {
-      id: 'controlsystem',                                //Identification unique
-      type: DEVICETYPE.CONTROLSYSTEM,                     //Type = 'CONTROLSYSTEM'
-      name: 'CTRLSYS',                                    //Nom, utilisé par le driver pour la communication
-      device: devicesLibrary.ControlSystem,               //Classe à utiliser
-      driver: driversLibrary.ControlSystemDriver_isc_h21, //Driver à utiliser par le device
-      syncRestart: true,                                  //Défini si le système de contrôle sera redémarré en même temps que le codec (si supporté)
-      restartString: 'HW_RESTART',                        //Commande à envoyer au système de contrôle pour le redémarrage
-      peripheralRequired: false,                           //Défini si ce device est requis pour l'utilisation du système. Sa présence est vérifiée au démarrage et à interval régulier
-      peripheralId: 'FOC2447N5FW',                        //Numéro de série ou MACADDR du device (Status/Peripherals)
-      heartbeatInterval: 5000                             //Interval à laquelle le driver signalera sa présence au système de contrôle
-    },
-
-
-    /* DISPLAYS */
-    /*
-    {
-      id: 'display.projector',                      //Identification unique
-      type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
-      name: 'PROJ',                                 //Nom, utilisé par le driver pour la communication
-      device: devicesLibrary.Display,               //Classe à utiliser
-      driver: driversLibrary.DisplayDriver_isc_h21, //Driver à utiliser par le device
-      connector: 1,                                 //Connecteur HDMI de sortie sur le codec
-      supportsPower: true,                          //Défini si l'affichage supporte les commandes d'alimentation (ON, OFF)
-      supportsBlanking: false,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
-      supportsSource: false,                        //Défini si l'affichage supporte le changement de source (HDMI1, HDMI2, SDI)
-      supportsUsageHours: false,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
-      defaultPower: 'off',                          //Alimentation par défaut lors du démarrage du système (ON, OFF)
-      defaultBlanking: false,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
-      blankBeforePowerOff: true,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
-      powerOffDelay: 6000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
-      usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
-    },
-    */
-    {
       id: 'display.projector',                      //Identification unique
       type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
       name: 'PROJ',                                 //Nom, utilisé par le driver pour la communication
@@ -283,32 +182,12 @@ export var config = {
       usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
       port: 1                                        //Numéro du port série
     },
-    /*
-    {
-      id: 'display.projector.secondary',
-      type: DEVICETYPE.DISPLAY,
-      name: 'PROJ2',
-      device: devicesLibrary.Display,
-      driver: driversLibrary.DisplayDriver_isc_h21,
-      //alwaysUse: true,
-      connector: 1,
-      supportsPower: true,
-      supportsBlanking: true,
-      supportsSource: false,
-      supportsUsageHours: false,
-      defaultPower: 'off',
-      defaultBlanking: false,
-      blankBeforePowerOff: true,
-      powerOffDelay: 6000,
-      usageHoursRequestInterval: 100000,
-    },
-    */
     {
       id: 'display.monitor',
       type: DEVICETYPE.DISPLAY,
       name: 'TV',
       device: devicesLibrary.Display,
-      driver: driversLibrary.DisplayDriver_isc_h21,
+      driver: driversLibrary.DisplayDriver_CEC,
       connector: 3,
       supportsPower: true,
       supportsBlanking: false,
@@ -346,21 +225,6 @@ export var config = {
       pin: 1,
       defaultPosition: 'up'
     },
-    {
-      id: 'screen.secondary',
-      type: DEVICETYPE.SCREEN,
-      name: 'SCREEN2',
-      device: devicesLibrary.Screen,
-      driver: driversLibrary.ScreenDriver_gpio,
-      //alwaysUse: true,
-      //pin:1,
-      //pin1: 1,
-      //pin2: 2,
-      gpiotype: 'single',
-      pin: 1,
-      defaultPosition: 'up'
-    },
-
     /* Shades */
     {
       id: 'shades',                                 //Identification unique

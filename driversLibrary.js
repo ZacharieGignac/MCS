@@ -122,6 +122,19 @@ export class DisplayDriver_isc {
   custom() { }
 }
 
+export class DisplayDriver_CEC {
+  constructor(device, config) {
+    this.config = config;
+    xapi.Config.Video.Output.Connector[this.config.connector].CEC.Mode.set('On');
+    debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Setting CEC mode to "On" for connector: ${this.config.connector}`);
+  }
+  setPower() {}
+  setBlanking() {}
+  setSource() {}
+  getUsageHours() {}
+  requestUsageHours() {}
+}
+
 export class DisplayDriver_serial_sonybpj {
   constructor(device, config) {
     this.pacing = 2000;

@@ -100,7 +100,7 @@ function displayNewSessionMessage() {
 
   setTimeout(() => {
     xapi.Command.UserInterface.Message.Prompt.Clear();
-  },systemconfig.system.newSessionDelay);
+  }, systemconfig.system.newSessionDelay);
 }
 
 
@@ -794,6 +794,13 @@ class Core {
       xapi.Config.UserInterface.SettingsMenu.Mode.set('Unlocked');
     });
 
+    self.uiManager.addActionMapping(/^PRESETSLOCK$/, () => {
+      xapi.Config.UserInterface.CameraControl.Presets.Mode.set('Locked');
+    });
+
+    self.uiManager.addActionMapping(/^PRESETSUNLOCK/, () => {
+      xapi.Config.UserInterface.CameraControl.Presets.Mode.set('Auto');
+    });
 
     self.uiManager.addActionMapping(/^SENDSYSTEMREPORT$/, () => {
       this.sendSystemReport();
@@ -1375,7 +1382,7 @@ debug(1, `Debug level is: ${systemconfig.system.debugLevel}`);
 
 xapi.Status.SystemUnit.Uptime.get().then(uptime => {
 
-  if (uptime > systemconfig.system.coldBootWait) {
+  if (uptime > systemconfig.system.coldBootTime) {
     debug(1, 'Warm boot detected, running preInit() now.');
     preInit();
   }
@@ -1392,7 +1399,7 @@ xapi.Status.SystemUnit.Uptime.get().then(uptime => {
         Title: str.systemStartingColdBootTitle,
       });
       xapi.Status.SystemUnit.Uptime.get().then(uptime => {
-        if (uptime > systemconfig.system.coldBootWait) {
+        if (uptime > systemconfig.system.coldBootTime) {
           clearInterval(coldbootWarningInterval);
           xapi.Command.Macros.Runtime.Restart();
 

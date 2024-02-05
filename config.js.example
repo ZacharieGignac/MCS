@@ -139,7 +139,8 @@ export var config = {
 
   version: VERSION,
   system: {
-    coldBootWait: 120,                            // Temps (secondes) qui détermine un "cold boot"
+    coldBootTime: 120,                            // Temps (secondes) qui détermine un "cold boot"
+    coldBootWait: 120,
     debugLevel: DEBUGLEVEL.HIGH,                  // Niveau de débug (LOW, MEDIUM, HIGH)
     debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
     messagesPacing: 500,                          // Temps (ms) entre les messages de type "xpi.Command.Message"

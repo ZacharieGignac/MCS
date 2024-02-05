@@ -55,8 +55,8 @@ const DEVICETYPE = {
 };
 
 
-export const PRODUCT = 'MCS (dev)';
-export const VERSION = '0.0.1';
+export const PRODUCT = 'MCS (BETA)';
+export const VERSION = '1.0.0-beta';
 
 export var config = {
   scenarios: [

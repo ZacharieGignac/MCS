@@ -109,6 +109,8 @@ Le système supporte aussi les préfixes comme décrit au début de ce document,
 * **LIGHTSCENE:id** : Active une scène d'éclairage
 * **ENABLESCENARIO:id** : Active un scénario
 * **ENABLESCENARIOASK** : Affiche une boite de dialogue demandant d'entrer un "id" de scénario et l'active
+* **PRESETSLOCK** : Vérouille les presets de caméra
+* **PRESETSUNLOCK** : Dévérouille les presets de caméra
 
 ## Exemples
 Activer le preset de caméra nommé "Tableau"

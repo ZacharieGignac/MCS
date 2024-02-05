@@ -13,7 +13,7 @@ import * as sce_como_type1 from './sce_como_type1';
 
 /****************************/
 //Import modules below
-import * as mod_autosauce from './mod_autosauce';
+//import * as mod_autosauce from './mod_autosauce';
 /****************************/
 
 
@@ -65,7 +65,6 @@ export var config = {
   ],
 
   modules: [
-    mod_autosauce,
   ],
 
   mod_autosauce_config: {
@@ -202,7 +201,7 @@ export var config = {
       type: DEVICETYPE.DISPLAY,
       name: 'BYOD',
       device: devicesLibrary.Display,
-      driver: driversLibrary.DisplayDriver_isc_h21,
+      driver: driversLibrary.DisplayDriver_NONE,
       connector: 2,
       supportsPower: false,
       supportsBlanking: false,
@@ -212,35 +211,11 @@ export var config = {
       blankBeforePowerOff: false,
       powerOffDelay: 0,
     },
-
-
-    /* MOTORIZED SCREENS */
-    {
-      id: 'screen',                                 //Identification unique
-      type: DEVICETYPE.SCREEN,                      //Type = 'SCREEN'
-      name: 'SCREEN',                               //Nom, utilisé par le drivwer pour la communication
-      device: devicesLibrary.Screen,                //Classe à utiliser
-      driver: driversLibrary.ScreenDriver_gpio,  //Driver à utiliser par le device
-      defaultPosition: 'up',                         //Position par défaut lors du démarrage du système
-      pin: 1,
-      defaultPosition: 'up'
-    },
-    /* Shades */
-    {
-      id: 'shades',                                 //Identification unique
-      type: DEVICETYPE.SHADE,                       //Type = 'SHADE'
-      name: 'SHADES-EAST',                          //Nom, utilisé par le driver pour la communication
-      device: devicesLibrary.Shade,                 //Classe à utiliser
-      driver: driversLibrary.ShadeDriver_basic_isc, //Driver à utiliser par le device
-      defaultPosition: 'up'                         //Position par défaut lors du démarrage du système
-    },
-
-
     /* AUDIO INPUTS */
     {
-      id: 'audioinput.presenter.sf1',                   //Identification unique
+      id: 'audioinput.presenter.ceiling',                   //Identification unique
       type: DEVICETYPE.AUDIOINPUT,                      //Type = 'AUDIOINPUT'
-      name: 'Micro sans-fil',                           //Nom
+      name: 'Micro plafond présentateur',                           //Nom
       device: devicesLibrary.AudioInput,                //Classe à utiliser
       driver: driversLibrary.AudioInputDriver_codecpro, //Driver à utiliser par le device
       connector: 7,                                     //Connecteur d'entrée du codec
@@ -344,7 +319,7 @@ export var config = {
     },
     {
       id: 'campreset.board',
-      name: 'Preset Tableau',
+      name: 'Tableau',
       type: DEVICETYPE.CAMERAPRESET,
       device: devicesLibrary.CameraPreset,
       presetName: 'Tableau',
@@ -352,156 +327,12 @@ export var config = {
     },
     {
       id: 'campreset.audience',
-      name: 'Preset Tableau',
+      name: 'Auditoire',
       type: DEVICETYPE.CAMERAPRESET,
       device: devicesLibrary.CameraPreset,
-      presetSource: 2,
-      presetType: 'source'
+      presetName: 'Auditoire',
+      presetType: 'preset'
     },
-
-
-    /* LIGHTS */
-    {
-      id: 'light.presenter',                      //Identification unique
-      name: 'ZONE1',                              //Nom, utilisé par le driver pour la communication
-      type: DEVICETYPE.LIGHT,                     //Type = 'LIGHT'
-      device: devicesLibrary.Light,               //Classe à utiliser
-      driver: driversLibrary.LightDriver_isc_h21, //Driver utilisé par la classe
-      sliderEvent: 'changed',                     //<changed, released> Événement à utiliser pour le changement du widget "slider". l'événement "changed" s'execute quand on glisse le widget (peut être demandant pour certain systèmes), "released" s'execute lorsqu'on lève le doigt
-      supportsPower: false,                       //Défini si l'éclairage supporte les commandes d'alimentation. Si false, une lumière éteinte est dim à 0
-      supportsDim: true,                          //Défini si l'éclairage supporte les commandes de tamisage
-      defaultPower: 'on',                         //Défini l'état d'alimentation par défaut au démarrage du système
-      defaultDim: 100                             //Défini le tamisage par défaut au démarrage du système
-    },
-    {
-      id: 'light.board',
-      name: 'ZONE2',
-      type: DEVICETYPE.LIGHT,
-      device: devicesLibrary.Light,
-      driver: driversLibrary.LightDriver_isc_h21,
-      sliderEvent: 'changed', //released, changed
-      supportsPower: true,
-      supportsDim: true,
-      defaultPower: 'on',
-      defaultDim: 100
-    },
-    {
-      id: 'light.audience',
-      name: 'ZONE3',
-      type: DEVICETYPE.LIGHT,
-      device: devicesLibrary.Light,
-      driver: driversLibrary.LightDriver_isc_h21,
-      sliderEvent: 'changed', //released, changed
-      supportsPower: true,
-      supportsDim: true,
-      defaultPower: 'on',
-      defaultDim: 100
-    },
-
-
-    /* LIGHTSCENES */
-    {
-      id: 'lightscene.100%',                          //Identification unique
-      name: 'STANDBY',                                //Nom
-      type: DEVICETYPE.LIGHTSCENE,                    //Type = 'LIGHTSCENE'
-      device: devicesLibrary.LightScene,              //Classe à utiliser
-      driver: driversLibrary.LightSceneDriver_lights, //Driver utilisé par la classe. Ce driver contrôle des drivers de type "Light"
-      lights: [                                       //Array contenant les "Light" à contrôler et leur paramètres
-        {
-          id: 'light.presenter',                      //"id" du device de type "Light"
-          power: 'on',                                //Statut d'alimentation
-          dim: 100                                    //Statut de tamisage
-        },
-        {
-          id: 'light.board',
-          power: 'on',
-          dim: 100
-        },
-        {
-          id: 'light.audience',
-          power: 'on',
-          dim: 100
-        }
-      ]
-    },
-    {
-      id: 'lightscene.100%-2',                         //Identification unique
-      name: 'LIGHTSCENE_100',                        //Nom de la scène d'éclairage à activer (dans le système d'éclairage)
-      type: DEVICETYPE.LIGHTSCENE,                  //Type = 'LIGHTSCENE'
-      device: devicesLibrary.LightScene,            //Driver à utiliser
-      driver: driversLibrary.LightSceneDriver_isc,  //Driver utilisé par la classe
-    },
-    {
-      id: 'lightscene.50%',
-      name: 'IDLE',
-      type: DEVICETYPE.LIGHTSCENE,
-      device: devicesLibrary.LightScene,
-      driver: driversLibrary.LightSceneDriver_lights,
-      lights: [
-        {
-          id: 'light.presenter',
-          dim: 50
-        },
-        {
-          id: 'light.board',
-          power: 'on',
-          dim: 50
-        },
-        {
-          id: 'light.audience',
-          power: 'on',
-          dim: 50
-        }
-      ]
-    },
-    {
-      id: 'lightscene.75%',
-      name: 'IDLE',
-      type: DEVICETYPE.LIGHTSCENE,
-      device: devicesLibrary.LightScene,
-      driver: driversLibrary.LightSceneDriver_lights,
-      lights: [
-        {
-          id: 'light.presenter',
-          dim: 75
-        },
-        {
-          id: 'light.board',
-          power: 'on',
-          dim: 75
-        },
-        {
-          id: 'light.audience',
-          power: 'on',
-          dim: 75
-        }
-      ]
-    },
-    {
-      id: 'lightscene.presentation',
-      name: 'IDLE',
-      type: DEVICETYPE.LIGHTSCENE,
-      device: devicesLibrary.LightScene,
-      driver: driversLibrary.LightSceneDriver_lights,
-      lights: [
-        {
-          id: 'light.presenter',
-          power: 'on',
-          dim: 70
-        },
-        {
-          id: 'light.board',
-          power: 'on',
-          dim: 0
-        },
-        {
-          id: 'light.audience',
-          power: 'on',
-          dim: 100
-        }
-      ]
-    },
-
 
     /* CAMERAS */
     {
@@ -521,7 +352,7 @@ export var config = {
       device: devicesLibrary.Camera,
       peripheralRequired: false,
       peripheralId: '88:C9:E8:D1:67:95',
-      connector: 3
+      connector: 6
     },
 
 
@@ -561,13 +392,6 @@ export var config = {
       type: DEVICETYPE.AUDIOOUTPUTGROUP,
       device: devicesLibrary.AudioOutputGroup
     },
-    {
-      id: 'aog.extra',
-      name: 'RoomExtra',
-      type: DEVICETYPE.AUDIOOUTPUTGROUP,
-      device: devicesLibrary.AudioOutputGroup
-    }
-
   ],
 
 
@@ -577,7 +401,7 @@ export var config = {
     //Default general groups
     {
       id: 'system.presentation.main',
-      devices: ['display.projector', 'screen', 'campreset.presenter', 'lightscene.presentation', 'camera.presenter', 'aog.room']
+      devices: ['display.projector', 'campreset.presenter', 'camera.presenter', 'aog.room']
     },
 
     {
@@ -592,11 +416,11 @@ export var config = {
     //Audio input configuration
     {
       id: 'system.audio.allmics',
-      devices: ['audioinput.presenter.sf1', 'audioinput.presenter.bat1', 'audioinput.ceilingmic.1', 'audioinput.ceilingmic.2', 'audioinput.ceilingmic.3']
+      devices: ['audioinput.presenter.ceiling', 'audioinput.presenter.bat1', 'audioinput.ceilingmic.1', 'audioinput.ceilingmic.2', 'audioinput.ceilingmic.3']
     },
     {
       id: 'system.audio.presentermics',
-      devices: ['audioinput.presenter.sf1', 'audioinput.presenter.bat1']
+      devices: ['audioinput.presenter.ceiling', 'audioinput.presenter.bat1']
     },
     {
       id: 'system.audio.presentationsources',
@@ -610,29 +434,29 @@ export var config = {
     //Lightscenes groups
     {
       id: 'system.lightscene.standby',
-      devices: ['lightscene.100%']
+      devices: []
     },
     {
       id: 'system.lightscene.idle',
-      devices: ['lightscene.100%']
+      devices: []
     },
     {
       id: 'system.lightscene.presentation',
-      devices: ['lightscene.50%']
+      devices: []
     },
     {
       id: 'system.lightscene.writing',
-      devices: ['lightscene.75%']
+      devices: []
     },
 
     //Extra groups
     {
       id: 'system.audio.extra.output',
-      devices: ['aog.extra']
+      devices: []
     },
     {
       id: 'system.audio.extra.inputs',
-      devices: ['aig.presentationsources', 'aig.reinforcement']
+      devices: []
     },
 
   ],
@@ -645,16 +469,14 @@ export var config = {
     PresenterTrackWarnings: 'on', //System, <on, off>, affichage des messages d'avertissement PresenterTrack
     UsePresenterTrack: 'on', //System, <on, off>, utilisation de PresenterTrack
     AutoDisplays: 'on', //System, <on, off>, gestion des affichages automatique (doit être pris en charge dans le scénario)
-    AutoScreens: 'on', //System, <on, off>, gestion des toiles motorisées automatique (doit être pris en charge dans le scénario)
-    AutoLights: 'on', //System, <on, off>, gestion de l'éclairage automatique (doit être pris en charge dans le scénario)
+    AutoScreens: 'off', //System, <on, off>, gestion des toiles motorisées automatique (doit être pris en charge dans le scénario)
+    AutoLights: 'off', //System, <on, off>, gestion de l'éclairage automatique (doit être pris en charge dans le scénario)
     AutoCamPresets: 'on', //System, <on, off> gestion des presets de caméra automatique (doit être pris en charge dans le scénario)
-    AutoCamSelection: 'off', //System, <on, off> selection de la caméra automatique (doit être pris en charge dans le scénario)
+    AutoCamSelection: 'on', //System, <on, off> selection de la caméra automatique (doit être pris en charge dans le scénario)
     AudienceMics: 'on', //System, <on, off> Utilisation des microphones de l'auditoire (doit être pris en charge dans le scénario)
     PresenterMics: 'on', //System, <on, off> Utilisation des microphones du présentateur (doit êter pris en charge dans le scénario)
     PresenterDetected: false, //System, <true, false>, indique si le présentateur est détecté par le système (utilise le statut de PresenterTrack)
     ClearPresentationZone: 'off', //System, <on, off>, indique si la zone de présentateur doit être dégagée (doit être pris en charge dans le scénario)
-    test: true
-
     //Scenario-specific status
 
   },

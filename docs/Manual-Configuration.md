@@ -16,6 +16,7 @@ MCS est une collection de macros pour les systèmes Cisco Webex, constituant un 
 * Gestion du boot (warm, cold)
 * Gestion du standby
 * Gestion du debug
+* Stockage permanent à travers les redémarrages
 * Avertissements pour PresenterTrack
 * Support pour plusieurs sorties audio dépendant du volume (extra)
 * Analyse des entrées audio avec événements

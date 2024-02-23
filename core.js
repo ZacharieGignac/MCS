@@ -143,7 +143,7 @@ class Storage {
     for (let file of this.storage.files) {
       if (file.name == name) {
         let decodedFileContent = atob(file.content);
-        console.log(decodedFileContent);
+        return(decodedFileContent);
       }
     }
   }
@@ -207,6 +207,7 @@ class Storage {
     this.write('storage.version', '1');
     this.write('storage.encoding', 'json');
     this.write('storage.encapsulation', 'base64');
+    this.write('system.bootcount', 0);
   }
 }
 
@@ -1342,11 +1343,11 @@ async function preInit() {
   debug(2, `Starting Storage Manager...`)
   storage = new Storage();
   await storage.init();
-  zapi.storage.read = (name) => { return storage.read(name); };
-  zapi.storage.write = (name, data) => { storage.write(name, data); };
-  zapi.storage.list = () => { return storage.list(); };
-  zapi.storage.del = (name) => { storage.del(name); };
-  zapi.storage.resetStorage = () => { storage.resetStorage(); };
+  zapi.storage.read = async (name) => { return await storage.read(name); };
+  zapi.storage.write = async (name, data) => { await storage.write(name, data); };
+  zapi.storage.list = async () => { return await storage.list(); };
+  zapi.storage.del = async (name) => { await storage.del(name); };
+  zapi.storage.resetStorage = async () => { storage.resetStorage(); };
 
   /* Wakeup system */
   xapi.Command.Standby.Deactivate();
@@ -1444,8 +1445,10 @@ async function init() {
   }
 
 
-  await zapi.storage.del('test');
-  await zapi.storage.list();
+  let bootcount = await storage.read('system.bootcount');
+  bootcount++;
+  zapi.storage.write('system.bootcount',bootcount);
+  console.warn(`BOOT COUNTER: ${bootcount}`);
 
   //TESTAREA AFTERBOOT
 

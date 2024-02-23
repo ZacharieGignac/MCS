@@ -18,6 +18,12 @@
 - `system_volumeunderlimit` : Le volume système est en-dessous de la limite
 - `system_standby` : Le système vient de tomber en standby
 - `system_wakeup` : Le système vient de se réveiller
+- `system_storage_init`: Le stockage fait son initialisation
+- `system_storage_init_done`: Le stockage a complété son initialisation
+- `system_storage_error_corrupted`: Le fichier de stockage est corrompu
+- `system_storage_reset`: Le stockage a été remis à zéro par la fonction `resetStorage()`
+- `system_storage_file_modified` `name`: Le fichier 'name' a été modifié
+- `system_storage_file_deleted` `name`: Le fichier 'name' a été supprimé
 
 # Utilisation du système d'événement
 Il est possible d'utiliser facilement les événements dans les modules ou les scénarios. Les événement peuvent servir à partager des données entre plusieurs parties de code qui sont autrement indépendantes.

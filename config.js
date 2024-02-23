@@ -82,6 +82,7 @@ export var config = {
 
   version: VERSION,
   system: {
+    storageFile:'storage',
     coldBootTime: 120,                            // Temps (secondes) qui détermine un "cold boot"
     coldBootWait: 120,                            // Temps (secondes) à attendre après un "cold boot"
     debugLevel: DEBUGLEVEL.HIGH,                  // Niveau de débug (LOW, MEDIUM, HIGH)

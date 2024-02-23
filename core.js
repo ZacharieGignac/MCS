@@ -23,6 +23,7 @@ const INITSTEPDELAY = 500;
 
 var coldbootWarningInterval;
 var core;
+var storage;
 var systemEvents;
 
 
@@ -103,6 +104,101 @@ function displayNewSessionMessage() {
   }, systemconfig.system.newSessionDelay);
 }
 
+class Storage {
+  constructor() {
+    this.STORAGEFILE = systemconfig.system.storageFile;
+    this.storage;
+  }
+
+
+  async init() {
+    zapi.system.events.emit('system_storage_init');
+    debug(2, `Storage: Init...`);
+    this.storage = await this.readStorage();
+    debug(2, `Storage: Init done`);
+    zapi.system.events.emit('system_storage_init_done');
+  }
+
+
+  async readStorage() {
+    debug(2, `Storage: Reading storage file...`);
+    let storageMacro = await xapi.Command.Macros.Macro.Get({
+      Content: true,
+      Name: this.STORAGEFILE
+    });
+    debug(2, `Storage size: ${storageMacro.Macro[0].Content.length} bytes`);
+    let storageContent = storageMacro.Macro[0].Content;
+    storageContent = atob(storageContent.substring(2));
+    try {
+      return JSON.parse(storageContent);
+    }
+    catch (e) {
+      console.error(`Error reading storage file. The file is malformed. Have you messed with it ?`);
+      zapi.system.events.emit('system_storage_error_corrupted');
+    }
+    debug(2, `Storage: Storage loaded into memory.`);
+  }
+
+  read(name) {
+    for (let file of this.storage.files) {
+      if (file.name == name) {
+        let decodedFileContent = atob(file.content);
+        console.log(decodedFileContent);
+      }
+    }
+  }
+  async write(name, data) {
+    let workingFile;
+    let content = btoa(JSON.stringify(data));
+    let size = content.length;
+    for (let file of this.storage.files) {
+      if (file.name == name) {
+        workingFile = file;
+      }
+    }
+    if (workingFile == undefined) {
+      workingFile = {
+        name: name,
+        content: content,
+        size: size
+      };
+      this.storage.files.push(workingFile);
+    }
+    else {
+      workingFile.content = content;
+      workingFile.size = size;
+    }
+    let macroContent = btoa(JSON.stringify(this.storage));
+    await xapi.Command.Macros.Macro.Save({
+      Name: this.STORAGEFILE,
+      Overwrite: true,
+      Transpile: false
+    }, '//' + macroContent);
+    api.system.events.emit('system_storage_file_modified', name);
+  }
+
+
+  list() {
+    let filelist = [];
+    for (let file of this.storage.files) {
+      debug(1, `FILE=${file.name}, SIZE=${file.size}`);
+      filelist.push(file.name);
+    }
+    return filelist;
+  }
+
+
+  async resetStorage() {
+    zapi.system.events.emit('system_storage_reset');
+    debug(3, 'Reseting storage to default...');
+    this.storage = {
+      files: []
+    };
+    this.write('storage.version', '1');
+    this.write('storage.encoding', 'json');
+    this.write('storage.encapsulation', 'base64');
+  }
+}
 
 class MessageQueue {
   constructor() {
@@ -753,6 +849,7 @@ class Core {
 
 
   async init() {
+    debug(2, `Core init.`);
     zapi.system.events.emit('system_coreinit');
     var self = this;
     this.uiManager = new UiManager();
@@ -790,7 +887,7 @@ class Core {
     self.uiManager.addActionMapping(/^SETTINGSLOCK$/, () => {
       xapi.Config.UserInterface.SettingsMenu.Mode.set('Locked');
     });
-    
+
     self.uiManager.addActionMapping(/^SETTINGSUNLOCK$/, () => {
       xapi.Config.UserInterface.SettingsMenu.Mode.set('Unlocked');
     });
@@ -1232,6 +1329,14 @@ async function preInit() {
 
   zapi.system.events.emit('system_preinit');
 
+  debug(2, `Starting Storage Manager...`)
+  storage = new Storage();
+  await storage.init();
+  zapi.storage.read = (name) => { return storage.read(name) };
+  zapi.storage.write = (name, data) => { storage.write(name, data) };
+  zapi.storage.list = () => { return storage.list() };
+  zapi.storage.resetStorage = () => { storage.resetStorage() };
+
   /* Wakeup system */
   xapi.Command.Standby.Deactivate();
   xapi.Command.UserInterface.Message.Prompt.Display({
@@ -1301,6 +1406,7 @@ async function init() {
   debug(2, `Init started...`);
   debug(2, `Starting core...`);
 
+
   core = await new Core();
   debug(2, `Loading modules...`);
   await core.loadModules();
@@ -1325,13 +1431,6 @@ async function init() {
       console.warn(performance);
     }, 240000);
   }
-
-
-
-
-
-
-
 
 
 

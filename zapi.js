@@ -72,5 +72,11 @@ export var zapiv1 = {
     addWidgetMapping: () => { },
     setWidgetValue: () => { },
     getAllWidgets: () => { }
+  },
+  storage: {
+    read:() => {},
+    write:() => {},
+    list:() => {},
+    resetStorage:() => {}
   }
 }

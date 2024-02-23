@@ -77,6 +77,7 @@ export var zapiv1 = {
     read:() => {},
     write:() => {},
     list:() => {},
+    del:() => {},
     resetStorage:() => {}
   }
 }

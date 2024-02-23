@@ -174,7 +174,7 @@ class Storage {
       Overwrite: true,
       Transpile: false
     }, '//' + macroContent);
-    api.system.events.emit('system_storage_file_modified', name);
+    zapi.system.events.emit('system_storage_file_modified', name);
   }
 
 
@@ -185,6 +185,16 @@ class Storage {
       filelist.push(file.name);
     }
     return filelist;
+  }
+
+  async del(name) {
+    for (let file of this.storage.files) {
+      if (file.name == name) {
+        let index = this.storage.files.indexOf(file);
+        this.storage.files.splice(index, 1);
+        zapi.system.events.emit('system_storage_file_deleted', name);
+      }
+    }
   }
 
 
@@ -1332,10 +1342,11 @@ async function preInit() {
   debug(2, `Starting Storage Manager...`)
   storage = new Storage();
   await storage.init();
-  zapi.storage.read = (name) => { return storage.read(name) };
-  zapi.storage.write = (name, data) => { storage.write(name, data) };
-  zapi.storage.list = () => { return storage.list() };
-  zapi.storage.resetStorage = () => { storage.resetStorage() };
+  zapi.storage.read = (name) => { return storage.read(name); };
+  zapi.storage.write = (name, data) => { storage.write(name, data); };
+  zapi.storage.list = () => { return storage.list(); };
+  zapi.storage.del = (name) => { storage.del(name); };
+  zapi.storage.resetStorage = () => { storage.resetStorage(); };
 
   /* Wakeup system */
   xapi.Command.Standby.Deactivate();
@@ -1433,7 +1444,8 @@ async function init() {
   }
 
 
-
+  await zapi.storage.del('test');
+  await zapi.storage.list();
 
   //TESTAREA AFTERBOOT
 

@@ -159,3 +159,16 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
   - `widgetId` : Identification du widget.
   - `value` : Valeur du widget.
 - `getAllWidgets`: Récupère tous les widgets.
+
+## Stockage (storage)
+
+### Méthodes
+- `write`: Écris des données dans un fichier virtuel. Ces données sont permanentes, même après un redémarrage
+  - `name`: Nom du fichier
+  - `data`: Contenu du fichier
+- `read`: Lis un fichier et retourne le contenu
+  - `name`: Nom du fichier
+- `del`: Efface un fichier
+  - `name`: Nom du fichier
+- `list`: Liste tous les fichiers dans le stockage
+- `resetStorage`: Remet le stockage par défaut en effacant tout

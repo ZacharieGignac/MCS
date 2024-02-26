@@ -9,6 +9,30 @@ import { SystemStatus } from './systemstatus';
 import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
+function systemKill() {
+  xapi.Command.Macros.Macro.Deactivate({ Name: 'core' });
+}
+
+async function killswitchInit() {
+  if (systemconfig.system.killswitchGPIO != undefined) {
+    await xapi.Config.GPIO.Pin[systemconfig.system.killswitchGPIO].Mode.set('InputNoAction');
+    let killswitchStatus = await xapi.Status.GPIO.Pin[systemconfig.system.killswitchGPIO].State.get();
+    if (killswitchStatus == 'High') {
+      systemKill();
+    }
+  }
+  xapi.Status.GPIO.Pin[systemconfig.system.killswitchGPIO].State.on(state => {
+    if (state == 'High') {
+      systemKill();
+    }
+  });
+}
+//INIT
+//GPIO Killswitch check on boot
+
+killswitchInit();
+
+
 
 const DEBUGLEVEL = {
   LOW: 3,
@@ -143,7 +167,7 @@ class Storage {
     for (let file of this.storage.files) {
       if (file.name == name) {
         let decodedFileContent = atob(file.content);
-        return(decodedFileContent);
+        return (decodedFileContent);
       }
     }
   }
@@ -1447,7 +1471,7 @@ async function init() {
 
   let bootcount = await storage.read('system.bootcount');
   bootcount++;
-  zapi.storage.write('system.bootcount',bootcount);
+  zapi.storage.write('system.bootcount', bootcount);
   console.warn(`BOOT COUNTER: ${bootcount}`);
 
   //TESTAREA AFTERBOOT

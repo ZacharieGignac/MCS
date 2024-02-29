@@ -207,7 +207,7 @@ class Storage {
     let filelist = [];
     for (let file of this.storage.files) {
       debug(1, `FILE=${file.name}, SIZE=${file.size}`);
-      filelist.push(file.name);
+      filelist.push({ name:file.name, size:file.size });
     }
     return filelist;
   }

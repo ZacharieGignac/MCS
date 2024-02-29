@@ -11,6 +11,7 @@ import { debug } from './debug';
 
 function systemKill() {
   xapi.Command.Macros.Macro.Deactivate({ Name: 'core' });
+  xapi.Command.Macros.Runtime.Restart();
 }
 
 async function killswitchInit() {
@@ -1310,22 +1311,60 @@ async function sleep(time) {
   });
 }
 
+async function isPeripheralConnectedInternal(pid) {
+  let peripherals = await xapi.Status.Peripherals.get();
+  for (let p of peripherals.ConnectedDevice) {
+    if ((pid.peripheralId == p.SerialNumber || pid.peripheralId == p.ID) && p.Status == 'Connected') {
+      return true;
+    }
+  }
+  return false;
+}
+
+async function isPeripheralConnectedHttpRequest(pid) {
+  try {
+    let httpresponse = await xapi.Command.HttpClient.Get({
+      AllowInsecureHTTPS: true,
+      Timeout: 3,
+      Url: pid.peripheralId
+    });
+
+    //Check response status code
+    if (httpresponse.StatusCode == pid.peripheralCheckStatusCode) {
+      return true;
+    }
+  }
+  catch (e) {
+    //If it fails, check the status code in the error data structure
+    if (e.data.StatusCode == pid.peripheralCheckStatusCode) {
+      return true;
+    }
+    debug(3, `Required peripherals: Device disconnected: ${pid.id}, ID=${pid.peripheralId}, METHOD=httprequest`);
+    return false;
+  }
+  debug(3, `Required peripherals: Device disconnected: ${pid.id}, ID=${pid.peripheralId}, METHOD=httprequest`);
+  return false;
+}
+
 async function getDisconnectedRequiredPeripherals() {
   var disconnectedPeripherals = [];
   var disconnected = 0;
-  let peripherals = await xapi.Status.Peripherals.get();
   let requiredPeripherals = systemconfig.devices.filter(dev => { return dev.peripheralRequired == true });
 
   for (let rp of requiredPeripherals) {
     let matchCount = 0;
-
-    for (let p of peripherals.ConnectedDevice) {
-      if ((rp.peripheralId == p.SerialNumber || rp.peripheralId == p.ID) && p.Status == 'Connected') {
+    if (rp.peripheralCheckMethod == 'internal') {
+      if (await isPeripheralConnectedInternal(rp)) {
         matchCount++;
       }
     }
+    else if (rp.peripheralCheckMethod == 'httprequest') {
+      if (await isPeripheralConnectedHttpRequest(rp)) {
+        matchCount++;
+      }
+    }
+
     if (matchCount == 0) {
-      debug(2, `Device disconnected: ${rp.id}, peripheralId: ${rp.peripheralId}`);
       disconnectedPeripherals.push(rp);
       disconnected++;
     }

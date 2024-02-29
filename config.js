@@ -82,8 +82,8 @@ export var config = {
 
   version: VERSION,
   system: {
-    killswitchGPIO:4,
-    storageFile:'storage',
+    killswitchGPIO: 4,
+    storageFile: 'storage',
     coldBootTime: 120,                            // Temps (secondes) qui détermine un "cold boot"
     coldBootWait: 120,                            // Temps (secondes) à attendre après un "cold boot"
     debugLevel: DEBUGLEVEL.HIGH,                  // Niveau de débug (LOW, MEDIUM, HIGH)
@@ -343,7 +343,8 @@ export var config = {
       name: 'Caméra (enseignant)',    //Nom
       device: devicesLibrary.Camera,  //Classe à utiliser
       peripheralRequired: false,       //Périphérique requis
-      peripheralId: 'FDO2515J291',    //Numéro de série de la caméra
+      peripheralCheckMethod: 'internal',
+      peripheralId: 'FDO2603J89L',    //Numéro de série de la caméra
       connector: 1                    //Connecteur d'entrée sur le codec
 
     },
@@ -353,9 +354,24 @@ export var config = {
       name: 'Caméra (auditoire)',
       device: devicesLibrary.Camera,
       peripheralRequired: false,
-      peripheralId: '88:C9:E8:D1:67:95',
+      peripheralCheckMethod: 'httprequest',
+      peripheralId: 'https://www.google.ca',
+      peripheralCheckStatusCode: 200,
       connector: 6
     },
+
+    /*
+    {
+      id: 'infrastructure.webex',
+      type: DEVICETYPE.SOFTWAREDEVICE,
+      device: devicesLibrary.SoftwareDevice,
+      name: 'Webex Infrastructure',
+      peripheralRequired: true,
+      peripheralId: 'https://idbroker.webex.com/idb/oauth2/',
+      peripheralCheckMethod: 'httprequest',
+      peripheralCheckStatusCode: 404
+    },
+    */
 
 
     /* AUDIO INPUT GROUPS */

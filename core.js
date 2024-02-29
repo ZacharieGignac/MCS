@@ -72,7 +72,7 @@ function toBool(value) {
 
 class HTTPClientQueue {
   constructor(requestsPacing = 0) {
-    console.log(`HTTPClientQueue: Initialized: ${id}`);
+    console.log(`HTTPClientQueue: Initialized.`);
     this.requestsPacing = requestsPacing;
     this.working = false;
     this.getBuffer = [];

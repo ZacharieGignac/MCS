@@ -79,5 +79,8 @@ export var zapiv1 = {
     list:() => {},
     del:() => {},
     resetStorage:() => {}
+  },
+  communication: {
+    httpGet:() => {}
   }
 }

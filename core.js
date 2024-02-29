@@ -49,6 +49,7 @@ const INITSTEPDELAY = 500;
 var coldbootWarningInterval;
 var core;
 var storage;
+var httpClientQueue;
 var systemEvents;
 
 
@@ -67,6 +68,82 @@ function toOnOff(value) {
 }
 function toBool(value) {
   return value.toLowerCase() == 'on' ? true : false;
+}
+
+class HTTPClientQueue {
+  constructor(requestsPacing = 0) {
+    console.log(`HTTPClientQueue: Initialized: ${id}`);
+    this.requestsPacing = requestsPacing;
+    this.working = false;
+    this.getBuffer = [];
+    this.postBuffer = [];
+  }
+
+  processNextGet() {
+    if (!this.working && this.getBuffer.length > 0) {
+      this.working = true;
+      let nextRequest = this.getBuffer.shift();
+      xapi.Command.HttpClient.Get(
+        nextRequest.clientParameters
+      ).then(response => {
+        try {
+          nextRequest.callback(response);
+        }
+        catch { }
+        this.working = false;
+        setTimeout(() => { this.processNextGet() }, this.requestsPacing);
+      }).catch(err => {
+        try {
+          nextRequest.errorcallback(err);
+        }
+        catch { }
+        this.working = false;
+        setTimeout(() => { this.processNextGet() }, this.requestsPacing);
+      });
+    }
+  }
+
+  processNextPost() {
+    if (!this.working && this.postBuffer.length > 0) {
+      this.working = true;
+      let nextRequest = this.postBuffer.shift();
+      xapi.Command.HttpClient.Post(
+        nextRequest.clientParameters
+      ).then(response => {
+        try {
+          nextRequest.callback(response);
+        }
+        catch { }
+        this.working = false;
+        setTimeout(this.processNextPost, this.requestsPacing);
+      }).catch(err => {
+        try {
+          nextRequest.errorcallback(err);
+        }
+        catch { }
+        this.working = false;
+        setTimeout(this.processNextPost, this.requestsPacing);
+      });
+    }
+  }
+
+  httpGet(clientParameters, callback, errorcallback) {
+    this.getBuffer.push({
+      clientParameters: clientParameters,
+      callback: callback,
+      errorcallback: errorcallback
+    });
+    this.processNextGet();
+  }
+
+  httpPost(clientParameters, callback, errorcallback) {
+    this.postBuffer.push({
+      clientParameters: clientParameters,
+      callback: callback,
+      errorcallback: errorcallback
+    });
+    this.processNextPost();
+  }
 }
 
 
@@ -207,7 +284,7 @@ class Storage {
     let filelist = [];
     for (let file of this.storage.files) {
       debug(1, `FILE=${file.name}, SIZE=${file.size}`);
-      filelist.push({ name:file.name, size:file.size });
+      filelist.push({ name: file.name, size: file.size });
     }
     return filelist;
   }
@@ -1403,6 +1480,7 @@ async function preInit() {
 
   zapi.system.events.emit('system_preinit');
 
+  /* Storage */
   debug(2, `Starting Storage Manager...`)
   storage = new Storage();
   await storage.init();
@@ -1411,6 +1489,11 @@ async function preInit() {
   zapi.storage.list = async () => { return await storage.list(); };
   zapi.storage.del = async (name) => { await storage.del(name); };
   zapi.storage.resetStorage = async () => { storage.resetStorage(); };
+
+  /* HTTP Client Queue */
+  httpClientQueue = new HTTPClientQueue(systemconfig.system.httpRequestPacing);
+  zapi.communication.httpGet = (clientParameters, callback, errorcallback) => { httpClientQueue.httpGet(clientParameters, callback, errorcallback); };
+  zapi.communication.httpPost = (clientParameters, callback, errorcallback) => { httpClientQueue.httpPost(clientParameters, callback, errorcallback); };
 
   /* Wakeup system */
   xapi.Command.Standby.Deactivate();

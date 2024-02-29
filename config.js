@@ -354,9 +354,7 @@ export var config = {
       name: 'Caméra (auditoire)',
       device: devicesLibrary.Camera,
       peripheralRequired: false,
-      peripheralCheckMethod: 'httprequest',
-      peripheralId: 'https://www.google.ca',
-      peripheralCheckStatusCode: 200,
+      peripheralId: 'unknown',
       connector: 6
     },
 
@@ -489,6 +487,7 @@ export var config = {
     AutoDisplays: 'on', //System, <on, off>, gestion des affichages automatique (doit être pris en charge dans le scénario)
     AutoScreens: 'off', //System, <on, off>, gestion des toiles motorisées automatique (doit être pris en charge dans le scénario)
     AutoLights: 'off', //System, <on, off>, gestion de l'éclairage automatique (doit être pris en charge dans le scénario)
+    AutoShades: 'off', //System, <on, off>, gestion des toiles solaires automatique (doit être pris en charge dans le scénario)
     AutoCamPresets: 'on', //System, <on, off> gestion des presets de caméra automatique (doit être pris en charge dans le scénario)
     AutoCamSelection: 'on', //System, <on, off> selection de la caméra automatique (doit être pris en charge dans le scénario)
     AudienceMics: 'on', //System, <on, off> Utilisation des microphones de l'auditoire (doit être pris en charge dans le scénario)

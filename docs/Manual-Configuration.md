@@ -257,6 +257,7 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
       syncRestart: true,                                  //Défini si le système de contrôle sera redémarré en même temps que le codec (si supporté)
       restartString: 'HW_RESTART',                        //Commande à envoyer au système de contrôle pour le redémarrage
       peripheralRequired: true,                           //Défini si ce device est requis pour l'utilisation du système. Sa présence est vérifiée au démarrage et à interval régulier
+      peripheralCheckMethod: 'internal',                  //Méthode à utiliser pour la vérification du device. "internal" réfère à la liste interne du codec (peripheral list)
       peripheralId: 'FOC2447N5FW',                        //Numéro de série ou MACADDR du device (Status/Peripherals)
       heartbeatInterval: 5000                             //Interval à laquelle le driver signalera sa présence au système de contrôle
     }
@@ -373,6 +374,7 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
       defaultDim: 100                             //Défini le tamisage par défaut au démarrage du système
     }
 ```
+
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
 * **light.presenter:LEVEL** : Slider, affiche et configure le niveau de tamisage de l'éclairage
 * **light.presenter:POWER** : Toggle, affiche et configure l'alimentation de l'éclairage
@@ -466,6 +468,20 @@ Cet appareil prends automatiquement en charge certaines actions.
       inputs: [1, 2, 3, 7, 8],                              //Entrées audio à observer
       sampleMs: 100,                                        //Temps (ms) entre chaque observation
       start: true                                           //Démarrage de l'observation
+    }
+```
+
+### Software Device
+```JS
+    {
+      id: 'infrastructure.webex',                               //Identification unique
+      type: DEVICETYPE.SOFTWAREDEVICE,                          //Type = 'SOFTWAREDEVICE'
+      device: devicesLibrary.SoftwareDevice,                    //Classe à utiliser
+      name: 'Webex Infrastructure',                             //Nom
+      peripheralRequired: true,                                 //Périphérique requis
+      peripheralId: 'https://idbroker.webex.com/idb/oauth2/',   //Adresse HTTP de vérification
+      peripheralCheckMethod: 'httprequest',                     //Méthode de vérification
+      peripheralCheckStatusCode: 404                            //Code HTTP qui constitue un succès
     }
 ```
 

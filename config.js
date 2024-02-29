@@ -362,14 +362,14 @@ export var config = {
 
     /*
     {
-      id: 'infrastructure.webex',
-      type: DEVICETYPE.SOFTWAREDEVICE,
-      device: devicesLibrary.SoftwareDevice,
-      name: 'Webex Infrastructure',
-      peripheralRequired: true,
-      peripheralId: 'https://idbroker.webex.com/idb/oauth2/',
-      peripheralCheckMethod: 'httprequest',
-      peripheralCheckStatusCode: 404
+      id: 'infrastructure.webex',                               //Identification unique
+      type: DEVICETYPE.SOFTWAREDEVICE,                          //Type = 'SOFTWAREDEVICE'
+      device: devicesLibrary.SoftwareDevice,                    //Classe à utiliser
+      name: 'Webex Infrastructure',                             //Nom
+      peripheralRequired: true,                                 //Périphérique requis
+      peripheralId: 'https://idbroker.webex.com/idb/oauth2/',   //Adresse HTTP de vérification
+      peripheralCheckMethod: 'httprequest',                     //Méthode de vérification
+      peripheralCheckStatusCode: 404                            //Code HTTP qui constitue un succès
     },
     */
 

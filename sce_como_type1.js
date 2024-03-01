@@ -533,7 +533,7 @@ export class Scenario {
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
+          //powerOffDisplays(presentationDisplays);
           if (presentationSupportsBlanking) {
             blankDisplays(presentationDisplays);
           }
@@ -548,7 +548,7 @@ export class Scenario {
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
+          //powerOffDisplays(presentationDisplays);
           if (presentationSupportsBlanking) {
             blankDisplays(presentationDisplays);
           }
@@ -564,7 +564,7 @@ export class Scenario {
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
+          //powerOffDisplays(presentationDisplays);
           if (presentationSupportsBlanking) {
             blankDisplays(presentationDisplays);
           }
@@ -579,7 +579,7 @@ export class Scenario {
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
+          //powerOffDisplays(presentationDisplays);
           if (presentationSupportsBlanking) {
             blankDisplays(presentationDisplays);
           }

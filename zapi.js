@@ -81,6 +81,6 @@ export var zapiv1 = {
     resetStorage:() => {}
   },
   communication: {
-    httpGet:() => {}
+    httpRequest:() => {}
   }
 }

@@ -89,7 +89,7 @@ export var config = {
     debugLevel: DEBUGLEVEL.HIGH,                  // Niveau de débug (LOW, MEDIUM, HIGH)
     debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
     messagesPacing: 500,                          // Temps (ms) entre les messages de type "xpi.Command.Message"
-    httpRequestPacing:0,                          // Temps (ms) entre les requêtes HTTP qui utilisent zapi.communication.httpGet
+    httpDispatcherClients:2,                      // Nombre de clients HTTP concurents. Plus que 2 commence à être risqué selon l'utilisation des clients HTTP non gérés par MCS. Une augmentation de ~5% de performance est observée entre 2 et 3.
     initDelay: 1000,                              // Temps (ms) avant l'initialisation du système
     newSessionDelay: 5000,                        // Temps (ms) pour l'ouverture d'une nouvelle session.
     forceStandby: true,                           // <true, false> Forcer un standby à une heure précise, peu importe si un appel ou une présentation sont actifs

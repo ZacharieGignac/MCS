@@ -49,7 +49,7 @@ const INITSTEPDELAY = 500;
 var coldbootWarningInterval;
 var core;
 var storage;
-var httpClientQueue;
+var httpRequestDispatcher;
 var systemEvents;
 
 
@@ -70,80 +70,92 @@ function toBool(value) {
   return value.toLowerCase() == 'on' ? true : false;
 }
 
-class HTTPClientQueue {
-  constructor(requestsPacing = 0) {
-    console.log(`HTTPClientQueue: Initialized.`);
-    this.requestsPacing = requestsPacing;
-    this.working = false;
-    this.getBuffer = [];
-    this.postBuffer = [];
+class HttpRequestQueue {
+  constructor() {
+    this.queue = [];
+    this.isProcessing = false;
   }
 
-  processNextGet() {
-    if (!this.working && this.getBuffer.length > 0) {
-      this.working = true;
-      let nextRequest = this.getBuffer.shift();
-      xapi.Command.HttpClient.Get(
-        nextRequest.clientParameters
-      ).then(response => {
-        try {
-          nextRequest.callback(response);
-        }
-        catch { }
-        this.working = false;
-        setTimeout(() => { this.processNextGet() }, this.requestsPacing);
+  async httpRequest(url) {
+    return new Promise(async (resolve, reject) => {
+      this.queue.push({ url, resolve, reject });
+      if (!this.isProcessing) {
+        await this.processQueue();
+      }
+    });
+  }
+
+  async processQueue() {
+    if (this.queue.length === 0) {
+      this.isProcessing = false;
+      return;
+    }
+
+    this.isProcessing = true;
+    const { url, resolve, reject } = this.queue.shift();
+    try {
+      const response = await this._request(url);
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+
+    await this.processQueue();
+  }
+
+  _request(clientParameters) {
+    return new Promise((resolve, reject) => {
+      var httpClientMethod;
+      switch (clientParameters.Method.toUpperCase()) {
+        case 'GET':
+          httpClientMethod = xapi.Command.HttpClient.Get;
+          break;
+        case 'POST':
+          httpClientMethod = xapi.Command.HttpClient.Post;
+          break;
+        case 'PUT':
+          httpClientMethod = xapi.Command.HttpClient.Put;
+          break;
+        case 'DELETE':
+          httpClientMethod = xapi.Command.HttpClient.Delete;
+          break;
+        case 'PATCH':
+          httpClientMethod = xapi.Command.HttpClient.Patch
+          break;
+        default:
+          reject(`Unknown HTTP method "${clientParameters.Method}"`);
+      }
+      delete clientParameters.Method;
+      httpClientMethod(clientParameters).then(response => {
+        resolve(response);
       }).catch(err => {
-        try {
-          nextRequest.errorcallback(err);
-        }
-        catch { }
-        this.working = false;
-        setTimeout(() => { this.processNextGet() }, this.requestsPacing);
+        reject(err);
       });
+    });
+  }
+}
+
+class HttpRequestDispatcher {
+  constructor() {
+    debug(2,`HTTP Request Dispatcher Init... Creating ${systemconfig.system.httpDispatcherClients} clients.`);
+    this.clients = [];
+    for (let i = 0; i < systemconfig.system.httpDispatcherClients; i++) {
+      let newHttpRequestQueue = new HttpRequestQueue();
+      newHttpRequestQueue.id = i;
+      this.clients.push(newHttpRequestQueue);
     }
   }
-
-  processNextPost() {
-    if (!this.working && this.postBuffer.length > 0) {
-      this.working = true;
-      let nextRequest = this.postBuffer.shift();
-      xapi.Command.HttpClient.Post(
-        nextRequest.clientParameters
-      ).then(response => {
-        try {
-          nextRequest.callback(response);
-        }
-        catch { }
-        this.working = false;
-        setTimeout(this.processNextPost, this.requestsPacing);
-      }).catch(err => {
-        try {
-          nextRequest.errorcallback(err);
-        }
-        catch { }
-        this.working = false;
-        setTimeout(this.processNextPost, this.requestsPacing);
-      });
-    }
-  }
-
-  httpGet(clientParameters, callback, errorcallback) {
-    this.getBuffer.push({
-      clientParameters: clientParameters,
-      callback: callback,
-      errorcallback: errorcallback
+  httpRequest(clientParameters) {
+    let sortedClients = this.clients.sort((a, b) => {
+      if (a.queue.length < b.queue.length) return -1;
+      if (a.queue.length > b.queue.length) return 1;
+      return 0;
     });
-    this.processNextGet();
+    let nextClient = sortedClients[0];
+    debug(1,`Dispatching request to client ${nextClient.id}. Queue length: ${nextClient.queue.length}`);
+    return nextClient.httpRequest(clientParameters);
   }
 
-  httpPost(clientParameters, callback, errorcallback) {
-    this.postBuffer.push({
-      clientParameters: clientParameters,
-      callback: callback,
-      errorcallback: errorcallback
-    });
-    this.processNextPost();
-  }
 }
 
 
@@ -1491,9 +1503,9 @@ async function preInit() {
   zapi.storage.resetStorage = async () => { storage.resetStorage(); };
 
   /* HTTP Client Queue */
-  httpClientQueue = new HTTPClientQueue(systemconfig.system.httpRequestPacing);
-  zapi.communication.httpGet = (clientParameters, callback, errorcallback) => { httpClientQueue.httpGet(clientParameters, callback, errorcallback); };
-  zapi.communication.httpPost = (clientParameters, callback, errorcallback) => { httpClientQueue.httpPost(clientParameters, callback, errorcallback); };
+  httpRequestDispatcher = new HttpRequestDispatcher();
+  zapi.communication.httpRequest = (clientParameters) => { return httpRequestDispatcher.httpRequest(clientParameters); };
+
 
   /* Wakeup system */
   xapi.Command.Standby.Deactivate();

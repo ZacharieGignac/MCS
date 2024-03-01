@@ -152,7 +152,7 @@ class HttpRequestDispatcher {
       return 0;
     });
     let nextClient = sortedClients[0];
-    debug(1,`Dispatching request to client ${nextClient.id}. Queue length: ${nextClient.queue.length}`);
+    debug(1,`HTTP Request Dispatcher: Dispatching request to client ${nextClient.id}. Queue length: ${nextClient.queue.length}`);
     return nextClient.httpRequest(clientParameters);
   }
 
@@ -1412,9 +1412,10 @@ async function isPeripheralConnectedInternal(pid) {
 
 async function isPeripheralConnectedHttpRequest(pid) {
   try {
-    let httpresponse = await xapi.Command.HttpClient.Get({
+    let httpresponse = await zapi.communication.httpRequest({
+      Method:'GET',
       AllowInsecureHTTPS: true,
-      Timeout: 3,
+      Timeout:3,
       Url: pid.peripheralId
     });
 

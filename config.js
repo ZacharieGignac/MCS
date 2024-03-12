@@ -18,11 +18,11 @@ import * as sce_como_type1 from './sce_como_type1';
 
 
 
-/****************************/
+/***************************/
 //Import drivers or drivers libraries below
 import * as devicesLibrary from './devicesLibrary';
 import * as driversLibrary from './driversLibrary';
-/****************************/
+/***************************/
 
 
 

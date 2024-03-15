@@ -154,7 +154,7 @@ export class SystemStatus {
 
   async init() {
     return new Promise(async success => {
-      debug(1, 'SystemStatus started!');
+      debug(2, 'Starting SystemStatus...');
 
 
       //Set special "presentation" status
@@ -200,10 +200,11 @@ export class SystemStatus {
           debug(2, this._systemStatus);
         }, 240000);
       }
-
       this.setDefaults();
+      debug(2,`SystemStatus running.`);
       success();
     });
+    
   }
 
   setDefaults() {

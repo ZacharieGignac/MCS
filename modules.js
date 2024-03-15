@@ -12,7 +12,7 @@ export class Modules {
   }
   init() {
     return new Promise((success, failure) => {
-      debug(1, `Module manager started!`);
+      debug(2, `Module manager started`);
       this.modules = [];
       for (let mod of systemconfig.modules) {
         debug(1, `Loading module "${mod.Manifest.id}" version ${mod.Manifest.version} (${mod.Manifest.description})`);
@@ -21,7 +21,7 @@ export class Modules {
           inst: new mod.Module()
         });
       }
-      debug(1, `Finished loading ${this.modules.length} modules.`);
+      debug(2, `Finished loading ${this.modules.length} modules.`);
       zapi.system.events.emit('system_modules_init');
       success();
     });

@@ -13,7 +13,7 @@ import * as sce_como_type1 from './sce_como_type1';
 
 /****************************/
 //Import modules below
-//import * as mod_autosauce from './mod_autosauce';
+import * as mod_regisseur from './mod_regisseur';
 /****************************/
 
 
@@ -65,6 +65,7 @@ export var config = {
   ],
 
   modules: [
+    mod_regisseur
   ],
 
   mod_autosauce_config: {

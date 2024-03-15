@@ -144,7 +144,7 @@ class Storage {
 
   async init() {
     zapi.system.events.emit('system_storage_init');
-    debug(2, `Storage: Init...`);
+    debug(2, `Storage initializing...`);
     this.storage = await this.readStorage();
     debug(2, `Storage: Init done`);
     zapi.system.events.emit('system_storage_init_done');
@@ -243,7 +243,31 @@ class Storage {
 }
 
 
+class SystemEvents {
+  constructor() {
+    this.events = [];
+  }
 
+  on(event, callback) {
+    this.events.push({ event: event, callback: callback });
+  }
+
+  off(event, callback) {
+    for (let e of this.events) {
+      if (e.event == event && e.callback == callback) {
+        this.events.splice(this.events.indexOf(e), 1);
+      }
+    }
+  }
+
+  emit(event, ...args) {
+    for (let e of this.events) {
+      if (e.event == event){
+        e.callback(...args);
+      }
+    }
+  }
+}
 
 
 class WidgetMapping {
@@ -297,36 +321,6 @@ class WidgetMapping {
 
 
 
-
-
-
-
-class SystemEvents {
-  constructor() {
-    this.events = {};
-  }
-
-  on(event, callback) {
-    if (!this.events[event]) {
-      this.events[event] = [];
-    }
-    this.events[event].push(callback);
-  }
-
-  off(event, callback) {
-    if (!this.events[event]) return;
-    const index = this.events[event].indexOf(callback);
-    if (index !== -1) {
-      this.events[event].splice(index, 1);
-    }
-  }
-
-  emit(event, ...args) {
-    if (!this.events[event]) return;
-    this.events[event].forEach(callback => callback(...args));
-  }
-}
-
 class UiManager {
   constructor() {
     this.allWidgets = [];
@@ -337,8 +331,6 @@ class UiManager {
   }
 
   async init() {
-
-
     return new Promise(async success => {
       xapi.Event.UserInterface.on(event => { this.forwardUiEvents(event); });
       this.onUiEvent((event) => this.parseUiEvent(event));
@@ -724,6 +716,7 @@ class Core {
     this.audioExtraSkipPrompt = false;
     await this.uiManager.init();
     await this.systemStatus.init();
+    await this.modules.start();
 
 
     xapi.Config.UserInterface.SettingsMenu.Mode.set(systemconfig.system.settingsMenu);
@@ -945,7 +938,7 @@ class Core {
     });
 
 
-    this.modules.start();
+    //this.modules.start();
 
 
 
@@ -1152,7 +1145,7 @@ async function isPeripheralConnectedHttpRequest(pid) {
   try {
     let httpresponse = await zapi.communication.httpClient.Get({
       AllowInsecureHTTPS: true,
-      Timeout:3,
+      Timeout: 3,
       Url: pid.peripheralId
     });
 
@@ -1242,7 +1235,7 @@ async function preInit() {
 
   /* HTTP Client Queue */
   httpRequestDispatcher = new HttpRequestDispatcher();
-  
+
 
 
   /* Wakeup system */

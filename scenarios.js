@@ -55,7 +55,7 @@ export class Scenarios {
       }
     });
 
-    debug(1, 'Scenarios Manager starting...');
+    debug(2, 'Scenarios Manager starting...');
     debug(1, `Loading ${systemconfig.scenarios.length} scenarios..`);
     for (let sce of systemconfig.scenarios) {
       let newScenario = {
@@ -121,7 +121,7 @@ export class Scenarios {
             this.currentScenario = id;
             zapi.system.setStatus('currentScenario', this.currentScenario);
 
-
+            
             this.hidePanels(currManifest.panels.hide);
             this.showPanels(currManifest.panels.show);
             if (currManifest.features != undefined) {

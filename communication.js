@@ -1,11 +1,19 @@
 import xapi from 'xapi';
 import { debug } from './debug';
 import { config as systemconfig } from './config';
+import { zapiv1 as zapi } from './zapi';
+
+
+
+
+
 
 class HttpRequestQueue {
   constructor() {
     this.queue = [];
     this.isProcessing = false;
+    let self = this;
+    
   }
 
   async httpRequest(url) {
@@ -69,13 +77,40 @@ class HttpRequestQueue {
 
 export class HttpRequestDispatcher {
   constructor() {
-    debug(2,`HTTP Request Dispatcher Init... Creating ${systemconfig.system.httpDispatcherClients} clients.`);
+    let self = this;
+    debug(2, `HTTP Request Dispatcher Init... Creating ${systemconfig.system.httpDispatcherClients} clients.`);
     this.clients = [];
     for (let i = 0; i < systemconfig.system.httpDispatcherClients; i++) {
       let newHttpRequestQueue = new HttpRequestQueue();
       newHttpRequestQueue.id = i;
       this.clients.push(newHttpRequestQueue);
     }
+
+    //Add ZAPI mapping
+    var zapiCallStruct = {
+      Get: (clientParameters) => {
+        clientParameters.Method = 'GET';
+        return self.httpRequest(clientParameters);
+      },
+      Post: (clientParameters) => {
+        clientParameters.Method = 'POST';
+        return self.httpRequest(clientParameters);
+      },
+      Put: (clientParameters) => {
+        clientParameters.Method = 'PUT';
+        return self.httpRequest(clientParameters);
+      },
+      Delete: (clientParameters) => {
+        clientParameters.Method = 'DELETE';
+        return self.httpRequest(clientParameters);
+      },
+      Patch: (clientParameters) => {
+        clientParameters.Method = 'PATCH';
+        return self.httpRequest(clientParameters);
+      }
+    }
+
+    zapi.communication.httpClient = zapiCallStruct;
   }
   httpRequest(clientParameters) {
     let sortedClients = this.clients.sort((a, b) => {
@@ -84,7 +119,7 @@ export class HttpRequestDispatcher {
       return 0;
     });
     let nextClient = sortedClients[0];
-    debug(1,`HTTP Request Dispatcher: Dispatching request to client ${nextClient.id}. Queue length: ${nextClient.queue.length}`);
+    debug(1, `HTTP Request Dispatcher: Dispatching request to client ${nextClient.id}. Queue length: ${nextClient.queue.length} (URL: ${clientParameters.Url})`);
     return nextClient.httpRequest(clientParameters);
   }
 }
@@ -93,6 +128,8 @@ export class MessageQueue {
   constructor() {
     this.queue = [];
     this.sending = false;
+    let self = this;
+    zapi.communication.sendMessage = (message) => { self.send(message); };
   }
 
   send(text) {
@@ -115,3 +152,4 @@ export class MessageQueue {
     }, systemconfig.system.messagesPacing);
   }
 }
+

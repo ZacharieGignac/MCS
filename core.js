@@ -8,6 +8,7 @@ import { Modules } from './modules';
 import { SystemStatus } from './systemstatus';
 import { HttpRequestDispatcher } from './communication';
 import { MessageQueue } from './communication';
+import { Audio } from './audio';
 import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
@@ -143,7 +144,7 @@ class Storage {
 
   async init() {
     zapi.system.events.emit('system_storage_init');
-    debug(2, `Storage: Init...`);
+    debug(2, `Storage initializing...`);
     this.storage = await this.readStorage();
     debug(2, `Storage: Init done`);
     zapi.system.events.emit('system_storage_init_done');
@@ -242,155 +243,31 @@ class Storage {
 }
 
 
-class Audio {
+class SystemEvents {
   constructor() {
-
+    this.events = [];
   }
 
-  getLocalInputId(name) {
-    return new Promise((success, failure) => {
-      xapi.Status.Audio.Input.LocalInput.get().then(li => {
-        for (let i of li) {
-          if (i.Name == name) {
-            success(i.id);
-          }
-        }
-        failure('LocalInput not found: ' + name);
-      });
-    });
+  on(event, callback) {
+    this.events.push({ event: event, callback: callback });
   }
 
-  getLocalOutputId(name) {
-    return new Promise((success, failure) => {
-      xapi.Status.Audio.Output.LocalOutput.get().then(lo => {
-        for (let o of lo) {
-          if (o.Name == name) {
-            success(o.id);
-          }
-        }
-        failure('LocalOutput not found: ' + name);
-      });
-    });
+  off(event, callback) {
+    for (let e of this.events) {
+      if (e.event == event && e.callback == callback) {
+        this.events.splice(this.events.indexOf(e), 1);
+      }
+    }
   }
 
-  getRemoteInputsIds() {
-    return new Promise((success, failure) => {
-      var inputs = [];
-      xapi.Status.Audio.Input.RemoteInput.get().then(ri => {
-        for (let r of ri) {
-          inputs.push(r.id);
-        }
-        if (inputs.length > 0) {
-          success(inputs);
-        }
-        else {
-          failure('No remote inputs found.');
-        }
-      });
-    });
-  }
-
-  getRemoteOutputIds() {
-    return new Promise((success, failure) => {
-      var outputs = [];
-      xapi.Status.Audio.Output.RemoteOutput.get().then(ro => {
-        for (let r of ro) {
-          outputs.push(r.id);
-        }
-        if (outputs.length > 0) {
-          success(outputs);
-        }
-        else {
-          failure('No remote output found.');
-        }
-      });
-    });
+  emit(event, ...args) {
+    for (let e of this.events) {
+      if (e.event == event){
+        e.callback(...args);
+      }
+    }
   }
 }
-
-
-
-
-class AudioReportAnalyzer {
-  constructor(audioReporter) {
-    this.audioReporter = audioReporter;
-    this.audioReporter.onReport((report) => { this.reportReceived(report); });
-    this.enabled = false;
-    this.rawAnalysisCallbacks = [];
-    this.loudestGroupAnalysisCallbacks = [];
-    this.customAnalysisCallbacks = [];
-    this.groups = [];
-    this.lastAnalysisData = undefined;
-  }
-  start() {
-    this.enabled = true;
-  }
-  stop() {
-    this.enabled = false;
-  }
-  reportReceived(report) {
-
-    this.lastAnalysisData = report;
-    if (this.enabled) {
-
-
-      //Process raw analysis callbacks
-      for (let rac of this.rawAnalysisCallbacks) {
-        rac(report);
-      }
-
-
-      //Find first group that contains the loudest input level
-      var loudestReport = report;
-      loudestReport.group = undefined;
-      delete loudestReport.inputs;
-      for (let group of this.groups) {
-        if (group.inputs.includes(loudestReport.highInputId)) {
-          loudestReport.group = group.group;
-        }
-      }
-
-      for (let lga of this.loudestGroupAnalysisCallbacks) {
-        if (loudestReport.highestSince >= lga.elapsed) {
-          loudestReport.significant = loudestReport.highestAverageDiff > 0 ? true : false;
-          lga.callback(loudestReport);
-        }
-      }
-
-
-    }
-
-
-  }
-  addSingleGroup(group) {
-    var newGroup = { group: group, inputs: [] };
-    let inputDevices = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.AUDIOINPUT, group);
-    for (let ai of inputDevices) {
-      newGroup.inputs.push(ai.config.connector);
-    }
-    this.groups.push(newGroup);
-  }
-  addGroup(groups) {
-    if (Array.isArray(groups)) {
-      for (let group of groups) {
-        this.addSingleGroup(group);
-      }
-    }
-    else {
-      this.addSingleGroup(groups);
-    }
-  }
-  onRawAnalysis(callback) {
-    this.rawAnalysisCallbacks.push(callback);
-  }
-  onLoudestGroup(elapsed, callback) {
-    this.loudestGroupAnalysisCallbacks.push({ elapsed: elapsed, callback: callback });
-  }
-  onCustomAnalysis(filter, callback) {
-    this.customAnalysisCallbacks.push({ filter: filter, callback: callback });
-  }
-}
-
 
 
 class WidgetMapping {
@@ -444,36 +321,6 @@ class WidgetMapping {
 
 
 
-
-
-
-
-class SystemEvents {
-  constructor() {
-    this.events = {};
-  }
-
-  on(event, callback) {
-    if (!this.events[event]) {
-      this.events[event] = [];
-    }
-    this.events[event].push(callback);
-  }
-
-  off(event, callback) {
-    if (!this.events[event]) return;
-    const index = this.events[event].indexOf(callback);
-    if (index !== -1) {
-      this.events[event].splice(index, 1);
-    }
-  }
-
-  emit(event, ...args) {
-    if (!this.events[event]) return;
-    this.events[event].forEach(callback => callback(...args));
-  }
-}
-
 class UiManager {
   constructor() {
     this.allWidgets = [];
@@ -484,8 +331,6 @@ class UiManager {
   }
 
   async init() {
-
-
     return new Promise(async success => {
       xapi.Event.UserInterface.on(event => { this.forwardUiEvents(event); });
       this.onUiEvent((event) => this.parseUiEvent(event));
@@ -654,12 +499,8 @@ class Core {
     zapi.performance.inc = (name, num) => { performance.inc(name, num); };
     zapi.performance.dec = (name, num) => { performance.dec(name, num); };
     zapi.performance.reset = () => { performance.reset(); };
-    zapi.system.sendMessage = (message) => { self.messageQueue.send(message); };
-    zapi.audio.getLocalInputId = (name) => { return self.audio.getLocalInputId(name); };
-    zapi.audio.getLocalOutputId = (name) => { return self.audio.getLocalOutputId(name); };
-    zapi.audio.getRemoteInputsIds = () => { return self.audio.getRemoteInputsIds(); };
-    zapi.audio.getRemoteOutputIds = () => { return self.audio.getRemoteOutputIds(); };
-    zapi.audio.addAudioReportAnalyzer = (audioReporter) => { return new AudioReportAnalyzer(audioReporter); };
+    
+
 
 
 
@@ -875,6 +716,7 @@ class Core {
     this.audioExtraSkipPrompt = false;
     await this.uiManager.init();
     await this.systemStatus.init();
+    await this.modules.start();
 
 
     xapi.Config.UserInterface.SettingsMenu.Mode.set(systemconfig.system.settingsMenu);
@@ -1096,7 +938,7 @@ class Core {
     });
 
 
-    this.modules.start();
+    //this.modules.start();
 
 
 
@@ -1301,10 +1143,9 @@ async function isPeripheralConnectedInternal(pid) {
 
 async function isPeripheralConnectedHttpRequest(pid) {
   try {
-    let httpresponse = await zapi.communication.httpRequest({
-      Method:'GET',
+    let httpresponse = await zapi.communication.httpClient.Get({
       AllowInsecureHTTPS: true,
-      Timeout:3,
+      Timeout: 3,
       Url: pid.peripheralId
     });
 
@@ -1394,7 +1235,7 @@ async function preInit() {
 
   /* HTTP Client Queue */
   httpRequestDispatcher = new HttpRequestDispatcher();
-  zapi.communication.httpRequest = (clientParameters) => { return httpRequestDispatcher.httpRequest(clientParameters); };
+
 
 
   /* Wakeup system */

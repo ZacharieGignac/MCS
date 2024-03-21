@@ -13,16 +13,16 @@ import * as sce_como_type1 from './sce_como_type1';
 
 /****************************/
 //Import modules below
-//import * as mod_autosauce from './mod_autosauce';
+import * as mod_regisseur from './mod_regisseur';
 /****************************/
 
 
 
-/***************************/
+/****************************/
 //Import drivers or drivers libraries below
 import * as devicesLibrary from './devicesLibrary';
 import * as driversLibrary from './driversLibrary';
-/***************************/
+/****************************/
 
 
 
@@ -65,6 +65,7 @@ export var config = {
   ],
 
   modules: [
+    mod_regisseur
   ],
 
   mod_autosauce_config: {
@@ -89,7 +90,7 @@ export var config = {
     debugLevel: DEBUGLEVEL.HIGH,                  // Niveau de débug (LOW, MEDIUM, HIGH)
     debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
     messagesPacing: 500,                          // Temps (ms) entre les messages de type "xpi.Command.Message"
-    httpDispatcherClients:2,                      // Nombre de clients HTTP concurents. Plus que 2 commence à être risqué selon l'utilisation des clients HTTP non gérés par MCS. Une augmentation de ~5% de performance est observée entre 2 et 3.
+    httpDispatcherClients: 2,                      // Nombre de clients HTTP concurents. Plus que 2 commence à être risqué selon l'utilisation des clients HTTP non gérés par MCS. Une augmentation de ~5% de performance est observée entre 2 et 3.
     initDelay: 1000,                              // Temps (ms) avant l'initialisation du système
     newSessionDelay: 5000,                        // Temps (ms) pour l'ouverture d'une nouvelle session.
     forceStandby: true,                           // <true, false> Forcer un standby à une heure précise, peu importe si un appel ou une présentation sont actifs
@@ -166,12 +167,31 @@ export var config = {
 
 
   devices: [
+    /*
     {
       id: 'display.projector',                      //Identification unique
       type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
       name: 'PROJ',                                 //Nom, utilisé par le driver pour la communication
       device: devicesLibrary.Display,               //Classe à utiliser
       driver: driversLibrary.DisplayDriver_serial_sonybpj, //Driver à utiliser par le device
+      connector: 1,                                 //Connecteur HDMI de sortie sur le codec
+      supportsPower: true,                          //Défini si l'affichage supporte les commandes d'alimentation (ON, OFF)
+      supportsBlanking: true,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
+      supportsSource: false,                        //Défini si l'affichage supporte le changement de source (HDMI1, HDMI2, SDI)
+      supportsUsageHours: false,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
+      defaultPower: 'off',                          //Alimentation par défaut lors du démarrage du système (ON, OFF)
+      defaultBlanking: false,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
+      blankBeforePowerOff: true,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
+      powerOffDelay: 6000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
+      usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
+      port: 1                                        //Numéro du port série
+    },*/
+    {
+      id: 'display.projector',                      //Identification unique
+      type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
+      name: 'PROJ',                                 //Nom, utilisé par le driver pour la communication
+      device: devicesLibrary.Display,               //Classe à utiliser
+      driver: driversLibrary.DisplayDriver_serial_epson, //Driver à utiliser par le device
       connector: 1,                                 //Connecteur HDMI de sortie sur le codec
       supportsPower: true,                          //Défini si l'affichage supporte les commandes d'alimentation (ON, OFF)
       supportsBlanking: true,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
@@ -359,18 +379,18 @@ export var config = {
       connector: 6
     },
 
-    /*
+
     {
       id: 'infrastructure.webex',                               //Identification unique
       type: DEVICETYPE.SOFTWAREDEVICE,                          //Type = 'SOFTWAREDEVICE'
       device: devicesLibrary.SoftwareDevice,                    //Classe à utiliser
       name: 'Webex Infrastructure',                             //Nom
       peripheralRequired: true,                                 //Périphérique requis
-      peripheralId: 'https://idbroker.webex.com/idb/oauth2/',   //Adresse HTTP de vérification
+      peripheralId: 'https://www.google.ca',   //Adresse HTTP de vérification
       peripheralCheckMethod: 'httprequest',                     //Méthode de vérification
-      peripheralCheckStatusCode: 404                            //Code HTTP qui constitue un succès
+      peripheralCheckStatusCode: 200                            //Code HTTP qui constitue un succès
     },
-    */
+
 
 
     /* AUDIO INPUT GROUPS */

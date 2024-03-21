@@ -32,7 +32,7 @@ export class LightSceneDriver_isc {
   }
 
   activate() {
-    zapi.system.sendMessage(`${this.config.name}:ACTIVATE`);
+    zapi.communication.sendMessage(`${this.config.name}:ACTIVATE`);
   }
 }
 
@@ -46,14 +46,14 @@ export class DisplayDriver_isc_h21 {
   setPower(power) {
     power = power.toLowerCase();
     let powerString = this.config.name + '_' + power.toUpperCase();
-    zapi.system.sendMessage(powerString);
+    zapi.communication.sendMessage(powerString);
     debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): setPower: ${power}`);
   }
 
   setBlanking(blanking) {
     let blankingStatus = blanking ? 'ON' : 'OFF';
     let blankingString = this.config.name + '_BLANKING_' + blankingStatus;
-    zapi.system.sendMessage(blankingString);
+    zapi.communication.sendMessage(blankingString);
     debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): setBlanking: ${blanking}`);
   }
 
@@ -95,20 +95,20 @@ export class DisplayDriver_isc {
   setPower(power) {
     power = power.toUpperCase();
     let powerString = this.config.name + ':' + power;
-    zapi.system.sendMessage(powerString);
+    zapi.communication.sendMessage(powerString);
     debug(1, `DRIVER DisplayDriver_isc (${this.config.id}): setPower: ${power}`);
   }
 
   setBlanking(blanking) {
     let blankingAction = blanking ? 'BLANK' : 'UNBLANK';
     let blankingString = this.config.name + ':' + blankingAction;
-    zapi.system.sendMessage(blankingString);
+    zapi.communication.sendMessage(blankingString);
     debug(1, `DRIVER DisplayDriver_isc (${this.config.id}): setBlanking: ${blanking}`);
   }
 
   setSource(source) {
     let sourceString = this.config.name + ':SOURCE;' + source;
-    zapi.system.sendMessage(sourceString);
+    zapi.communication.sendMessage(sourceString);
   }
 
   getUsageHours() {
@@ -116,7 +116,7 @@ export class DisplayDriver_isc {
   }
 
   requestUsageHours() {
-    zapi.system.sendMessage(this.config.name + ':USAGEREQUEST');
+    zapi.communication.sendMessage(this.config.name + ':USAGEREQUEST');
   }
 
   custom() { }
@@ -127,6 +127,17 @@ export class DisplayDriver_CEC {
     this.config = config;
     xapi.Config.Video.Output.Connector[this.config.connector].CEC.Mode.set('On');
     debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Setting CEC mode to "On" for connector: ${this.config.connector}`);
+  }
+  setPower() {}
+  setBlanking() {}
+  setSource() {}
+  getUsageHours() {}
+  requestUsageHours() {}
+}
+
+export class DisplayDriver_NONE {
+  constructor(device, config) {
+    debug(1, `DRIVER DisplayDriver_NONE (${config.id}): doing absolutely nothing on connector: ${config.connector}`);
   }
   setPower() {}
   setBlanking() {}
@@ -240,6 +251,110 @@ export class DisplayDriver_serial_sonybpj {
   custom() { }
 }
 
+export class DisplayDriver_serial_epson {
+  constructor(device, config) {
+    this.pacing = 2000;
+    this.repeat = 8000;
+    this.queue = [];
+    this.sending = false;
+    this.config = config;
+    this.device = device;
+    this.currentPower;
+    this.currentBlanking;
+    xapi.Config.SerialPort.Outbound.Mode.set('On');
+    xapi.Config.SerialPort.Outbound.Port[this.config.port].BaudRate.set(9600);
+    xapi.Config.SerialPort.Outbound.Port[this.config.port].Description.set(this.config.id);
+    xapi.Config.SerialPort.Outbound.Port[this.config.port].Parity.set('None');
+    this.serialCommands = {
+      TERMINATOR: '\\r\\n',
+      POWERON: 'PWR ON\\r\\n',
+      POWEROFF: 'PWR OFF\\r\\n',
+      BLANK: 'MUTE ON\\r\\n',
+      UNBLANK: 'MUTE OFF\\r\\n'
+    };
+    let self = this;
+
+    this.stateInterval = setInterval(() => {
+      if (self.currentBlanking == true) {
+        self.serialSend(self.serialCommands.BLANK);
+      }
+      else {
+        self.serialSend(self.serialCommands.UNBLANK);
+      }
+      if (self.currentPower == 'on') {
+        self.serialSend(self.serialCommands.POWERON);
+      }
+      else {
+        self.serialSend(self.serialCommands.POWEROFF);
+      }
+    }, self.repeat);
+  }
+
+  setPower(power) {
+    power = power.toLowerCase();
+    this.currentPower = power;
+    if (power == 'on') {
+      this.serialSend(this.serialCommands.POWERON);
+    }
+    else {
+      this.serialSend(this.serialCommands.POWEROFF);
+    }
+    debug(1, `DRIVER DisplayDriver_serial_epson (${this.config.id}): setPower: ${power}`);
+  }
+
+  setBlanking(blanking) {
+    this.currentBlanking = blanking;
+    if (blanking) {
+      this.serialSend(this.serialCommands.BLANK);
+    }
+    else {
+      this.serialSend(this.serialCommands.UNBLANK);
+    }
+
+    debug(1, `DRIVER DisplayDriver_serial_epson (${this.config.id}): setBlanking: ${blanking}`);
+  }
+
+  setSource(source) {
+    debug(2, `DRIVER DisplayDriver_serial_epson (${this.config.id}): This driver does not support source selection.`);
+  }
+
+  getUsageHours() {
+    return 0;
+  }
+
+  requestUsageHours() {
+
+  }
+  serialSend(command) {
+    this.queue.push(command);
+    if (!this.sending) {
+      this.sendNextMessage();
+    }
+  }
+  sendNextMessage() {
+    if (this.queue.length === 0) {
+      this.sending = false;
+      return;
+    }
+    const message = this.queue.shift();
+    this.sending = true;
+    xapi.Command.SerialPort.PeripheralControl.Send({
+      PortId: this.config.port,
+      ResponseTerminator: this.serialCommands.TERMINATOR,
+      ResponseTimeout:200,
+      Text: message
+    }).catch(e => {
+      debug(2, `DRIVER DisplayDriver_serial_epson (${this.config.id}): ${e.message}`);
+    });
+
+
+    setTimeout(() => {
+      this.sendNextMessage();
+    }, this.pacing);
+  }
+
+  custom() { }
+}
 
 
 export class ScreenDriver_isc_h21 {
@@ -250,7 +365,7 @@ export class ScreenDriver_isc_h21 {
 
   setPosition(position) {
     position = position.toLowerCase();
-    zapi.system.sendMessage(this.config.name + '_' + position);
+    zapi.communication.sendMessage(this.config.name + '_' + position);
     debug(1, `DRIVER ScreenDriver_isc_h21 (${this.config.id}): setPosition: ${position}`);
   }
 
@@ -268,7 +383,7 @@ export class ScreenDriver_isc {
 
   setPosition(position) {
     position = position.toUpperCase();
-    zapi.system.sendMessage(this.config.name + ':' + position);
+    zapi.communication.sendMessage(this.config.name + ':' + position);
     debug(1, `DRIVER ScreenDriver_isc (${this.config.id}): setPosition: ${position}`);
   }
 
@@ -391,17 +506,17 @@ export class LightDriver_isc_h21 {
 
   on() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): On`);
-    zapi.system.sendMessage(`${this.config.name}_ON`);
+    zapi.communication.sendMessage(`${this.config.name}_ON`);
   }
 
   off() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Off`);
-    zapi.system.sendMessage(`${this.config.name}_OFF`);
+    zapi.communication.sendMessage(`${this.config.name}_OFF`);
   }
 
   dim(level) {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Dim ${level}`);
-    zapi.system.sendMessage(`${this.config.name}_DIM ${level}`);
+    zapi.communication.sendMessage(`${this.config.name}_DIM ${level}`);
   }
 }
 
@@ -414,17 +529,17 @@ export class LightDriver_isc {
 
   on() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): On`);
-    zapi.system.sendMessage(`${this.config.name}:ON`);
+    zapi.communication.sendMessage(`${this.config.name}:ON`);
   }
 
   off() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Off`);
-    zapi.system.sendMessage(`${this.config.name}:OFF`);
+    zapi.communication.sendMessage(`${this.config.name}:OFF`);
   }
 
   dim(level) {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Dim ${level}`);
-    zapi.system.sendMessage(`${this.config.name}:DIM;${level}`);
+    zapi.communication.sendMessage(`${this.config.name}:DIM;${level}`);
   }
 }
 
@@ -549,7 +664,8 @@ export class ControlSystemDriver_isc_h21 {
     if (this.config.syncRestart) {
       xapi.Event.BootEvent.Action.on(action => {
         if (action == 'Restart') {
-          zapi.system.sendMessage(`HW_RESTART`);
+          zapi.communication.sendMessage(`HW_RESTART`);
+          zpai.communication.sendMessage(`SYSTEM_CRESTRON_REBOOT`);
         }
       });
     }
@@ -565,14 +681,14 @@ export class ControlSystemDriver_isc {
     if (this.config.syncRestart) {
       xapi.Event.BootEvent.Action.on(action => {
         if (action == 'Restart') {
-          zapi.system.sendMessage(`${this.config.name}:HWRESET`);
+          zapi.communication.sendMessage(`${this.config.name}:HWRESET`);
         }
       });
     }
 
     if (this.config.heartbeatInterval != undefined) {
       setInterval(() => {
-        zapi.system.sendMessage(`${this.config.name}:HEARTBEAT;CODEC`);
+        zapi.communication.sendMessage(`${this.config.name}:HEARTBEAT;CODEC`);
       }, this.config.heartbeatInterval);
     }
   }
@@ -586,7 +702,7 @@ export class ShadeDriver_basic_isc {
 
   setPosition(position) {
     position = position.toUpperCase();
-    zapi.system.sendMessage(this.config.name + ':' + position);
+    zapi.communication.sendMessage(this.config.name + ':' + position);
     debug(1, `DRIVER ShadeDriver_basic_isc (${this.config.id}): setPosition: ${position}`);
   }
 

@@ -5,6 +5,7 @@ import { debug } from './debug';
 
 export class Storage {
   constructor() {
+    this.version = 1;
     this.STORAGEFILE = systemconfig.system.storageFile;
     this.storage;
   }
@@ -95,6 +96,7 @@ export class Storage {
         zapi.system.events.emit('system_storage_file_deleted', name);
       }
     }
+    this.write('storage.version', this.version);
   }
 
 
@@ -107,9 +109,7 @@ export class Storage {
     this.write('storage.version', '1');
     this.write('storage.encoding', 'json');
     this.write('storage.encapsulation', 'base64');
-    this.write('system.bootcount', 0);
     this.init();
-
   }
 }
 

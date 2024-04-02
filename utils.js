@@ -32,8 +32,9 @@ export class Storage {
       return JSON.parse(storageContent);
     }
     catch (e) {
-      console.error(`Error reading storage file. The file is malformed. Have you messed with it ?`);
+      console.error(`Error reading storage file. The file is malformed.`);
       zapi.system.events.emit('system_storage_error_corrupted');
+      this.resetStorage();
     }
     debug(2, `Storage: Storage loaded into memory.`);
   }
@@ -107,6 +108,8 @@ export class Storage {
     this.write('storage.encoding', 'json');
     this.write('storage.encapsulation', 'base64');
     this.write('system.bootcount', 0);
+    this.init();
+
   }
 }
 

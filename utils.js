@@ -106,7 +106,7 @@ export class Storage {
     this.storage = {
       files: []
     };
-    this.write('storage.version', '1');
+    this.write('storage.version', this.version);
     this.write('storage.encoding', 'json');
     this.write('storage.encapsulation', 'base64');
     this.init();

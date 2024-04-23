@@ -128,6 +128,8 @@ export class MessageQueue {
   constructor() {
     this.queue = [];
     this.sending = false;
+    let self = this;
+    zapi.communication.sendMessage = (message) => { self.send(message); };
   }
 
   send(text) {

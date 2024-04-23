@@ -32,7 +32,7 @@ export class LightSceneDriver_isc {
   }
 
   activate() {
-    zapi.system.sendMessage(`${this.config.name}:ACTIVATE`);
+    zapi.communication.sendMessage(`${this.config.name}:ACTIVATE`);
   }
 }
 
@@ -46,14 +46,14 @@ export class DisplayDriver_isc_h21 {
   setPower(power) {
     power = power.toLowerCase();
     let powerString = this.config.name + '_' + power.toUpperCase();
-    zapi.system.sendMessage(powerString);
+    zapi.communication.sendMessage(powerString);
     debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): setPower: ${power}`);
   }
 
   setBlanking(blanking) {
     let blankingStatus = blanking ? 'ON' : 'OFF';
     let blankingString = this.config.name + '_BLANKING_' + blankingStatus;
-    zapi.system.sendMessage(blankingString);
+    zapi.communication.sendMessage(blankingString);
     debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): setBlanking: ${blanking}`);
   }
 
@@ -95,20 +95,20 @@ export class DisplayDriver_isc {
   setPower(power) {
     power = power.toUpperCase();
     let powerString = this.config.name + ':' + power;
-    zapi.system.sendMessage(powerString);
+    zapi.communication.sendMessage(powerString);
     debug(1, `DRIVER DisplayDriver_isc (${this.config.id}): setPower: ${power}`);
   }
 
   setBlanking(blanking) {
     let blankingAction = blanking ? 'BLANK' : 'UNBLANK';
     let blankingString = this.config.name + ':' + blankingAction;
-    zapi.system.sendMessage(blankingString);
+    zapi.communication.sendMessage(blankingString);
     debug(1, `DRIVER DisplayDriver_isc (${this.config.id}): setBlanking: ${blanking}`);
   }
 
   setSource(source) {
     let sourceString = this.config.name + ':SOURCE;' + source;
-    zapi.system.sendMessage(sourceString);
+    zapi.communication.sendMessage(sourceString);
   }
 
   getUsageHours() {
@@ -116,7 +116,7 @@ export class DisplayDriver_isc {
   }
 
   requestUsageHours() {
-    zapi.system.sendMessage(this.config.name + ':USAGEREQUEST');
+    zapi.communication.sendMessage(this.config.name + ':USAGEREQUEST');
   }
 
   custom() { }
@@ -365,7 +365,7 @@ export class ScreenDriver_isc_h21 {
 
   setPosition(position) {
     position = position.toLowerCase();
-    zapi.system.sendMessage(this.config.name + '_' + position);
+    zapi.communication.sendMessage(this.config.name + '_' + position);
     debug(1, `DRIVER ScreenDriver_isc_h21 (${this.config.id}): setPosition: ${position}`);
   }
 
@@ -383,7 +383,7 @@ export class ScreenDriver_isc {
 
   setPosition(position) {
     position = position.toUpperCase();
-    zapi.system.sendMessage(this.config.name + ':' + position);
+    zapi.communication.sendMessage(this.config.name + ':' + position);
     debug(1, `DRIVER ScreenDriver_isc (${this.config.id}): setPosition: ${position}`);
   }
 
@@ -506,17 +506,17 @@ export class LightDriver_isc_h21 {
 
   on() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): On`);
-    zapi.system.sendMessage(`${this.config.name}_ON`);
+    zapi.communication.sendMessage(`${this.config.name}_ON`);
   }
 
   off() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Off`);
-    zapi.system.sendMessage(`${this.config.name}_OFF`);
+    zapi.communication.sendMessage(`${this.config.name}_OFF`);
   }
 
   dim(level) {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Dim ${level}`);
-    zapi.system.sendMessage(`${this.config.name}_DIM ${level}`);
+    zapi.communication.sendMessage(`${this.config.name}_DIM ${level}`);
   }
 }
 
@@ -529,17 +529,17 @@ export class LightDriver_isc {
 
   on() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): On`);
-    zapi.system.sendMessage(`${this.config.name}:ON`);
+    zapi.communication.sendMessage(`${this.config.name}:ON`);
   }
 
   off() {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Off`);
-    zapi.system.sendMessage(`${this.config.name}:OFF`);
+    zapi.communication.sendMessage(`${this.config.name}:OFF`);
   }
 
   dim(level) {
     debug(1, `DRIVER Light_isc_h21 (${this.config.id}): Dim ${level}`);
-    zapi.system.sendMessage(`${this.config.name}:DIM;${level}`);
+    zapi.communication.sendMessage(`${this.config.name}:DIM;${level}`);
   }
 }
 
@@ -664,7 +664,8 @@ export class ControlSystemDriver_isc_h21 {
     if (this.config.syncRestart) {
       xapi.Event.BootEvent.Action.on(action => {
         if (action == 'Restart') {
-          zapi.system.sendMessage(`HW_RESTART`);
+          zapi.communication.sendMessage(`HW_RESTART`);
+          zpai.communication.sendMessage(`SYSTEM_CRESTRON_REBOOT`);
         }
       });
     }
@@ -680,14 +681,14 @@ export class ControlSystemDriver_isc {
     if (this.config.syncRestart) {
       xapi.Event.BootEvent.Action.on(action => {
         if (action == 'Restart') {
-          zapi.system.sendMessage(`${this.config.name}:HWRESET`);
+          zapi.communication.sendMessage(`${this.config.name}:HWRESET`);
         }
       });
     }
 
     if (this.config.heartbeatInterval != undefined) {
       setInterval(() => {
-        zapi.system.sendMessage(`${this.config.name}:HEARTBEAT;CODEC`);
+        zapi.communication.sendMessage(`${this.config.name}:HEARTBEAT;CODEC`);
       }, this.config.heartbeatInterval);
     }
   }
@@ -701,7 +702,7 @@ export class ShadeDriver_basic_isc {
 
   setPosition(position) {
     position = position.toUpperCase();
-    zapi.system.sendMessage(this.config.name + ':' + position);
+    zapi.communication.sendMessage(this.config.name + ':' + position);
     debug(1, `DRIVER ShadeDriver_basic_isc (${this.config.id}): setPosition: ${position}`);
   }
 

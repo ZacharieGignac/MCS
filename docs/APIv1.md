@@ -93,8 +93,6 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `onStatusKeyChange` : Ajoute un écouteur d'événement lors du changement d'un statut particulier.
   - `key` : Clé du statut.
   - `callback` : Fonction qui sera executée lors du changement du statut particulier.
-- `sendMessage` : Envoie un message texte _xapi.Command.Message.Send.Text_ en respectant une cadence prédéfinie.
-  - `text` : Texte à envoyer.
 - `sendSystemReport` : Envoie le rapport système.
 
 ### Propriétés
@@ -172,3 +170,14 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
   - `name`: Nom du fichier
 - `list`: Liste tous les fichiers dans le stockage
 - `resetStorage`: Remet le stockage par défaut en effacant tout
+
+## Communication (communication)
+
+### Méthodes
+- `sendMessage` : Envoie un message texte _xapi.Command.Message.Send.Text_ en respectant une cadence prédéfinie.
+  - `text` : Texte à envoyer.
+- `httpClient` : Client HTTP multi-thread. Toute les méthodes du client natif XAPI sont disponibles, mais seulement "GET" et "POST" sont décrites ici.
+  - `Get` : Envoie une requête "GET"
+    - `args` : Mêmes arguments que le client HTTP natif XAPI
+  - `Post` : Envoie une requête "POST"
+    - `args` : Mêmes arguments que le client HTTP natif XAPI

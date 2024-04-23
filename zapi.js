@@ -44,7 +44,6 @@ export var zapiv1 = {
     getAllStatus: () => { },
     onStatusChange: () => { },
     onStatusKeyChange: () => { },
-    sendMessage:() => { },
     systemReport:{},
     sendSystemReport:() => {},
     events:{
@@ -81,6 +80,7 @@ export var zapiv1 = {
     resetStorage:() => {}
   },
   communication: {
-    httpClient:() => {}
+    httpClient:() => {},
+    sendMessage:() => {}
   }
 }

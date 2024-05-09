@@ -261,32 +261,33 @@ export class Display {
     }
   }
 
-  setPower(power, delay = this.config.powerOffDelay) {
+  setPower(power, delay = this.config.powerOffDelay, overrideCurrentDelay = false) {
     power = power.toLowerCase();
     if (this.config.supportsPower) {
       if (this._currentPower !== power) {
         if (power === 'on') {
           this.powerOn();
         } else {
-          this.powerOff(delay);
+          this.powerOff(delay, overrideCurrentDelay);
         }
       }
     }
   }
 
-  off(delay = this.config.powerOffDelay) {
-    this.powerOff(delay);
+  off(delay = this.config.powerOffDelay, overrideCurrentDelay = false) {
+    this.powerOff(delay, overrideCurrentDelay);
   }
-  powerOff(delay = this.config.powerOffDelay) {
+  powerOff(delay = this.config.powerOffDelay, overrideCurrentDelay = false) {
     debug(1, `DEVICE ${this.config.id}: OFF`);
     zapi.performance.inc('DEVICE.' + this.config.id + '.powerOff');
     if (this.config.supportsPower) {
-      if (this._currentPower !== 'off') {
+      if (this._currentPower !== 'off' || this._currentDelay != delay || overrideCurrentDelay) {
         this._currentPower = 'off';
         zapi.ui.setWidgetValue(this.config.id + ':POWERSTATUS', `OFF (transiting ${delay}ms)`);
         zapi.ui.setWidgetValue(this.config.id + ':POWER', 'off');
         debug(1, `Display "${this.config.id}" POWER set to OFF. Delay: ${delay} ms"`);
         clearTimeout(this.powerOffTimeout);
+        this._currentDelay = delay;
         this.powerOffTimeout = setTimeout(() => {
           this.driver.setPower('off');
           zapi.ui.setWidgetValue(this.config.id + ':POWERSTATUS', `OFF`);

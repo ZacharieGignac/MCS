@@ -33,12 +33,14 @@ Aucunes.
 
 ### Display
 - `void setDefaults(void)`: Active les paramètres par défaut définis dans la configuration comme l'alimentation, la source et le blanking
-- `void setPower(string power, number delay)`: Allume ou éteint l'affichage
+- `void setPower(string power, number delay, bool overrideDelay)`: Allume ou éteint l'affichage
   - `power`: 'on', 'off'
   - `delay`: délais (ms) avant la fermeture de l'affichage. Si non spécifié, le délais par défaut de la configuration sera utilisé
+  - `overrideDelay`: Optionnel, `false` par défaut. Remplace le délais actuel si `true`.
 - `void on(void)` / `void powerOn(void)`: Allume l'affichage
-- `void off(number delay)` / `void powerOff(number delay)`: Éteint l'affichage
+- `void off(number delay, overrideDelay=false)` / `void powerOff(number delay, overrideDelay=false)`: Éteint l'affichage
   - `delay`: délais (ms) avant la fermeture de l'affichage. Si non spécifié, le délais par défaut de la configuration sera utilisé
+  - `overrideDelay`: Optionnel, `false` par défaut. Remplace le délais actuel si `true`.
 - `string getPower(void)`: Retourne l'état d'alimentation actuel, 'on' ou 'off'
 - `void setBlanking(boolean blanking)`: Activation / désactivation du blanking
   - `blanking`: true = activé, false = désactivé

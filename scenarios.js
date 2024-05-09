@@ -16,7 +16,7 @@ export class Scenarios {
     zapi.system.setStatus('currentScenario', undefined, false);
     var self = this;
 
-    //Setup ZAPI
+    //TAG:ZAPI
     zapi.scenarios.enableScenario = (id) => { self.enableScenario(id); };
     zapi.scenarios.enablePreviousScenario = () => { self.enablePreviousScenario(); };
     zapi.scenarios.getPreviousScenario = () => { return this.previousScenario; };

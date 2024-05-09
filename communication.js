@@ -109,7 +109,7 @@ export class HttpRequestDispatcher {
         return self.httpRequest(clientParameters);
       }
     }
-
+    //TAG:ZAPI
     zapi.communication.httpClient = zapiCallStruct;
   }
   httpRequest(clientParameters) {
@@ -129,6 +129,7 @@ export class MessageQueue {
     this.queue = [];
     this.sending = false;
     let self = this;
+    //TAG:ZAPI
     zapi.communication.sendMessage = (message) => { self.send(message); };
   }
 

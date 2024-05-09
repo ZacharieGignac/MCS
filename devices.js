@@ -17,7 +17,7 @@ export class DevicesManager {
 
     var self = this;
 
-    //Setup ZAPI
+    //TAG:ZAPI
     zapi.devices.getAllDevices = () => { return self.getAllDevices(); };
     zapi.devices.getDevice = (id) => { return self.getDevice(id); };
     zapi.devices.getDevicesByType = (type) => { return self.getDevicesByType(type); };

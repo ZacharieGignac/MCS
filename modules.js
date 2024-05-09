@@ -7,6 +7,7 @@ import { debug } from './debug';
 export class Modules {
   constructor() {
     let self = this;
+    //TAG:ZAPI
     zapi.modules.isModuleAvailable = (id) => { return self.isModuleAvailable(id); };
     zapi.modules.getModule = (id) => { return self.getModule(id); };
   }

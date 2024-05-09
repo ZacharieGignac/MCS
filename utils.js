@@ -8,6 +8,13 @@ export class Storage {
     this.version = 1;
     this.STORAGEFILE = systemconfig.system.storageFile;
     this.storage;
+
+    //TAG:ZAPI
+    zapi.storage.read = async (name) => { return await this.read(name); };
+    zapi.storage.write = async (name, data) => { await this.write(name, data); };
+    zapi.storage.list = async () => { return await this.list(); };
+    zapi.storage.del = async (name) => { await this.del(name); };
+    zapi.storage.resetStorage = async () => { this.resetStorage(); };
   }
 
 
@@ -15,6 +22,7 @@ export class Storage {
     zapi.system.events.emit('system_storage_init');
     debug(2, `Storage initializing...`);
     this.storage = await this.readStorage();
+
     debug(2, `Storage: Init done`);
     zapi.system.events.emit('system_storage_init_done');
   }

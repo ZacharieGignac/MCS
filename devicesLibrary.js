@@ -236,6 +236,7 @@ export class Display {
     this.setDefaults();
 
     // Default WidgetMapping
+    //TAG:ZAPI
     var onButton = zapi.ui.addWidgetMapping(this.config.id + ':POWERON');
     var offButton = zapi.ui.addWidgetMapping(this.config.id + ':POWEROFF');
     var powerToggle = zapi.ui.addWidgetMapping(this.config.id + ':POWER');

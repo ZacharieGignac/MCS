@@ -143,6 +143,7 @@ export class SystemStatus {
     this._systemStatus = {};
     this._systemStatus.presentation = {};
     this._callbacks = [];
+    //TAG:ZAPI
     zapi.system.setStatus = (key, value, notify) => { self.setStatus(key, value, notify); };
     zapi.system.getAllStatus = () => { return self.getAllStatus(); };
     zapi.system.onStatusChange = (callback) => { self.onChange(callback); };

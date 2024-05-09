@@ -187,6 +187,7 @@ class UiManager {
     return new Promise(async success => {
       xapi.Event.UserInterface.on(event => { this.forwardUiEvents(event); });
       this.onUiEvent((event) => this.parseUiEvent(event));
+      //TAG:ZAPI
       zapi.ui.addActionMapping = (regex, func) => { this.addActionMapping(regex, func); };
       zapi.ui.setWidgetValue = (widgetId, value) => { this.setWidgetValue(widgetId, value); };
       zapi.ui.getAllWidgets = () => { return this.getAllWidgets(); };
@@ -346,7 +347,7 @@ class Core {
     this.audio = new Audio();
 
 
-    //Building zapi
+    //TAG:ZAPI
     zapi.performance.setElapsedStart = (test) => { performance.setElapsedStart(test); };
     zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test); };
     zapi.performance.inc = (name, num) => { performance.inc(name, num); };
@@ -361,7 +362,7 @@ class Core {
 
     this.lastPresenterDetectedStatus = false;
 
-
+    //TAG:ZAPI
     zapi.system.systemReport = {};
     zapi.system.systemReport.systemVersion = VERSION;
     zapi.system.sendSystemReport = () => this.sendSystemReport();
@@ -1073,6 +1074,7 @@ async function waitForAllDevicesConnected(disconnectedCallback) {
 async function preInit() {
   debug(2, `Starting System Events Manager...`);
   systemEvents = new SystemEvents();
+  //TAG:ZAPI
   zapi.system.events.on = (event, callback) => { systemEvents.on(event, callback); };
   zapi.system.events.off = (event, callback) => { systemEvents.off(event, callback); };
   zapi.system.events.emit = (event, ...args) => { systemEvents.emit(event, ...args); };
@@ -1083,11 +1085,6 @@ async function preInit() {
   debug(2, `Starting Storage Manager...`)
   storage = new Storage();
   await storage.init();
-  zapi.storage.read = async (name) => { return await storage.read(name); };
-  zapi.storage.write = async (name, data) => { await storage.write(name, data); };
-  zapi.storage.list = async () => { return await storage.list(); };
-  zapi.storage.del = async (name) => { await storage.del(name); };
-  zapi.storage.resetStorage = async () => { storage.resetStorage(); };
 
   /* HTTP Client Queue */
   httpRequestDispatcher = new HttpRequestDispatcher();
@@ -1189,13 +1186,14 @@ async function init() {
     }, 240000);
   }
 
-
+  
   let bootcount = await storage.read('system.bootcount');
   if (isNaN(bootcount)) {
     bootcount = 0;
   }
   bootcount++;
   zapi.storage.write('system.bootcount', bootcount);
+  
   console.warn(`BOOT COUNTER: ${bootcount}`);
 
   //TESTAREA AFTERBOOT

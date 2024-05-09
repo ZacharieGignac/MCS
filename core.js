@@ -14,6 +14,10 @@ import { Audio } from './audio';
 import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
+
+const COREVERSION = '1.0.1-beta';
+const ZAPIVERSION = 1;
+
 function systemKill() {
   xapi.Command.Macros.Macro.Deactivate({ Name: 'core' });
   xapi.Command.Macros.Runtime.Restart();
@@ -111,7 +115,7 @@ class SystemEvents {
 
   emit(event, ...args) {
     for (let e of this.events) {
-      if (e.event == event){
+      if (e.event == event) {
         e.callback(...args);
       }
     }
@@ -348,7 +352,7 @@ class Core {
     zapi.performance.inc = (name, num) => { performance.inc(name, num); };
     zapi.performance.dec = (name, num) => { performance.dec(name, num); };
     zapi.performance.reset = () => { performance.reset(); };
-    
+
 
 
 
@@ -565,6 +569,9 @@ class Core {
     this.audioExtraSkipPrompt = false;
     await this.uiManager.init();
     await this.systemStatus.init();
+    debug(1,'Setting versions...');
+    this.systemStatus.setStatus('CoreVersion', COREVERSION, false);
+    this.systemStatus.setStatus('ZapiVersion', ZAPIVERSION, false);
     await this.modules.start();
 
 
@@ -1229,7 +1236,7 @@ async function init() {
 }
 
 
-debug(1, `${PRODUCT} is starting...`);
+debug(1, `MCS is starting...`);
 debug(1, `Version: ${VERSION}`);
 debug(1, `Debug level is: ${systemconfig.system.debugLevel}`);
 

@@ -21,7 +21,7 @@ export var Manifest = {
 
 export class Scenario {
   constructor(api) {
-
+    this.standbyTimeout;
   }
 
   enable() {
@@ -62,7 +62,11 @@ export class Scenario {
         }
       }
     }
-    xapi.Command.Standby.Activate();
+    clearTimeout(this.standbyTimeout);
+    this.standbyTimeout = setTimeout(() => {
+      xapi.Command.Standby.Activate();
+    }, 2000);
+
   }
 
   test() {

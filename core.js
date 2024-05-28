@@ -1196,6 +1196,8 @@ async function init() {
   
   console.warn(`BOOT COUNTER: ${bootcount}`);
 
+  xapi.Command.Standby.Activate();
+
   //TESTAREA AFTERBOOT
 
   /*

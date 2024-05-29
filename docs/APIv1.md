@@ -160,7 +160,11 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
   - `widgetId` : Identification du widget.
   - `value` : Valeur du widget.
 - `getAllWidgets`: Récupère tous les widgets.
-
+- `showProgressBar`: Affiche une progressbar ainsi qu'un titre et un texte pour une durée spécifiée
+  - `title`: Titre du message
+  - `text`: Texte du message
+  - `seconds`: Durée de la progressBar (secondes)
+  
 ## Stockage (storage)
 
 ### Méthodes

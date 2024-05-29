@@ -64,7 +64,8 @@ export var zapiv1 = {
     getLocalOutputId: () => { },
     getRemoteInputsIds: () => { },
     getRemoteOutputIds: () => { },
-    addAudioReportAnalyzer: () => { }
+    addAudioReportAnalyzer: () => { },
+    applyAudioConfig: () => { }
   },
   ui: {
     addActionMapping: () => { },

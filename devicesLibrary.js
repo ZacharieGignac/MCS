@@ -753,6 +753,10 @@ export class AudioInput {
     debug(1, `DEVICE ${this.config.id}: RESET`);
     this.setDefaults();
   }
+
+  refresh() {
+    this.setGain(this.currentGain, false);
+  }
 }
 
 

@@ -142,6 +142,9 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `getRemoteInputsIds`: Récupère les IDs d'entrées audio du site distant.
 - `getRemoteOutputIds`: Récupère les IDs de sortie audio du site distant.
 - `addAudioReportAnalyzer`: Récupère un nouvel analyseur de rapport audio.
+- `applyAudioConfig`: Applique une configuration audio. (audio-console).
+  - `config` : Structure de donnée qui doit être extraite d'un fichier ce-audio-config (const config).
+  - `reset (false)` :  Si `true`, les `AuduiInput` seront remis dans l'état initial défini dans la config `reset()`, si `false` ils seront remis à jour `refresh()`.
 
 ## Interface Utilisateur (ui)
 

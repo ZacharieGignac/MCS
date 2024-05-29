@@ -90,6 +90,8 @@ Aucunes.
 - `void decreaseGain(void)`: Diminue le gain de l'entrée d'un nombre de "db" spécifié dans la configuration par la propriété "gainStep".
 - `void decreaseLevel(void)`: Alias de decreaseGain
 - `void setBoost(void)`: Configure le gain de l'entrée audio au niveau spécifié dans la configuration par la propriété "boost".
+- `void reset(void)`: Remet les paramètres spécifiés dans la configuration.
+- `void refresh(void)`: Réapplique les paramètres courant.
 
 ### AudioInputGroup
 - `void connectToRemoteOutputs(void)`: Connecte le groupe d'entrée audio aux sorties audio des sites distants.

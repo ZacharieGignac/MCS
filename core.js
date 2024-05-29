@@ -84,16 +84,7 @@ performance.setElapsedStart('Boot');
 
 
 
-function displayNewSessionMessage() {
-  xapi.Command.UserInterface.Message.Prompt.Display({
-    title: systemconfig.strings.newSessionTitle,
-    text: `Veuillez patienter ${systemconfig.system.newSessionDelay / 1000} secondes.`,
-  });
 
-  setTimeout(() => {
-    xapi.Command.UserInterface.Message.Prompt.Clear();
-  }, systemconfig.system.newSessionDelay);
-}
 
 
 class SystemEvents {
@@ -935,7 +926,6 @@ class Core {
   handleWakeup() {
     debug(1, 'Waking up...');
     this.audioExtraSkipPrompt = false;
-    displayNewSessionMessage();
     if (this.scenarios.currentScenario == systemconfig.system.onStandby.enableScenario) {
       this.scenarios.enableScenario(systemconfig.system.onWakeup.enableScenario);
     }

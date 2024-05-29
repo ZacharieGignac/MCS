@@ -89,6 +89,7 @@ export class Scenario {
 
   enable() {
     return new Promise(async success => {
+      zapi.ui.showProgressBar(systemconfig.strings.newSessionTitle, 'Un instant...', 5);
       this.devices.displays.farend.forEach(display => {
         display.setBlanking(false);
         display.powerOn();
@@ -107,8 +108,8 @@ export class Scenario {
   }
 
   start() {
-    this.displayEnableMessage();
-    zapi.system.setStatus('comotype1Mode', '?');
+    
+    zapi.system.setStatus('comotype1Mode', '-1');
     let status = zapi.system.getAllStatus();
     this.evaluateAll(status);
   }
@@ -156,15 +157,16 @@ export class Scenario {
   }
 
   displayEnableMessage() {
-  xapi.Command.UserInterface.Message.Prompt.Display({
-    title: systemconfig.strings.newSessionTitle,
-    text: `Veuillez patienter ${systemconfig.system.newSessionDelay / 1000} secondes.`,
-  });
+    xapi.Command.UserInterface.Message.Prompt.Display({
+      title: systemconfig.strings.newSessionTitle,
+      text: `Veuillez patienter ${systemconfig.system.newSessionDelay / 1000} secondes.`,
+    });
 
-  setTimeout(() => {
-    xapi.Command.UserInterface.Message.Prompt.Clear();
-  }, systemconfig.system.newSessionDelay);
-}
+    setTimeout(() => {
+      xapi.Command.UserInterface.Message.Prompt.Clear();
+    }, systemconfig.system.newSessionDelay);
+  }
+
 
   setAudienceMics(mode) {
     this.devices.audioinputs.audiencemics.forEach(mic => {
@@ -526,7 +528,7 @@ export class Scenario {
     //Without permanent displays for presentation
     else {
       //console.error('NO PRERMANENT DISPLAYS!');
-      
+
       if (needClearZone) {
         //console.error('NEED CLEAR ZONE');
         //WITHOUT Permanent displays + Clear zone

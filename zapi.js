@@ -71,7 +71,8 @@ export var zapiv1 = {
     addActionMapping: () => { },
     addWidgetMapping: () => { },
     setWidgetValue: () => { },
-    getAllWidgets: () => { }
+    getAllWidgets: () => { },
+    showProgressBar: () => { }
   },
   storage: {
     read:() => {},

@@ -183,6 +183,7 @@ class UiManager {
       zapi.ui.setWidgetValue = (widgetId, value) => { this.setWidgetValue(widgetId, value); };
       zapi.ui.getAllWidgets = () => { return this.getAllWidgets(); };
       zapi.ui.addWidgetMapping = (widgetId) => { return this.addWidgetMapping(widgetId); };
+      zapi.ui.showProgressBar = (title, text, seconds) => { return this.showProgressBar(title, text, seconds )};
 
       //Build widgets cache
       let list = await xapi.Command.UserInterface.Extensions.List();
@@ -327,6 +328,26 @@ class UiManager {
         }
       }
     }
+  }
+
+  showProgressBar(title, text, seconds) {
+    const totalSteps = 10;
+    const interval = seconds * 1000 / totalSteps;
+    let currentStep = 0;
+
+    const intervalId = setInterval(() => {
+      currentStep++;
+      const progressBar = '🟦'.repeat(currentStep) + '⬛'.repeat(totalSteps - currentStep);
+      xapi.Command.UserInterface.Message.Prompt.Display({
+        Title: title,
+        Text: text + '<br>' + progressBar
+      });
+
+      if (currentStep === totalSteps) {
+        clearInterval(intervalId);
+        xapi.Command.UserInterface.Message.Prompt.Clear();
+      }
+    }, interval);
   }
 }
 
@@ -561,7 +582,7 @@ class Core {
     this.audioExtraSkipPrompt = false;
     await this.uiManager.init();
     await this.systemStatus.init();
-    debug(1,'Setting versions...');
+    debug(1, 'Setting versions...');
     this.systemStatus.setStatus('CoreVersion', COREVERSION, false);
     this.systemStatus.setStatus('ZapiVersion', ZAPIVERSION, false);
     await this.modules.start();
@@ -1176,14 +1197,14 @@ async function init() {
     }, 240000);
   }
 
-  
+
   let bootcount = await storage.read('system.bootcount');
   if (isNaN(bootcount)) {
     bootcount = 0;
   }
   bootcount++;
   zapi.storage.write('system.bootcount', bootcount);
-  
+
   console.warn(`BOOT COUNTER: ${bootcount}`);
 
   xapi.Command.Standby.Activate();

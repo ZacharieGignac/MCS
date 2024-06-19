@@ -30,22 +30,28 @@ export class Storage {
 
   async readStorage() {
     debug(2, `Storage: Reading storage file...`);
-    let storageMacro = await xapi.Command.Macros.Macro.Get({
-      Content: true,
-      Name: this.STORAGEFILE
-    });
-    debug(2, `Storage size: ${storageMacro.Macro[0].Content.length} bytes`);
-    let storageContent = storageMacro.Macro[0].Content;
-    storageContent = atob(storageContent.substring(2));
     try {
-      return JSON.parse(storageContent);
+      let storageMacro = await xapi.Command.Macros.Macro.Get({
+        Content: true,
+        Name: this.STORAGEFILE
+      });
+      debug(2, `Storage size: ${storageMacro.Macro[0].Content.length} bytes`);
+      let storageContent = storageMacro.Macro[0].Content;
+      storageContent = atob(storageContent.substring(2));
+      try {
+        return JSON.parse(storageContent);
+      }
+      catch (e) {
+        console.error(`Error reading storage file. The file is malformed.`);
+        zapi.system.events.emit('system_storage_error_corrupted');
+        this.resetStorage();
+      }
+      debug(2, `Storage: Storage loaded into memory.`);
     }
     catch (e) {
-      console.error(`Error reading storage file. The file is malformed.`);
-      zapi.system.events.emit('system_storage_error_corrupted');
       this.resetStorage();
     }
-    debug(2, `Storage: Storage loaded into memory.`);
+
   }
 
   read(name) {

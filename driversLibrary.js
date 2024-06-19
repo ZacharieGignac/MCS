@@ -251,6 +251,111 @@ export class DisplayDriver_serial_sonybpj {
   custom() { }
 }
 
+export class DisplayDriver_serial_panasonic {
+  constructor(device, config) {
+    this.pacing = 2000;
+    this.repeat = 8000;
+    this.queue = [];
+    this.sending = false;
+    this.config = config;
+    this.device = device;
+    this.currentPower;
+    this.currentBlanking;
+    xapi.Config.SerialPort.Outbound.Mode.set('On');
+    xapi.Config.SerialPort.Outbound.Port[this.config.port].BaudRate.set(9600);
+    xapi.Config.SerialPort.Outbound.Port[this.config.port].Description.set(this.config.id);
+    xapi.Config.SerialPort.Outbound.Port[this.config.port].Parity.set('Even');
+    this.serialCommands = {
+      TERMINATOR: '\\x03',
+      POWERON: '\\x02PON\\x03',
+      POWEROFF: '\\x02POF\\x03',
+      BLANK: '\\x02OSH:1\\x03',
+      UNBLANK: '\\x02OSH:0\\x03'
+    };
+    let self = this;
+
+    this.stateInterval = setInterval(() => {
+      if (self.currentBlanking == true) {
+        self.serialSend(self.serialCommands.BLANK);
+      }
+      else {
+        self.serialSend(self.serialCommands.UNBLANK);
+      }
+      if (self.currentPower == 'on') {
+        self.serialSend(self.serialCommands.POWERON);
+      }
+      else {
+        self.serialSend(self.serialCommands.POWEROFF);
+      }
+    }, self.repeat);
+  }
+
+  setPower(power) {
+    power = power.toLowerCase();
+    this.currentPower = power;
+    if (power == 'on') {
+      this.serialSend(this.serialCommands.POWERON);
+    }
+    else {
+      this.serialSend(this.serialCommands.POWEROFF);
+    }
+    debug(1, `DRIVER DisplayDriver_serial_panasonic (${this.config.id}): setPower: ${power}`);
+  }
+
+  setBlanking(blanking) {
+    this.currentBlanking = blanking;
+    if (blanking) {
+      this.serialSend(this.serialCommands.BLANK);
+    }
+    else {
+      this.serialSend(this.serialCommands.UNBLANK);
+    }
+
+    debug(1, `DRIVER DisplayDriver_serial_panasonic (${this.config.id}): setBlanking: ${blanking}`);
+  }
+
+  setSource(source) {
+    debug(2, `DRIVER DisplayDriver_serial_panasonic (${this.config.id}): This driver does not support source selection.`);
+  }
+
+  getUsageHours() {
+    return 0;
+  }
+
+  requestUsageHours() {
+
+  }
+  serialSend(command) {
+    this.queue.push(command);
+    if (!this.sending) {
+      this.sendNextMessage();
+    }
+  }
+  sendNextMessage() {
+    if (this.queue.length === 0) {
+      this.sending = false;
+      return;
+    }
+    const message = this.queue.shift();
+    this.sending = true;
+    xapi.Command.SerialPort.PeripheralControl.Send({
+      PortId: this.config.port,
+      ResponseTerminator: this.serialCommands.TERMINATOR,
+      ResponseTimeout:200,
+      Text: message
+    }).catch(e => {
+      debug(2, `DRIVER DisplayDriver_serial_panasonic (${this.config.id}): ${e.message}`);
+    });
+
+
+    setTimeout(() => {
+      this.sendNextMessage();
+    }, this.pacing);
+  }
+
+  custom() { }
+}
+
 export class DisplayDriver_serial_epson {
   constructor(device, config) {
     this.pacing = 2000;
@@ -412,7 +517,6 @@ export class ScreenDriver_gpio {
   }
 
   setPosition(position) {
-
     debug(1, `DRIVER ScreenDriver_gpio (${this.config.id}): setPosition: ${position}`);
     var config = {};
     let args = {};

@@ -1248,7 +1248,7 @@ async function init() {
 
 
 debug(1, `MCS is starting...`);
-debug(1, `Version: ${VERSION}`);
+debug(1, `Version: ${COREVERSION}`);
 debug(1, `Debug level is: ${systemconfig.system.debugLevel}`);
 
 

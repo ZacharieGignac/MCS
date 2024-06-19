@@ -63,10 +63,11 @@ export class Scenario {
       }
     }
     clearTimeout(this.standbyTimeout);
+    /*
     this.standbyTimeout = setTimeout(() => {
       xapi.Command.Standby.Activate();
     }, 2000);
-
+    */
   }
 
   test() {

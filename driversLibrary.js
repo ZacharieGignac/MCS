@@ -45,7 +45,7 @@ export class DisplayDriver_isc_h21 {
 
   setPower(power) {
     power = power.toLowerCase();
-    let powerString = this.config.name + '_' + power.toUpperCase();
+    let powerString = this.config.name + '_POWER_' + power.toUpperCase();
     zapi.communication.sendMessage(powerString);
     debug(1, `DRIVER DisplayDriver_isc_h21 (${this.config.id}): setPower: ${power}`);
   }

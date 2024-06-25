@@ -65,13 +65,6 @@ import * as driversLibrary from './driversLibrary';
 ```
 Dans cette section sont importés les devices et les drivers. Il n'y a pas de nommenclature standard pour ces fichiers.
 
-### Définition du produit
-```JS
-export const PRODUCT = 'PrepOS (dev)';
-export const VERSION = '0.0.1';
-```
-Définition du nom de produit et de la version. Il n'est pas recommandé de modifier ces variables.
-
 ### Configuration, section "scenarios"
 ```JS
   scenarios: [

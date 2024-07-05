@@ -18,27 +18,34 @@ function toOnOff(value) {
 }
 
 function areObjectsIdentical(obj1, obj2) {
-  const obj1Keys = Object.keys(obj1);
-  const obj2Keys = Object.keys(obj2);
+  const stack = [[obj1, obj2]];
 
-  if (obj1Keys.length !== obj2Keys.length) {
-    return false;
-  }
-  for (const key of obj1Keys) {
-    if (!obj2.hasOwnProperty(key)) {
+  while (stack.length > 0) {
+    const [currentObj1, currentObj2] = stack.pop();
+
+    const obj1Keys = Object.keys(currentObj1);
+    const obj2Keys = Object.keys(currentObj2);
+
+    if (obj1Keys.length !== obj2Keys.length) {
       return false;
     }
-    const value1 = obj1[key];
-    const value2 = obj2[key];
-    
-    if (typeof value1 === 'object' && value1 !== null && typeof value2 === 'object' && value2 !== null) {
-      if (!areObjectsIdentical(value1, value2)) {
+
+    for (const key of obj1Keys) {
+      if (!currentObj2.hasOwnProperty(key)) {
         return false;
       }
-    } else if (value1 !== value2) {
-      return false;
+
+      const value1 = currentObj1[key];
+      const value2 = currentObj2[key];
+
+      if (typeof value1 === 'object' && value1 !== null && typeof value2 === 'object' && value2 !== null) {
+        stack.push([value1, value2]);
+      } else if (value1 !== value2) {
+        return false;
+      }
     }
   }
+
   return true;
 }
 

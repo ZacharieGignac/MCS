@@ -41,7 +41,7 @@ export class Scenario {
     xapi.Command.Presentation.Stop();
     xapi.Command.Audio.Volume.SetToDefault();
 
-    xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: systemconfig.system.mainVideoSource });
+    //xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: systemconfig.system.mainVideoSource });
 
     let devices = zapi.devices.getAllDevices();
 

@@ -470,6 +470,7 @@ export class ScreenDriver_isc_h21 {
 
   setPosition(position) {
     position = position.toLowerCase();
+    position = position == 'up' ? 'UP' : 'DN';
     zapi.communication.sendMessage(this.config.name + '_' + position);
     debug(1, `DRIVER ScreenDriver_isc_h21 (${this.config.id}): setPosition: ${position}`);
   }

@@ -4,7 +4,6 @@ import { Storage } from './utils';
 import { Performance } from './utils';
 import { DevicesManager } from './devices';
 import { config as systemconfig } from './config';
-import { PRODUCT, VERSION } from './config';
 import { Scenarios } from './scenarios';
 import { Modules } from './modules';
 import { SystemStatus } from './systemstatus';
@@ -376,7 +375,7 @@ class Core {
 
     //TAG:ZAPI
     zapi.system.systemReport = {};
-    zapi.system.systemReport.systemVersion = VERSION;
+    zapi.system.systemReport.systemVersion = COREVERSION;
     zapi.system.sendSystemReport = () => this.sendSystemReport();
 
 

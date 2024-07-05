@@ -9,6 +9,9 @@ const PRES_LOCALPREVIEW = 'LOCALPREVIEW';
 const PRES_LOCALSHARE = 'LOCALSHARE';
 const PRES_REMOTE = 'REMOTE';
 const PRES_REMOTELOCALPREVIEW = 'REMOTELOCALPREVIEW';
+const CALLSTATUS_IDLE = 'Idle';
+const CALLSTATUS_CONNECTED = 'Connected';
+const CALLSTATUS_CONNECTING = 'Connecting';
 
 var eventSinks = [];
 var callEventSinks = [];
@@ -80,17 +83,17 @@ export var call = {
     return new Promise((success) => {
       xapi.Status.Call.get().then(call => {
         if (call == '') {
-          success('Idle');
+          success(CALLSTATUS_IDLE);
         }
-        else if (call[0].Status == 'Connected') {
-          success('Connected');
+        else if (call[0].Status == CALLSTATUS_CONNECTED) {
+          success(CALLSTATUS_CONNECTED);
 
         }
-        else if (call[0].Status == 'Connecting') {
-          success('Connecting');
+        else if (call[0].Status == CALLSTATUS_CONNECTING) {
+          success(CALLSTATUS_CONNECTING);
         }
-        else if (call[0].Status == 'Idle') {
-          success('Idle');
+        else if (call[0].Status == CALLSTATUS_IDLE) {
+          success(CALLSTATUS_IDLE);
         }
       });
     });

@@ -129,44 +129,93 @@ export class Storage {
 
 export class Performance {
   constructor() {
-    this.counters = [];
-    this.elapsedStarts = [];
+    try {
+      this.counters = {};
+      this.elapsedStarts = {};
+      let self = this;
+      //TAG:ZAPI
+      zapi.performance.setElapsedStart = (name) => { self.setElapsedStart(name); };
+      zapi.performance.setElapsedEnd = (name) => { self.setElapsedEnd(name); };
+      zapi.performance.inc = (name, num) => { self.inc(name, num); };
+      zapi.performance.dec = (name, num) => { self.dec(name, num); };
+      zapi.performance.reset = () => { self.reset(); };
+    } catch (error) {
+      console.error("Error in Performance constructor:", error);
+    }
   }
-  setElapsedStart(name) {
-    this.elapsedStarts[name] = new Date();
-  }
-  setElapsedEnd(name) {
-    this.counters[name] = new Date() - this.elapsedStarts[name];
-    this.counters[name] = this.counters[name] + 'ms';
-    delete this.elapsedStarts[name];
-  }
-  clearElapsed(name) {
 
+  setElapsedStart(name) {
+    try {
+      this.elapsedStarts[name] = new Date();
+    } catch (error) {
+      console.error(`Error in setElapsedStart for ${name}:`, error);
+    }
   }
+
+  setElapsedEnd(name) {
+    try {
+      this.counters[name] = new Date() - this.elapsedStarts[name];
+      delete this.elapsedStarts[name];
+    } catch (error) {
+      console.error(`Error in setElapsedEnd for ${name}:`, error);
+    }
+  }
+
+  clearElapsed(name) {
+    try {
+      delete this.elapsedStarts[name];
+    } catch (error) {
+      console.error(`Error in clearElapsed for ${name}:`, error);
+    }
+  }
+
   setCounter(name, value) {
-    this.counters[name] = value;
+    try {
+      this.counters[name] = value;
+    } catch (error) {
+      console.error(`Error in setCounter for ${name}:`, error);
+    }
   }
+
   getCounter(name) {
-    return this.counters[name];
+    try {
+      return this.counters[name];
+    } catch (error) {
+      console.error(`Error in getCounter for ${name}:`, error);
+      return undefined;
+    }
   }
+
   inc(name, num = 1) {
-    if (this.counters[name] != undefined) {
-      this.counters[name] += num;
-    }
-    else {
-      this.counters[name] = num;
+    try {
+      this.counters[name] = (this.counters[name] || 0) + num;
+    } catch (error) {
+      console.error(`Error in inc for ${name}:`, error);
     }
   }
+
   dec(name, num = 1) {
-    if (this.counters[name] != undefined) {
-      this.counters[name] -= num;
-    }
-    else {
-      this.counters[name] = num;
+    try {
+      this.counters[name] = (this.counters[name] || 0) - num;
+    } catch (error) {
+      console.error(`Error in dec for ${name}:`, error);
     }
   }
+
   reset() {
-    this.counters = [];
-    this.elapsedStarts = [];
+    try {
+      this.counters = {};
+      this.elapsedStarts = {};
+    } catch (error) {
+      console.error("Error in reset:", error);
+    }
+  }
+
+  displayCounters() {
+    try {
+      console.log("Current counters:", this.counters);
+    } catch (error) {
+      console.error("Error in displayCounters:", error);
+    }
   }
 }

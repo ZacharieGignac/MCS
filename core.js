@@ -357,20 +357,6 @@ class Core {
     this.messageQueue = new MessageQueue();
     this.audio = new Audio();
 
-
-    //TAG:ZAPI
-    zapi.performance.setElapsedStart = (test) => { performance.setElapsedStart(test); };
-    zapi.performance.setElapsedEnd = (test) => { performance.setElapsedEnd(test); };
-    zapi.performance.inc = (name, num) => { performance.inc(name, num); };
-    zapi.performance.dec = (name, num) => { performance.dec(name, num); };
-    zapi.performance.reset = () => { performance.reset(); };
-
-
-
-
-
-
-
     this.lastPresenterDetectedStatus = false;
 
     //TAG:ZAPI

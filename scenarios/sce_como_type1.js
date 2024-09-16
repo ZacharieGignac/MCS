@@ -310,6 +310,7 @@ export class Scenario {
 
   async evaluateDisplays(status) {
     debug(1, 'ComoType1 evaluating displays...');
+    
     /******************
      * 
      *  Displays configuration
@@ -323,9 +324,7 @@ export class Scenario {
     var callConnected = status.call == 'Connected';
     var remotePresenterPresent = callConnected && presenterLocation == REMOTE;
     var presentationSupportsBlanking = this.devices.displays.presentation.filter(disp => disp.config.supportsBlanking).length == this.devices.displays.presentation.length;
-
-
-
+    
     const setDisplaysRole = (displays, role) => {
       if (status.AutoDisplays == ON) {
 
@@ -408,7 +407,7 @@ export class Scenario {
     var farendDisplays = this.devices.displays.farend;
 
 
-
+    
     //With permanent displays for presentation
 
     if (permanentDisplays) {
@@ -664,11 +663,6 @@ export class Scenario {
       }
 
     }
-
-
-
-
-
   }
 
 

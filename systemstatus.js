@@ -9,6 +9,7 @@ const PRES_LOCALPREVIEW = 'LOCALPREVIEW';
 const PRES_LOCALSHARE = 'LOCALSHARE';
 const PRES_REMOTE = 'REMOTE';
 const PRES_REMOTELOCALPREVIEW = 'REMOTELOCALPREVIEW';
+const PRES_UNKNOWN = 'UNKNOWN';
 const CALLSTATUS_IDLE = 'Idle';
 const CALLSTATUS_CONNECTED = 'Connected';
 const CALLSTATUS_CONNECTING = 'Connecting';
@@ -111,41 +112,58 @@ export var presentation = {
     return new Promise(success => {
       var status = {};
       xapi.Status.Conference.Presentation.get().then(pres => {
-        if (pres.LocalInstance !== undefined) {
+        if (!pres) {
+          console.log("Statut de la présentation : Aucune présentation disponible.");
+          status.type = PRES_NOPRES;
+          return;
+        }
 
-          status.source = pres.LocalInstance[0].Source;
-          status.id = pres.LocalInstance[0].id;
-          if (status.remotePresentation == true) {
-            if (status.localPresentationMode === 'LocalOnly') {
-              status.type = PRES_REMOTELOCALPREVIEW;
-            }
-            else {
-              status.type = PRES_REMOTE;
-            }
-          }
-          else {
-            if (status.localPresentationMode === 'LocalOnly') {
-              status.type = PRES_LOCALPREVIEW;
-            }
-            else {
-              status.type = PRES_LOCALSHARE;
-            }
-          }
-          success(status);
+        const localSendingMode = pres.LocalSendingMode;
+        const mode = pres.Mode;
+        const localInstance = pres.LocalInstance;
+
+        // Vérifier si la présentation est nulle (No Presentation)
+        if (localSendingMode === "Off" && mode === "Off") {
+          status.type = PRES_NOPRES;
         }
+        // Vérifier si c'est Local Share
+        else if (
+          localSendingMode === "LocalRemote" &&
+          mode === "Sending" &&
+          Array.isArray(localInstance) &&
+          localInstance.length > 0 &&
+          localInstance.every(instance => instance.SendingMode === "LocalRemote")
+        ) {
+          status.type = PRES_LOCALSHARE;
+        }
+        // Vérifier si c'est Local Only
+        else if (
+          localSendingMode === "LocalOnly" &&
+          mode === "Off" &&
+          Array.isArray(localInstance) &&
+          localInstance.length > 0 &&
+          localInstance.every(instance => instance.SendingMode === "LocalOnly")
+        ) {
+          status.type = PRES_LOCALPREVIEW;
+        }
+        // Vérifier si c'est Remote Only
+        else if (localSendingMode === "Off" && mode === "Receiving") {
+          status.type = PRES_REMOTE;
+        }
+        // Vérifier si c'est Remote + Local Preview
+        else if (localSendingMode === "LocalOnly" && mode === "Receiving") {
+          status.type = PRES_REMOTELOCALPREVIEW
+        }
+        // Si aucun des cas précédents ne correspond
         else {
-          if (status.remotePresentation == true) {
-            status.type = PRES_REMOTE;
-          }
-          else {
-            status.type = PRES_NOPRES;
-          }
-          success(status);
+          status.type = PRES_UNKNOWN;
         }
+        success(status);
       });
     });
   }
 };
+
 
 export class SystemStatus {
   constructor() {
@@ -178,7 +196,7 @@ export class SystemStatus {
 
       //Set special "hdmipassthrough" status
       let hpt = await xapi.Status.Video.Output.HDMI.Passthrough.Status.get();
-      this.setStatus('hdmiPassthrough', hpt,false);
+      this.setStatus('hdmiPassthrough', hpt, false);
       xapi.Status.Video.Output.HDMI.Passthrough.Status.on(hptstatus => {
         this.setStatus('hdmiPassthrough', hptstatus);
       });
@@ -212,10 +230,10 @@ export class SystemStatus {
         }, 240000);
       }
       this.setDefaults();
-      debug(2,`SystemStatus running.`);
+      debug(2, `SystemStatus running.`);
       success();
     });
-    
+
   }
 
   setDefaults() {

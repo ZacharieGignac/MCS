@@ -37,7 +37,8 @@ export class Scenario {
   }
 
   start() {
-
+    xapi.Command.UserInterface.Message.Prompt.Clear();
+    xapi.Command.UserInterface.Message.Alert.Clear();
     xapi.Command.Presentation.Stop();
     xapi.Command.Audio.Volume.SetToDefault();
 

@@ -770,7 +770,7 @@ export class ControlSystemDriver_isc_h21 {
       xapi.Event.BootEvent.Action.on(action => {
         if (action == 'Restart') {
           zapi.communication.sendMessage(`HW_RESTART`);
-          zpai.communication.sendMessage(`SYSTEM_CRESTRON_REBOOT`);
+          zapi.communication.sendMessage(`SYSTEM_CRESTRON_REBOOT`);
         }
       });
     }

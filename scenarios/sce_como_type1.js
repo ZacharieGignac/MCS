@@ -324,7 +324,7 @@ export class Scenario {
     var callConnected = status.call == 'Connected';
     var remotePresenterPresent = callConnected && presenterLocation == REMOTE;
     var presentationSupportsBlanking = this.devices.displays.presentation.filter(disp => disp.config.supportsBlanking).length == this.devices.displays.presentation.length;
-    
+    //console.error(status);
     const setDisplaysRole = (displays, role) => {
       if (status.AutoDisplays == ON) {
 

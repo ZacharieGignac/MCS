@@ -9,10 +9,6 @@ const PRES_LOCALPREVIEW = 'LOCALPREVIEW';
 const PRES_LOCALSHARE = 'LOCALSHARE';
 const PRES_REMOTE = 'REMOTE';
 const PRES_REMOTELOCALPREVIEW = 'REMOTELOCALPREVIEW';
-const PRES_UNKNOWN = 'UNKNOWN';
-const CALLSTATUS_IDLE = 'Idle';
-const CALLSTATUS_CONNECTED = 'Connected';
-const CALLSTATUS_CONNECTING = 'Connecting';
 
 var eventSinks = [];
 var callEventSinks = [];
@@ -22,34 +18,27 @@ function toOnOff(value) {
 }
 
 function areObjectsIdentical(obj1, obj2) {
-  const stack = [[obj1, obj2]];
+  const obj1Keys = Object.keys(obj1);
+  const obj2Keys = Object.keys(obj2);
 
-  while (stack.length > 0) {
-    const [currentObj1, currentObj2] = stack.pop();
-
-    const obj1Keys = Object.keys(currentObj1);
-    const obj2Keys = Object.keys(currentObj2);
-
-    if (obj1Keys.length !== obj2Keys.length) {
+  if (obj1Keys.length !== obj2Keys.length) {
+    return false;
+  }
+  for (const key of obj1Keys) {
+    if (!obj2.hasOwnProperty(key)) {
       return false;
     }
+    const value1 = obj1[key];
+    const value2 = obj2[key];
 
-    for (const key of obj1Keys) {
-      if (!currentObj2.hasOwnProperty(key)) {
+    if (typeof value1 === 'object' && value1 !== null && typeof value2 === 'object' && value2 !== null) {
+      if (!areObjectsIdentical(value1, value2)) {
         return false;
       }
-
-      const value1 = currentObj1[key];
-      const value2 = currentObj2[key];
-
-      if (typeof value1 === 'object' && value1 !== null && typeof value2 === 'object' && value2 !== null) {
-        stack.push([value1, value2]);
-      } else if (value1 !== value2) {
-        return false;
-      }
+    } else if (value1 !== value2) {
+      return false;
     }
   }
-
   return true;
 }
 
@@ -84,17 +73,17 @@ export var call = {
     return new Promise((success) => {
       xapi.Status.Call.get().then(call => {
         if (call == '') {
-          success(CALLSTATUS_IDLE);
+          success('Idle');
         }
-        else if (call[0].Status == CALLSTATUS_CONNECTED) {
-          success(CALLSTATUS_CONNECTED);
+        else if (call[0].Status == 'Connected') {
+          success('Connected');
 
         }
-        else if (call[0].Status == CALLSTATUS_CONNECTING) {
-          success(CALLSTATUS_CONNECTING);
+        else if (call[0].Status == 'Connecting') {
+          success('Connecting');
         }
-        else if (call[0].Status == CALLSTATUS_IDLE) {
-          success(CALLSTATUS_IDLE);
+        else if (call[0].Status == 'Idle') {
+          success('Idle');
         }
       });
     });
@@ -111,59 +100,52 @@ export var presentation = {
   getStatus: async function () {
     return new Promise(success => {
       var status = {};
+
       xapi.Status.Conference.Presentation.get().then(pres => {
-        if (!pres) {
-          console.log("Statut de la présentation : Aucune présentation disponible.");
-          status.type = PRES_NOPRES;
-          return;
+        var localPresentation = false;
+        var remotePresentation = false;
+        var localPresentationSending = false;
+
+        //Check if local presentation (preview, share, whatever)
+        if (pres.LocalSendingMode != 'Off') {
+          localPresentation = true;
+          if (pres.LocalSendingMode == 'LocalRemote') {
+            localPresentationSending = true;
+          }
         }
 
-        const localSendingMode = pres.LocalSendingMode;
-        const mode = pres.Mode;
-        const localInstance = pres.LocalInstance;
+        //Check if remote presentation
+        if (pres.Mode == 'Receiving') {
+          remotePresentation = true;
+        }
 
-        // Vérifier si la présentation est nulle (No Presentation)
-        if (localSendingMode === "Off" && mode === "Off") {
+        if (!localPresentation && !remotePresentation) {
           status.type = PRES_NOPRES;
         }
-        // Vérifier si c'est Local Share
-        else if (
-          localSendingMode === "LocalRemote" &&
-          mode === "Sending" &&
-          Array.isArray(localInstance) &&
-          localInstance.length > 0 &&
-          localInstance.every(instance => instance.SendingMode === "LocalRemote")
-        ) {
-          status.type = PRES_LOCALSHARE;
+
+        if (localPresentation && !remotePresentation) {
+          if (localPresentationSending) {
+            status.type = PRES_LOCALSHARE;
+          }
+          else {
+            status.type = PRES_LOCALPREVIEW;
+          }
         }
-        // Vérifier si c'est Local Only
-        else if (
-          localSendingMode === "LocalOnly" &&
-          mode === "Off" &&
-          Array.isArray(localInstance) &&
-          localInstance.length > 0 &&
-          localInstance.every(instance => instance.SendingMode === "LocalOnly")
-        ) {
-          status.type = PRES_LOCALPREVIEW;
-        }
-        // Vérifier si c'est Remote Only
-        else if (localSendingMode === "Off" && mode === "Receiving") {
+
+        if (!localPresentation && remotePresentation) {
           status.type = PRES_REMOTE;
         }
-        // Vérifier si c'est Remote + Local Preview
-        else if (localSendingMode === "LocalOnly" && mode === "Receiving") {
-          status.type = PRES_REMOTELOCALPREVIEW
+
+        if (localPresentation && remotePresentation) {
+          status.type = PRES_REMOTELOCALPREVIEW;
         }
-        // Si aucun des cas précédents ne correspond
-        else {
-          status.type = PRES_UNKNOWN;
-        }
+
         success(status);
+
       });
     });
   }
 };
-
 
 export class SystemStatus {
   constructor() {

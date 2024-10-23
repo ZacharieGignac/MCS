@@ -2,7 +2,7 @@
 "MODULAR CONTROL SYSTEM". Original.
 
 ## Statut
-Fonctionnel, phase de test (BETA)
+Version actuelle: 1.0.0
 
 ## Installation (pour une salle comodale de type 1)
 * Activer AudioConsole
@@ -25,3 +25,7 @@ Fonctionnel, phase de test (BETA)
 * Renommer le fichier config.js.example en config.js et le copier sur le codec
 * Ajuster le fichier config.js selon les besoins
 * Activer le fichier `ce-audio-config` et `core`
+
+
+## Version dévelopement (pas de release)
+* Ajout du module `mod_cafeine`: Empêche les affichages qui supportent le "blanking" d'être éteint si l'affichage supporte le "blanking". Accélère l'allumage des affichages, mais peut diminuer la durée de vie des équipements

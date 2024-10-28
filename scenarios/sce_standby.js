@@ -3,6 +3,20 @@ import xapi from 'xapi';
 import { zapiv1 as zapi } from './zapi';
 import { config as systemconfig } from './config';
 
+  function safeStringify(obj, cache = new Set()) {
+    return JSON.stringify(obj, (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (cache.has(value)) {
+          // Remove cyclic reference
+          return;
+        }
+        cache.add(value);
+      }
+      return value;
+    });
+  }
+
+
 export var Manifest = {
   fileName: 'sce_standby',
   id: 'standby',
@@ -56,19 +70,14 @@ export class Scenario {
     zapi.system.resetSystemStatus();
     let lightscenes = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.standby');
     if (lightscenes.length > 0) {
+      
+      
       for (let lightscene of lightscenes) {
-        let lsdevice = zapi.devices.getDevice(lightscene.config.id);
-        if (lsdevice) {
-          lsdevice.activate();
-        }
+        lightscene.activate();
       }
+      
     }
     clearTimeout(this.standbyTimeout);
-    /*
-    this.standbyTimeout = setTimeout(() => {
-      xapi.Command.Standby.Activate();
-    }, 2000);
-    */
   }
 
   test() {

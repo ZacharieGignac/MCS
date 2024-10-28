@@ -29,3 +29,4 @@ Version actuelle: 1.0.0
 
 ## Version dévelopement (pas de release)
 * Ajout du module `mod_cafeine`: Empêche les affichages d'être éteint si l'affichage supporte le "blanking". Accélère l'allumage des affichages, mais peut diminuer la durée de vie des équipements
+* Bugfix: Activation de la scène d'éclairage lors du mode veille

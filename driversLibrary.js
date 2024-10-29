@@ -541,6 +541,67 @@ export class ScreenDriver_gpio {
   }
 }
 
+export class ScreenDriver_gpio_pulse {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+
+    if (this.config.pin) {
+      this.gpiotype = 'single';
+      this.pin = this.config.pin;
+    } else {
+      this.gpiotype = 'pair';
+      this.pin1 = this.config.pin1;
+      this.pin2 = this.config.pin2;
+    }
+    this.pulseDuration = 1000; // Example pulse duration in milliseconds
+    this.setPosition(this.config.defaultPosition);
+  }
+
+  setPosition(position) {
+    debug(1, `DRIVER ScreenDriver_gpio (${this.config.id}): setPosition: ${position}`);
+    
+    if (this.gpiotype === 'single') {
+      this.pulseSingle(position);
+    } else if (this.gpiotype === 'pair') {
+      this.pulsePair(position);
+    }
+  }
+
+  pulseSingle(position) {
+    const voltage = position === 'up' ? 'High' : 'Low';
+    const args = { ['Pin' + this.pin]: voltage };
+    xapi.Command.GPIO.ManualState.Set(args);
+
+    // Use a timeout to turn off the relay after the pulse duration
+    setTimeout(() => {
+      xapi.Command.GPIO.ManualState.Set({ ['Pin' + this.pin]: 'Low' });
+    }, this.pulseDuration);
+  }
+
+  pulsePair(position) {
+    const voltage1 = position === 'up' ? 'High' : 'Low';
+    const voltage2 = position === 'up' ? 'Low' : 'High';
+    const args = {
+      ['Pin' + this.pin1]: voltage1,
+      ['Pin' + this.pin2]: voltage2
+    };
+    xapi.Command.GPIO.ManualState.Set(args);
+
+    // Turn off both pins after the pulse duration
+    setTimeout(() => {
+      xapi.Command.GPIO.ManualState.Set({
+        ['Pin' + this.pin1]: 'Low',
+        ['Pin' + this.pin2]: 'Low'
+      });
+    }, this.pulseDuration);
+  }
+
+  custom() {
+    // Custom function implementation if needed
+  }
+}
+
 export class AudioInputDriver_codecpro {
   constructor(device, config) {
     this.config = config;

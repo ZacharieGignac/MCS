@@ -554,7 +554,7 @@ export class ScreenDriver_gpio_pulse {
       this.pin1 = this.config.pin1;
       this.pin2 = this.config.pin2;
     }
-    this.pulseDuration = 1000; // Example pulse duration in milliseconds
+    this.pulseDuration = 100;
     this.setPosition(this.config.defaultPosition);
   }
 

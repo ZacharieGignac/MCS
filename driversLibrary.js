@@ -530,8 +530,14 @@ export class ScreenDriver_gpio {
       let voltage2 = position == 'up' ? 'Low' : 'High';
       args['Pin' + this.pin1] = voltage1;
       args['Pin' + this.pin2] = voltage2;
+      setTimeout(() => {
+        args['Pin' + this.pin1] = 'High';
+        args['Pin' + this.pin2] = 'High';
+        xapi.Command.GPIO.ManualState.Set(args);
+      }, 300);
     }
     xapi.Command.GPIO.ManualState.Set(args);
+
 
 
   }

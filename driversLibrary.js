@@ -537,11 +537,8 @@ export class ScreenDriver_gpio {
       }, 300);
     }
     xapi.Command.GPIO.ManualState.Set(args);
-
-
-
   }
-
+  
   custom() {
 
   }

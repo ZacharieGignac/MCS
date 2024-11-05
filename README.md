@@ -30,7 +30,6 @@ Version actuelle: 1.0.0
 # En dévelopement
 ## Ajouts
 * Module `mod_cafeine`: Empêche les affichages d'être éteint si l'affichage supporte le "blanking". Accélère l'allumage des affichages, mais peut diminuer la durée de vie des équipements
-* Driver ScreenDriver_gpio_pulse : Comme le driver de toile normal, mais pulsé plutôt que latché
 
 ## Bugfix
 * L'Activation de la scène d'éclairage lors du mode veille ne s'effectue pas

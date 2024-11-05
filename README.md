@@ -34,3 +34,4 @@ Version actuelle: 1.0.0
 
 ## Bugfix
 * L'Activation de la scène d'éclairage lors du mode veille ne s'effectue pas
+* Modification de la méthode de détection des appels (Idle, Connected)

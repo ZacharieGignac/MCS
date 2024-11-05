@@ -62,14 +62,27 @@ xapi.Event.PresentationPreviewStopped.on(checkPresentationStatus);
 xapi.Event.PresentationStarted.on(checkPresentationStatus);
 xapi.Event.PresentationStopped.on(checkPresentationStatus);
 
+xapi.Status.Call.on(call => {
+  if (call.Status != undefined) {
+    processCallCallbacks(call.Status);
+  }
+});
+
 export var call = {
   getCallStatus: async function () {
     return new Promise((success) => {
-      xapi.Status.SystemUnit.State.NumberOfActiveCalls.get().then(calls => {
-        if (calls >= 1) {
-          success('Connected');
+      xapi.Status.Call.get().then(call => {
+        if (call == '') {
+          success('Idle');
         }
-        else {
+        else if (call[0].Status == 'Connected') {
+          success('Connected');
+
+        }
+        else if (call[0].Status == 'Connecting') {
+          success('Connecting');
+        }
+        else if (call[0].Status == 'Idle') {
           success('Idle');
         }
       });
@@ -79,17 +92,6 @@ export var call = {
     callEventSinks.push(callback);
   }
 };
-
-xapi.Status.SystemUnit.State.NumberOfActiveCalls.on(call => {
-  var callStatus;
-  if (call >= 1) {
-    callStatus = 'Connected'
-  }
-  else {
-    callStatus = 'Idle'
-  }
-  processCallCallbacks(callStatus);
-});
 
 export var presentation = {
   onChange: function (callback) {
@@ -104,13 +106,18 @@ export var presentation = {
         var remotePresentation = false;
         var localPresentationSending = false;
 
-        //Check if local presentation (preview, share, whatever)
-        if (pres.LocalSendingMode != 'Off') {
-          localPresentation = true;
-          if (pres.LocalSendingMode == 'LocalRemote') {
-            localPresentationSending = true;
+        if (pres.LocalInstance != undefined) {
+          if (pres.LocalInstance != undefined) {
+            localPresentation = true;
+          }
+          else {
+            localPresentation = false;
           }
         }
+        else {
+          localPresentation = false;
+        }
+
 
         //Check if remote presentation
         if (pres.Mode == 'Receiving') {

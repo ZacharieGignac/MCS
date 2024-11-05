@@ -62,29 +62,32 @@ xapi.Event.PresentationPreviewStopped.on(checkPresentationStatus);
 xapi.Event.PresentationStarted.on(checkPresentationStatus);
 xapi.Event.PresentationStopped.on(checkPresentationStatus);
 
-xapi.Status.Call.on(call => {
-  if (call.Status != undefined) {
-    processCallCallbacks(call.Status);
+
+xapi.Status.SystemUnit.State.NumberOfActiveCalls.on(calls => {
+  var callStatus;
+  if (calls >= 1) {
+    callStatus = 'Connected';
   }
+  else {
+    callStatus = 'Idle';
+  }
+  processCallCallbacks(callStatus);
 });
+
+
 
 export var call = {
   getCallStatus: async function () {
     return new Promise((success) => {
-      xapi.Status.Call.get().then(call => {
-        if (call == '') {
-          success('Idle');
+      xapi.Status.SystemUnit.State.NumberOfActiveCalls.get().then(calls => {
+        var callStatus;
+        if (calls >= 1) {
+          callStatus = 'Connected';
         }
-        else if (call[0].Status == 'Connected') {
-          success('Connected');
-
+        else {
+          callStatus = 'Idle';
         }
-        else if (call[0].Status == 'Connecting') {
-          success('Connecting');
-        }
-        else if (call[0].Status == 'Idle') {
-          success('Idle');
-        }
+        success(callStatus);
       });
     });
   },
@@ -92,6 +95,7 @@ export var call = {
     callEventSinks.push(callback);
   }
 };
+
 
 export var presentation = {
   onChange: function (callback) {

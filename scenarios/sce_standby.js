@@ -77,6 +77,10 @@ export class Scenario {
       }
       
     }
+
+    //Force call status to 'Idle'
+    zapi.system.setStatus('call', 'Idle', false);
+
     clearTimeout(this.standbyTimeout);
   }
 

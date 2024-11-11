@@ -182,7 +182,7 @@ class UiManager {
       zapi.ui.setWidgetValue = (widgetId, value) => { this.setWidgetValue(widgetId, value); };
       zapi.ui.getAllWidgets = () => { return this.getAllWidgets(); };
       zapi.ui.addWidgetMapping = (widgetId) => { return this.addWidgetMapping(widgetId); };
-      zapi.ui.showProgressBar = (title, text, seconds) => { return this.showProgressBar(title, text, seconds )};
+      zapi.ui.showProgressBar = (title, text, seconds) => { return this.showProgressBar(title, text, seconds) };
 
       //Build widgets cache
       let list = await xapi.Command.UserInterface.Extensions.List();
@@ -715,6 +715,19 @@ class Core {
       });
     }
 
+    //Watch DisplaySystemStatus
+    zapi.system.onStatusChange(cb => {
+      this.displaySystemStatus();
+    });
+    this.systemStatus.onKeyChg('DisplaySystemStatus', status => {
+      this._displaySystemStatus = status.value;
+      if (this._displaySystemStatus == 'on') {
+        this.displaySystemStatus();
+      }
+      else {
+        this.clearDisplaySystemStatus();
+      }
+    });
 
     this.scheduleStandby = () => {
       schedule(systemconfig.system.forceStandbyTime, () => {
@@ -724,8 +737,6 @@ class Core {
       });
     };
     this.scheduleStandby();
-
-
 
     //Setup devices
     debug(2, `Starting Devices Manager...`);
@@ -826,6 +837,8 @@ class Core {
         }
       });
     }
+
+    this.displaySystemStatus();
 
   }
 
@@ -936,6 +949,7 @@ class Core {
       this.scenarios.enableScenario(systemconfig.system.onWakeup.enableScenario);
     }
     zapi.system.events.emit('system_wakup');
+    this.displaySystemStatus();
   }
 
   setPresenterLocation(location) {
@@ -946,6 +960,23 @@ class Core {
     xapi.Command.Conference.DoNotDisturb.Activate({ Timeout: 1440 });
   }
 
+  displaySystemStatus() {
+    let allStatus = zapi.system.getAllStatus();
+    if (allStatus.DisplaySystemStatus != 'on')
+      return;
+
+    xapi.Command.Video.Graphics.Text.Display({
+      Target: 'LocalOutput',
+      Text: `P:${allStatus.presentation.type} C:${allStatus.call} HPT:${allStatus.hdmiPassthrough} PD:${allStatus.PresenterDetected} PL:${allStatus.PresenterLocation } CPZ:${allStatus.ClearPresentationZone} PM:${allStatus.PresenterMics} AM:${allStatus.AudienceMics}`
+    });
+  }
+
+  clearDisplaySystemStatus() {
+    xapi.Command.Video.Graphics.Text.Display({
+      Target: 'LocalOutput',
+      Text: ''
+    });
+  }
 }
 
 function configValidityCheck() {
@@ -1193,6 +1224,7 @@ async function init() {
   console.warn(`BOOT COUNTER: ${bootcount}`);
 
   xapi.Command.Standby.Activate();
+
 
   //TESTAREA AFTERBOOT
 

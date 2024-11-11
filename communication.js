@@ -13,7 +13,6 @@ class HttpRequestQueue {
     this.queue = [];
     this.isProcessing = false;
     let self = this;
-    
   }
 
   async httpRequest(url) {

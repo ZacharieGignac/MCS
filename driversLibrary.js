@@ -128,22 +128,22 @@ export class DisplayDriver_CEC {
     xapi.Config.Video.Output.Connector[this.config.connector].CEC.Mode.set('On');
     debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Setting CEC mode to "On" for connector: ${this.config.connector}`);
   }
-  setPower() { }
-  setBlanking() { }
-  setSource() { }
-  getUsageHours() { }
-  requestUsageHours() { }
+  setPower() {}
+  setBlanking() {}
+  setSource() {}
+  getUsageHours() {}
+  requestUsageHours() {}
 }
 
 export class DisplayDriver_NONE {
   constructor(device, config) {
     debug(1, `DRIVER DisplayDriver_NONE (${config.id}): doing absolutely nothing on connector: ${config.connector}`);
   }
-  setPower() { }
-  setBlanking() { }
-  setSource() { }
-  getUsageHours() { }
-  requestUsageHours() { }
+  setPower() {}
+  setBlanking() {}
+  setSource() {}
+  getUsageHours() {}
+  requestUsageHours() {}
 }
 
 export class DisplayDriver_serial_sonybpj {
@@ -236,7 +236,7 @@ export class DisplayDriver_serial_sonybpj {
     xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
       ResponseTerminator: this.serialCommands.TERMINATOR,
-      ResponseTimeout: 200,
+      ResponseTimeout:200,
       Text: message
     }).catch(e => {
       debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): ${e.message}`);
@@ -341,7 +341,7 @@ export class DisplayDriver_serial_panasonic {
     xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
       ResponseTerminator: this.serialCommands.TERMINATOR,
-      ResponseTimeout: 200,
+      ResponseTimeout:200,
       Text: message
     }).catch(e => {
       debug(2, `DRIVER DisplayDriver_serial_panasonic (${this.config.id}): ${e.message}`);
@@ -446,7 +446,7 @@ export class DisplayDriver_serial_epson {
     xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
       ResponseTerminator: this.serialCommands.TERMINATOR,
-      ResponseTimeout: 200,
+      ResponseTimeout:200,
       Text: message
     }).catch(e => {
       debug(2, `DRIVER DisplayDriver_serial_epson (${this.config.id}): ${e.message}`);
@@ -530,15 +530,12 @@ export class ScreenDriver_gpio {
       let voltage2 = position == 'up' ? 'Low' : 'High';
       args['Pin' + this.pin1] = voltage1;
       args['Pin' + this.pin2] = voltage2;
-      setTimeout(() => {
-        args['Pin' + this.pin1] = 'High';
-        args['Pin' + this.pin2] = 'High';
-        xapi.Command.GPIO.ManualState.Set(args);
-      }, 300);
     }
     xapi.Command.GPIO.ManualState.Set(args);
+
+
   }
-  
+
   custom() {
 
   }

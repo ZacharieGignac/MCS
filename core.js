@@ -884,6 +884,9 @@ class Core {
           }
         }
       }
+      else {
+        xapi.Command.UserInterface.Message.TextLine.Clear();
+      }
     }
     else if (pts == 'Off') {
       xapi.Command.UserInterface.Message.TextLine.Clear();

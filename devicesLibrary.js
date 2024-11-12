@@ -400,6 +400,7 @@ export class Light {
     this.driver = new this.config.driver(this, config);
     this.currentPowerStatus = undefined;
     this.widgetLevelName = this.config.id + ':LEVEL';
+    this.widgetLevelNamePercent = this.config.id + ':LEVEL%';
     this.widgetPowerName = this.config.id + ':POWER';
     this.widgetPowerOn = this.config.id + ':POWERON';
     this.widgetPowerOff = this.config.id + ':POWEROFF';
@@ -424,6 +425,7 @@ export class Light {
     });
 
     this.levelSlider = zapi.ui.addWidgetMapping(this.widgetLevelName);
+    this.levelLabel = zapi.ui.addWidgetMapping(this.widgetLevelNamePercent);
     this.levelSlider.on(this.config.sliderEvent, value => {
       let mappedValue = mapValue(value, 0, 255, 0, 100);
       this.dim(mappedValue);
@@ -549,6 +551,7 @@ export class Light {
         this.currentDimLevel = level;
         let mappedValue = mapValue(level, 0, 100, 0, 255);
         this.levelSlider.setValue(mappedValue);
+        this.levelLabel.setValue(level);
       }
     }
   }

@@ -654,16 +654,16 @@ class Core {
             if (event.OptionId == '1') {
               xapi.Command.Presentation.Stop();
               xapi.Command.Call.Disconnect();
-              setTimeout(() => {
-                xapi.Command.Standby.Activate();
-              }, 2000);
-
+              xapi.Command.Video.Output.HDMI.Passthrough.Stop();
             }
           }
         });
       }
       else {
+        xapi.Command.Video.Output.HDMI.Passthrough.Stop();
         xapi.Command.Standby.Activate();
+
+
       }
 
     });

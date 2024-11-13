@@ -363,8 +363,6 @@ class Core {
     zapi.system.systemReport = {};
     zapi.system.systemReport.systemVersion = COREVERSION;
     zapi.system.sendSystemReport = () => this.sendSystemReport();
-
-
   }
 
   safeStringify(obj, cache = new Set()) {
@@ -576,7 +574,18 @@ class Core {
     xapi.Config.UserInterface.SettingsMenu.Mode.set(systemconfig.system.settingsMenu);
 
 
+    //Listen for call ended and hdmipassthrough disable
+    this.systemStatus.onKeyChg('call', (status) => {
+      if (status.value === 'Idle') {
+        this.handleCallEnded();
+      }
+    });
 
+    this.systemStatus.onKeyChg('hdmiPassthrough', (status) => {
+      if (status.value !== 'Active') {
+        this.handleHDMIPassThroughOff();
+      }
+    });
 
 
 
@@ -909,6 +918,21 @@ class Core {
     });
   }
 
+  handleCallEnded() {
+    this.clearPresenterTrackMessages();
+  }
+
+  // Fonction pour gérer la désactivation du HDMI pass-through
+  handleHDMIPassThroughOff() {
+    this.clearPresenterTrackMessages();
+  }
+
+  // Fonction pour effacer les messages de Presenter Track
+  clearPresenterTrackMessages() {
+    xapi.Command.UserInterface.Message.TextLine.Clear();
+  }
+
+
   devicesMonitoringMissing(devices) {
     var devs = [];
     for (let d of devices) {
@@ -970,7 +994,7 @@ class Core {
 
     xapi.Command.Video.Graphics.Text.Display({
       Target: 'LocalOutput',
-      Text: `P:${allStatus.presentation.type} C:${allStatus.call} HPT:${allStatus.hdmiPassthrough} PD:${allStatus.PresenterDetected} PL:${allStatus.PresenterLocation } CPZ:${allStatus.ClearPresentationZone} PM:${allStatus.PresenterMics} AM:${allStatus.AudienceMics}`
+      Text: `P:${allStatus.presentation.type} C:${allStatus.call} HPT:${allStatus.hdmiPassthrough} PD:${allStatus.PresenterDetected} PL:${allStatus.PresenterLocation} CPZ:${allStatus.ClearPresentationZone} PM:${allStatus.PresenterMics} AM:${allStatus.AudienceMics}`
     });
   }
 

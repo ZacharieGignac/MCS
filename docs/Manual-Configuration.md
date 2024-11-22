@@ -412,6 +412,19 @@ Qui appelle une scène d'éclairage externe. Par exemple, dans un panneau d'écl
       driver: driversLibrary.LightSceneDriver_isc,  //Driver utilisé par la classe
     }
 ```
+En utilisant un contrôleur de relais réseau Global Caché iTach Flex
+```JS
+    {
+      id: 'lightscene.100%',                          //Identification unique
+      name: 'lightscene.100%',                                //Nom
+      type: DEVICETYPE.LIGHTSCENE,                    //Type = 'LIGHTSCENE'
+      device: devicesLibrary.LightScene,              //Classe à utiliser
+      driver: driversLibrary.LightSceneDriver_gc_itachflex, //Driver utilisé par la classe. Ce driver contrôle un appareil "Global Caché iTach Flex"
+      host: '169.254.1.30', //Host ou IP de l'appareil. Ici, l'appareil est connecté directement au codec
+      relay: 1, //Numéro du relais (1 à 4)
+      pulseLength: 500 //Temps de fermeture du relais en ms (1000 par défaut si cette valeur est omise)
+    }
+```
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
 * **lightscene.100%:ACTIVATE** : Bouton, active la scène d'éclairage
 Cet appareil prends automatiquement en charge certaines actions.

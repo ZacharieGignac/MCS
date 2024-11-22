@@ -282,6 +282,21 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
       defaultPosition: 'up'                       //Position par défaut
     }
 ```
+#### En utilisant un Global Caché iTach Flex
+```JS
+    {
+      id: 'screen.main',                          //Identification unique
+      type: DEVICETYPE.SCREEN,                    //Type = 'SCREEN'
+      name: 'SCREEN2',                            //Nom
+      device: devicesLibrary.Screen,              //Classe à utiliser
+      driver: driversLibrary.ScreenDriver_gc_itachflex,   //Driver à utiliser par le device (GPIO)
+      host:'169.254.1.30',                        //Host ou IP du Global Caché iTach
+      upRelay: 3,                                    //Relais pour monter la toile
+      downRelay: 4,                                    //Relais pour descendre la toile
+      pulseLength: 3000,                          //Temps d'activation du relais en ms, 1000ms si la propriété est omise
+      defaultPosition: 'up'                       //Position par défaut
+    }
+```
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
 * **screen:UP** : Bouton, monte la toile
 * **screen:DOWN** : Bouton, descends la toile
@@ -375,7 +390,7 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 * **light.presenter:POWEROFF** : Bouton, éteint l'éclairage
 
 ### LightScene (Scène d'éclairage)
-Qui contrôle les devices de type "Light"
+#### Qui contrôle les devices de type "Light"
 ```JS
     {
       id: 'lightscene.100%',                          //Identification unique
@@ -402,7 +417,7 @@ Qui contrôle les devices de type "Light"
       ]
     }
 ```
-Qui appelle une scène d'éclairage externe. Par exemple, dans un panneau d'éclairage, crestron, etc...
+#### Qui appelle une scène d'éclairage externe. Par exemple, dans un panneau d'éclairage, crestron, etc...
 ```JS
     {
       id:'lightscene.100%',                         //Identification unique
@@ -412,7 +427,7 @@ Qui appelle une scène d'éclairage externe. Par exemple, dans un panneau d'écl
       driver: driversLibrary.LightSceneDriver_isc,  //Driver utilisé par la classe
     }
 ```
-En utilisant un contrôleur de relais réseau Global Caché iTach Flex
+#### En utilisant un contrôleur de relais réseau Global Caché iTach Flex
 ```JS
     {
       id: 'lightscene.100%',                          //Identification unique

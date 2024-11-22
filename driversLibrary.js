@@ -36,6 +36,38 @@ export class LightSceneDriver_isc {
   }
 }
 
+export class LightSceneDriver_gc_itachflex {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
+    if (!this.config.pulseLength) this.config.pulseLength = 1000;
+    this.headers = [`Content-Type: application/json`];
+
+  }
+  async activate() {
+    zapi.communication.httpClient.Put({
+      AllowInsecureHTTPS: true,
+      Header: this.headers,
+      Timeout: 5,
+      Url: `http://${this.config.host}/api/host/modules/1/relays/logicals/${this.config.relay}`,
+      Body: `{ "type": "SPST", "state": "on" }`
+    });
+
+    
+    setTimeout(() => {
+      zapi.communication.httpClient.Put({
+        AllowInsecureHTTPS: true,
+        Header: this.headers,
+        Timeout: 5,
+        Url: `http://${this.config.host}/api/host/modules/1/relays/logicals/${this.config.relay}`,
+        Body: `{ "type": "SPST", "state": "off" }`
+      });
+    }, this.config.pulseLength);
+    
+
+
+  }
+}
 
 export class DisplayDriver_isc_h21 {
   constructor(device, config) {
@@ -128,22 +160,22 @@ export class DisplayDriver_CEC {
     xapi.Config.Video.Output.Connector[this.config.connector].CEC.Mode.set('On');
     debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Setting CEC mode to "On" for connector: ${this.config.connector}`);
   }
-  setPower() {}
-  setBlanking() {}
-  setSource() {}
-  getUsageHours() {}
-  requestUsageHours() {}
+  setPower() { }
+  setBlanking() { }
+  setSource() { }
+  getUsageHours() { }
+  requestUsageHours() { }
 }
 
 export class DisplayDriver_NONE {
   constructor(device, config) {
     debug(1, `DRIVER DisplayDriver_NONE (${config.id}): doing absolutely nothing on connector: ${config.connector}`);
   }
-  setPower() {}
-  setBlanking() {}
-  setSource() {}
-  getUsageHours() {}
-  requestUsageHours() {}
+  setPower() { }
+  setBlanking() { }
+  setSource() { }
+  getUsageHours() { }
+  requestUsageHours() { }
 }
 
 export class DisplayDriver_serial_sonybpj {
@@ -236,7 +268,7 @@ export class DisplayDriver_serial_sonybpj {
     xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
       ResponseTerminator: this.serialCommands.TERMINATOR,
-      ResponseTimeout:200,
+      ResponseTimeout: 200,
       Text: message
     }).catch(e => {
       debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): ${e.message}`);
@@ -341,7 +373,7 @@ export class DisplayDriver_serial_panasonic {
     xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
       ResponseTerminator: this.serialCommands.TERMINATOR,
-      ResponseTimeout:200,
+      ResponseTimeout: 200,
       Text: message
     }).catch(e => {
       debug(2, `DRIVER DisplayDriver_serial_panasonic (${this.config.id}): ${e.message}`);
@@ -446,7 +478,7 @@ export class DisplayDriver_serial_epson {
     xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
       ResponseTerminator: this.serialCommands.TERMINATOR,
-      ResponseTimeout:200,
+      ResponseTimeout: 200,
       Text: message
     }).catch(e => {
       debug(2, `DRIVER DisplayDriver_serial_epson (${this.config.id}): ${e.message}`);

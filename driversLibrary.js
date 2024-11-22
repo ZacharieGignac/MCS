@@ -53,7 +53,7 @@ export class LightSceneDriver_gc_itachflex {
       Body: `{ "type": "SPST", "state": "on" }`
     });
 
-    
+
     setTimeout(() => {
       zapi.communication.httpClient.Put({
         AllowInsecureHTTPS: true,
@@ -63,9 +63,6 @@ export class LightSceneDriver_gc_itachflex {
         Body: `{ "type": "SPST", "state": "off" }`
       });
     }, this.config.pulseLength);
-    
-
-
   }
 }
 
@@ -527,6 +524,44 @@ export class ScreenDriver_isc {
 
   custom() {
 
+  }
+}
+
+export class ScreenDriver_gc_itachflex {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
+    if (!this.config.pulseLength) this.config.pulseLength = 1000;
+    this.headers = [`Content-Type: application/json`];
+
+  }
+  setPosition(position) {
+    var relay;
+    if (position.toUpperCase() == 'UP') {
+      relay = this.config.upRelay;
+    }
+    else if (position.toUpperCase() == 'DOWN') {
+      relay = this.config.downRelay;
+    }
+
+    zapi.communication.httpClient.Put({
+      AllowInsecureHTTPS: true,
+      Header: this.headers,
+      Timeout: 5,
+      Url: `http://${this.config.host}/api/host/modules/1/relays/logicals/${relay}`,
+      Body: `{ "type": "SPST", "state": "on" }`
+    });
+
+
+    setTimeout(() => {
+      zapi.communication.httpClient.Put({
+        AllowInsecureHTTPS: true,
+        Header: this.headers,
+        Timeout: 5,
+        Url: `http://${this.config.host}/api/host/modules/1/relays/logicals/${relay}`,
+        Body: `{ "type": "SPST", "state": "off" }`
+      });
+    }, this.config.pulseLength);
   }
 }
 

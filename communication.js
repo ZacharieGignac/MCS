@@ -65,11 +65,14 @@ class HttpRequestQueue {
           reject(`Unknown HTTP method "${clientParameters.Method}"`);
       }
       delete clientParameters.Method;
-      httpClientMethod(clientParameters).then(response => {
+      var body = clientParameters.Body;
+      delete clientParameters.Body;
+      httpClientMethod(clientParameters, body).then(response => {
         resolve(response);
       }).catch(err => {
         reject(err);
       });
+      
     });
   }
 }

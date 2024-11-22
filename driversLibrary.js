@@ -11,6 +11,7 @@ export class LightSceneDriver_lights {
   }
 
   activate() {
+    debug(1, `DRIVER LightSceneDriver_lights (${this.config.id}): ACTIVATE`);
     for (let light of this.config.lights) {
       for (let prop in light) {
         if (light.hasOwnProperty(prop)) {
@@ -32,6 +33,7 @@ export class LightSceneDriver_isc {
   }
 
   activate() {
+    debug(1, `DRIVER LightSceneDriver_isc (${this.config.id}): ACTIVATE`);
     zapi.communication.sendMessage(`${this.config.name}:ACTIVATE`);
   }
 }
@@ -41,10 +43,15 @@ export class LightSceneDriver_gc_itachflex {
     this.device = device;
     this.config = config;
     if (!this.config.pulseLength) this.config.pulseLength = 1000;
+    if (!this.config.relay) this.config.relay = 1;
+    if (!this.config.host) {
+      debug(3,`DRIVER LightSceneDriver_gc_itachflex (${this.config.id}): Property 'host' not defined in config.`);
+    }
     this.headers = [`Content-Type: application/json`];
 
   }
   async activate() {
+    debug(1,`DRIVER LightSceneDriver_gc_itachflex (${this.config.id}): ACTIVATE`);
     zapi.communication.httpClient.Put({
       AllowInsecureHTTPS: true,
       Header: this.headers,
@@ -543,6 +550,8 @@ export class ScreenDriver_gc_itachflex {
     else if (position.toUpperCase() == 'DOWN') {
       relay = this.config.downRelay;
     }
+
+    debug(1, `DRIVER ScreenDriver_gc_itachflex (${this.config.id}): setPosition: ${position}`);
 
     zapi.communication.httpClient.Put({
       AllowInsecureHTTPS: true,

@@ -185,6 +185,6 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
   - `text` : Texte à envoyer.
 - `httpClient` : Client HTTP multi-thread. Toute les méthodes du client natif XAPI sont disponibles, mais seulement "GET" et "POST" sont décrites ici.
   - `Get` : Envoie une requête "GET"
-    - `args` : Mêmes arguments que le client HTTP natif XAPI
+    - `args` : Mêmes arguments que le client HTTP natif XAPI. Le request body doit être placé dans la propriété `Body` de cet objet.
   - `Post` : Envoie une requête "POST"
-    - `args` : Mêmes arguments que le client HTTP natif XAPI
+    - `args` : Mêmes arguments que le client HTTP natif XAPI. Le request body doit être placé dans la propriété `Body` de cet objet.

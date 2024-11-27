@@ -37,7 +37,7 @@ export var Manifest = {
     joinMicrosoftTeamsCVI: true,
     keypad: true,
     layoutControls: true,
-    midCallControls: false,
+    midCallControls: true,
     musicMode: false,
     participantList: true,
     selfviewControls: true,

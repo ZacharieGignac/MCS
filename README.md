@@ -42,3 +42,4 @@ Version actuelle: 1.0.0
 * Modification de la méthode de détection des appels (Idle, Connected)
 * Retirer le message de PresenterTrack quand le système n'est pas en appel ou en mode hdmiPassthrough
 * Les requètes HTTP au travers `zapi.communication.httpClient` n'envoyaient pas de "body" dans la requête. Il faut utiliser la propriété `Body` dans les paramêtres de la requête.
+* Désactivation automatique du mode hdmipassthrough lors de la fermeture de session

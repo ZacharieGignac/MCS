@@ -3,18 +3,18 @@ import xapi from 'xapi';
 import { zapiv1 as zapi } from './zapi';
 import { config as systemconfig } from './config';
 
-  function safeStringify(obj, cache = new Set()) {
-    return JSON.stringify(obj, (key, value) => {
-      if (typeof value === 'object' && value !== null) {
-        if (cache.has(value)) {
-          // Remove cyclic reference
-          return;
-        }
-        cache.add(value);
+function safeStringify(obj, cache = new Set()) {
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.has(value)) {
+        // Remove cyclic reference
+        return;
       }
-      return value;
-    });
-  }
+      cache.add(value);
+    }
+    return value;
+  });
+}
 
 
 export var Manifest = {
@@ -51,12 +51,21 @@ export class Scenario {
   }
 
   start() {
+
+    //Clear prompts and alerts
     xapi.Command.UserInterface.Message.Prompt.Clear();
     xapi.Command.UserInterface.Message.Alert.Clear();
+
+    //Stop presentation
     xapi.Command.Presentation.Stop();
+
+    //Stop HdmiPassthrough
+    xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+
+    //Set default volume
     xapi.Command.Audio.Volume.SetToDefault();
 
-    //xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: systemconfig.system.mainVideoSource });
+    //Disable HDMIPassthrough
 
     let devices = zapi.devices.getAllDevices();
 
@@ -70,12 +79,12 @@ export class Scenario {
     zapi.system.resetSystemStatus();
     let lightscenes = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.LIGHTSCENE, 'system.lightscene.standby');
     if (lightscenes.length > 0) {
-      
-      
+
+
       for (let lightscene of lightscenes) {
         lightscene.activate();
       }
-      
+
     }
 
     clearTimeout(this.standbyTimeout);

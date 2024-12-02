@@ -84,5 +84,6 @@ export var zapiv1 = {
   communication: {
     httpClient:() => {},
     sendMessage:() => {}
-  }
+  },
+  obj2string:() => {}
 }

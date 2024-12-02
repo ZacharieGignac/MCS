@@ -1214,6 +1214,21 @@ async function init() {
   debug(2, `Init started...`);
   debug(2, `Starting core...`);
 
+  var safeStringify = function (obj, cache = new Set()) {
+    return JSON.stringify(obj, (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (cache.has(value)) {
+          // Remove cyclic reference
+          return;
+        }
+        cache.add(value);
+      }
+      return value;
+    });
+  }
+
+  zapi.obj2string = safeStringify;
+
 
   core = await new Core();
   debug(2, `Loading modules...`);

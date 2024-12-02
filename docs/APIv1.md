@@ -188,3 +188,8 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
     - `args` : Mêmes arguments que le client HTTP natif XAPI. Le request body doit être placé dans la propriété `Body` de cet objet.
   - `Post` : Envoie une requête "POST"
     - `args` : Mêmes arguments que le client HTTP natif XAPI. Le request body doit être placé dans la propriété `Body` de cet objet.
+
+
+## À la racine (zapi.)
+- `obj2string` : Retourne un JSON qui retire automatiquement les références cycliques
+  - `object` : Objet à transformer en JSON 

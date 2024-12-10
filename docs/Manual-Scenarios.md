@@ -26,6 +26,7 @@ export var Manifest = {
     cameraControls: true,
     endCallButton: true,
     hdmiPassthrough: true,
+    webcam:true,
     joinGoogleMeet: false,
     joinWebex: true,
     joinZoom: false,
@@ -108,7 +109,8 @@ export class Scenario {
 - `features` : Permet d'afficher ou non les différentes fonctionnalités du système
   - `cameraControls` : Contrôles de caméra
   - `endCallButton` : Bouton "terminer l'appel"
-  - `hdmiPassthrough` : Fonctionnalité "BYOD"
+  - `hdmiPassthrough` : Fonctionnalité "BYOD" (pour codec pro, room kit, room 55, etc..) *Interchangeable par la propriété `webcam`
+  - `webcam` : Fonctionnalité "BYOD" (pour EQ, BarPro, etc..) *Interchangeable par la propriété `hdmiPassthrough`
   - `joinGoogleMeet` : Joindre Google Meet
   - `joinWebex` : Joindre Webex
   - `joinZoom` : Joindre Zoom

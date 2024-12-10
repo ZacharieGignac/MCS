@@ -121,7 +121,7 @@ export class Scenarios {
             this.currentScenario = id;
             zapi.system.setStatus('currentScenario', this.currentScenario);
 
-            
+
             this.hidePanels(currManifest.panels.hide);
             this.showPanels(currManifest.panels.show);
             if (currManifest.features != undefined) {
@@ -151,7 +151,7 @@ export class Scenarios {
     }
     debug(1, `Current scenario is: ${this.currentScenario}`);
     zapi.performance.setElapsedEnd('Scenarios.enableScenario');
-    
+
   }
 
   enablePreviousScenario() {
@@ -209,7 +209,15 @@ export class Scenarios {
     zapi.performance.setElapsedStart('Scenarios.setupFeatures');
     xapi.Config.UserInterface.Features.Call.CameraControls.set(features.cameraControls ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.End.set(features.endCallButton ? 'Auto' : 'Hidden');
-    xapi.Config.UserInterface.Features.Call.HdmiPassthrough.set(features.hdmiPassthrough ? 'Auto' : 'Hidden');
+    if (features.hdmiPassthrough || features.webcam) {
+      xapi.Config.UserInterface.Features.Call.Webcam.set('Auto').catch(e => { });
+      xapi.Config.UserInterface.Features.Call.HdmiPassthrough.set('Auto').catch(e => { });
+    }
+    else {
+
+      xapi.Config.UserInterface.Features.Call.Webcam.set('Hidden').catch(e => { });
+      xapi.Config.UserInterface.Features.Call.HdmiPassthrough.set('Hidden').catch(e => { });
+    }
     xapi.Config.UserInterface.Features.Call.JoinWebex.set(features.joinWebex ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.JoinGoogleMeet.set(features.joinGoogleMeet ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.JoinZoom.set(features.joinZoom ? 'Auto' : 'Hidden');

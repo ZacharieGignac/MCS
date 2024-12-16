@@ -130,7 +130,9 @@ export class DevicesManager {
       let presetDetails = await xapi.Command.Camera.Preset.Show({ PresetId: preset.PresetId });
       let presetCamId = presetDetails.CameraId;
       let connectors = await xapi.Config.Video.Input.Connector.get();
-      let camConnectorDetails = connectors.filter(connector => connector.CameraControl.CameraId == presetCamId)[0];
+      let camConnectorDetails = connectors.filter(connector => {
+        return connector.CameraControl && connector.CameraControl.CameraId === presetCamId;
+      })[0];
       let camConnector = camConnectorDetails.id;
 
       xapi.Command.Camera.Preset.Activate({ PresetId: preset.PresetId });

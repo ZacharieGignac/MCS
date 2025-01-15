@@ -45,13 +45,13 @@ export class LightSceneDriver_gc_itachflex {
     if (!this.config.pulseLength) this.config.pulseLength = 1000;
     if (!this.config.relay) this.config.relay = 1;
     if (!this.config.host) {
-      debug(3,`DRIVER LightSceneDriver_gc_itachflex (${this.config.id}): Property 'host' not defined in config.`);
+      debug(3, `DRIVER LightSceneDriver_gc_itachflex (${this.config.id}): Property 'host' not defined in config.`);
     }
     this.headers = [`Content-Type: application/json`];
 
   }
   async activate() {
-    debug(1,`DRIVER LightSceneDriver_gc_itachflex (${this.config.id}): ACTIVATE`);
+    debug(1, `DRIVER LightSceneDriver_gc_itachflex (${this.config.id}): ACTIVATE`);
     zapi.communication.httpClient.Put({
       AllowInsecureHTTPS: true,
       Header: this.headers,
@@ -689,9 +689,16 @@ export class AudioOutputDriver_codecpro {
     switch (this.config.output) {
       case "line":
         xapi.Config.Audio.Output.Line[this.config.connector].Level.set(level);
+        setTimeout(() => {
+          xapi.Config.Audio.Output.Line[this.config.connector].Level.set(level);
+        }, 2000)
+
         break;
       case "hdmi":
         xapi.Config.Audio.Output.HDMI[this.config.connector].Level.set(level);
+        setTimeout(() => {
+          xapi.Config.Audio.Output.HDMI[this.config.connector].Level.set(level);
+        }, 2000);
         break;
     }
   }

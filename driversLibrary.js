@@ -654,10 +654,10 @@ export class AudioInputDriver_codecpro {
         xapi.Config.Audio.Input.Microphone[this.config.connector].mode.set('Off');
         break;
       case 'hdmi':
-        this.Config.Audio.Input.Microphone[this.config.connector].mode.set('Off');
+        xapi.Config.Audio.Input.HDMI[this.config.connector].mode.set('Off');
         break;
       case 'ethernet':
-        this.Config.Audio.Input.Microphone[this.config.connector].mode.set('Off');
+        xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].mode.set('Off');
         break;
     }
   }
@@ -669,14 +669,15 @@ export class AudioInputDriver_codecpro {
         xapi.Config.Audio.Input.Microphone[this.config.connector].mode.set('On');
         break;
       case 'hdmi':
-        this.Config.Audio.Input.Microphone[this.config.connector].mode.set('On');
+        xapi.Config.Audio.Input.HDMI[this.config.connector].mode.set('On');
         break;
       case 'ethernet':
-        this.Config.Audio.Input.Microphone[this.config.connector].mode.set('On');
+        xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].mode.set('On');
         break;
     }
   }
 }
+
 
 
 export class LightDriver_isc_h21 {

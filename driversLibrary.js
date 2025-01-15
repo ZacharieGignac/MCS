@@ -678,6 +678,57 @@ export class AudioInputDriver_codecpro {
   }
 }
 
+export class AudioOutputDriver_codecpro {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setLevel(level) {
+    debug(1, `DRIVER AudioOutput_codecpro (${this.config.id}): setLevel: ${level}`);
+    switch (this.config.output) {
+      case "line":
+        xapi.Config.Audio.Output.Line[this.config.connector].Level.set(level);
+        break;
+      case "hdmi":
+        xapi.Config.Audio.Output.HDMI[this.config.connector].Level.set(level);
+        break;
+    }
+  }
+
+  setMode(mute) {
+    if (mute.toLowerCase() == 'off') {
+      this.mute();
+    }
+    else {
+      this.unmute();
+    }
+  }
+
+  off() {
+    debug(1, `DRIVER AudioOutput_codecpro (${this.config.id}): Off`);
+    switch (this.config.output) {
+      case 'line':
+        xapi.Config.Audio.Output.Line[this.config.connector].mode.set('Off');
+        break;
+      case 'hdmi':
+        xapi.Config.Audio.Output.HDMI[this.config.connector].mode.set('Off');
+        break;
+    }
+  }
+
+  on() {
+    debug(1, `DRIVER AudioOutput_codecpro (${this.config.id}): On`);
+    switch (this.config.output) {
+      case 'line':
+        xapi.Config.Audio.Output.Line[this.config.connector].mode.set('On');
+        break;
+      case 'hdmi':
+        xapi.Config.Audio.Output.HDMI[this.config.connector].mode.set('On');
+        break;
+    }
+  }
+}
 
 
 export class LightDriver_isc_h21 {

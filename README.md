@@ -32,6 +32,7 @@ Version actuelle: 1.0.1
 
 ### Ajouts
 * Ajout d'un nouveau type de device, `AudioOutput`, qui permet de contrôler les sorties audio
+* Ajout d'un nouveau type de driver, `AudioOutputDriver_codecpro` qui permet de contrôler les sorties audio sur un codec pro, utilisé par le driver `AudioOutput`
   
 ### Bugfix
-* aucun
+* Arrangé le contrôle de gain et de mute sur les entrées `AudioInput` de type `HDMI` ou `Ethernet`

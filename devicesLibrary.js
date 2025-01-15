@@ -763,6 +763,156 @@ export class AudioInput {
 }
 
 
+export class AudioOutput {
+  constructor(config) {
+    this.config = config;
+    this.driver = new this.config.driver(this, config);
+    this.currentLevel = undefined;
+    this.currentMute = undefined;
+    this.widgetModeName = this.config.id + ':MODE';
+    this.widgetLevelName = this.config.id + ':LEVEL';
+    this.widgetLevelGroupName = this.config.id + ':LEVELGROUP';
+    this.storedLevel = this.config.defaultLevel;
+
+    //Default UI Handling
+    this.modeSwitch = zapi.ui.addWidgetMapping(this.widgetModeName);
+    this.modeSwitch.on('changed', value => {
+      this.setMode(value);
+    });
+
+    this.levelSlider = zapi.ui.addWidgetMapping(this.widgetLevelName);
+    this.levelSlider.on('changed', value => {
+      let mappedLevel = mapValue(value, 0, 255, this.config.levelLowLimit, this.config.levelHighLimit);
+      this.setLevel(mappedLevel);
+    });
+
+    if (this.config.lowLevel || this.config.mediumLevel || this.config.highLevel) {
+      this.levelGroup = zapi.ui.addWidgetMapping(this.widgetLevelGroupName);
+      this.levelGroup.on('released', value => {
+        if (value == 'off') {
+          this.setLevel(0, true);
+        }
+        if (value == 'low') {
+          this.setLevel(this.config.lowLevel);
+        }
+        else if (value == 'medium') {
+          this.setLevel(this.config.mediumLevel);
+        }
+        else if (value == 'high') {
+          this.setLevel(this.config.highLevel);
+        }
+      });
+    }
+
+    this.setDefaults();
+  }
+
+  setDefaults() {
+    if (this.config.defaultLevel != undefined) {
+      this.setLevel(this.config.defaultLevel);
+    }
+    if (this.config.defaultMode != undefined) {
+      this.setMode(this.config.defaultMode);
+    }
+  }
+
+  setLevel(level, ignoreLimits = false) {
+    debug(1, `DEVICE ${this.config.id}: setLevel: ${level}`);
+    if (!ignoreLimits) {
+      if (level < this.config.levelLowLimit) {
+        level = this.config.levelLowLimit;
+      }
+      if (level > this.config.levelHighLimit) {
+        level = this.config.levelHighLimit;
+      }
+    }
+
+    this.currentLevel = level;
+    this.driver.setlevel(level);
+    let mappedLevel = mapValue(level, this.config.levelLowLimit, this.config.levelHighLimit, 0, 255);
+    this.levelSlider.setValue(mappedLevel);
+    if (this.config.lowLevel || this.config.mediumLevel || this.config.highLevel) {
+      if (level == 0) {
+        this.levelGroup.setValue('off');
+      }
+      else if (level <= this.config.lowLevel) {
+        this.levelGroup.setValue('low');
+      }
+      else if (level > this.config.lowLevel && level < this.config.highLevel) {
+        this.levelGroup.setValue('medium');
+      }
+      else if (level >= this.config.highLevel) {
+        this.levelGroup.setValue('high');
+      }
+
+    }
+  }
+
+  getLevel() {
+    return this.currentLevel;
+  }
+
+  increaseLevel() {
+    debug(1, `DEVICE ${this.config.id}: Increasing level: ${this.currentLevel + this.config.levelStep}`);
+    if ((this.currentLevel + this.config.levelStep) <= this.config.levelHighLimit) {
+      this.setLevel(this.currentLevel + this.config.levelStep);
+    }
+    else {
+      this.setLevel(this.config.levelHighLimit);
+    }
+  }
+
+  decreaseLevel() {
+    debug(1, `DEVICE ${this.config.id}: Decreasing level: ${this.currentLevel - this.config.levelStep}`);
+    if ((this.currentLevel - this.config.levelLowLimit) >= this.config.levelLowLimit) {
+      this.setLevel(this.currentLevel + this.config.levelStep);
+    }
+    else {
+      this.setLevel(this.config.levelLowLimit);
+    }
+  }
+
+  off() {
+    debug(1, `DEVICE ${this.config.id}: Off`);
+    this.currentMute = true;
+    this.driver.off();
+    this.modeSwitch.setValue('off');
+  }
+
+  on() {
+    debug(1, `DEVICE ${this.config.id}: On`);
+    this.currentMute = false;
+    this.driver.on();
+    this.modeSwitch.setValue('on');
+  }
+
+  setMode(mode) {
+    if (mode.toLowerCase() == 'off') {
+      this.off();
+    }
+    else {
+      this.on();
+    }
+  }
+
+  storeLevel() {
+    this.storedLevel = this.currentLevel;
+  }
+  restoreLevel() {
+    this.setLevel(this.storedLevel);
+  }
+
+  reset() {
+    debug(1, `DEVICE ${this.config.id}: RESET`);
+    this.setDefaults();
+  }
+
+  refresh() {
+    this.setLevel(this.currentLevel, false);
+  }
+}
+
+
 export class ControlSystem {
   constructor(config) {
     this.config = config;

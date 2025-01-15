@@ -790,7 +790,7 @@ export class AudioOutput {
       this.levelGroup = zapi.ui.addWidgetMapping(this.widgetLevelGroupName);
       this.levelGroup.on('released', value => {
         if (value == 'off') {
-          this.setLevel(0, true);
+          this.setLevel(-24, true);
         }
         if (value == 'low') {
           this.setLevel(this.config.lowLevel);
@@ -828,11 +828,11 @@ export class AudioOutput {
     }
 
     this.currentLevel = level;
-    this.driver.setlevel(level);
+    this.driver.setLevel(level);
     let mappedLevel = mapValue(level, this.config.levelLowLimit, this.config.levelHighLimit, 0, 255);
     this.levelSlider.setValue(mappedLevel);
     if (this.config.lowLevel || this.config.mediumLevel || this.config.highLevel) {
-      if (level == 0) {
+      if (level == -24) {
         this.levelGroup.setValue('off');
       }
       else if (level <= this.config.lowLevel) {

@@ -14,7 +14,7 @@ import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 
-const COREVERSION = '1.0.1';
+const COREVERSION = '1.1.0';
 const ZAPIVERSION = 1;
 
 function systemKill() {
@@ -162,8 +162,6 @@ class WidgetMapping {
   }
 }
 
-
-
 class UiManager {
   constructor() {
     this.allWidgets = [];
@@ -175,8 +173,12 @@ class UiManager {
 
   async init() {
     return new Promise(async success => {
-      xapi.Event.UserInterface.on(event => { this.forwardUiEvents(event); });
-      this.onUiEvent((event) => this.parseUiEvent(event));
+      xapi.Event.UserInterface.on(event => {
+        this.forwardUiEvents(event);
+      });
+      this.onUiEvent((event) => {
+        this.parseUiEvent(event)
+      });
       //TAG:ZAPI
       zapi.ui.addActionMapping = (regex, func) => { this.addActionMapping(regex, func); };
       zapi.ui.setWidgetValue = (widgetId, value) => { this.setWidgetValue(widgetId, value); };
@@ -186,24 +188,34 @@ class UiManager {
 
       //Build widgets cache
       let list = await xapi.Command.UserInterface.Extensions.List();
+      this.processWidgetsCache(list); // Call the new synchronous function to process widgets
 
-      for (let panel of list.Extensions.Panel) {
-        if (panel.Page) {
-          for (let page of panel.Page) {
-            if (page.Row) {
-              for (let row of page.Row) {
-                if (row.Widget) {
-                  for (let widget of row.Widget) {
-                    this.allWidgets.push({ widgetId: widget.WidgetId, type: widget.Type });
-                  }
-                }
-              }
-            }
+      success();
+    });
+  }
+
+  // New synchronous function to process widget data
+  processWidgetsCache(list) {
+    if (!list?.Extensions?.Panel) {
+      return; // Exit early if no relevant data
+    }
+
+    const panels = list.Extensions.Panel;
+    for (const panel of panels) {
+      if (!panel?.Page) continue;
+      const pages = panel.Page;
+      for (const page of pages) {
+        if (!page?.Row) continue;
+        const rows = page.Row;
+        for (const row of rows) {
+          if (!row?.Widget) continue;
+          const widgets = row.Widget;
+          for (const widget of widgets) {
+            this.allWidgets.push({ widgetId: widget.WidgetId, type: widget.Type });
           }
         }
       }
-      success();
-    });
+    }
   }
 
   forwardUiEvents(event) {

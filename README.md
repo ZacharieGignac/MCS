@@ -35,5 +35,5 @@ Version actuelle: 1.0.1
   
 ### Bugfix
 * Arrangé le contrôle de gain et de mute sur les entrées `AudioInput` de type `HDMI` ou `Ethernet`
-* Arrangé quelques nesting qui empêchent le transpiler de restaurer un backup (dans core)
+* Arrangé quelques nesting qui empêchent le transpiler de restaurer un backup (core, mod_cafeine)
 * Ajouté .gitignore pour les fichiers de metadata de MacOS

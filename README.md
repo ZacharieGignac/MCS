@@ -28,7 +28,6 @@ Version actuelle: 1.0.1
 
 ## v1.1.0 (En dévelopement)
 ### Bugs connus
-* aucun
 
 ### Ajouts
 * Ajout d'un nouveau type de device, `AudioOutput`, qui permet de contrôler les sorties audio
@@ -36,3 +35,5 @@ Version actuelle: 1.0.1
   
 ### Bugfix
 * Arrangé le contrôle de gain et de mute sur les entrées `AudioInput` de type `HDMI` ou `Ethernet`
+* Arrangé quelques nesting qui empêchent le transpiler de restaurer un backup (dans core)
+* Ajouté .gitignore pour les fichiers de metadata de MacOS

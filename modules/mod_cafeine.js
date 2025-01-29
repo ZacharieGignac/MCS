@@ -17,25 +17,41 @@ export class Module {
   }
 
   start() {
-    let devicesLoaded = zapi.system.events.on('system_devices_init', () => {
-      for (let d of systemconfig.devices) {
-        if (d.type == zapi.devices.DEVICETYPE.DISPLAY) {
-          if(d.supportsBlanking) {
-            let device = zapi.devices.getDevice(d.id);
-            device.driver.cafeinePowerFunction = device.driver.setPower;
-            device.driver.setPower = (state) => {
-              if (state == 'off') {
-                debug(1, `Cafeine: Overriding POWER OFF. Setting ON and BLANKING instead.`);
-                device.driver.cafeinePowerFunction('on');
-                device.driver.setBlanking(true);
-              }
-              else {
-                device.driver.cafeinePowerFunction(state);
-              }
-            }
-          }
-        }
+    zapi.system.events.on('system_devices_init', this.handleDevicesInit.bind(this)); // Use bind for proper 'this' context
+  }
+
+  handleDevicesInit() {
+    for (const deviceConfig of systemconfig.devices) {
+      if (deviceConfig.type === zapi.devices.DEVICETYPE.DISPLAY) {
+        this.processDisplayDevice(deviceConfig);
       }
-    });
+    }
+  }
+
+  processDisplayDevice(deviceConfig) {
+    if (!deviceConfig.supportsBlanking) {
+      return; // Early return if blanking is not supported, reducing nesting
+    }
+
+    const device = zapi.devices.getDevice(deviceConfig.id);
+    if (!device) {
+      debug(2, `Cafeine: Device with id ${deviceConfig.id} not found.`); // Debug if device is not found
+      return; // Exit if device is not found
+    }
+
+    this.overrideSetPowerFunction(device);
+  }
+
+  overrideSetPowerFunction(device) {
+    device.driver.cafeinePowerFunction = device.driver.setPower;
+    device.driver.setPower = (state) => {
+      if (state === 'off') {
+        debug(1, `Cafeine: Overriding POWER OFF. Setting ON and BLANKING instead.`);
+        device.driver.cafeinePowerFunction('on');
+        device.driver.setBlanking(true);
+      } else {
+        device.driver.cafeinePowerFunction(state);
+      }
+    };
   }
 }

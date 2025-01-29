@@ -600,7 +600,15 @@ class Core {
     });
 
 
-
+    xapi.Event.UserInterface.Message.Prompt.Response.on(event => {
+      if (event.FeedbackId == 'system_ask_standby') {
+        if (event.OptionId == '1') {
+          xapi.Command.Presentation.Stop();
+          xapi.Command.Call.Disconnect();
+          xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+        }
+      }
+    });
     //Add UI-related mappings
 
 
@@ -643,17 +651,21 @@ class Core {
       let callStatus = status.call;
 
       var msg;
+      var displayMsg = false;
       if (presentationStatus != 'NOPRESENTATION' && callStatus == 'Idle') {
         msg = str.endSessionPresentation;
+        displayMsg = true;
       }
       else if (presentationStatus == 'NOPRESENTATION' && callStatus == 'Connected') {
         msg = str.endSessionCall;
+        displayMsg = true;
       }
       else if (presentationStatus != 'NOPRESENTATION' && callStatus == 'Connected') {
         msg = str.endSessionCallPresentation;
+        displayMsg = true;
       }
 
-      if (msg != undefined) {
+      if (displayMsg) {
         xapi.Command.UserInterface.Message.Prompt.Display({
           Title: str.endSessionTitle,
           Text: msg,
@@ -661,15 +673,7 @@ class Core {
           "Option.1": str.endSessionChoiceYes,
           "Option.2": str.endSessionChoiceNo
         });
-        xapi.Event.UserInterface.Message.Prompt.Response.on(event => {
-          if (event.FeedbackId == 'system_ask_standby') {
-            if (event.OptionId == '1') {
-              xapi.Command.Presentation.Stop();
-              xapi.Command.Call.Disconnect();
-              xapi.Command.Video.Output.HDMI.Passthrough.Stop();
-            }
-          }
-        });
+
       }
       else {
         xapi.Command.Video.Output.HDMI.Passthrough.Stop();
@@ -1318,39 +1322,53 @@ async function init() {
 }
 
 
-debug(1, `MCS is starting...`);
-debug(1, `Version: ${COREVERSION}`);
-debug(1, `Debug level is: ${systemconfig.system.debugLevel}`);
+      
+let bootWaitPromptIntervalId; // Using a new name
 
+async function handleBoot() {
+  try {
+    const uptime = await xapi.Status.SystemUnit.Uptime.get();
 
-
-
-xapi.Status.SystemUnit.Uptime.get().then(uptime => {
-
-  if (uptime > systemconfig.system.coldBootTime) {
-    debug(1, 'Warm boot detected, running preInit() now.');
-    preInit();
+    if (uptime > systemconfig.system.coldBootTime) {
+      debug(1, 'Warm boot detected, running preInit() now.');
+      preInit();
+    } else {
+      debug(1, `Cold boot detected, running preInit() in ${systemconfig.system.coldBootWait} seconds...`);
+      setTimeout(preInit, systemconfig.system.coldBootWait * 1000);
+      startColdBootWarning();
+    }
+  } catch (error) {
+    console.error("Error getting uptime:", error);
+    // Handle error appropriately
   }
-  else {
-    debug(1, `Cold boot detected, running preInit() in ${systemconfig.system.coldBootWait} seconds...`);
-    setTimeout(preInit, systemconfig.system.coldBootWait * 1000);
-    var x = 0;
-    let waitChar = '🟦';
-    coldbootWarningInterval = setInterval(() => {
-      x++;
-      xapi.Command.UserInterface.Message.Prompt.Display({
-        Duration: 0,
-        Text: str.systemStartingColdBootText + '<br>' + waitChar.repeat(x),
-        Title: str.systemStartingColdBootTitle,
-      });
-      xapi.Status.SystemUnit.Uptime.get().then(uptime => {
-        if (uptime > systemconfig.system.coldBootTime) {
-          clearInterval(coldbootWarningInterval);
-          xapi.Command.Macros.Runtime.Restart();
+}
 
-        }
-      });
-    }, 5000);
+
+async function checkUptimeAndRestart() {
+  try {
+    const uptime = await xapi.Status.SystemUnit.Uptime.get();
+    if (uptime > systemconfig.system.coldBootTime) {
+      clearInterval(bootWaitPromptIntervalId); // Using the new name here
+      xapi.Command.Macros.Runtime.Restart();
+    }
+  } catch (error) {
+    console.error("Error getting uptime in interval:", error);
+    clearInterval(bootWaitPromptIntervalId); // And here
   }
-});
+}
 
+function startColdBootWarning() {
+  let x = 0; // Declare x here
+  const waitChar = '🟦';
+  bootWaitPromptIntervalId = setInterval(() => { // Using the new name here to assign the interval ID
+    x++;
+    xapi.Command.UserInterface.Message.Prompt.Display({
+      Duration: 0,
+      Text: str.systemStartingColdBootText + '<br>' + waitChar.repeat(x),
+      Title: str.systemStartingColdBootTitle,
+    });
+    checkUptimeAndRestart();
+  }, 5000);
+}
+
+handleBoot();

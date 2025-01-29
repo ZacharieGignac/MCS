@@ -1,0 +1,22 @@
+# macOS system files
+
+.DS_Store
+._*
+
+# Thumbnail cache files
+Thumbs.db
+Thumbs.db:*
+._.DS_Store
+
+# Folder attributes - these can sometimes be created by macOS
+.fseventsd
+.Spotlight-V100
+.Trashes
+
+# Icon must be different for each folder - often problematic in repos
+Icon?
+
+# Temporary files created by macOS apps, like TextEdit, etc.
+*.swp
+*.plist
+._*

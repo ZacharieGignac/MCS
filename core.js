@@ -1141,7 +1141,30 @@ async function waitForAllDevicesConnected(disconnectedCallback) {
   });
 }
 
+function mcsVersionPeripheralHeartbeat() {
+  xapi.Command.Peripherals.HeartBeat(
+    {
+      ID: 'mcs',
+      Timeout: 65535
+    });
+}
+
 async function preInit() {
+  //Register a MCS peripheral to write macros version number to WCH
+  xapi.Command.Peripherals.Connect(
+    {
+      ID: 'mcs',
+      Name: `mcs-${COREVERSION}`,
+      SoftwareInfo: `mcs-${COREVERSION}`,
+      Type: 'ControlSystem'
+    });
+    mcsVersionPeripheralHeartbeat();
+
+  setInterval(() => {
+      mcsVersionPeripheralHeartbeat();
+  }, 50000);
+
+
   debug(2, `Starting System Events Manager...`);
   systemEvents = new SystemEvents();
   //TAG:ZAPI
@@ -1322,7 +1345,7 @@ async function init() {
 }
 
 
-      
+
 let bootWaitPromptIntervalId; // Using a new name
 
 async function handleBoot() {

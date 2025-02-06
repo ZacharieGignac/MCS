@@ -317,6 +317,7 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 * **shades:DOWN** : Bouton, descends la toile
 
 ### AudioInput (entrée audio du codec)
+Attention, le niveau de ÀudioInput` va de 0 à 70.
 ```JS
     {
       id: 'audioinput.presenter.sf1',                   //Identification unique
@@ -330,7 +331,7 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
       gainLowLimit: 20,                                 //Limite basse du gain de l'entrée
       gainHighLimit: 70,                                //Limite supérieure du gain de l'entrée
       defaultGain: 60,                                  //Gain par défaut au démarrage du système
-      gainStep: 1,                                      //Gain ajouté ou retiré de la valeur actuelle lorsque les fonctionas increase() et decrease() sont appelées
+      gainStep: 1,                                      //Gain ajouté ou retiré de la valeur actuelle lorsque les fonctions increase() et decrease() sont appelées
       defaultMode: 'on',                                //Mode par défaut lors du démarrage du système
       lowGain: 60,                                      //Gain "bas" (utilisé par les widgets de type "button group")
       mediumGain: 65,                                   //Gain "moyen" (utilisé par les widgets de type "button group")
@@ -342,6 +343,29 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 * **audioinput.presenter.sf1:MODE** : Toggle, affiche et configure le mode de l'entrée à "ON" ou "OFF"
 * **audioinput.presenter.sf1:LEVEL** : Slider, affiche et configure le gain de l'entrée. Automatiquement scalé entre 0 et 255 -> gainLowLimite et gainHighLimit
 * **audioinput.presenter.sf1:LEVELGROUP** : Button group, affiche et configure le gain de l'entrée, en utilisant mute, lowGain, mediumGain, highGain. L'identification des 4 boutons doivent êtres "off, low, medium, high"
+
+### AudioOutput (sortie audio du codec)
+Attention, le niveau de `AudioOutput` va de -24 à 0.
+```JS
+    /* AUDIO OUTPUTS */
+    {
+      id: 'audiooutput.snubwoofer',                      //Identification unique
+      type: DEVICETYPE.AUDIOOUTPUT,                      //Type = 'AUDIOOUTPUT'
+      name: 'SnubWoofer',                                //Nom
+      device: devicesLibrary.AudioOutput,                //Classe à utiliser
+      driver: driversLibrary.AudioOutputDriver_codecpro, //Driver à utiliser par le device
+      connector: 5,                                      //Connecteur de sortie du codec
+      output: 'line',                                    //line, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioOutput_codecpro
+      levelLowLimit: -20,                                //Limite basse de la sortie
+      levelHighLimit: 0,                                 //Limite supérieure de la sortie
+      defaultLevel: -10,                                 //Niveau par défaut au démarrage du système
+      levelStep: 1,                                      //Niveau ajouté ou retiré de la valeur actuelle lorsque les fonctions increase() et decrease() sont appelées
+      defaultMode: 'on',                                 //Mode par défaut lors du démarrage du système
+      lowLevel: -15,                                     //Niveau "bas" (utlisé par les widgets de type "button group")
+      mediumLevel: -10,                                  //Niveau "moyen" (utlisé par les widgets de type "button group")
+      highLevel: 0,                                      //Niveau "haut" (utlisé par les widgets de type "button group")
+    },
+```
 
 ### CameraPreset
 #### Pour caméra Cisco

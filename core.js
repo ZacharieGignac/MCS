@@ -14,7 +14,7 @@ import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 
-const COREVERSION = '1.1.0';
+const COREVERSION = '1.1.0-beta';
 const ZAPIVERSION = 1;
 
 function systemKill() {
@@ -236,9 +236,15 @@ class UiManager {
       }
       if (targetWidgetId == widgetId) {
         try {
+          let setValue = value;
+
+          if (typeof value === 'boolean') {
+            setValue = value ? 'on' : 'off';
+          }
+
           xapi.Command.UserInterface.Extensions.Widget.SetValue({
             WidgetId: w.widgetId,
-            Value: value
+            Value: setValue
           });
         }
         catch (e) {

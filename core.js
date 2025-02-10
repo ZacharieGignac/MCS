@@ -612,6 +612,7 @@ class Core {
           xapi.Command.Presentation.Stop();
           xapi.Command.Call.Disconnect();
           xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+          xapi.Command.Standby.Activate();
         }
       }
     });

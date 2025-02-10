@@ -161,10 +161,21 @@ export class DisplayDriver_isc {
 export class DisplayDriver_CEC {
   constructor(device, config) {
     this.config = config;
+    this.setOnInterval;
     xapi.Config.Video.Output.Connector[this.config.connector].CEC.Mode.set('On');
     debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Setting CEC mode to "On" for connector: ${this.config.connector}`);
   }
-  setPower() { }
+  setPower(power) { 
+    if (power == 'on') {
+      this.setOnInterval = setInterval(() => {
+        xapi.Command.Video.CEC.Output.SendActiveSourceRequest(this.config.connector);
+        debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Sending SEND_ACTIVE_SOURCE_REQUEST on connector: ${this.config.connector}`);
+      },10000);
+    }
+    else {
+      clearInterval(this.setOnInterval);
+    }
+  }
   setBlanking() { }
   setSource() { }
   getUsageHours() { }

@@ -14,7 +14,7 @@ import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 
-const COREVERSION = '1.1.0-beta';
+const COREVERSION = '1.1.0-beta2';
 const ZAPIVERSION = 1;
 
 function systemKill() {
@@ -612,7 +612,9 @@ class Core {
           xapi.Command.Presentation.Stop();
           xapi.Command.Call.Disconnect();
           xapi.Command.Video.Output.HDMI.Passthrough.Stop();
-          xapi.Command.Standby.Activate();
+          setTimeout(() => {
+            xapi.Command.Standby.Activate();
+          }, 2000);
         }
       }
     });
@@ -1165,10 +1167,10 @@ async function preInit() {
       SoftwareInfo: `mcs-${COREVERSION}`,
       Type: 'ControlSystem'
     });
-    mcsVersionPeripheralHeartbeat();
+  mcsVersionPeripheralHeartbeat();
 
   setInterval(() => {
-      mcsVersionPeripheralHeartbeat();
+    mcsVersionPeripheralHeartbeat();
   }, 50000);
 
 

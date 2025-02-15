@@ -135,9 +135,11 @@ export var presentation = {
         if (localPresentation && !remotePresentation) {
           if (localPresentationSending) {
             status.type = PRES_LOCALSHARE;
+            status.source = pres.LocalSource;
           }
           else {
             status.type = PRES_LOCALPREVIEW;
+            status.source = pres.LocalSource;
           }
         }
 
@@ -147,8 +149,8 @@ export var presentation = {
 
         if (localPresentation && remotePresentation) {
           status.type = PRES_REMOTELOCALPREVIEW;
+          status.source = pres.LocalSource;
         }
-
         success(status);
 
       });
@@ -175,7 +177,6 @@ export class SystemStatus {
   async init() {
     return new Promise(async success => {
       debug(2, 'Starting SystemStatus...');
-
 
       //Set special "presentation" status
       let presentationStatus = await presentation.getStatus();
@@ -221,11 +222,14 @@ export class SystemStatus {
         }, 240000);
       }
       this.setDefaults();
+
       debug(2, `SystemStatus running.`);
       success();
     });
 
   }
+
+
 
   setDefaults() {
     for (let prop in systemconfig.systemStatus) {

@@ -85,5 +85,9 @@ export var zapiv1 = {
     httpClient:() => {},
     sendMessage:() => {}
   },
+  telemetry:{
+    dailyReport:{},
+    sessionReport:{}
+  },
   obj2string:() => {}
 }

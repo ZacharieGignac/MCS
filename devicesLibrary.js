@@ -216,23 +216,25 @@ export class Display {
     this._currentBlanking = undefined;
     this._currentSource = undefined;
     this._usageHours = undefined;
-    this._usageHoursReqTimeout = undefined;
+    this._usageHoursTimeout = undefined;
     this.powerOffTimeout = undefined;
     var self = this;
 
+
     if (config.supportsUsageHours) {
-      this._usageHoursRequestInterval = setInterval(() => {
-        debug(1, `Requesting usage hours for display "${this.config.id}"`);
-        self.driver.requestUsageHours();
-        this._usageHoursReqTimeout = setTimeout(() => {
-          debug(1, `No usage hours response for display "${this.config.id}"`);
-        }, 5000);
-      }, this.config.usageHoursRequestInterval);
+      self.startRequestUsageHours(self);
+    }
+
+    if (config.supportsFilterStatus) {
+      self.startRequestFilterStatus(self);
+    }
+
+    if (config.supportsSystemStatus) {
+      self.startRequestSystemStatus(self);
     }
 
     // Load driver
     this.driver = new this.config.driver(this, config);
-
     this.setDefaults();
 
     // Default WidgetMapping
@@ -252,6 +254,61 @@ export class Display {
     powerToggle.on('changed', (value) => {
       this.setPower(value);
     });
+  }
+
+  startRequestUsageHours(self) {
+    self._usageHoursInterval = setInterval(() => {
+      debug(1, `Requesting usage hours for display "${this.config.id}"`);
+      self.driver.requestUsageHours().then(usage => {
+        debug(1, `Received usage hours report for display "${this.config.id}": ${usage}`);
+        self._usageHours = usage;
+        if (zapi.telemetry.available == true) {
+          const dynamicKey = `lampUsage_${this.config.id}`;
+          const resultObject = {
+            [dynamicKey]: usage
+          };
+          zapi.telemetry.send(resultObject);
+        }
+      }).catch(err => {
+        debug(3, `Error getting usage hours report for display "${this.config.id}": ${err}`);
+      });
+    }, self.config.usageHoursRequestInterval);
+  }
+
+  startRequestFilterStatus(self) {
+    self._filterStatusInterval = setInterval(() => {
+      debug(1, `Requesting filter status for display "${this.config.id}"`);
+      self.driver.requestFilterStatus().then(status => {
+        debug(1, `Received filter status report for display "${this.config.id}": ${status}`);
+        if (zapi.telemetry.available == true) {
+          const dynamicKey = `filterStatus_${this.config.id}`;
+          const resultObject = {
+            [dynamicKey]: status
+          };
+          zapi.telemetry.send(resultObject);
+        }
+      }).catch(err => {
+        debug(3, `Error getting filter status report for display ${this.config.id}`);
+      });
+    }, self.config.filterStatusRequestInterval);
+  }
+
+  startRequestSystemStatus(self) {
+    self._systemStatusInterval = setInterval(() => {
+      debug(1, `Requesting system status for display "${this.config.id}"`);
+      self.driver.requestSystemStatus().then(status => {
+        debug(1, `Received system status report for display "${this.config.id}": ${status}`);
+        if (zapi.telemetry.available == true) {
+          const dynamicKey = `systemStatus_${this.config.id}`;
+          const resultObject = {
+            [dynamicKey]: status
+          };
+          zapi.telemetry.send(resultObject);
+        }
+      }).catch(err => {
+        debug(3, `Error getting filter status report for display ${this.config.id}`);
+      });
+    }, self.config.systemStatusRequestInterval);
   }
 
   setDefaults() {
@@ -362,9 +419,9 @@ export class Display {
   }
 
   fbUsageHours(usage) {
-    clearTimeout(this._usageHoursReqTimeout);
-    debug(1, `Received usage hours report for display "${this.config.id}": ${usage}`);
-    this._usageHours = usage;
+    clearTimeout(this._usageHoursTimeout);
+
+
   }
 
   processActionPower(power) {

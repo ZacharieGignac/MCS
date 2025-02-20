@@ -217,21 +217,27 @@ Ci-dessous une description de chaque type de device inclus par défaut.
 ### Display (projecteur, téléviseur)
 ```JS
     {
-      id: 'display.projector',                      //identification unique
+      id: 'display.projector',                      //Identification unique
       type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
       name: 'PROJ',                                 //Nom, utilisé par le driver pour la communication
       device: devicesLibrary.Display,               //Classe à utiliser
-      driver: driversLibrary.DisplayDriver_isc_h21, //Driver à utiliser par le device
+      driver: driversLibrary.DisplayDriver_serial_sonybpj, //Driver à utiliser par le device
       connector: 1,                                 //Connecteur HDMI de sortie sur le codec
+      supportsSystemStatus:true,                    //Défini si l'affichage supporte le rapport de l'état général
+      systemStatusRequestInterval:3600000,          //Interval de demande de status du système
+      supportsFilterStatus: true,                   //Défini si l'affichage supporte le rapport de l'état du filtre
+      filterStatusRequestInterval:3600000,            //Interval de demande du status du filtre
       supportsPower: true,                          //Défini si l'affichage supporte les commandes d'alimentation (ON, OFF)
-      supportsBlanking: false,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
+      supportsBlanking: true,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
       supportsSource: false,                        //Défini si l'affichage supporte le changement de source (HDMI1, HDMI2, SDI)
-      supportsUsageHours: false,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
+      supportsUsageHours: true,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
       defaultPower: 'off',                          //Alimentation par défaut lors du démarrage du système (ON, OFF)
       defaultBlanking: false,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
       blankBeforePowerOff: true,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
-      powerOffDelay: 6000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
-      usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
+      powerOffDelay: 300000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
+      usageHoursRequestInterval: 3600000,            //Interval de demande du temps d'utilisation
+      usageHoursRequestTimeout:2000,
+      port: 1                                        //Numéro du port série
     }
 ```
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
@@ -255,7 +261,6 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
       heartbeatInterval: 5000                             //Interval à laquelle le driver signalera sa présence au système de contrôle
     }
 ```
-
 ### Screen (toile motorisée)
 #### En utilisant un système de contrôle externe
 ```JS

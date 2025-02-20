@@ -165,12 +165,12 @@ export class DisplayDriver_CEC {
     xapi.Config.Video.Output.Connector[this.config.connector].CEC.Mode.set('On');
     debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Setting CEC mode to "On" for connector: ${this.config.connector}`);
   }
-  setPower(power) { 
+  setPower(power) {
     if (power == 'on') {
       this.setOnInterval = setInterval(() => {
         xapi.Command.Video.CEC.Output.SendActiveSourceRequest(this.config.connector);
         debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Sending SEND_ACTIVE_SOURCE_REQUEST on connector: ${this.config.connector}`);
-      },10000);
+      }, 10000);
     }
     else {
       clearInterval(this.setOnInterval);
@@ -212,7 +212,10 @@ export class DisplayDriver_serial_sonybpj {
       POWERON: 'power "on"\\r\\n',
       POWEROFF: 'power "off"\\r\\n',
       BLANK: 'blank "on"\\r\\n',
-      UNBLANK: 'blank "off"\\r\\n'
+      UNBLANK: 'blank "off"\\r\\n',
+      USAGE: 'timer ?\\r\\n',
+      FILTER_STATUS: 'filter_status ?\\r\\n',
+      SYSTEM_STATUS: 'error ?\\r\\n'        // Renamed ERROR_STATUS to SYSTEM_STATUS
     };
     let self = this;
 
@@ -230,6 +233,7 @@ export class DisplayDriver_serial_sonybpj {
         self.serialSend(self.serialCommands.POWEROFF);
       }
     }, self.repeat);
+
   }
 
   setPower(power) {
@@ -260,41 +264,108 @@ export class DisplayDriver_serial_sonybpj {
     debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): This driver does not support source selection.`);
   }
 
-  getUsageHours() {
-    return 0;
-  }
 
   requestUsageHours() {
+    return new Promise((resolve, reject) => {
+      this.serialSend(this.serialCommands.USAGE)
+        .then(response => {
+          if (response.Response == '') {
+            reject('NO_SERIAL_DATA_FROM_DEVICE');
+          }
+          resolve(response.Response.replaceAll('"',''));
+        })
+        .catch(err => {
+          reject('timeout');
+          debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Request timed out: ${err}`);
+        });
+    });
 
   }
-  serialSend(command) {
-    this.queue.push(command);
-    if (!this.sending) {
-      this.sendNextMessage();
-    }
+
+  // New function to request filter status
+  requestFilterStatus() {
+    return new Promise((resolve, reject) => {
+      this.serialSend(this.serialCommands.FILTER_STATUS)
+        .then(response => {
+          if (response.Response == '') {
+            reject('NO_SERIAL_DATA_FROM_DEVICE');
+          }
+          const filterStatus = response.Response.trim().replaceAll('"',''); // Trim whitespace from response
+          debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Filter Status Response: ${filterStatus}`);
+          resolve(filterStatus); // Resolve with the filter status string
+        })
+        .catch(err => {
+          reject('timeout');
+          debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Request Filter Status timed out: ${err}`);
+        });
+    });
   }
+
+  // New function to request system status (previously error status)
+  requestSystemStatus() {
+    return new Promise((resolve, reject) => {
+      this.serialSend(this.serialCommands.SYSTEM_STATUS) // Use SYSTEM_STATUS command
+        .then(response => {
+          if (response.Response == '') {
+            reject('NO_SERIAL_DATA_FROM_DEVICE');
+          }
+          var systemStatus = response.Response.trim().replaceAll('"',''); // Trim whitespace from response
+          if (systemStatus == 'no_err') {
+            systemStatus = 'normal';
+          }
+          debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): System Status Response: ${systemStatus}`); // Updated debug message
+          resolve(systemStatus); // Resolve with the system status string
+        })
+        .catch(err => {
+          reject('timeout');
+          debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Request System Status timed out: ${err}`); // Updated debug message
+        });
+    });
+  }
+
+
+  serialSend(command) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ command, resolve, reject });
+      if (!this.sending) {
+        this.sendNextMessage();
+      }
+    });
+  }
+
   sendNextMessage() {
     if (this.queue.length === 0) {
       this.sending = false;
-      return;
+      return Promise.resolve();
     }
-    const message = this.queue.shift();
+
+    if (this.sending) {
+      return Promise.resolve();
+    }
+
     this.sending = true;
-    xapi.Command.SerialPort.PeripheralControl.Send({
+    const { command, resolve, reject } = this.queue.shift();
+
+    return xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
       ResponseTerminator: this.serialCommands.TERMINATOR,
       ResponseTimeout: 200,
-      Text: message
-    }).catch(e => {
-      debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): ${e.message}`);
-    });
-
-
-    setTimeout(() => {
-      this.sendNextMessage();
-    }, this.pacing);
+      Text: command
+    })
+      .then(response => {
+        resolve(response); // Always resolve here
+        return new Promise(res => setTimeout(res, this.pacing));
+      })
+      .catch(e => {
+        reject('timeout'); // Reject only on timeout/error from xapi.Send
+        debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): ${e.message}`);
+        return new Promise(res => setTimeout(res, this.pacing));
+      })
+      .finally(() => {
+        this.sending = false;
+        return this.sendNextMessage();
+      });
   }
-
   custom() { }
 }
 

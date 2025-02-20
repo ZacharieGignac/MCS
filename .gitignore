@@ -30,3 +30,4 @@ node_modules/
 *.swo
 *.diff
 *.patch
+.DS_Store

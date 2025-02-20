@@ -8,7 +8,7 @@ Version actuelle: 1.0.1
 ### Bugs connus
 * Pour une raison encore inconnue, le message de PresenterTrack peut être affiché même lorsque le système n'est pas en appel ou en mode hdmiPassthrough. Une tentative de correction est appliquée dans cette version.
 
-### Ajouts
+### Ajouts / Modification
 * Module `mod_cafeine`: Empêche les affichages d'être éteint si l'affichage supporte le "blanking". Accélère l'allumage des affichages, mais peut diminuer la durée de vie des équipements
 * Module `mod_autogrid`: Configure automatiquement la conférence en mode "grille" à la connexion
 * Nouveau widget mapping pour les devices de type `Light` pour afficher le pourcentage dans un label. Syntaxe: `my.light.id:LEVEL%`
@@ -29,12 +29,16 @@ Version actuelle: 1.0.1
 ## v1.1.0 (En dévelopement)
 ### Bugs connus
 
-### Ajouts
-* Ajout d'un nouveau type de device, `AudioOutput`, qui permet de contrôler les sorties audio
-* Ajout d'un nouveau type de driver, `AudioOutputDriver_codecpro` qui permet de contrôler les sorties audio sur un codec pro, utilisé par le driver `AudioOutput`
+### Ajouts / Modifications
+* Nouveau type de device, `AudioOutput`, qui permet de contrôler les sorties audio
+* Nouveau type de driver, `AudioOutputDriver_codecpro` qui permet de contrôler les sorties audio sur un codec pro, utilisé par le driver `AudioOutput`
 * MCS rapporte maintenant sa version dans Webex Control Hub, en ajoutant un faux périphérique nommé "MCS", avec une valeur avec la nommenclature "mcs-x.x.x"
-* Ajout de structure à zapi pour supporter la télémétrie
-  
+* Structure `zapi.telemetry` pour supporter la télémétrie
+* Module `mod_telemetry` en example pour un module de télémétrie complexe
+* Propriété `supportsSystemStatus` <true/false> et `systemStatusRequestInterval` pour les devices de type DISPLAY 
+* Propriété `supportsFilterStatus` <true/false> et `filterStatusRequestInterval` pour les devices de type DISPLAY
+* Modification majeure de `Display`, `DisplayDriver_serial_sonybpj`, `DisplayDriver_serial_epson`, `DisplayDriver_serial_panasonic` pour pemettre la télémétrie, la communication avec le display en mode asynchrone
+
 ### Bugfix
 * Arrangé le contrôle de gain et de mute sur les entrées `AudioInput` de type `HDMI` ou `Ethernet`
 * Arrangé quelques nesting qui empêchent le transpiler de restaurer un backup (core, mod_cafeine)

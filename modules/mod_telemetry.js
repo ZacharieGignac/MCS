@@ -8,7 +8,7 @@ export var Manifest = {
   fileName: 'mod_telemetry',
   id: 'telemetry',
   friendlyName: 'Telemetry Module',
-  version: '1.0.0',
+  version: '1.0.0-beta',
   description: 'Collects and sends telemetry data to a broker.'
 };
 
@@ -25,7 +25,7 @@ class TelemetryBroker {
     zapi.telemetry.broker = this; // Populate the imported zapi object
   }
   sendTelemetry(data) {
-    debug(1, `Sending telemetry: ${JSON.stringify(data)} to http://${this.settings.broker}/api/v1/${this.settings.token}/telemetry`);
+    debug(1, `mod_telemetry: Sending telemetry: ${JSON.stringify(data)} to http://${this.settings.broker}/api/v1/${this.settings.token}/telemetry`);
     zapi.communication.httpClient.Post({ // Use zapi.communication.httpClient.Post
       AllowInsecureHTTPS: true,
       Header: [`Content-Type: application/json`],
@@ -33,7 +33,7 @@ class TelemetryBroker {
       Url: `http://${this.settings.broker}/api/v1/${this.settings.token}/telemetry`,
       Body: JSON.stringify(data) // Send data as JSON string in Body
     }).catch(e => {
-      console.error("Error sending telemetry:", e);
+      debug(3, "mod_telemetry: Error sending telemetry: " + e); // Updated to debug(3) for error and correct debug usage
     });
   }
 }
@@ -42,6 +42,9 @@ class TelemetryManager {
   constructor(telemetrySettings, telemetryBroker) {
     this.settings = telemetrySettings;
     this.telemetryBroker = telemetryBroker;
+    this.localComputersInputs = systemconfig.mod_telemetry_config?.localComputers || []; // Get localComputers inputs from config
+    this.personnalComputersInputs = systemconfig.mod_telemetry_config?.personnalComputers || []; // Get personnalComputers inputs from config
+
 
     // Ensure zapi.telemetry exists before proceeding
     if (!zapi.telemetry) {
@@ -63,12 +66,17 @@ class TelemetryManager {
     this.dailyReport.presentationRemote = false;
     this.dailyReport.callCount = 0; // Initialize call count for daily report
     this.dailyReport.hdmiPassthroughCount = 0; // Initialize HDMI Passthrough count for daily report
+    this.dailyReport.localComputerUsedCount = 0; // Initialize local computer count for daily report
+    this.dailyReport.personnalComputerUsedCount = 0; // Initialize personnal computer count for daily report
+    this.dailyReport.localComputerUsed = false;
+    this.dailyReport.personnalComputerUsed = false;
 
 
     this.previousPresentationStatus = { // Initialize previous presentation status
       type: presNoPresentation,
       presentationLocal: false,
-      presentationRemote: false
+      presentationRemote: false,
+      presentationSource: null // Add presentationSource to previous status
     };
     this.previousCallStatus = 'Idle'; // Initialize previous call status
     this.previousHdmiPassthroughStatus = 'Inactive'; // Initialize HDMI Passthrough status
@@ -108,12 +116,19 @@ class TelemetryManager {
     const presentationType = presentationStatus.type || presNoPresentation; // Default to NOPRESENTATION if type is missing
     let newPresentationLocal = false;
     let newPresentationRemote = false;
-    let presentationSource = null;
+    let presentationSource = presentationStatus.source || null; // CORRECTED LINE: use lowercase 'source'
+
+    let isLocalComputer = false;
+    let isPersonnalComputer = false;
+
+    if (presentationSource) {
+      isLocalComputer = this.localComputersInputs.includes(parseInt(presentationSource));
+      isPersonnalComputer = this.personnalComputersInputs.includes(parseInt(presentationSource));
+    }
 
 
     if (presentationType === presLocalPreview || presentationType === presLocalShare || presentationType === presRemoteLocalPreview) {
       newPresentationLocal = true;
-      presentationSource = presentationStatus.source || null; // Get source if available
       this.dailyReport.presentationLocal = true; // Set daily report flag for local presentation
     }
 
@@ -122,12 +137,24 @@ class TelemetryManager {
       this.dailyReport.presentationRemote = true; // Set daily report flag for remote presentation
     }
 
+    if (isLocalComputer) {
+      this.dailyReport.localComputerUsed = true;
+      this.dailyReport.localComputerUsedCount++;
+    }
+
+    if (isPersonnalComputer) {
+      this.dailyReport.personnalComputerUsed = true;
+      this.dailyReport.personnalComputerUsedCount++;
+    }
+
 
     const currentPresentationStatus = {
       type: presentationType,
       presentationLocal: newPresentationLocal,
       presentationRemote: newPresentationRemote,
-      source: presentationSource
+      source: presentationSource,
+      isLocalComputer: isLocalComputer,
+      isPersonnalComputer: isPersonnalComputer
     };
 
 
@@ -140,12 +167,13 @@ class TelemetryManager {
     return (
       currentStatus.type !== this.previousPresentationStatus.type ||
       currentStatus.presentationLocal !== this.previousPresentationStatus.presentationLocal ||
-      currentStatus.presentationRemote !== this.previousPresentationStatus.presentationRemote
+      currentStatus.presentationRemote !== this.previousPresentationStatus.presentationRemote ||
+      currentStatus.source !== this.previousPresentationStatus.source // Include source in change detection
     );
   }
 
   handlePresentationStatusChange(currentStatus) {
-    debug(1, "Presentation status changed via system status:", currentStatus);
+    debug(1, "mod_telemetry: Presentation status changed via system status: " + JSON.stringify(currentStatus));
 
     // Send telemetry IMMEDIATELY on status change
     let telemetryData = {};
@@ -155,7 +183,7 @@ class TelemetryManager {
     telemetryData.presentationLocal = currentStatus.presentationLocal;
     telemetryData.presentationRemote = currentStatus.presentationRemote;
     this.send(telemetryData);
-    debug(1, "Immediate Presentation Telemetry Sent:", telemetryData);
+    debug(1, "mod_telemetry: Immediate Presentation Telemetry Sent: " + JSON.stringify(telemetryData));
 
     // Update session report presentation flags if presentation becomes active during the session
     if (currentStatus.presentationLocal) {
@@ -164,6 +192,13 @@ class TelemetryManager {
     if (currentStatus.presentationRemote) {
       zapi.telemetry.sessionReport.sessionReport.sessionPresentationRemote = true;
     }
+    if (currentStatus.isLocalComputer) {
+      zapi.telemetry.sessionReport.sessionReport.sessionLocalComputerUsed = true;
+    }
+    if (currentStatus.isPersonnalComputer) {
+      zapi.telemetry.sessionReport.sessionReport.sessionPersonnalComputerUsed = true;
+    }
+
     this.previousPresentationStatus = currentStatus; // Update previous status
   }
 
@@ -182,11 +217,11 @@ class TelemetryManager {
 
 
     if (currentCallStatus !== this.previousCallStatus) {
-      debug(1, `Call status changed via system status: ${currentCallStatus}`);
+      debug(1, "mod_telemetry: Call status changed via system status: " + currentCallStatus);
 
       // Send immediate call status telemetry as boolean
       this.send({ callStatus: callActive });
-      debug(1, "Immediate Call Status Telemetry Sent:", { callStatus: callActive });
+      debug(1, "mod_telemetry: Immediate Call Status Telemetry Sent: " + JSON.stringify({ callStatus: callActive }));
 
 
       this.previousCallStatus = currentCallStatus; // Update previous call status
@@ -198,11 +233,11 @@ class TelemetryManager {
     const currentHdmiPassthroughStatus = hdmiPassthroughStatus.Mode || 'Inactive'; // Default to 'Inactive' if status is missing
 
     if (currentHdmiPassthroughStatus !== this.previousHdmiPassthroughStatus) {
-      debug(1, `HDMI Passthrough status changed via system status: ${currentHdmiPassthroughStatus}`);
+      debug(1, "mod_telemetry: HDMI Passthrough status changed via system status: " + currentHdmiPassthroughStatus);
 
       // Send immediate HDMI Passthrough status telemetry
       this.send({ hdmiPassthroughStatus: currentHdmiPassthroughStatus });
-      debug(1, "Immediate HDMI Passthrough Status Telemetry Sent:", { hdmiPassthroughStatus: currentHdmiPassthroughStatus });
+      debug(1, "mod_telemetry: Immediate HDMI Passthrough Status Telemetry Sent: " + JSON.stringify({ hdmiPassthroughStatus: currentHdmiPassthroughStatus }));
 
       // Update session report if HDMI Passthrough becomes active during the session
       if (currentHdmiPassthroughStatus === 'Active') {
@@ -218,7 +253,7 @@ class TelemetryManager {
   initSessionTracking() {
     zapi.telemetry.sessionReport = zapi.telemetry.sessionReport || {}; // Ensure sessionReport exists
     zapi.telemetry.sessionReport.sessionReport = this.initializeSessionReport();
-    debug(1, "Session tracking initialized.");
+    debug(1, "mod_telemetry: Session tracking initialized.");
 
     xapi.Status.Standby.on(standby => {
       if (standby.State == 'Off') {
@@ -243,37 +278,37 @@ class TelemetryManager {
       sessionPresentationLocal: false,
       sessionPresentationRemote: false,
       sessionCallUsed: false, // Add sessionCallUsed to session report
-      sessionHdmiPassthroughUsed: false // Add sessionHdmiPassthroughUsed to session report
+      sessionHdmiPassthroughUsed: false, // Add sessionHdmiPassthroughUsed to session report
+      sessionLocalComputerUsed: false, // Add sessionLocalComputerUsed to session report
+      sessionPersonnalComputerUsed: false // Add sessionPersonnalComputerUsed to session report
     };
   }
 
   handleStandbyOff() {
     zapi.telemetry.send({ inUse: true });
     this.sessionCounter++;
-    debug(1, "New session started (Standby Off). Session count:", this.sessionCounter);
+    debug(1, "mod_telemetry: New session started (Standby Off). Session count: " + this.sessionCounter);
     xapi.Status.Audio.Volume.get().then(initialVolume => {
-      this.startNewSession(initialVolume);
+      zapi.telemetry.sessionReport.sessionReport.startTime = Date.now();
+      zapi.telemetry.sessionReport.sessionReport = {
+        ...this.initializeSessionReport(), // Keep most default values
+        startTime: zapi.telemetry.sessionReport.sessionReport.startTime, // Retain startTime
+        minVolume: initialVolume,
+        maxVolume: initialVolume,
+        lastVolume: initialVolume,
+        lastVolumeTimestamp: Date.now()
+      };
+      debug(1, "mod_telemetry: Session start time set to: " + zapi.telemetry.sessionReport.sessionReport.startTime);
+      debug(1, "mod_telemetry: Session tracking initialized with initial volume: " + initialVolume);
+    }).catch(error => {
+        debug(3, "mod_telemetry: ERROR getting initial volume: " + error); // Log any errors
     });
-  }
-
-  startNewSession(initialVolume) {
-    zapi.telemetry.sessionReport.sessionReport.startTime = Date.now();
-    debug(2, "Session start time set to:", zapi.telemetry.sessionReport.sessionReport.startTime); // DEBUG LOG
-    zapi.telemetry.sessionReport.sessionReport = {
-      ...this.initializeSessionReport(), // Keep most default values
-      startTime: zapi.telemetry.sessionReport.sessionReport.startTime, // Retain startTime
-      minVolume: initialVolume,
-      maxVolume: initialVolume,
-      lastVolume: initialVolume,
-      lastVolumeTimestamp: Date.now()
-    };
-    debug(1, "Session tracking initialized with initial volume:", initialVolume);
   }
 
 
   handleStandbyOn() {
     zapi.telemetry.send({ inUse: false });
-    debug(1, "Session ending (Standby On). Finalizing and sending session report.");
+    debug(1, "mod_telemetry: Session ending (Standby On). Finalizing and sending session report.");
     zapi.telemetry.sessionReport.sessionReport.endTime = Date.now();
     this.finalizeSessionReport();
     this.calculateSessionDuration();
@@ -296,10 +331,19 @@ class TelemetryManager {
     const flatSessionReport = this.flattenSessionReport();
     const nestedSessionReport = { sessionReport: zapi.telemetry.sessionReport.sessionReport }; // Create nested object
 
-    zapi.telemetry.send(flatSessionReport); // Send the flattened session report
-    debug(1, "Session report sent (flat).", flatSessionReport);
-    zapi.telemetry.send(nestedSessionReport); // Send the nested session report
-    debug(1, "Session report sent (nested).", nestedSessionReport);
+    // Combine flat and nested reports into a single object
+    const combinedSessionReport = {
+      ...flatSessionReport, // Spread the flattened properties
+      ...nestedSessionReport // Spread the nested object (sessionReport will be a property)
+    };
+
+    zapi.telemetry.send(combinedSessionReport); // Send the combined session report
+    debug(1, "mod_telemetry: Session report sent (combined). " + JSON.stringify(combinedSessionReport));
+    // Remove the separate sends for flat and nested reports
+    // zapi.telemetry.send(flatSessionReport);
+    // debug(1, "mod_telemetry: Session report sent (flat).", flatSessionReport);
+    // zapi.telemetry.send(nestedSessionReport);
+    // debug(1, "mod_telemetry: Session report sent (nested).", nestedSessionReport);
   }
 
 
@@ -336,17 +380,17 @@ class TelemetryManager {
   initVolumeTelemetry() {
     xapi.Status.Audio.Volume.get()
       .then(vol => {
+        debug(1, "mod_telemetry: Initial volume reading: " + vol);
         this.updateSessionVolumeMetrics(vol);
-        debug(1, `Initial volume reading: ${vol}`);
       })
       .catch(e => {
-        console.error("Error getting initial volume:", e);
+        debug(3, "mod_telemetry: Error getting initial volume: " + e); // Updated to debug(3) for error and correct debug usage
       });
 
     xapi.Status.Audio.Volume.on(vol => {
       zapi.telemetry.send({ volume: vol }); // Immediate volume telemetry
       this.updateSessionVolumeMetrics(vol);
-      debug(1, `Volume changed to: ${vol}`);
+      debug(1, "mod_telemetry: Volume changed to: " + vol);
     });
   }
 
@@ -362,7 +406,7 @@ class TelemetryManager {
   }
 
   initRoomAnalyticsTelemetry() {
-    debug(1, "Room Analytics Telemetry Initializing...");
+    debug(1, "mod_telemetry: Room Analytics Telemetry Initializing...");
     setInterval(() => {
       this.fetchAndSendRoomAnalytics();
     }, 5 * 60 * 1000);
@@ -373,13 +417,13 @@ class TelemetryManager {
     xapi.Status.Peripherals.get()
       .then(peripherals => {
         if (!peripherals || !peripherals.ConnectedDevice) {
-          debug(1, "No peripherals data found.");
+          debug(1, "mod_telemetry: No peripherals data found.");
           return; // Early return if no peripherals or ConnectedDevice
         }
         this.processPeripheralsData(peripherals.ConnectedDevice);
       })
       .catch(e => {
-        console.error("Error fetching room analytics data:", e);
+        debug(3, "mod_telemetry: Error fetching room analytics data: " + e); // Updated to debug(3) for error and correct debug usage
       });
   }
 
@@ -391,7 +435,7 @@ class TelemetryManager {
     for (const p of connectedDevices) {
       if (p.RoomAnalytics) {
         foundAnalytics = true;
-        debug(1, "Room Analytics data found on peripheral:", p.Name || p.ProductId);
+        debug(1, "mod_telemetry: Room Analytics data found on peripheral: " + (p.Name || p.ProductId));
         telemetryData.airQualityIndex = p.RoomAnalytics.AirQuality?.Index;
         telemetryData.ambientTemperature = p.RoomAnalytics.AmbientTemperature;
         telemetryData.relativeHumidity = p.RoomAnalytics.RelativeHumidity;
@@ -401,9 +445,9 @@ class TelemetryManager {
 
     if (foundAnalytics) {
       this.send(telemetryData); // Immediate room analytics telemetry
-      debug(1, "Room Analytics Telemetry Sent (Flat):", telemetryData);
+      debug(1, "mod_telemetry: Room Analytics Telemetry Sent (Flat): " + JSON.stringify(telemetryData));
     } else {
-      debug(1, "No Room Analytics data found on connected peripherals.");
+      debug(1, "mod_telemetry: No Room Analytics data found on connected peripherals.");
     }
   }
 
@@ -429,15 +473,15 @@ class TelemetryManager {
 
     const timeDiff = scheduledTime.getTime() - now.getTime();
 
-    debug(1, `Daily report scheduled for: ${scheduledTime.toLocaleTimeString()}, precisely at ${dailyReportTime}`);
+    debug(1, "mod_telemetry: Daily report scheduled for: " + scheduledTime.toLocaleTimeString() + ", precisely at " + dailyReportTime);
 
     const lastCallTimeDiff = timeDiff - (5 * 60 * 1000);
     if (lastCallTimeDiff > 0) {
       setTimeout(() => {
-        debug(1, "LAST CALL: Daily telemetry report will be sent in 5 minutes.");
+        debug(1, "mod_telemetry: LAST CALL: Daily telemetry report will be sent in 5 minutes.");
       }, lastCallTimeDiff);
     } else {
-      debug(1, "LAST CALL time is in the past or very near, 'LAST CALL' message might not be shown.");
+      debug(1, "mod_telemetry: LAST CALL time is in the past or very near, 'LAST CALL' message might not be shown.");
     }
 
     setTimeout(() => {
@@ -447,7 +491,7 @@ class TelemetryManager {
   }
 
   sendDailyReport() {
-    debug(1, "Sending daily telemetry report...");
+    debug(1, "mod_telemetry: Sending daily telemetry report...");
     const dailyData = this.dailyReport;
     dailyData.sessionCount = this.sessionCounter;
 
@@ -459,7 +503,7 @@ class TelemetryManager {
       this.sendTelemetryReports(flatDailyData, nestedDailyData);
       this.resetDailyReportData();
     } else {
-      debug(1, "No daily telemetry data to send.");
+      debug(1, "mod_telemetry: No daily telemetry data to send.");
     }
   }
 
@@ -476,10 +520,10 @@ class TelemetryManager {
   sendTelemetryReports(flatDailyData, nestedDailyData) {
     // Send FLAT daily report data
     this.send(flatDailyData);
-    debug(1, "Daily telemetry report sent (flat, prefixed).", flatDailyData); // Debug log updated to indicate prefix
+    debug(1, "mod_telemetry: Daily telemetry report sent (flat, prefixed). " + JSON.stringify(flatDailyData)); // Debug log updated to indicate prefix
     // Send NESTED daily report data (inside dailyReport object)
     this.send(nestedDailyData);
-    debug(1, "Daily telemetry report sent (nested).", nestedDailyData);
+    debug(1, "mod_telemetry: Daily telemetry report sent (nested). " + JSON.stringify(nestedDailyData));
   }
 
   resetDailyReportData() {
@@ -487,8 +531,12 @@ class TelemetryManager {
     this.dailyReport.presentationRemote = false;
     this.dailyReport.callCount = 0; // Reset call count for next day
     this.dailyReport.hdmiPassthroughCount = 0; // Reset HDMI Passthrough count for next day
+    this.dailyReport.localComputerUsedCount = 0; // Reset local computer count for next day
+    this.dailyReport.personnalComputerUsedCount = 0; // Reset personnal computer count for next day
+    this.dailyReport.localComputerUsed = false;
+    this.dailyReport.personnalComputerUsed = false;
     this.sessionCounter = 0;
-    debug(1, "Daily telemetry report sent successfully (flat and nested) and data cleared. Session count reset, presentation flags, call count and HDMI Passthrough count reset.");
+    debug(1, "mod_telemetry: Daily telemetry report sent successfully (flat and nested) and data cleared. Session count reset, presentation flags, call count and HDMI Passthrough count reset, local and personnal computer flags and counts reset.");
   }
 }
 
@@ -501,16 +549,16 @@ export class Module {
       token: systemconfig.mod_telemetry_config?.token // Get token from config, no default, using camelCase
     };
     // removed moduleLoaded from daily report
-    debug(1, 'Telemetry Module constructor');
+    debug(1, 'mod_telemetry: Telemetry Module constructor');
   }
 
   start() {
     const telemetryBroker = new TelemetryBroker(this.telemetrySettings); // Create Broker
     new TelemetryManager(this.telemetrySettings, telemetryBroker); // Create Manager, populating zapi.telemetry
-    debug(3, 'Telemetry Module started');
+    debug(1, 'mod_telemetry: Telemetry Module started');
   }
 
   stop() {
-    debug(1, 'Telemetry Module stopped');
+    debug(1, 'mod_telemetry: Telemetry Module stopped');
   }
 }

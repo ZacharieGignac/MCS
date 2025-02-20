@@ -89,6 +89,13 @@ class TelemetryManager {
     this.initVolumeTelemetry();
     this.initStatusTelemetry(); // Initialize status telemetry to handle presentation, call and hdmiPassthrough
     this.initRoomAnalyticsTelemetry();
+
+    // Send telemetryClientVersion when module starts
+    const moduleStartTelemetryData = {
+      telemetryClientVersion: Manifest.version
+    };
+    this.send(moduleStartTelemetryData);
+    debug(1, "mod_telemetry: Sending telemetryClientVersion on module start: " + JSON.stringify(moduleStartTelemetryData));
   }
 
   initStatusTelemetry() {

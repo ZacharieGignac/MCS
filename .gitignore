@@ -1,22 +1,32 @@
-# macOS system files
-
+# macOS files
 .DS_Store
+.AppleDouble
+.LSOverride
 ._*
-
-# Thumbnail cache files
-Thumbs.db
-Thumbs.db:*
-._.DS_Store
-
-# Folder attributes - these can sometimes be created by macOS
-.fseventsd
-.Spotlight-V100
-.Trashes
-
-# Icon must be different for each folder - often problematic in repos
 Icon?
 
-# Temporary files created by macOS apps, like TextEdit, etc.
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+System Volume Information/
+
+# Node.js - if applicable to your project
+node_modules/
+
+# VS Code - if you use VS Code and want to ignore workspace settings
+.vscode/
+
+# IntelliJ IDEA - if you use IntelliJ IDEA
+.idea/
+
+# Other common system files or directories (optional, adjust as needed)
+*.log
+*.tmp
+*.bak
+*~
 *.swp
-*.plist
-._*
+*.swo
+*.diff
+*.patch

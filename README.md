@@ -40,6 +40,7 @@ Version actuelle: 1.0.1
 * Modification majeure de `Display`, `DisplayDriver_serial_sonybpj`, `DisplayDriver_serial_epson`, `DisplayDriver_serial_panasonic` pour pemettre la télémétrie (si disponible), la communication avec le display en mode asynchrone
 * `DisplayDriver_serial_sonybpj` supporte maintenant la communication avec le projecteur pour obtenir les informations suivantes: Statut du projecteur, statut du filtre, nombre d'heures de la lampe
 * `DisplayDriver_serial_epson` supporte maintenant la communication avec le projecteur pour obtenir les informations suivantes: Statut du projecteur, nombre d'heures de la lampe
+* `DisplayDriver_serial_panasonic` supporte maintenant la communication avec le projecteur pour obtenir les informations suivantes: Statut du projecteur (incluant filtre), nombre d'heure de la lampe
 
 ### Bugfix
 * Arrangé le contrôle de gain et de mute sur les entrées `AudioInput` de type `HDMI` ou `Ethernet`

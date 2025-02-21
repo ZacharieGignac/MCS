@@ -258,28 +258,35 @@ export class Display {
 
   startRequestUsageHours(self) {
     self._usageHoursInterval = setInterval(() => {
-      debug(1, `Requesting usage hours for display "${this.config.id}"`);
+      debug(1, `${this.config.id}: Requesting usage hours...`);
       self.driver.requestUsageHours().then(usage => {
-        debug(1, `Received usage hours report for display "${this.config.id}": ${usage}`);
+        debug(1, `${this.config.id}: Received usage hours: ${usage}`);
         self._usageHours = usage;
         if (zapi.telemetry.available == true) {
-          const dynamicKey = `lampUsage_${this.config.id}`;
+          const dynamicUsage = `lampUsage_${this.config.id}`;
           const resultObject = {
-            [dynamicKey]: usage
+            [dynamicUsage]: usage,
           };
           zapi.telemetry.send(resultObject);
         }
       }).catch(err => {
-        debug(3, `Error getting usage hours report for display "${this.config.id}": ${err}`);
+        debug(3, `${this.config.id}: Error getting usage hours report: ${err}`);
+        if (zapi.telemetry.available == true) {
+          const dynamicError = `systemStatus_${this.config.id}`;
+          const resultObject = {
+            [dynamicError]: err
+          };
+          zapi.telemetry.send(resultObject);
+        }
       });
     }, self.config.usageHoursRequestInterval);
   }
 
   startRequestFilterStatus(self) {
     self._filterStatusInterval = setInterval(() => {
-      debug(1, `Requesting filter status for display "${this.config.id}"`);
+      debug(1, `${this.config.id}: Requesting filter status...`);
       self.driver.requestFilterStatus().then(status => {
-        debug(1, `Received filter status report for display "${this.config.id}": ${status}`);
+        debug(1, `${this.config.id}: Received filter status report: ${status}`);
         if (zapi.telemetry.available == true) {
           const dynamicKey = `filterStatus_${this.config.id}`;
           const resultObject = {
@@ -288,16 +295,23 @@ export class Display {
           zapi.telemetry.send(resultObject);
         }
       }).catch(err => {
-        debug(3, `Error getting filter status report for display ${this.config.id}`);
+        debug(3, `${this.config.id}: Error getting filter status report: ${err}`);
+        if (zapi.telemetry.available == true) {
+          const dynamicError = `systemStatus_${this.config.id}`;
+          const resultObject = {
+            [dynamicError]: err
+          };
+          zapi.telemetry.send(resultObject);
+        }
       });
     }, self.config.filterStatusRequestInterval);
   }
 
   startRequestSystemStatus(self) {
     self._systemStatusInterval = setInterval(() => {
-      debug(1, `Requesting system status for display "${this.config.id}"`);
+      debug(1, `${this.config.id}: Requesting system status...`);
       self.driver.requestSystemStatus().then(status => {
-        debug(1, `Received system status report for display "${this.config.id}": ${status}`);
+        debug(1, `${this.config.id}: Received system status report: ${status}`);
         if (zapi.telemetry.available == true) {
           const dynamicKey = `systemStatus_${this.config.id}`;
           const resultObject = {
@@ -306,7 +320,14 @@ export class Display {
           zapi.telemetry.send(resultObject);
         }
       }).catch(err => {
-        debug(3, `Error getting filter status report for display ${this.config.id}`);
+        debug(3, `${this.config.id}: Error getting filter status report: ${err}`);
+        if (zapi.telemetry.available == true) {
+          const dynamicError = `systemStatus_${this.config.id}`;
+          const resultObject = {
+            [dynamicError]: err
+          };
+          zapi.telemetry.send(resultObject);
+        }
       });
     }, self.config.systemStatusRequestInterval);
   }

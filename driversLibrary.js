@@ -383,7 +383,7 @@ export class DisplayDriver_serial_panasonic {
     xapi.Config.SerialPort.Outbound.Mode.set('On');
     xapi.Config.SerialPort.Outbound.Port[this.config.port].BaudRate.set(9600);
     xapi.Config.SerialPort.Outbound.Port[this.config.port].Description.set(this.config.id);
-    xapi.Config.SerialPort.Outbound.Port[this.config.port].Parity.set('Even');
+    xapi.Config.SerialPort.Outbound.Port[this.config.port].Parity.set('None');
     this.serialCommands = {
       TERMINATOR: '\\x03',
       POWERON: '\\x02PON\\x03',
@@ -391,8 +391,7 @@ export class DisplayDriver_serial_panasonic {
       BLANK: '\\x02OSH:1\\x03',
       UNBLANK: '\\x02OSH:0\\x03',
       USAGE: '\\x02Q$L\\x03', // Updated to Q$L:1 for Lamp Hours (more common command)
-      FILTER_STATUS: '\\x02CVF\\x03', // Keeping CVF for Filter Status for now (from PT-D6000U doc)
-      SYSTEM_STATUS: '\\x02CTR\\x03' // Keeping CTR for System Status for now (from PT-D6000U doc)
+      SYSTEM_STATUS: '\\x02\\x00\\xfe\\x03' // Keeping CTR for System Status for now (from PT-D6000U doc)
     };
     let self = this;
 
@@ -410,6 +409,66 @@ export class DisplayDriver_serial_panasonic {
         self.serialSend(self.serialCommands.POWEROFF);
       }
     }, self.repeat);
+  }
+
+  analyserReponseProjecteur(reponse) {
+    // Étape 1 : Convertir la chaîne hexadécimale en tableau de bytes
+    // Split sur "\\x" pour extraire les parties hexadécimales (ex. "02", "00", "FE", etc.)
+    const hexParts = reponse.split('\\x').filter(part => part); // Filtrer les parties vides
+    const bytes = hexParts.map(part => parseInt(part, 16)); // Convertir en nombres
+
+    // Étape 2 : Vérifier la validité de la réponse
+    let erreursValidation = []; // Renamed to erreursValidation for clarity
+    if (bytes[0] !== 0x02) {
+      erreursValidation.push("TIMEOUT");
+    }
+    else if (bytes[1] !== 0x00 || bytes[2] !== 0xFE) {
+      erreursValidation.push("TIMEOUT");
+    }
+
+    // If there are validation errors, return them immediately
+    if (erreursValidation.length > 0) {
+      return erreursValidation; // Return the array of validation errors
+    }
+
+    // Étape 3 : Extraire les données d'état (bytes après 0x00 0xFE)
+    const donneesEtat = bytes.slice(3);
+
+    // Étape 4 : Définir les descriptions des composants
+    // Cette liste est hypothétique et doit être ajustée selon la documentation réelle
+    const descriptionsComposants = [
+      "Lampe",
+      "Ventilateur",
+      "Température",
+      "Filtre",
+      "Alimentation",
+      "Système",
+      "Réseau",
+      "Capteur",
+      "Mémoire",
+      "Processeur",
+      "Logiciel",
+      "Matériel",
+      "Communication",
+      "Configuration",
+      "Mise à jour",
+      "Inconnu"
+    ];
+
+    // Étape 5 : Identifier les composants en erreur
+    const composantsEnErreur = [];
+    donneesEtat.forEach((byte, index) => {
+      if (byte !== 0x00) { // Check for non-zero byte (indicating error)
+        const composant = descriptionsComposants[index] || `Composant inconnu ${index + 1}`;
+        composantsEnErreur.push(composant);
+      }
+    });
+
+    if (composantsEnErreur.length > 0) {
+      return composantsEnErreur.join(', '); // Return comma-separated string of component errors
+    } else {
+      return null; // Return null if no component errors (and no validation errors)
+    }
   }
 
   setPower(power) {
@@ -443,7 +502,16 @@ export class DisplayDriver_serial_panasonic {
 
   requestUsageHours() {
     return new Promise((resolve, reject) => {
-      reject(`DisplayDriver_serial_panasonic: REQUEST_LAMP_USAGE_SUPPORTED. Please remove lamp usage request from device configuration!`);
+      this.serialSend(this.serialCommands.USAGE)
+        .then(response => {
+          let val = response.Response;
+          val = val.substring(4);
+          resolve(val);
+        })
+        .catch(err => {
+          reject('TIMEOUT');
+          debug(2, `DRIVER DisplayDriver_serial_panasonic (${this.config.id}): Request System Status timed out: ${err}`); // Updated debug message
+        });
     });
   }
 
@@ -455,7 +523,27 @@ export class DisplayDriver_serial_panasonic {
 
   requestSystemStatus() {
     return new Promise((resolve, reject) => {
-      reject(`DisplayDriver_serial_panasonic: REQUEST_SYSTEM_STATUS_NOT_SUPPORTED. Please remove system status request from device configuration!`);
+      this.serialSend(this.serialCommands.SYSTEM_STATUS) // Use SYSTEM_STATUS command
+        .then(response => {
+          var val = response.Response;
+          
+          const resultatAnalyse = this.analyserReponseProjecteur(val); // Get the result from the analyser
+
+          if (Array.isArray(resultatAnalyse)) { // Check if the result is an array (validation errors)
+            const stringErreursValidation = resultatAnalyse.join(", "); // Join validation errors into a single string
+            reject(resultatAnalyse);
+          } else if (typeof resultatAnalyse === 'string' && resultatAnalyse.length > 0) { // Check if result is a non-empty string (component errors)
+            reject(resultatAnalyse);
+          } else if (resultatAnalyse === null) { // Check if the result is null (no errors)
+            resolve('normal');
+          } else {
+            resolve('normal');
+          }
+        })
+        .catch(err => {
+          reject('TIMEOUT');
+          debug(2, `DRIVER DisplayDriver_serial_panasonic (${this.config.id}): Request System Status timed out: ${err}`); // Updated debug message
+        });
     });
   }
 
@@ -484,8 +572,8 @@ export class DisplayDriver_serial_panasonic {
 
     return xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
-      ResponseTerminator: '\xE0', // **MODIFIED: Using \xE0 as ResponseTerminator**
-      ResponseTimeout: 1000,
+      ResponseTerminator: '\x03', // **MODIFIED: Using \xE0 as ResponseTerminator**
+      ResponseTimeout: 5000,
       Text: command
     })
       .then(response => {

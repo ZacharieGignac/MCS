@@ -703,7 +703,7 @@ export class DisplayDriver_serial_epson {
             reject('TIMEOUT');
           }
           let status = response.Response;
-          if (status == 'ERR\\x0D:') {
+          if (status == 'ERR\\x0D:' || status == 'ERR=00x0D:') {
             status = 'normal';
           }
           debug(1, `DRIVER DisplayDriver_serial_epson (${this.config.id}): System Status Response: ${status}`); // Updated debug message

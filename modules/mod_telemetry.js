@@ -324,9 +324,28 @@ class TelemetryManager {
   }
 
   calculateSessionDuration() {
-    let durationMs = zapi.telemetry.sessionReport.sessionReport.endTime - zapi.telemetry.sessionReport.sessionReport.startTime;
-    let durationMinutes = Math.round(durationMs / 60000);
-    zapi.telemetry.sessionReport.sessionReport.duration = Math.max(1, durationMinutes);
+    const report = zapi.telemetry.sessionReport.sessionReport;
+    if (!report.startTime || !report.endTime) {
+      debug(3, "mod_telemetry: Invalid session times - start: " + report.startTime + ", end: " + report.endTime);
+      report.duration = 1;  // Default to 1 minute if times are invalid
+      return;
+    }
+    
+    let durationMs = report.endTime - report.startTime;
+    if (durationMs < 0) {
+      debug(3, "mod_telemetry: Negative duration detected, using 1 minute");
+      report.duration = 1;
+      return;
+    }
+    
+    // Convert to minutes and round up to nearest minute
+    // This ensures even short sessions (1-59 seconds) are counted as 1 minute
+    let durationMinutes = Math.ceil(durationMs / 60000);
+    
+    // Cap at 24 hours (1440 minutes) to prevent unreasonable values
+    report.duration = Math.min(1440, Math.max(1, durationMinutes));
+    
+    debug(1, `mod_telemetry: Session duration calculated: ${report.duration} minutes (${durationMs}ms)`);
   }
 
   formatSessionTime() {

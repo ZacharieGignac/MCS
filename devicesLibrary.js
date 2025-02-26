@@ -320,7 +320,7 @@ export class Display {
           zapi.telemetry.send(resultObject);
         }
       }).catch(err => {
-        debug(3, `${this.config.id}: Error getting filter status report: ${err}`);
+        debug(3, `${this.config.id}: Error getting system status report: ${err}`);
         if (zapi.telemetry.available == true) {
           const dynamicError = `systemStatus_${this.config.id}`;
           const resultObject = {

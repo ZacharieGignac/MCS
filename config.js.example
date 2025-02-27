@@ -388,7 +388,7 @@ export var config = {
     //Default general groups
     {
       id: 'system.presentation.main',
-      devices: ['display.projector', 'campreset.presenter', 'camera.presenter', 'aog.room']
+      devices: ['display.projector', 'campreset.presenter', 'camera.presenter', 'aog.room', 'screen.main']
     },
 
     {

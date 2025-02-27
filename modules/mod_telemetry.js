@@ -326,16 +326,16 @@ class TelemetryManager {
   calculateSessionDuration() {
     const report = zapi.telemetry.sessionReport.sessionReport;
     if (!report.startTime || !report.endTime) {
-      debug(3, "mod_telemetry: Invalid session times - start: " + report.startTime + ", end: " + report.endTime);
-      report.duration = 1;  // Default to 1 minute if times are invalid
-      return;
+        debug(3, "mod_telemetry: Invalid session times - start: " + report.startTime + ", end: " + report.endTime);
+        report.duration = -1;  // Set to -1 for invalid times
+        return;
     }
     
     let durationMs = report.endTime - report.startTime;
     if (durationMs < 0) {
-      debug(3, "mod_telemetry: Negative duration detected, using 1 minute");
-      report.duration = 1;
-      return;
+        debug(3, "mod_telemetry: Negative duration detected");
+        report.duration = -1;  // Set to -1 for negative duration
+        return;
     }
     
     // Convert to minutes and round up to nearest minute

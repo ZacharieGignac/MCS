@@ -615,7 +615,7 @@ export class DisplayDriver_serial_epson {
       UNBLANK: 'MUTE OFF\\r\\n',
       USAGE: 'LAMP?\\r\\n',
       FILTER_STATUS: 'FILTER?\\r\\n',
-      SYSTEM_STATUS: 'ERR?\\r\\n'        // Renamed ERROR_STATUS to SYSTEM_STATUS
+      SYSTEM_STATUS: 'PWR?\\r\\n'        // Renamed ERROR_STATUS to SYSTEM_STATUS
     };
     let self = this;
 
@@ -703,8 +703,12 @@ export class DisplayDriver_serial_epson {
             reject('TIMEOUT');
           }
           let status = response.Response;
-          if (status == 'ERR\\x0D:' || status == 'ERR=00x0D:' || status == 'ERR=00\x0D:') {
+          status = status.split('=')[1].substring(0,2);
+          if (status != '05') {
             status = 'normal';
+          }
+          else {
+            status = 'error: ' + status;
           }
           debug(1, `DRIVER DisplayDriver_serial_epson (${this.config.id}): System Status Response: ${status}`); // Updated debug message
           resolve(status); // Resolve with the system status string

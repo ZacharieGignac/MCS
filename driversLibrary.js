@@ -526,7 +526,7 @@ export class DisplayDriver_serial_panasonic {
       this.serialSend(this.serialCommands.SYSTEM_STATUS) // Use SYSTEM_STATUS command
         .then(response => {
           var val = response.Response;
-          
+
           const resultatAnalyse = this.analyserReponseProjecteur(val); // Get the result from the analyser
 
           if (Array.isArray(resultatAnalyse)) { // Check if the result is an array (validation errors)
@@ -703,7 +703,7 @@ export class DisplayDriver_serial_epson {
             reject('TIMEOUT');
           }
           let status = response.Response;
-          status = status.split('=')[1].substring(0,2);
+          status = status.split('=')[1].substring(0, 2);
           if (status != '05') {
             status = 'normal';
           }
@@ -861,23 +861,43 @@ export class ScreenDriver_gpio {
 
   }
 
-  setPosition(position) {
+  async sleep(time) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve();
+      }, time);
+    });
+  }
+
+  async setPosition(position) {
     debug(1, `DRIVER ScreenDriver_gpio (${this.config.id}): setPosition: ${position}`);
     var config = {};
     let args = {};
     if (this.gpiotype == 'single') {
       var voltage = position == 'up' ? 'High' : 'Low';
       args['Pin' + this.pin] = voltage;
+      xapi.Command.GPIO.ManualState.Set(args);
     }
     else if (this.gpiotype == 'pair') {
-      let voltage1 = position == 'up' ? 'High' : 'Low';
-      let voltage2 = position == 'up' ? 'Low' : 'High';
-      args['Pin' + this.pin1] = voltage1;
-      args['Pin' + this.pin2] = voltage2;
+      if (position == 'up') {
+        let args = {};
+        args['Pin' + this.pin1] = 'High';
+        xapi.Command.GPIO.ManualState.Set(args);
+        await this.sleep(500);
+
+        args['Pin' + this.pin1] = 'Low';
+        xapi.Command.GPIO.ManualState.Set(args);
+      }
+      else {
+        let args = {};
+        args['Pin' + this.pin2] = 'High';
+        xapi.Command.GPIO.ManualState.Set(args);
+        await this.sleep(500);
+
+        args['Pin' + this.pin2] = 'Low';
+        xapi.Command.GPIO.ManualState.Set(args);
+      }
     }
-    xapi.Command.GPIO.ManualState.Set(args);
-
-
   }
 
   custom() {

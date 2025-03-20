@@ -856,6 +856,10 @@ export class ScreenDriver_gpio {
       this.gpiotype = 'pair';
       this.pin1 = this.config.pin1;
       this.pin2 = this.config.pin2;
+      let args = {};
+      args['Pin' + this.pin1] = 'High';
+      args['Pin' + this.pin2] = 'High';
+      xapi.Command.GPIO.ManualState.Set(args);
     }
     this.setPosition(this.config.defaultPosition);
 
@@ -881,20 +885,28 @@ export class ScreenDriver_gpio {
     else if (this.gpiotype == 'pair') {
       if (position == 'up') {
         let args = {};
-        args['Pin' + this.pin1] = 'High';
+        args['Pin' + this.pin2] = 'High';
         xapi.Command.GPIO.ManualState.Set(args);
         await this.sleep(500);
 
         args['Pin' + this.pin1] = 'Low';
         xapi.Command.GPIO.ManualState.Set(args);
+        await this.sleep(500);
+
+        args['Pin' + this.pin1] = 'High';
+        xapi.Command.GPIO.ManualState.Set(args);
       }
       else {
         let args = {};
-        args['Pin' + this.pin2] = 'High';
+        args['Pin' + this.pin1] = 'High';
         xapi.Command.GPIO.ManualState.Set(args);
         await this.sleep(500);
 
         args['Pin' + this.pin2] = 'Low';
+        xapi.Command.GPIO.ManualState.Set(args);
+        await this.sleep(500);
+
+        args['Pin' + this.pin2] = 'High';
         xapi.Command.GPIO.ManualState.Set(args);
       }
     }

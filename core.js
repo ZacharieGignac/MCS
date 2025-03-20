@@ -14,7 +14,7 @@ import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 
-const COREVERSION = '1.1.0-beta2';
+const COREVERSION = '1.1.0-beta5';
 const ZAPIVERSION = 1;
 
 function systemKill() {
@@ -1231,7 +1231,6 @@ async function preInit() {
   await sleep(INITSTEPDELAY);
 
   debug(2, `PreInit started...`);
-
 
 
   clearInterval(coldbootWarningInterval);

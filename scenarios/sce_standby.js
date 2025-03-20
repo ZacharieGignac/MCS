@@ -21,7 +21,7 @@ export var Manifest = {
   fileName: 'sce_standby',
   id: 'standby',
   friendlyName: 'En veille',
-  version: '1.0.0-beta',
+  version: '1.0.0',
   description: 'Comportement standby',
   panels: {
     hide: [],

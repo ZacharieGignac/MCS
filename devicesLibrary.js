@@ -1030,10 +1030,8 @@ export class Screen {
 
   setPosition(position) {
     position = position.toLowerCase();
-    if (position != this._currentPosition) {
-      this._currentPosition = position;
-      this.driver.setPosition(position);
-    }
+    this._currentPosition = position;
+    this.driver.setPosition(position);
   }
 
   up() {

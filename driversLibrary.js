@@ -889,10 +889,12 @@ export class ScreenDriver_gpio {
         xapi.Command.GPIO.ManualState.Set(args);
         await this.sleep(500);
 
+        args = {};
         args['Pin' + this.pin1] = 'Low';
         xapi.Command.GPIO.ManualState.Set(args);
-        await this.sleep(500);
+        await this.sleep(2000);
 
+        args = {};
         args['Pin' + this.pin1] = 'High';
         xapi.Command.GPIO.ManualState.Set(args);
       }
@@ -902,10 +904,12 @@ export class ScreenDriver_gpio {
         xapi.Command.GPIO.ManualState.Set(args);
         await this.sleep(500);
 
+        args = {};
         args['Pin' + this.pin2] = 'Low';
         xapi.Command.GPIO.ManualState.Set(args);
-        await this.sleep(500);
+        await this.sleep(2000);
 
+        args = {};
         args['Pin' + this.pin2] = 'High';
         xapi.Command.GPIO.ManualState.Set(args);
       }

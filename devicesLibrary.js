@@ -1006,7 +1006,7 @@ export class Screen {
   constructor(config) {
     this.config = config;
     var self = this;
-    this._currentPosition = undefined;
+    this._currentPosition = 'unknown';
     this.driver = new this.config.driver(this, config);
 
     this.setDefaults();
@@ -1030,8 +1030,10 @@ export class Screen {
 
   setPosition(position) {
     position = position.toLowerCase();
-    this._currentPosition = position;
-    this.driver.setPosition(position);
+    if (this._currentPosition != position) {
+      this._currentPosition = position;
+      this.driver.setPosition(position);
+    }
   }
 
   up() {

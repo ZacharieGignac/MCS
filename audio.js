@@ -2,7 +2,6 @@ import xapi from 'xapi';
 import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
-import { config1, config2 } from './audioconfigs';
 
 const flatten = (arrs) => [].concat(...arrs);
 

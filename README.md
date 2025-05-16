@@ -2,31 +2,9 @@
 "MODULAR CONTROL SYSTEM". Original.
 
 # Statut
-Version actuelle: 1.0.1
+Version actuelle: 1.1.0
 
-## v1.0.1
-### Bugs connus
-* Pour une raison encore inconnue, le message de PresenterTrack peut être affiché même lorsque le système n'est pas en appel ou en mode hdmiPassthrough. Une tentative de correction est appliquée dans cette version.
-
-### Ajouts / Modification
-* Module `mod_cafeine`: Empêche les affichages d'être éteint si l'affichage supporte le "blanking". Accélère l'allumage des affichages, mais peut diminuer la durée de vie des équipements
-* Module `mod_autogrid`: Configure automatiquement la conférence en mode "grille" à la connexion
-* Nouveau widget mapping pour les devices de type `Light` pour afficher le pourcentage dans un label. Syntaxe: `my.light.id:LEVEL%`
-* Ajout du driver de toile motorisée `ScreenDriver_gc_itachflex` pour contrôle à partir d'un module "Global Caché iTach Flex" + "Relay Flex Cable"
-* Ajout du driver de scène d'éclairage `LightSceneDriver_gc_itachflex` pour contrôle à partir d'un module "Global Caché iTach Flex" + "Relay Flex Cable"
-* Ajout du feature "Webcam" dans le manifest d'un scénario pour les codecs EQ et BarPro (au lieu de hdmiPassthrough)
-
-### Bugfix
-* L'Activation de la scène d'éclairage lors du mode veille ne s'effectue pas
-* Modification de la méthode de détection des appels (Idle, Connected)
-* Retirer le message de PresenterTrack quand le système n'est pas en appel ou en mode hdmiPassthrough
-* Les requètes HTTP au travers `zapi.communication.httpClient` n'envoyaient pas de "body" dans la requête. Il faut utiliser la propriété `Body` dans les paramêtres de la requête.
-* Désactivation automatique du mode hdmipassthrough lors de la fermeture de session
-* Désactivation automatique du mode hdmipassthrough dans le scénario standby
-
-
-
-## v1.1.0 (En dévelopement)
+## v1.1.0
 ### Bugs connus
 
 ### Ajouts / Modifications
@@ -48,3 +26,24 @@ Version actuelle: 1.0.1
 * La mise en veille n'est plus bloquée lorsque la session est fermée par l'utilisateur et qu'une présentation ou un appel est actif
 * Gestion de l'alimentation CEC (`DisplayDriver_CEC`) qui s'assure d'allumer les affichages CEC lorsqu'ils sont requis
 * Ajouté .gitignore pour les fichiers de metadata de MacOS
+
+
+## v1.0.1
+### Bugs connus
+* Pour une raison encore inconnue, le message de PresenterTrack peut être affiché même lorsque le système n'est pas en appel ou en mode hdmiPassthrough. Une tentative de correction est appliquée dans cette version.
+
+### Ajouts / Modification
+* Module `mod_cafeine`: Empêche les affichages d'être éteint si l'affichage supporte le "blanking". Accélère l'allumage des affichages, mais peut diminuer la durée de vie des équipements
+* Module `mod_autogrid`: Configure automatiquement la conférence en mode "grille" à la connexion
+* Nouveau widget mapping pour les devices de type `Light` pour afficher le pourcentage dans un label. Syntaxe: `my.light.id:LEVEL%`
+* Ajout du driver de toile motorisée `ScreenDriver_gc_itachflex` pour contrôle à partir d'un module "Global Caché iTach Flex" + "Relay Flex Cable"
+* Ajout du driver de scène d'éclairage `LightSceneDriver_gc_itachflex` pour contrôle à partir d'un module "Global Caché iTach Flex" + "Relay Flex Cable"
+* Ajout du feature "Webcam" dans le manifest d'un scénario pour les codecs EQ et BarPro (au lieu de hdmiPassthrough)
+
+### Bugfix
+* L'Activation de la scène d'éclairage lors du mode veille ne s'effectue pas
+* Modification de la méthode de détection des appels (Idle, Connected)
+* Retirer le message de PresenterTrack quand le système n'est pas en appel ou en mode hdmiPassthrough
+* Les requètes HTTP au travers `zapi.communication.httpClient` n'envoyaient pas de "body" dans la requête. Il faut utiliser la propriété `Body` dans les paramêtres de la requête.
+* Désactivation automatique du mode hdmipassthrough lors de la fermeture de session
+* Désactivation automatique du mode hdmipassthrough dans le scénario standby

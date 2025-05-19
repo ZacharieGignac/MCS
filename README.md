@@ -1,11 +1,16 @@
 # MCS
 "MODULAR CONTROL SYSTEM". Original.
 
-# Statut
-Version actuelle: 1.1.0
-
-## v1.1.0
+## v1.1.1 (developement)
 ### Bugs connus
+
+### Ajouts / Modifications
+* Ajout du driver `AudioInput_aes67` pour les sources AES67 (Celine Mic Pro, Table Mic Pro, etc...)
+* Retrait du type `ethernet` dans la configuration d'un device de type `AudioInput_codecpro`  
+
+## v1.1.0 (version actuelle)
+### Bugs connus / limitation
+* Support manquant pour les microphone Ceiling Microphone Pro et Table Microphone Pro
 
 ### Ajouts / Modifications
 * Nouveau type de device, `AudioOutput`, qui permet de contrôler les sorties audio

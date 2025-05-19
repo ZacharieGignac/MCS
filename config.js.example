@@ -199,13 +199,22 @@ export var config = {
     },
     /* AUDIO INPUTS */
     {
+      id: 'audioinput.aes67',
+      type: DEVICETYPE.AUDIOINPUT,
+      name: 'Table Mic Pro',
+      device: devicesLibrary.AudioInput,
+      driver: driversLibrary.AudioOutputDriver_aes67,
+      connector: 2,
+      defaultMode: 'on'
+    },
+    {
       id: 'audioinput.presenter.ceiling',                   //Identification unique
       type: DEVICETYPE.AUDIOINPUT,                      //Type = 'AUDIOINPUT'
       name: 'Micro plafond présentateur',                           //Nom
       device: devicesLibrary.AudioInput,                //Classe à utiliser
       driver: driversLibrary.AudioInputDriver_codecpro, //Driver à utiliser par le device
       connector: 7,                                     //Connecteur d'entrée du codec
-      input: 'microphone',                              //Type d'entrée, microphone, hdmi, ethernet. Ethernet requiert la propriété "channel". (non testé)
+      input: 'microphone',                              //Type d'entrée, microphone, hdmi
       bias: 0,                                          //Biais de niveau audio, peut être positif ou négatif. Utilisé par l'analyze d'entrée audio
       gainLowLimit: 20,                                 //Limite basse du gain de l'entrée
       gainHighLimit: 70,                                //Limite supérieure du gain de l'entrée

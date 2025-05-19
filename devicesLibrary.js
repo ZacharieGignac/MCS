@@ -664,7 +664,12 @@ export class CameraPreset {
 export class AudioInput {
   constructor(config) {
     this.config = config;
-    this.driver = new this.config.driver(this, config);
+    try {
+      this.driver = new this.config.driver(this, config);
+    }
+    catch (e) {
+      debug(3,`AudioInput (constructor) ERROR: Could not load audio driver for device ${this.config.id}`);
+    }
     this.currentGain = undefined;
     this.currentMute = undefined;
     this.beforeBoostGain = undefined;
@@ -673,7 +678,6 @@ export class AudioInput {
     this.widgetLevelGroupName = this.config.id + ':LEVELGROUP';
     this.beforeBoostGain = undefined;
     this.storedGain = this.config.defaultGain;
-
     //Default UI Handling
     this.modeSwitch = zapi.ui.addWidgetMapping(this.widgetModeName);
     this.modeSwitch.on('changed', value => {
@@ -685,7 +689,6 @@ export class AudioInput {
       let mappedGain = mapValue(value, 0, 255, this.config.gainLowLimit, this.config.gainHighLimit);
       this.setGain(mappedGain);
     });
-
     if (this.config.lowGain || this.config.mediumGain || this.config.highGain) {
       this.levelGroup = zapi.ui.addWidgetMapping(this.widgetLevelGroupName);
       this.levelGroup.on('released', value => {
@@ -703,7 +706,6 @@ export class AudioInput {
         }
       });
     }
-
     this.setDefaults();
   }
 

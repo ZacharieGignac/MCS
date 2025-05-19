@@ -936,9 +936,6 @@ export class AudioInputDriver_codecpro {
       case "hdmi":
         xapi.Config.Audio.Input.HDMI[this.config.connector].Level.set(gain);
         break;
-      case "ethernet":
-        xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].Level.set(gain);
-        break;
     }
   }
 
@@ -960,9 +957,6 @@ export class AudioInputDriver_codecpro {
       case 'hdmi':
         xapi.Config.Audio.Input.HDMI[this.config.connector].mode.set('Off');
         break;
-      case 'ethernet':
-        xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].mode.set('Off');
-        break;
     }
   }
 
@@ -974,9 +968,6 @@ export class AudioInputDriver_codecpro {
         break;
       case 'hdmi':
         xapi.Config.Audio.Input.HDMI[this.config.connector].mode.set('On');
-        break;
-      case 'ethernet':
-        xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].mode.set('On');
         break;
     }
   }
@@ -1041,6 +1032,35 @@ export class AudioOutputDriver_codecpro {
   }
 }
 
+export class AudioOutputDriver_aes67 {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setLevel(level) {
+    //AES67 audio inputs don't support setLevel
+  }
+
+  setMode(mute) {
+    if (mute.toLowerCase() == 'off') {
+      this.off();
+    }
+    else {
+      this.on();
+    }
+  }
+
+  off() {
+    debug(1, `DRIVER AudioOutput_aes67 (${this.config.id}): Off`);
+    xapi.Config.Audio.Input.Ethernet[2].mode.set('Off');
+  }
+
+  on() {
+    debug(1, `DRIVER AudioOutput_aes67 (${this.config.id}): On`);
+    xapi.Config.Audio.Input.Ethernet[2].mode.set('On');
+  }
+}
 
 export class LightDriver_isc_h21 {
   constructor(device, config) {

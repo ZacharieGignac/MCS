@@ -1,7 +1,7 @@
 # MCS
 "MODULAR CONTROL SYSTEM". Original.
 
-## v1.1.1 (developement)
+## v1.2.0 (developement)
 ### Bugs connus
 
 ### Ajouts / Modifications

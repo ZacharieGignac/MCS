@@ -183,6 +183,22 @@ export var config = {
       powerOffDelay: 0,
     },
     {
+      id: 'display.monitor2',
+      type: DEVICETYPE.DISPLAY,
+      name: 'TV2',
+      device: devicesLibrary.Display,
+      driver: driversLibrary.DisplayDriver_CEC,
+      connector: 3,
+      skipVideoMatrix: true,  //Second display on the same connector, skip video matrix
+      supportsPower: true,
+      supportsBlanking: false,
+      supportsSource: false,
+      supportsUsageHours: false,
+      defaultPower: 'off',
+      blankBeforePowerOff: false,
+      powerOffDelay: 0,
+    }
+    {
       id: 'display.byod',
       type: DEVICETYPE.DISPLAY,
       name: 'BYOD',

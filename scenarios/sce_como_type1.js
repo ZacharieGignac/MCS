@@ -374,31 +374,40 @@ export class Scenario {
 
     const matrixBlankDisplay = displays => {
       if (status.AutoDisplays == ON) {
-        xapi.Command.Video.Matrix.Assign({
-          Mode: 'Replace',
-          Output: displays[0].config.connector,
-          RemoteMain: 4
+        displays.forEach(display => {
+          if (display.config.skipVideoMatrix) return;
+          xapi.Command.Video.Matrix.Assign({
+            Mode: 'Replace',
+            Output: display.config.connector,
+            RemoteMain: 4
+          });
         });
       }
     };
 
     const matrixRemoteToDisplay = (display) => {
       if (status.AutoDisplays == ON) {
-        xapi.Command.Video.Matrix.Assign({
-          Mode: 'Replace',
-          Output: display[0].config.connector,
-          RemoteMain: 1
+        display.forEach(disp => {
+          if (disp.config.skipVideoMatrix) return;
+          xapi.Command.Video.Matrix.Assign({
+            Mode: 'Replace',
+            Output: disp.config.connector,
+            RemoteMain: 1
+          });
         });
       }
     };
 
     const matrixReset = (displays) => {
       if (status.AutoDisplays == ON) {
-        setTimeout(() => {
-          xapi.Command.Video.Matrix.Reset({
-            Output: displays[0].config.connector
-          });
-        }, 1000);
+        displays.forEach(display => {
+          if (display.config.skipVideoMatrix) return;
+          setTimeout(() => {
+            xapi.Command.Video.Matrix.Reset({
+              Output: display.config.connector
+            });
+          }, 1000);
+        });
       }
     };
 

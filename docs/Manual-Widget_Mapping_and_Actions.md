@@ -111,6 +111,7 @@ Le système supporte aussi les préfixes comme décrit au début de ce document,
 * **ENABLESCENARIOASK** : Affiche une boite de dialogue demandant d'entrer un "id" de scénario et l'active
 * **PRESETSLOCK** : Vérouille les presets de caméra
 * **PRESETSUNLOCK** : Dévérouille les presets de caméra
+* **SETSS:key,value** : Définit le statut système (systemStatus) nommé "key" à la valeur "value".
 
 ## Exemples
 Activer le preset de caméra nommé "Tableau"
@@ -128,3 +129,7 @@ Appeler la scène d'éclairage "normal" et fermer le panel en cours
 Activer le preset de caméra nommé "Tableau" et ouvrir le panneau "Controle" à page "Camera"
 
 ```ACTIONS$ACTIVATECAMPRESET:Tableau&PANELOPEN:Controle,Camera```
+
+Définir le statut système "MyStatus" à "on"
+
+```ACTION$SETSS:MyStatus,on```

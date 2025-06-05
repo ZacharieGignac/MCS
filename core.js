@@ -14,7 +14,7 @@ import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 
-const COREVERSION = '1.1.1-dev1';
+const COREVERSION = '1.2.0-dev1';
 const ZAPIVERSION = 1;
 
 function systemKill() {
@@ -630,6 +630,10 @@ class Core {
     });
     enableAdmin.on('released', () => {
       clearTimeout(this.adminPanelTimeout);
+    });
+    
+    self.uiManager.addActionMapping(/^SETSS$/, (key, value) => {
+      zapi.system.setStatus(key, value);
     });
 
     self.uiManager.addActionMapping(/^SETTINGSLOCK$/, () => {

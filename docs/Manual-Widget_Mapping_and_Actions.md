@@ -94,6 +94,11 @@ Plusieurs actions de base sont disponibles et il est possible d'en ajouter d'aut
 
 Pour signifier au système que le widget doit déclancher une action, le "id" du widget doit être préfixé de "ACTION$" si seulement une action doit être appelée et de "ACTIONS$" si plusieurs actions doivent être appelées.
 
+Il est aussi possible d'utiliser les actions à partir de messages textes `xapi.Command.Message.Send` en utilisant la nommenclature "MCSACTION$" et "MCSACTIONS$", par exemple:
+```
+xapi.Command.Message.Send({Text:'MCSACTION$SETSS:test.123'})
+```
+
 Le système supporte aussi les préfixes comme décrit au début de ce document, donc un widget préfixé "test|ACTION$" est valide.
 
 ## Actions système

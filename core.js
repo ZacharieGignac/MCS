@@ -1238,11 +1238,25 @@ async function preInit() {
 
 
   clearInterval(coldbootWarningInterval);
-  if (systemconfig.system.debugInternalMessages) {
-    xapi.Event.Message.Send.Text.on(text => {
+  xapi.Event.Message.Send.Text.on(text => {
+    if (systemconfig.system.debugInternalMessages) {
       debug(1, `[INTERNAL MESSAGE] ${text}`);
-    });
-  }
+    }
+    // Action parsing logic
+    if (typeof text === 'string') {
+      let actionMatch = text.match(/MCSACTION\$(.+)/);
+      let actionsMatch = text.match(/MCSACTIONS\$(.+)/);
+      if (actionMatch) {
+        if (typeof uiManager !== 'undefined' && uiManager.processMatchAction) {
+          uiManager.processMatchAction('ACTION$' + actionMatch[1]);
+        }
+      } else if (actionsMatch) {
+        if (typeof uiManager !== 'undefined' && uiManager.processMatchAction) {
+          uiManager.processMatchAction('ACTIONS$' + actionsMatch[1]);
+        }
+      }
+    }
+  });
 
   debug(1, `Checking config validity...`);
   let validConfig = configValidityCheck();

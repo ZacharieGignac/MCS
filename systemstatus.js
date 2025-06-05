@@ -237,6 +237,8 @@ export class SystemStatus {
         zapi.system.setStatus(prop, systemconfig.systemStatus[prop], false);
       }
     }
+    //Set status that are not "settings" in config file
+    zapi.system.setStatus('PresenterDetected', false);
   }
 
   setStatus(key, value, notifyChange = true) {

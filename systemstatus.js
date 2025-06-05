@@ -239,6 +239,7 @@ export class SystemStatus {
     }
     //Set status that are not "settings" in config file
     zapi.system.setStatus('PresenterDetected', false);
+    zapi.system.setStatus('Occupancy', undefined);
   }
 
   setStatus(key, value, notifyChange = true) {

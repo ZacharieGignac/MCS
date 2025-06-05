@@ -10,7 +10,7 @@
 * Ajout du support pour la propriété ` skipVideoMatrix:true` dans `sce_comotype1` pour les devices de type `DISPLAY``
 * SystemStatus `Occupancy:undefined` automatiquement ajouté au status. Peut servir pour déclarer la présence dans la salle, mais le système ne le fait pas de base
 * SystemStatus `PresenterDetected` retiré de la config, et est maintenant ajouté automatiquement
-* Ajout de l'action `SETSS$jkey,value` pour définir un SystemStatus
+* Ajout de l'action `SETSS$key,value` pour définir un SystemStatus
 * Ajout de la réception des messages texte `MCSACTION$ACTION,VALUE` et `MCSACTION$ACTION,VALUE&ACTION,VALUE`  qui sont convertis en actions
 
 

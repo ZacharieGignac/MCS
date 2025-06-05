@@ -6,7 +6,13 @@
 
 ### Ajouts / Modifications
 * Ajout du driver `AudioInput_aes67` pour les sources AES67 (Celine Mic Pro, Table Mic Pro, etc...)
-* Retrait du type `ethernet` dans la configuration d'un device de type `AudioInput_codecpro`  
+* Retrait du type `ethernet` dans la configuration d'un device de type `AudioInput_codecpro`
+* Ajout du support pour la propriété ` skipVideoMatrix:true` dans `sce_comotype1` pour les devices de type `DISPLAY``
+* SystemStatus `Occupancy:undefined` automatiquement ajouté au status. Peut servir pour déclarer la présence dans la salle, mais le système ne le fait pas de base
+* SystemStatus `PresenterDetected` retiré de la config, et est maintenant ajouté automatiquement
+* Ajout de l'action `SETSS$jkey,value` pour définir un SystemStatus
+* Ajout de la réception des messages texte `MCSACTION$ACTION,VALUE` et `MCSACTION$ACTION,VALUE&ACTION,VALUE`  qui sont convertis en actions
+
 
 ## v1.1.0 (version actuelle)
 ### Bugs connus / limitation

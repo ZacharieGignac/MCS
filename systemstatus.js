@@ -233,8 +233,8 @@ export class SystemStatus {
 
   setDefaults() {
     //Set status that are not "settings" in config file
-    zapi.system.setStatus('PresenterDetected', false);
-    zapi.system.setStatus('Occupancy', undefined);
+    zapi.system.setStatus('PresenterDetected', false, false);
+    zapi.system.setStatus('Occupancy', undefined, false);
 
     for (let prop in systemconfig.systemStatus) {
       if (systemconfig.systemStatus.hasOwnProperty(prop)) {

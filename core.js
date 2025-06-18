@@ -631,7 +631,7 @@ class Core {
     enableAdmin.on('released', () => {
       clearTimeout(this.adminPanelTimeout);
     });
-    
+
     self.uiManager.addActionMapping(/^SETSS$/, (key, value) => {
       zapi.system.setStatus(key, value);
     });
@@ -1238,25 +1238,26 @@ async function preInit() {
 
 
   clearInterval(coldbootWarningInterval);
-  xapi.Event.Message.Send.Text.on(text => {
-    if (systemconfig.system.debugInternalMessages) {
-      debug(1, `[INTERNAL MESSAGE] ${text}`);
-    }
-    // Action parsing logic
-    if (typeof text === 'string') {
-      let actionMatch = text.match(/MCSACTION\$(.+)/);
-      let actionsMatch = text.match(/MCSACTIONS\$(.+)/);
-      if (actionMatch) {
-        if (typeof uiManager !== 'undefined' && uiManager.processMatchAction) {
-          uiManager.processMatchAction('ACTION$' + actionMatch[1]);
-        }
-      } else if (actionsMatch) {
-        if (typeof uiManager !== 'undefined' && uiManager.processMatchAction) {
-          uiManager.processMatchAction('ACTIONS$' + actionsMatch[1]);
-        }
+
+
+xapi.Event.Message.Send.Text.on(text => {
+  if (systemconfig.system.debugInternalMessages) {
+    debug(1, `[INTERNAL MESSAGE] ${text}`);
+  }
+  if (typeof text === 'string') {
+    let actionMatch = text.match(/MCSACTION\$(.+)/);
+    let actionsMatch = text.match(/MCSACTIONS\$(.+)/);
+    if (actionMatch) {
+      if (core && core.uiManager && core.uiManager.processMatchAction) {
+        core.uiManager.processMatchAction('ACTION$' + actionMatch[1]);
+      }
+    } else if (actionsMatch) {
+      if (core && core.uiManager && core.uiManager.processMatchAction) {
+        core.uiManager.processMatchAction('ACTIONS$' + actionsMatch[1]);
       }
     }
-  });
+  }
+});
 
   debug(1, `Checking config validity...`);
   let validConfig = configValidityCheck();

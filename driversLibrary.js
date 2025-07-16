@@ -52,7 +52,7 @@ export class LightSceneDriver_gc_itachflex {
   }
   async activate() {
     debug(1, `DRIVER LightSceneDriver_gc_itachflex (${this.config.id}): ACTIVATE`);
-    zapi.communication.httpClient.Put({
+    await zapi.communication.httpClient.Put({
       AllowInsecureHTTPS: true,
       Header: this.headers,
       Timeout: 5,
@@ -810,7 +810,7 @@ export class ScreenDriver_gc_itachflex {
     this.headers = [`Content-Type: application/json`];
 
   }
-  setPosition(position) {
+  async setPosition(position) {
     var relay;
     if (position.toUpperCase() == 'UP') {
       relay = this.config.upRelay;
@@ -821,7 +821,7 @@ export class ScreenDriver_gc_itachflex {
 
     debug(1, `DRIVER ScreenDriver_gc_itachflex (${this.config.id}): setPosition: ${position}`);
 
-    zapi.communication.httpClient.Put({
+    await zapi.communication.httpClient.Put({
       AllowInsecureHTTPS: true,
       Header: this.headers,
       Timeout: 5,

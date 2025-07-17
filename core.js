@@ -377,6 +377,12 @@ class Core {
 
     this.lastPresenterDetectedStatus = false;
 
+    // Mute button admin panel trigger variables
+    this.mutePressCount = 0;
+    this.muteTimeout = null;
+    this.lastMuteState = null;
+    this.firstPressTime = null;
+
     //TAG:ZAPI
     zapi.system.systemReport = {};
     zapi.system.systemReport.systemVersion = COREVERSION;
@@ -878,6 +884,9 @@ class Core {
 
     this.displaySystemStatus();
 
+    // Initialize mute button monitoring for admin panel trigger
+    this.initMuteButtonMonitoring();
+
   }
 
   displayNextDiagnosticsMessages() {
@@ -1006,6 +1015,9 @@ class Core {
     }
     zapi.system.events.emit('system_wakup');
     this.displaySystemStatus();
+    
+    // Unmute microphones when system wakes up
+    xapi.Command.Audio.Microphones.Unmute();
   }
 
   setPresenterLocation(location) {
@@ -1031,6 +1043,88 @@ class Core {
     xapi.Command.Video.Graphics.Text.Display({
       Target: 'LocalOutput',
       Text: ''
+    });
+  }
+
+  async initMuteButtonMonitoring() {
+    // Get initial mute state
+    try {
+      this.lastMuteState = await xapi.Status.Audio.Microphones.Mute.get();
+    } catch (error) {
+      // Silent error handling
+    }
+    
+    // Monitor mute status changes
+    xapi.Status.Audio.Microphones.Mute.on((muteState) => {
+      this.handleMuteStateChange(muteState);
+    });
+  }
+
+  handleMuteStateChange(newMuteState) {
+    // Only count when mute is turned OFF (unmuting the system)
+    if (newMuteState === 'Off' && this.lastMuteState === 'On') {
+      this.handleUnmuteAction();
+    }
+    
+    this.lastMuteState = newMuteState;
+  }
+
+  handleUnmuteAction() {
+    const currentTime = Date.now();
+    
+    // If this is the first unmute, start the 10-second window
+    if (this.mutePressCount === 0) {
+      this.firstPressTime = currentTime;
+    }
+    
+    // Increment unmute count
+    this.mutePressCount++;
+    
+    // Check if we've reached 5 unmutes
+    if (this.mutePressCount >= 5) {
+      this.triggerAdminPanel();
+      this.resetMuteCounter();
+      return;
+    }
+    
+    // Check if we're still within the 10-second window
+    const timeElapsed = currentTime - this.firstPressTime;
+    if (timeElapsed >= 10000) {
+      this.resetMuteCounter();
+      return;
+    }
+    
+    // Set timeout to reset counter when the 10-second window expires
+    if (this.muteTimeout) {
+      clearTimeout(this.muteTimeout);
+    }
+    const remainingTime = 10000 - timeElapsed;
+    this.muteTimeout = setTimeout(() => {
+      this.resetMuteCounter();
+    }, remainingTime);
+  }
+
+  resetMuteCounter() {
+    this.mutePressCount = 0;
+    this.firstPressTime = null;
+    if (this.muteTimeout) {
+      clearTimeout(this.muteTimeout);
+      this.muteTimeout = null;
+    }
+  }
+
+  triggerAdminPanel() {
+    // Use the PANELOPEN action to open the system_admin panel
+    xapi.Command.UserInterface.Extensions.Panel.Open({
+      PanelId: 'system_admin'
+    });
+    
+    // Show a brief message to confirm the action
+    xapi.Command.UserInterface.Message.TextLine.Display({
+      Duration: 3,
+      Text: 'Admin panel opened',
+      X: 10000,
+      Y: 1
     });
   }
 }

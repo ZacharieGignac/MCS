@@ -12,8 +12,10 @@
 * SystemStatus `PresenterDetected` retiré de la config, et est maintenant ajouté automatiquement
 * Ajout de l'action `SETSS$key,value` pour définir un SystemStatus
 * Ajout de la réception des messages texte `MCSACTION$ACTION,VALUE` et `MCSACTION$ACTION,VALUE&ACTION,VALUE` qui sont convertis en actions
+* Unmuter 5 fois (avec le bouton mute) ouvre le panneau `system_admin``
 
 ### Bugfix
+* Les microphones sont maintenant unmuté lors du démarrage d'une nouvelle session (wakeup)
 * Le statut d'éclairage automatique ne se met pas à OFF lorsqu'on intéragit avec un bouton de scène d'éclairage
 * LightSceneDriver_gc_itachflex: Les requêtes HTTP ne se font pas de façon synchrone, ce qui peut entrainer un mauvais timing en cas de latence réseau
 * ScreenDriver_gc_itachflex: Les requêtes HTTP ne se font pas de façon synchrone, ce qui peut entrainer un mauvais timing enc as de latence réseau

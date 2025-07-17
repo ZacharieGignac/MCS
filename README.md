@@ -11,7 +11,12 @@
 * SystemStatus `Occupancy:undefined` automatiquement ajouté au status. Peut servir pour déclarer la présence dans la salle, mais le système ne le fait pas de base
 * SystemStatus `PresenterDetected` retiré de la config, et est maintenant ajouté automatiquement
 * Ajout de l'action `SETSS$key,value` pour définir un SystemStatus
-* Ajout de la réception des messages texte `MCSACTION$ACTION,VALUE` et `MCSACTION$ACTION,VALUE&ACTION,VALUE`  qui sont convertis en actions
+* Ajout de la réception des messages texte `MCSACTION$ACTION,VALUE` et `MCSACTION$ACTION,VALUE&ACTION,VALUE` qui sont convertis en actions
+
+### Bugfix
+* Le statut d'éclairage automatique ne se met pas à OFF lorsqu'on intéragit avec un bouton de scène d'éclairage
+* LightSceneDriver_gc_itachflex: Les requêtes HTTP ne se font pas de façon synchrone, ce qui peut entrainer un mauvais timing en cas de latence réseau
+* ScreenDriver_gc_itachflex: Les requêtes HTTP ne se font pas de façon synchrone, ce qui peut entrainer un mauvais timing enc as de latence réseau
 
 
 ## v1.1.0 (version actuelle)

@@ -1001,6 +1001,7 @@ class Core {
     if (systemconfig.system.onStandby.clearCallHistory) {
       xapi.Command.CallHistory.DeleteAll();
     }
+
     this.disableExtraOutput();
 
     this.scenarios.enableScenario(systemconfig.system.onStandby.enableScenario);
@@ -1016,8 +1017,6 @@ class Core {
     zapi.system.events.emit('system_wakup');
     this.displaySystemStatus();
     
-    // Unmute microphones when system wakes up
-    xapi.Command.Audio.Microphones.Unmute();
   }
 
   setPresenterLocation(location) {

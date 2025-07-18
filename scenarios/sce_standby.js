@@ -51,6 +51,7 @@ export class Scenario {
   }
 
   start() {
+    xapi.Command.Audio.Microphones.Unmute();
 
     //Clear prompts and alerts
     xapi.Command.UserInterface.Message.Prompt.Clear();

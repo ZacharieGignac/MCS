@@ -195,8 +195,9 @@ export class DisplayDriver_NONE {
 
 export class DisplayDriver_serial_sonybpj {
   constructor(device, config) {
-    this.pacing = 2000;
-    this.repeat = 8000;
+    this.pacing = config.pacing || 500;
+    this.repeat = config.repeat || 2000;
+    this.timeout = config.timeout || 100;
     this.queue = [];
     this.sending = false;
     this.config = config;
@@ -350,7 +351,7 @@ export class DisplayDriver_serial_sonybpj {
     return xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
       ResponseTerminator: this.serialCommands.TERMINATOR,
-      ResponseTimeout: 1000,
+      ResponseTimeout: this.timeout, // Timeout in milliseconds
       Text: command
     })
       .then(response => {
@@ -372,8 +373,9 @@ export class DisplayDriver_serial_sonybpj {
 
 export class DisplayDriver_serial_panasonic {
   constructor(device, config) {
-    this.pacing = 2000;
-    this.repeat = 8000;
+    this.pacing = config.pacing || 500;
+    this.repeat = config.repeat || 2000;
+    this.timeout = config.timeout || 100;
     this.queue = [];
     this.sending = false;
     this.config = config;
@@ -573,7 +575,7 @@ export class DisplayDriver_serial_panasonic {
     return xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
       ResponseTerminator: '\x03', // **MODIFIED: Using \xE0 as ResponseTerminator**
-      ResponseTimeout: 5000,
+      ResponseTimeout: this.timeout, // Timeout in milliseconds
       Text: command
     })
       .then(response => {
@@ -595,8 +597,9 @@ export class DisplayDriver_serial_panasonic {
 
 export class DisplayDriver_serial_epson {
   constructor(device, config) {
-    this.pacing = 2000;
-    this.repeat = 8000;
+    this.pacing = config.pacing || 500;
+    this.repeat = config.repeat || 2000;
+    this.timeout = config.timeout || 100;
     this.queue = [];
     this.sending = false;
     this.config = config;
@@ -744,7 +747,7 @@ export class DisplayDriver_serial_epson {
     return xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
       ResponseTerminator: this.serialCommands.TERMINATOR,
-      ResponseTimeout: 1000,
+      ResponseTimeout: this.timeout, // Timeout in milliseconds
       Text: command
     })
       .then(response => {

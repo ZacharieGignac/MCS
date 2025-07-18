@@ -237,7 +237,10 @@ Ci-dessous une description de chaque type de device inclus par défaut.
       powerOffDelay: 300000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
       usageHoursRequestInterval: 3600000,            //Interval de demande du temps d'utilisation
       usageHoursRequestTimeout:2000,
-      port: 1                                        //Numéro du port série
+      port: 1,                                       //Numéro du port série
+      pacing: 500,                                   //Délai entre les commandes série (en ms). Valeur par défaut: 500
+      repeat: 2000,                                  //Interval de répétition des commandes d'état (en ms). Valeur par défaut: 2000
+      timeout: 100                                   //Timeout pour les réponses série (en unités de 100ms). Valeur par défaut: 100
     }
 ```
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.

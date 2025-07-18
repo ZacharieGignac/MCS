@@ -5,6 +5,7 @@
 ### Bugs connus
 
 ### Ajouts / Modifications
+* Ajout du support pour la configuration `pacing`, `repeat`, et `timeout` dans les drivers série (Sony, Panasonic, Epson) avec valeurs par défaut
 * Ajout du driver `AudioInput_aes67` pour les sources AES67 (Celine Mic Pro, Table Mic Pro, etc...)
 * Retrait du type `ethernet` dans la configuration d'un device de type `AudioInput_codecpro`
 * Ajout du support pour la propriété `skipVideoMatrix:true` dans `sce_comotype1` pour les devices de type `DISPLAY``

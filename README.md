@@ -20,6 +20,15 @@
 * Le statut d'éclairage automatique ne se met pas à OFF lorsqu'on intéragit avec un bouton de scène d'éclairage
 * LightSceneDriver_gc_itachflex: Les requêtes HTTP ne se font pas de façon synchrone, ce qui peut entrainer un mauvais timing en cas de latence réseau
 * ScreenDriver_gc_itachflex: Les requêtes HTTP ne se font pas de façon synchrone, ce qui peut entrainer un mauvais timing enc as de latence réseau
+* core: `setPresenterLocation` appelait une fonction inexistante. La méthode met maintenant à jour `SystemStatus` avec validation des valeurs (`local`, `remote`).
+* core: Killswitch GPIO: l'écouteur était enregistré même si `killswitchGPIO` n'était pas défini. Ajout d'une garde et d'un try/catch pour éviter les plantages.
+* core/SystemStatus/UI: `PresenterDetected` est désormais converti en booléen avant mise à jour, évitant l'erreur "Switch expects a value: <on/off>".
+* modules: `getModule(id)` gère maintenant le cas module introuvable (retourne `undefined` et journalise) au lieu de provoquer un crash.
+* scenarios: `enableScenario(id)` gère les IDs dupliqués/introuvables, protège l'accès aux `panels`/`features` et émet `system_scenario_enable_failed` avec une raison.
+* devices: `getDevicesInGroup` et `getDevicesByTypeInGroup` gèrent les groupes introuvables et ignorent les devices non définis.
+* drivers (Display série Sony/Epson): gestion d'erreurs centralisée et logs "debouncés"; plus d'"Unhandled promise rejection TIMEOUT" quand le projecteur est débranché.
+* core (audio.extra): vérifications null/undefined sur les groupes d'entrées/sorties audio supplémentaires pour éviter les exceptions lors des connexions/déconnexions.
+* core: `toBool` accepte maintenant des valeurs non-string en toute sécurité.
 
 
 ## v1.1.0 (version actuelle)

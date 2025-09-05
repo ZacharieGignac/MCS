@@ -24,17 +24,22 @@ function systemKill() {
 
 async function killswitchInit() {
   if (systemconfig.system.killswitchGPIO != undefined) {
-    await xapi.Config.GPIO.Pin[systemconfig.system.killswitchGPIO].Mode.set('InputNoAction');
-    let killswitchStatus = await xapi.Status.GPIO.Pin[systemconfig.system.killswitchGPIO].State.get();
-    if (killswitchStatus == 'High') {
-      systemKill();
+    try {
+      await xapi.Config.GPIO.Pin[systemconfig.system.killswitchGPIO].Mode.set('InputNoAction');
+      let killswitchStatus = await xapi.Status.GPIO.Pin[systemconfig.system.killswitchGPIO].State.get();
+      if (killswitchStatus == 'High') {
+        systemKill();
+      }
+      xapi.Status.GPIO.Pin[systemconfig.system.killswitchGPIO].State.on(state => {
+        if (state == 'High') {
+          systemKill();
+        }
+      });
+    }
+    catch (e) {
+      debug(3, `killswitchInit() error: ${e}`);
     }
   }
-  xapi.Status.GPIO.Pin[systemconfig.system.killswitchGPIO].State.on(state => {
-    if (state == 'High') {
-      systemKill();
-    }
-  });
 }
 //INIT
 //GPIO Killswitch check on boot
@@ -729,11 +734,13 @@ class Core {
     xapi.Command.UserInterface.Message.TextLine.Clear();
     if (systemconfig.system.usePresenterTrack) {
       let presenterDetected = await xapi.Status.Cameras.PresenterTrack.PresenterDetected.get();
-      this.systemStatus.setStatus('PresenterDetected', presenterDetected, false);
+      let presenterDetectedBool = String(presenterDetected).toLowerCase() === 'true';
+      this.systemStatus.setStatus('PresenterDetected', presenterDetectedBool, false);
       xapi.Status.Cameras.PresenterTrack.PresenterDetected.on(value => {
         if (this.systemStatus.getStatus('PresenterTrackWarnings') == 'on') {
-          this.systemStatus.setStatus('PresenterDetected', value);
-          this.processPresenterDetectedStatus(value == 'True' ? true : false);
+          let valBool = String(value).toLowerCase() === 'true';
+          this.systemStatus.setStatus('PresenterDetected', valBool);
+          this.processPresenterDetectedStatus(valBool);
         }
       });
     }

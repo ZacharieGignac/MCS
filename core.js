@@ -80,7 +80,11 @@ function toOnOff(value) {
   return value ? 'on' : 'off';
 }
 function toBool(value) {
-  return value.toLowerCase() == 'on' ? true : false;
+  try {
+    return String(value).toLowerCase() == 'on' ? true : false;
+  } catch (e) {
+    return false;
+  }
 }
 
 var performance = new Performance();
@@ -530,16 +534,31 @@ class Core {
   }
 
   async enableExtraOutput() {
-
+    if (!this.audioExtraModeOutput) {
+      debug(3, 'audioExtraModeOutput is undefined; skipping enableExtraOutput');
+      return;
+    }
     this.audioExtraModeInputs.forEach(input => {
-      this.audioExtraModeOutput.connectLocalInput(input);
-      this.audioExtraModeOutput.updateInputGain(input, input.config.extraGain);
+      try {
+        this.audioExtraModeOutput.connectLocalInput(input);
+        this.audioExtraModeOutput.updateInputGain(input, input.config.extraGain);
+      } catch (e) {
+        debug(3, `enableExtraOutput error: ${e}`);
+      }
     });
   }
 
   async disableExtraOutput() {
+    if (!this.audioExtraModeOutput) {
+      debug(3, 'audioExtraModeOutput is undefined; skipping disableExtraOutput');
+      return;
+    }
     this.audioExtraModeInputs.forEach(input => {
-      this.audioExtraModeOutput.disconnectLocalInput(input);
+      try {
+        this.audioExtraModeOutput.disconnectLocalInput(input);
+      } catch (e) {
+        debug(3, `disableExtraOutput error: ${e}`);
+      }
     });
   }
 
@@ -862,6 +881,9 @@ class Core {
     if (systemconfig.audio.extra.enabled) {
       this.audioExtraModeOutput = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.AUDIOOUTPUTGROUP, systemconfig.audio.extra.outputGroup)[0];
       this.audioExtraModeInputs = zapi.devices.getDevicesByTypeInGroup(zapi.devices.DEVICETYPE.AUDIOINPUTGROUP, systemconfig.audio.extra.inputGroup);
+      if (!this.audioExtraModeOutput) {
+        debug(3, `Audio extra mode output group not found or empty: ${systemconfig.audio.extra.outputGroup}`);
+      }
 
       xapi.Event.UserInterface.Message.Prompt.Response.on(response => {
         if (response.FeedbackId == 'system_overvolume') {

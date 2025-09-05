@@ -219,20 +219,22 @@ export class DisplayDriver_serial_sonybpj {
       FILTER_STATUS: 'filter_status ?\\r\\n',
       SYSTEM_STATUS: 'error ?\\r\\n'
     };
+    this._lastErrorAt = 0;
+    this._errorDebounceMs = 5000;
     let self = this;
 
     this.stateInterval = setInterval(() => {
       if (self.currentBlanking == true) {
-        self.serialSend(self.serialCommands.BLANK);
+        self.serialSend(self.serialCommands.BLANK).catch(e => self.handleSerialError(e));
       }
       else {
-        self.serialSend(self.serialCommands.UNBLANK);
+        self.serialSend(self.serialCommands.UNBLANK).catch(e => self.handleSerialError(e));
       }
       if (self.currentPower == 'on') {
-        self.serialSend(self.serialCommands.POWERON);
+        self.serialSend(self.serialCommands.POWERON).catch(e => self.handleSerialError(e));
       }
       else {
-        self.serialSend(self.serialCommands.POWEROFF);
+        self.serialSend(self.serialCommands.POWEROFF).catch(e => self.handleSerialError(e));
       }
     }, self.repeat);
 
@@ -242,10 +244,10 @@ export class DisplayDriver_serial_sonybpj {
     power = power.toLowerCase();
     this.currentPower = power;
     if (power == 'on') {
-      this.serialSend(this.serialCommands.POWERON);
+      this.serialSend(this.serialCommands.POWERON).catch(e => this.handleSerialError(e));
     }
     else {
-      this.serialSend(this.serialCommands.POWEROFF);
+      this.serialSend(this.serialCommands.POWEROFF).catch(e => this.handleSerialError(e));
     }
     debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): setPower: ${power}`);
   }
@@ -253,10 +255,10 @@ export class DisplayDriver_serial_sonybpj {
   setBlanking(blanking) {
     this.currentBlanking = blanking;
     if (blanking) {
-      this.serialSend(this.serialCommands.BLANK);
+      this.serialSend(this.serialCommands.BLANK).catch(e => this.handleSerialError(e));
     }
     else {
-      this.serialSend(this.serialCommands.UNBLANK);
+      this.serialSend(this.serialCommands.UNBLANK).catch(e => this.handleSerialError(e));
     }
 
     debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): setBlanking: ${blanking}`);
@@ -360,13 +362,21 @@ export class DisplayDriver_serial_sonybpj {
       })
       .catch(e => {
         reject('TIMEOUT'); // Reject only on timeout/error from xapi.Send
-        debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): ${e.message}`);
+        this.handleSerialError(e);
         return new Promise(res => setTimeout(res, this.pacing));
       })
       .finally(() => {
         this.sending = false;
         return this.sendNextMessage();
       });
+  }
+  handleSerialError(e) {
+    const now = Date.now();
+    if (now - this._lastErrorAt >= this._errorDebounceMs) {
+      this._lastErrorAt = now;
+      const msg = (e && e.message) ? e.message : String(e);
+      debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): ${msg}`);
+    }
   }
   custom() { }
 }
@@ -620,20 +630,22 @@ export class DisplayDriver_serial_epson {
       FILTER_STATUS: 'FILTER?\\r\\n',
       SYSTEM_STATUS: 'PWR?\\r\\n'        // Renamed ERROR_STATUS to SYSTEM_STATUS
     };
+    this._lastErrorAt = 0;
+    this._errorDebounceMs = 5000;
     let self = this;
 
     this.stateInterval = setInterval(() => {
       if (self.currentBlanking == true) {
-        self.serialSend(self.serialCommands.BLANK);
+        self.serialSend(self.serialCommands.BLANK).catch(e => self.handleSerialError(e));
       }
       else {
-        self.serialSend(self.serialCommands.UNBLANK);
+        self.serialSend(self.serialCommands.UNBLANK).catch(e => self.handleSerialError(e));
       }
       if (self.currentPower == 'on') {
-        self.serialSend(self.serialCommands.POWERON);
+        self.serialSend(self.serialCommands.POWERON).catch(e => self.handleSerialError(e));
       }
       else {
-        self.serialSend(self.serialCommands.POWEROFF);
+        self.serialSend(self.serialCommands.POWEROFF).catch(e => self.handleSerialError(e));
       }
     }, self.repeat);
   }
@@ -642,10 +654,10 @@ export class DisplayDriver_serial_epson {
     power = power.toLowerCase();
     this.currentPower = power;
     if (power == 'on') {
-      this.serialSend(this.serialCommands.POWERON);
+      this.serialSend(this.serialCommands.POWERON).catch(e => this.handleSerialError(e));
     }
     else {
-      this.serialSend(this.serialCommands.POWEROFF);
+      this.serialSend(this.serialCommands.POWEROFF).catch(e => this.handleSerialError(e));
     }
     debug(1, `DRIVER DisplayDriver_serial_epson (${this.config.id}): setPower: ${power}`);
   }
@@ -653,10 +665,10 @@ export class DisplayDriver_serial_epson {
   setBlanking(blanking) {
     this.currentBlanking = blanking;
     if (blanking) {
-      this.serialSend(this.serialCommands.BLANK);
+      this.serialSend(this.serialCommands.BLANK).catch(e => this.handleSerialError(e));
     }
     else {
-      this.serialSend(this.serialCommands.UNBLANK);
+      this.serialSend(this.serialCommands.UNBLANK).catch(e => this.handleSerialError(e));
     }
 
     debug(1, `DRIVER DisplayDriver_serial_epson (${this.config.id}): setBlanking: ${blanking}`);
@@ -756,13 +768,24 @@ export class DisplayDriver_serial_epson {
       })
       .catch(e => {
         reject('TIMEOUT'); // Reject only on timeout/error from xapi.Send
-        debug(2, `DRIVER DisplayDriver_serial_epson (${this.config.id}): ${e.message}`);
+        this.handleSerialError(e);
         return new Promise(res => setTimeout(res, this.pacing));
       })
       .finally(() => {
         this.sending = false;
         return this.sendNextMessage();
       });
+  }
+  handleSerialError(e) {
+    const now = Date.now();
+    if (now - this._lastErrorAt >= this._errorDebounceMs) {
+      this._lastErrorAt = now;
+      const msg = (e && e.message) ? e.message : String(e);
+      debug(2, `DRIVER DisplayDriver_serial_epson (${this.config.id}): ${msg}`);
+      if (String(msg).includes('Unable to open outgoing connection')) {
+        debug(2, `DRIVER DisplayDriver_serial_epson (${this.config.id}): USB serial not available (projector unplugged?)`);
+      }
+    }
   }
 
   custom() { }

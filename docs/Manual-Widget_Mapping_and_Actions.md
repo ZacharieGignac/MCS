@@ -82,10 +82,10 @@ Les valeurs bool de systemStatus sont automatiquement converties en valeurs 'on'
 En d'autres mots, si une valeur de systemStatus est de type boolean, il est OBLIGATOIRE d'utiliser le préfixe "SS?" au lieu de "SS$" pour activer l'auto-mapping d'un widget.
 
 Exemples:
-* **SS$PresenterLocation** (button group avec 2 boutons: 'local', 'remote'): Affiche et défini l'emplacement du présentateur
+* **SS$PresenterLocation** (button group avec 2 boutons: 'local', 'remote'): Affiche et défini l'emplacement du présentateur. Valeurs acceptées: `local`, `remote`.
 * **SS$AudienceMics** (toggle): Affiche et défini l'emplacement du présentateur
 * **SS$Version** (texte): Affiche la version actuelle du système
-* **SS?PresenterDetected** (toggle): Affiche si le présentateur est détecté, même si la valeur de systemStatus est de type "bool". Cette valeur est automatiquement convertie
+* **SS?PresenterDetected** (toggle): Affiche si le présentateur est détecté (valeur bool). Conversion automatique en `on`/`off`.
 
 # Action et Actions
 Le système possède un mécanisme de mapping d'action, c'est à dire le déclanchement d'actions (function) à partir d'une identifiation de widget.

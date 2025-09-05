@@ -9,6 +9,8 @@
 - `system_modules_init` : Le modules manager est activé et les modules sont chargés
 - `system_devices_init` : Le device manager est activé et les devices sont chargés
 - `system_scenarios_init` : Le scenario manager est activé et les scénarios sont chargés
+- `system_scenario_enable_failed` : L'activation d'un scénario a échoué
+  - `{ id, reason }` : `reason` ∈ `duplicate`, `not_found`, `invalid_entry`
 - `system_forcestandby` : Le système force le standby (sur horaire)
 - `system_peripheralscheck` : Le système effectue une vérification des périphériques
 - `system_peripheralsmissing` : Certain périphériques sont manquants

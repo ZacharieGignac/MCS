@@ -48,12 +48,12 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 
 ### Méthodes
 
-- `device getDevice`: Récupère un dispositif spécifique.
+- `device|undefined getDevice`: Récupère un dispositif spécifique (retourne `undefined` si introuvable).
   - `id`: id du device
 - `devices[] getAllDevices`: Récupère tous les dispositifs.
 - `devices[] getDevicesByType`: Récupère les dispositifs par type.
   - `type`: type de devices
-- `devices[] getDevicesByTypeInGroup`: Récupère les dispositifs par type dans un groupe spécifique.
+- `devices[] getDevicesByTypeInGroup`: Récupère les dispositifs par type dans un groupe spécifique (retourne `[]` si le groupe est introuvable).
   - `type`: type de devices
   - `group`: groupe
 - `activateCameraPreset`: Active un préréglage de caméra spécifique.
@@ -66,6 +66,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 
 - `getScenarios`: Récupère tous les scénarios.
 - `enableScenario`: Active un scénario spécifique.
+  - Émet `system_scenario_enable_failed` si l'`id` est dupliqué, introuvable ou invalide.
 - `enablePreviousScenario`: Active le scénario précédent.
 - `getPreviousScenario`: Récupère le scénario précédent.
 
@@ -74,7 +75,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 ### Méthodes
 
 - `isModuleAvailable`: Vérifie si un module est disponible.
-- `getModule`: Récupère un module spécifique.
+- `module|undefined getModule`: Récupère un module spécifique (retourne `undefined` si introuvable ou non initialisé).
 
 ## Système (system)
 

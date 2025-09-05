@@ -1020,8 +1020,14 @@ class Core {
   }
 
   setPresenterLocation(location) {
-    this.eventPresenterLocationSet(location);
+    const normalized = String(location).toLowerCase();
+    if (normalized !== 'local' && normalized !== 'remote') {
+      debug(3, `setPresenterLocation(): invalid value "${location}"`);
+      return;
+    }
+    zapi.system.setStatus('PresenterLocation', normalized);
   }
+  
   setDND() {
     this.setDNDInterval = setInterval(() => { this.setDND(); }, 82800000);
     xapi.Command.Conference.DoNotDisturb.Activate({ Timeout: 1440 });

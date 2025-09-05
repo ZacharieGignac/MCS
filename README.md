@@ -14,6 +14,7 @@
 * Ajout de l'action `SETSS$key,value` pour définir un SystemStatus
 * Ajout de la réception des messages texte `MCSACTION$ACTION,VALUE` et `MCSACTION$ACTION,VALUE&ACTION,VALUE` qui sont convertis en actions
 * Unmuter 5 fois (avec le bouton mute) ouvre le panneau `system_admin``
+* Nouveau macro séparé `watchdog.js` pour surveiller la santé du core (voir section Watchdog)
 
 ### Bugfix
 * Les microphones sont maintenant unmuté lors de l'activation du scénario sce_standby
@@ -29,6 +30,28 @@
 * drivers (Display série Sony/Epson): gestion d'erreurs centralisée et logs "debouncés"; plus d'"Unhandled promise rejection TIMEOUT" quand le projecteur est débranché.
 * core (audio.extra): vérifications null/undefined sur les groupes d'entrées/sorties audio supplémentaires pour éviter les exceptions lors des connexions/déconnexions.
 * core: `toBool` accepte maintenant des valeurs non-string en toute sécurité.
+
+## Watchdog
+Un macro séparé `watchdog.js` agit comme chien de garde pour vérifier que le core fonctionne et répondre dans des délais raisonnables.
+
+### Principe
+- Le watchdog envoie un message texte XAPI (`MCS_WD_PING`).
+- Le core répond immédiatement avec (`MCS_WD_PONG`) même durant l'attente de cold boot.
+- Le watchdog attend un PONG pendant 15 secondes.
+- Après 3 tentatives consécutives sans réponse (3 minutes), le watchdog redémarre le moteur de macros.
+
+### Détails
+- Délai initial avant le premier ping: 1 minute.
+- Fréquence: 1 ping par minute.
+- Seuil de redémarrage: 3 PING sans PONG.
+- Redémarrage: `xapi.Command.Macros.Runtime.Restart()`.
+
+### Déploiement
+- Installer `watchdog.js` comme macro séparée (distincte de `core`).
+- Aucun paramètre requis; les constantes par défaut sont:
+  - PING: `MCS_WD_PING`
+  - PONG: `MCS_WD_PONG`
+  - Délai initial: 60s, Intervalle: 60s, Attente PONG: 15s, Échecs avant restart: 3
 
 
 ## v1.1.0 (version actuelle)

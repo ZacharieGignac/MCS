@@ -1014,7 +1014,7 @@ class Core {
     if (this.scenarios.currentScenario == systemconfig.system.onStandby.enableScenario) {
       this.scenarios.enableScenario(systemconfig.system.onWakeup.enableScenario);
     }
-    zapi.system.events.emit('system_wakup');
+    zapi.system.events.emit('system_wakeup');
     this.displaySystemStatus();
     
   }

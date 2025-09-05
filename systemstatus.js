@@ -110,18 +110,11 @@ export var presentation = {
         var remotePresentation = false;
         var localPresentationSending = false;
 
-        if (pres.LocalInstance != undefined) {
-          if (pres.LocalInstance != undefined) {
-            localPresentation = true;
-          }
-          else {
-            localPresentation = false;
-          }
+        // Determine local presentation and whether it is being sent
+        localPresentation = (pres.LocalInstance != undefined);
+        if (pres.Mode == 'Sending') {
+          localPresentationSending = true;
         }
-        else {
-          localPresentation = false;
-        }
-
 
         //Check if remote presentation
         if (pres.Mode == 'Receiving') {

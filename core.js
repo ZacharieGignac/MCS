@@ -47,6 +47,16 @@ async function killswitchInit() {
 killswitchInit();
 
 
+// Watchdog responder: reply to watchdog pings at any time (even before preInit)
+xapi.Event.Message.Send.Text.on(text => {
+  if (text === 'MCS_WD_PING') {
+    try {
+      xapi.Command.Message.Send({ Text: 'MCS_WD_PONG' });
+    }
+    catch (e) { }
+  }
+});
+
 
 const DEBUGLEVEL = {
   LOW: 3,

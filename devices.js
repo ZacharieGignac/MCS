@@ -103,8 +103,13 @@ export class DevicesManager {
   getDevicesInGroup(group) {
     let foundGroup = this.allGroups.filter(g => g.id == group)[0];
     let devices = [];
+    if (!foundGroup) {
+      debug(3, `getDevicesInGroup("${group}"): group not found`);
+      return devices;
+    }
     for (let d of foundGroup.devices) {
-      devices.push(this.getDevice(d));
+      const dev = this.getDevice(d);
+      if (dev) devices.push(dev);
     }
     return devices;
   }
@@ -112,12 +117,14 @@ export class DevicesManager {
   getDevicesByTypeInGroup(type, group) {
     let foundGroup = this.allGroups.filter(g => g.id == group)[0];
     let devices = [];
-    if (foundGroup) {
-      for (let d of foundGroup.devices) {
-        let tempDevice = this.getDevice(d, true);
-        if (tempDevice.type == type) {
-          devices.push(tempDevice.inst);
-        }
+    if (!foundGroup) {
+      debug(3, `getDevicesByTypeInGroup("${type}", "${group}"): group not found`);
+      return devices;
+    }
+    for (let d of foundGroup.devices) {
+      let tempDevice = this.getDevice(d, true);
+      if (tempDevice && tempDevice.type == type) {
+        devices.push(tempDevice.inst);
       }
     }
     return devices;

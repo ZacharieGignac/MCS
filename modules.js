@@ -28,7 +28,16 @@ export class Modules {
     });
   }
   getModule(id) {
-    return (this.modules.filter(mod => mod.module.Manifest.id == id)[0].inst);
+    if (!this.modules || this.modules.length === 0) {
+      debug(3, `getModule("${id}"): modules not initialized`);
+      return undefined;
+    }
+    const found = this.modules.find(mod => mod.module.Manifest.id == id);
+    if (!found) {
+      debug(3, `getModule("${id}"): module not found`);
+      return undefined;
+    }
+    return found.inst;
   }
   isModuleAvailable(id) {
     return (this.modules.filter(mod => mod.module.Manifest.id == id).length > 0 ? true : false);

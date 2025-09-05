@@ -89,6 +89,11 @@ export class Scenarios {
       var match = this.scenariosLibrary.filter(sce => { return sce.manifest.id == id });
       if (match.length > 1) {
         debug(3, `SCENARIOS ERROR!!! More than one scenario use id "${id}". No scenario will be enabled.`);
+        zapi.system.events.emit('system_scenario_enable_failed', { id, reason: 'duplicate' });
+      }
+      else if (match.length === 0) {
+        debug(3, `SCENARIOS ERROR!!! No scenario found with id "${id}". No scenario will be enabled.`);
+        zapi.system.events.emit('system_scenario_enable_failed', { id, reason: 'not_found' });
       }
       else {
         currManifest = match[0].manifest;
@@ -112,7 +117,14 @@ export class Scenarios {
             debug(1, `Scenario "${this.currentScenario}" disable success!`);
           }
 
-          let scenarioToEnable = this.getScenario(id).scenario;
+          const scenarioEntry = this.getScenario(id);
+          if (!scenarioEntry || !scenarioEntry.scenario) {
+            debug(3, `Scenario entry missing for id "${id}".`);
+            zapi.system.events.emit('system_scenario_enable_failed', { id, reason: 'invalid_entry' });
+            zapi.performance.setElapsedEnd('Scenarios.enableScenario');
+            return;
+          }
+          let scenarioToEnable = scenarioEntry.scenario;
           scenarioToEnable.enabled = true;
           let enableResult = await scenarioToEnable.enable();
           if (enableResult) {
@@ -122,8 +134,8 @@ export class Scenarios {
             zapi.system.setStatus('currentScenario', this.currentScenario);
 
 
-            this.hidePanels(currManifest.panels.hide);
-            this.showPanels(currManifest.panels.show);
+            if (currManifest.panels && currManifest.panels.hide) this.hidePanels(currManifest.panels.hide);
+            if (currManifest.panels && currManifest.panels.show) this.showPanels(currManifest.panels.show);
             if (currManifest.features != undefined) {
               this.setupFeatures(currManifest.features);
             }

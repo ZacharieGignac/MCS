@@ -104,6 +104,8 @@ Aucunes.
 - `void disconnectLocalInput(AudioInputGroup audioInputGroup)`: Déconnecte le groupe de sortie audio à un groupe d'entrée audio locale
 - `void connectRemoteInputs(void)`: Connecte les entrées audio distantes au groupe de sortie audio local
 - `void disconnectRemoteInputs(void)`: Déconnecte les entrées audio distantes au groupe de sortie audio local
+- `void connectSpecificRemoteInputs(string[] remoteInputIds)`: Connecte uniquement les entrées distantes spécifiées au groupe de sortie audio local
+- `void disconnectSpecificRemoteInputs(string[] remoteInputIds)`: Déconnecte uniquement les entrées distantes spécifiées du groupe de sortie audio local
 - `void updateInputGain(AudioInputGroup audioInputGroup, AudioOutputGroup audioOutputGroup)`: Défini le gain dans le lien entre le groupe d'entrée local et le groupe de sortie local
 ## AudioReporter
 

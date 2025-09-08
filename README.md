@@ -15,6 +15,10 @@
 * Ajout de la réception des messages texte `MCSACTION$ACTION,VALUE` et `MCSACTION$ACTION,VALUE&ACTION,VALUE` qui sont convertis en actions
 * Unmuter 5 fois (avec le bouton mute) ouvre le panneau `system_admin``
 * Nouveau macro séparé `watchdog.js` pour surveiller la santé du core (voir section Watchdog)
+* Audio (sce_como_type1): Routage sélectif des entrées distantes selon leur rôle. Toute entrée distante avec rôle `Presentation` est désormais acheminée vers le groupe `system.presentation.main` (et jamais vers `system.farend.main`). Les autres entrées suivent la logique selon `PresenterLocation`.
+* API Audio: Nouvelle méthode `zapi.audio.getRemoteInputsDetailed()` renvoyant la liste des entrées distantes avec leurs rôles (`[{ id, role, callId, streamId }]`).
+* Devices/AudioOutputGroup: Nouvelles méthodes `connectSpecificRemoteInputs(ids)` et `disconnectSpecificRemoteInputs(ids)` pour un routage ciblé des entrées distantes.
+* Journaux: Logs audio et scenario simplifiés et structurés (comptes, rôles, ids) pour faciliter le diagnostic.
 
 ### Bugfix
 * Les microphones sont maintenant unmuté lors de l'activation du scénario sce_standby

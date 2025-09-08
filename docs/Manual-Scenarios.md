@@ -177,3 +177,14 @@ Cette function est executée quand le scénario est activé et que le scénario 
 ## Activation d'un scénario
 Le système a besoin d'au moins 1 scénario pour fonctionner. Lorsque le système tombe en veille, il activera le scénario indiqué dans la configuration `config.system.onStandby.enableScenario`. Lorsqu'il se réveille, il activara le scénario indiqué dans la configuration `config.system.onWakeup.enableScenario`
 
+## Note sur `sce_como_type1` (Audio)
+Dans `sce_como_type1`, le routage audio des entrées distantes utilise désormais les rôles fournis par le codec:
+- Toute entrée distante avec rôle `Presentation` est toujours connectée au groupe `system.presentation.main` et jamais au groupe `system.farend.main`.
+- Les autres entrées distantes sont routées selon `PresenterLocation`:
+  - `local` → far-end
+  - `remote` → presentation
+
+Ce comportement repose sur:
+- `zapi.audio.getRemoteInputsDetailed()` pour obtenir `{ id, role }` des entrées distantes
+- Les méthodes `connectSpecificRemoteInputs` et `disconnectSpecificRemoteInputs` de `AudioOutputGroup` pour un routage ciblé
+

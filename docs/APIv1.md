@@ -141,6 +141,8 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `getLocalOutputId`: Récupère l'ID de sortie audio local.
   - `name` : Nom du groupe de sortie dans audio console.
 - `getRemoteInputsIds`: Récupère les IDs d'entrées audio du site distant.
+- `getRemoteInputsDetailed`: Récupère les entrées audio distantes détaillées, incluant les rôles.
+  - Retour: `[{ id: string, role: 'main'|'presentation'|'simultaneousinterpreter'|string, callId: string, streamId?: number }]`
 - `getRemoteOutputIds`: Récupère les IDs de sortie audio du site distant.
 - `addAudioReportAnalyzer`: Récupère un nouvel analyseur de rapport audio.
 - `applyAudioConfig`: Applique une configuration audio. (audio-console).

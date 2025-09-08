@@ -116,17 +116,26 @@ export class Scenario {
 
   onStatusChange(status) {
     if (this.enabled) {
+      try { debug(1, `ComoType1 status key=${status.key}`); } catch (e) {}
       switch (status.key) {
         case 'hdmiPassthrough':
           this.evaluateCameras(status.status);
           break;
         case 'call':
           //Filter non-important call status
+          try { debug(1, `ComoType1 call: Connected, presenter=${status.status.PresenterLocation}, pres=${status.status.presentation ? status.status.presentation.type : 'n/a'}`); } catch (e) {}
           if (status.status.call == 'Idle' || status.status.call == 'Connected') {
             this.evaluateDisplays(status.status);
             this.evaluateScreens(status.status);
           }
           this.evaluateAudio(status.status);
+          // If a call just connected and a presentation is ongoing, probe for remote presentation audio
+          try {
+            if (status.status.call == 'Connected' && status.status.presentation && status.status.presentation.type && status.status.presentation.type != 'NOPRESENTATION') {
+              this._scheduleRemotePresentationProbe();
+            }
+          }
+          catch (e) { }
           this.evaluateCameras(status.status);
           break;
         case 'UsePresenterTrack':
@@ -136,10 +145,18 @@ export class Scenario {
         case 'presentation':
         case 'ClearPresentationZone':
         case 'PresenterLocation':
+          try { debug(1, `ComoType1 presentation change: type=${status.status.presentation ? status.status.presentation.type : 'n/a'}, presenter=${status.status.PresenterLocation}`); } catch (e) {}
           this.evaluateDisplays(status.status);
           this.evaluateScreens(status.status);
           this.evaluateLightscene(status.status);
           this.evaluateAudio(status.status);
+          // On presentation start, probe until remote Presentation input is available
+          try {
+            if (status.status.presentation && status.status.presentation.type && status.status.presentation.type != 'NOPRESENTATION') {
+              this._scheduleRemotePresentationProbe();
+            }
+          }
+          catch (e) { }
           this.evaluateCameras(status.status);
           break;
         case 'AudienceMics':
@@ -259,23 +276,101 @@ export class Scenario {
 
   }
 
+  // Schedules a short retry loop to detect RemoteInput Role=Presentation that may
+  // appear slightly after presentation start or call connected.
+  _scheduleRemotePresentationProbe() {
+    if (this._remotePresentationProbeActive) return;
+    try { debug(1, 'ComoType1: schedule remote-presentation probe'); } catch (e) {}
+    this._remotePresentationProbeActive = true;
+    let attempts = 0;
+    const maxAttempts = 6;
+    const delayMs = 350;
+    const attempt = async () => {
+      attempts++;
+      try { debug(1, `ComoType1: probe attempt ${attempts}/${maxAttempts}`); } catch (e) {}
+      const applied = await this._checkAndApplyRemotePresentationRouting();
+      if (applied) {
+        this._remotePresentationProbeActive = false;
+        return;
+      }
+      if (attempts < maxAttempts && this.enabled) {
+        this._remotePresentationProbeTimerId = setTimeout(() => {
+          attempt();
+        }, delayMs);
+      }
+      else {
+        this._remotePresentationProbeActive = false;
+        try { debug(1, 'ComoType1: probe finished, no override applied'); } catch (e) {}
+      }
+    };
+    attempt();
+  }
+
+  async _checkAndApplyRemotePresentationRouting() {
+    try {
+      // Ensure presentation is still active
+      let status = zapi.system.getAllStatus();
+      try { debug(1, `ComoType1: probe status call=${status.call}, presenter=${status.PresenterLocation}, pres=${status.presentation ? status.presentation.type : 'n/a'}`); } catch (e) {}
+      if (!status.presentation || !status.presentation.type || status.presentation.type == 'NOPRESENTATION') {
+        try { debug(1, 'ComoType1: probe aborted, no active presentation'); } catch (e) {}
+        return false;
+      }
+      let detailed = await zapi.audio.getRemoteInputsDetailed().catch(() => []);
+      try {
+        const roles = (detailed||[]).reduce((a,d)=>{a[d.role]=(a[d.role]||0)+1;return a;},{});
+        debug(1, `ComoType1: remote inputs detailed: ${detailed.length}, roles=${JSON.stringify(roles)}`);
+      } catch (e) {}
+      const presentationIds = (detailed || []).filter(d => d.role === 'presentation').map(d => d.id);
+      if (presentationIds.length > 0) {
+        this._remotePresentationAudioOverride = true;
+        this.devices.audiooutputgroups.presentation.forEach(aog => { aog.connectSpecificRemoteInputs(presentationIds); });
+        // Disconnect presentation-role inputs from farend, but allow others to follow default logic
+        this.devices.audiooutputgroups.farend.forEach(aog => { aog.disconnectSpecificRemoteInputs(presentationIds); });
+        debug(1, `ComoType1: applied presentation override, ids=[${presentationIds.join(', ')}]`);
+        return true;
+      }
+      else {
+        try { debug(1, 'ComoType1: no Presentation-role inputs yet'); } catch (e) {}
+      }
+    }
+    catch (e) {
+      debug(3, `ComoType1 remote presentation probe error: ${e}`);
+    }
+    return false;
+  }
+
   async evaluateAudio(status) {
 
+    try { debug(1, `ComoType1 evalAudio: call=${status.call}, presenter=${status.PresenterLocation}, pres=${status.presentation ? status.presentation.type : 'n/a'}`); } catch (e) {}
+    // Always read current remote inputs and route Presentation role to presentation group
+    let detailed = await zapi.audio.getRemoteInputsDetailed().catch(() => []);
+    const presentationIds = (detailed || []).filter(d => d.role === 'presentation').map(d => d.id);
+    const nonPresentationIds = (detailed || []).filter(d => d.role !== 'presentation').map(d => d.id);
+
+    // Route presentation-role inputs: connect to presentation, disconnect from farend
+    if (presentationIds.length > 0) {
+      try { debug(1, `ComoType1 evalAudio: route Presentation-role -> presentation, ids=[${presentationIds.join(', ')}]`); } catch (e) {}
+      this.devices.audiooutputgroups.presentation.forEach(aog => { aog.connectSpecificRemoteInputs(presentationIds); });
+      this.devices.audiooutputgroups.farend.forEach(aog => { aog.disconnectSpecificRemoteInputs(presentationIds); });
+    }
+
+    // Route non-presentation inputs according to PresenterLocation
     if (status.PresenterLocation == LOCAL) {
-      this.devices.audiooutputgroups.presentation.forEach(aog => {
-        aog.disconnectRemoteInputs();
-      });
-      this.devices.audiooutputgroups.farend.forEach(aog => {
-        aog.connectRemoteInputs();
-      });
+      try { debug(1, `ComoType1 evalAudio: LOCAL presenter, route non-presentation -> farend, ids=[${nonPresentationIds.join(', ')}]`); } catch (e) {}
+      if (nonPresentationIds.length > 0) {
+        this.devices.audiooutputgroups.farend.forEach(aog => { aog.connectSpecificRemoteInputs(nonPresentationIds); });
+      }
+      // Ensure non-presentation are not in presentation group
+      if (nonPresentationIds.length > 0) {
+        this.devices.audiooutputgroups.presentation.forEach(aog => { aog.disconnectSpecificRemoteInputs(nonPresentationIds); });
+      }
     }
     else {
-      this.devices.audiooutputgroups.presentation.forEach(aog => {
-        aog.connectRemoteInputs();
-      });
-      this.devices.audiooutputgroups.farend.forEach(aog => {
-        aog.disconnectRemoteInputs();
-      });
+      try { debug(1, `ComoType1 evalAudio: REMOTE presenter, route non-presentation -> presentation, ids=[${nonPresentationIds.join(', ')}]`); } catch (e) {}
+      if (nonPresentationIds.length > 0) {
+        this.devices.audiooutputgroups.presentation.forEach(aog => { aog.connectSpecificRemoteInputs(nonPresentationIds); });
+        this.devices.audiooutputgroups.farend.forEach(aog => { aog.disconnectSpecificRemoteInputs(nonPresentationIds); });
+      }
     }
 
   }

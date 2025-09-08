@@ -14,9 +14,22 @@ export class Audio {
     zapi.audio.getLocalInputId = (name) => { return self.getLocalInputId(name); };
     zapi.audio.getLocalOutputId = (name) => { return self.getLocalOutputId(name); };
     zapi.audio.getRemoteInputsIds = () => { return self.getRemoteInputsIds(); };
+    zapi.audio.getRemoteInputsDetailed = () => { return self.getRemoteInputsDetailed(); };
     zapi.audio.getRemoteOutputIds = () => { return self.getRemoteOutputIds(); };
     zapi.audio.addAudioReportAnalyzer = (audioReporter) => { return new AudioReportAnalyzer(audioReporter); };
     zapi.audio.applyAudioConfig = (config, reset = false) => { return self.applyAudioConfig(config, reset) }
+
+    xapi.Event.UserInterface.Extensions.Widget.Action.on(action => {
+      if (action.Type == 'clicked') {
+        if (action.WidgetId == 'aconfig1') {
+          this.applyAudioConfig(config1);
+        }
+        else if (action.WidgetId == 'aconfig2') {
+          this.applyAudioConfig(config2);
+        }
+      }
+    });
+
 
   }
 
@@ -53,12 +66,29 @@ export class Audio {
         for (let r of ri) {
           inputs.push(r.id);
         }
+        try { debug(1, `Audio.getRemoteInputsIds: ${inputs.length} remote inputs [${inputs.join(', ')}]`); } catch (e) {}
         if (inputs.length > 0) {
           success(inputs);
         }
         else {
           failure('No remote inputs found.');
         }
+      });
+    });
+  }
+
+  getRemoteInputsDetailed() {
+    return new Promise((success, failure) => {
+      xapi.Status.Audio.Input.RemoteInput.get().then(ri => {
+        let list = ri || [];
+        if (!Array.isArray(list)) list = [list];
+        const mapped = list.map(r => ({ id: String(r.id), role: String(r.Role || '').toLowerCase(), callId: String(r.CallId || ''), streamId: r.StreamId }));
+        const roles = mapped.reduce((acc, r) => { acc[r.role] = (acc[r.role]||0)+1; return acc; }, {});
+        const ids = mapped.map(r => r.id).join(', ');
+        try { debug(1, `Audio.getRemoteInputsDetailed: ${mapped.length} inputs, roles=${JSON.stringify(roles)}, ids=[${ids}]`); } catch (e) {}
+        success(mapped);
+      }).catch(err => {
+        failure(err);
       });
     });
   }

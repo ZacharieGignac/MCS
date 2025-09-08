@@ -162,35 +162,73 @@ export class AudioOutputGroup {
   async connectRemoteInputs() {
     try {
       let remoteinputs = await zapi.audio.getRemoteInputsIds();
+      try { debug(1, `DEVICE ${this.config.id}: ConnectRemoteInputs: ${remoteinputs.length} inputs -> Output ${this.outputId}`); } catch (e) {}
       for (let ri of remoteinputs) {
+        try { debug(1, `DEVICE ${this.config.id}: Connect RI ${ri} -> LO ${this.outputId}`); } catch (e) {}
         xapi.Command.Audio.LocalOutput.ConnectInput({
           InputId: ri,
           OutputId: this.outputId
         });
       }
-      debug(1, `DEVICE ${this.config.id}: ConnectRemoteInputs`);
+      debug(1, `DEVICE ${this.config.id}: ConnectRemoteInputs done.`);
     }
     catch (e) {
       debug(1, `DEVICE ${this.config.id} connectRemoteInputs error: ${e}`);
     }
   }
 
+  async connectSpecificRemoteInputs(remoteInputIds) {
+    try {
+      try { debug(1, `DEVICE ${this.config.id}: connectSpecificRemoteInputs: ${remoteInputIds.length} -> LO ${this.outputId}`); } catch (e) {}
+      for (let ri of remoteInputIds) {
+        try { debug(1, `DEVICE ${this.config.id}: Connect RI ${ri} -> LO ${this.outputId}`); } catch (e) {}
+        xapi.Command.Audio.LocalOutput.ConnectInput({
+          InputId: ri,
+          OutputId: this.outputId
+        });
+      }
+      debug(1, `DEVICE ${this.config.id}: connectSpecificRemoteInputs done.`);
+    }
+    catch (e) {
+      debug(1, `DEVICE ${this.config.id} connectSpecificRemoteInputs error: ${e}`);
+    }
+  }
+
   async disconnectRemoteInputs() {
     try {
       let remoteinputs = await zapi.audio.getRemoteInputsIds();
+      try { debug(1, `DEVICE ${this.config.id}: DisconnectRemoteInputs: ${remoteinputs.length} inputs from LO ${this.outputId}`); } catch (e) {}
       for (let ri of remoteinputs) {
+        try { debug(1, `DEVICE ${this.config.id}: Disconnect RI ${ri} -/-> LO ${this.outputId}`); } catch (e) {}
         xapi.Command.Audio.LocalOutput.DisconnectInput({
           InputId: ri,
           OutputId: this.outputId
         });
       }
 
-      debug(1, `DEVICE ${this.config.id}: DisconnectRemoteInputs`);
+      debug(1, `DEVICE ${this.config.id}: DisconnectRemoteInputs done.`);
     }
     catch (e) {
       debug(1, `DEVICE ${this.config.id} disConnectRemoteInputs error: ${e}`);
     }
 
+  }
+
+  async disconnectSpecificRemoteInputs(remoteInputIds) {
+    try {
+      try { debug(1, `DEVICE ${this.config.id}: disconnectSpecificRemoteInputs: ${remoteInputIds.length} from LO ${this.outputId}`); } catch (e) {}
+      for (let ri of remoteInputIds) {
+        try { debug(1, `DEVICE ${this.config.id}: Disconnect RI ${ri} -/-> LO ${this.outputId}`); } catch (e) {}
+        xapi.Command.Audio.LocalOutput.DisconnectInput({
+          InputId: ri,
+          OutputId: this.outputId
+        });
+      }
+      debug(1, `DEVICE ${this.config.id}: disconnectSpecificRemoteInputs done.`);
+    }
+    catch (e) {
+      debug(1, `DEVICE ${this.config.id} disconnectSpecificRemoteInputs error: ${e}`);
+    }
   }
   async updateInputGain(li, gain) {
     try {

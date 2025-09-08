@@ -539,7 +539,7 @@ class Core {
 
   async enableExtraOutput() {
     if (!this.audioExtraModeOutput) {
-      debug(3, 'audioExtraModeOutput is undefined; skipping enableExtraOutput');
+      debug(1, 'audioExtraModeOutput is undefined; skipping enableExtraOutput');
       return;
     }
     this.audioExtraModeInputs.forEach(input => {
@@ -554,7 +554,7 @@ class Core {
 
   async disableExtraOutput() {
     if (!this.audioExtraModeOutput) {
-      debug(3, 'audioExtraModeOutput is undefined; skipping disableExtraOutput');
+      debug(1, 'audioExtraModeOutput is undefined; skipping disableExtraOutput');
       return;
     }
     this.audioExtraModeInputs.forEach(input => {

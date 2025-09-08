@@ -16,6 +16,8 @@ import { debug } from './debug';
 
 const COREVERSION = '1.2.0-dev1';
 const ZAPIVERSION = 1;
+// If true, skip restarting Macro Runtime after cold boot and proceed with scheduled preInit()
+const SKIP_FRAMEWORK_RESTART_AFTER_COLD_BOOT = false;
 
 function systemKill() {
   xapi.Command.Macros.Macro.Deactivate({ Name: 'core' });
@@ -47,15 +49,7 @@ async function killswitchInit() {
 killswitchInit();
 
 
-// Watchdog responder: reply to watchdog pings at any time (even before preInit)
-xapi.Event.Message.Send.Text.on(text => {
-  if (text === 'MCS_WD_PING') {
-    try {
-      xapi.Command.Message.Send({ Text: 'MCS_WD_PONG' });
-    }
-    catch (e) { }
-  }
-});
+// Watchdog responder moved to the end of init()
 
 
 const DEBUGLEVEL = {
@@ -1055,7 +1049,7 @@ class Core {
     }
     zapi.system.events.emit('system_wakeup');
     this.displaySystemStatus();
-    
+
   }
 
   setPresenterLocation(location) {
@@ -1066,7 +1060,7 @@ class Core {
     }
     zapi.system.setStatus('PresenterLocation', normalized);
   }
-  
+
   setDND() {
     this.setDNDInterval = setInterval(() => { this.setDND(); }, 82800000);
     xapi.Command.Conference.DoNotDisturb.Activate({ Timeout: 1440 });
@@ -1097,7 +1091,7 @@ class Core {
     } catch (error) {
       // Silent error handling
     }
-    
+
     // Monitor mute status changes
     xapi.Status.Audio.Microphones.Mute.on((muteState) => {
       this.handleMuteStateChange(muteState);
@@ -1109,35 +1103,35 @@ class Core {
     if (newMuteState === 'Off' && this.lastMuteState === 'On') {
       this.handleUnmuteAction();
     }
-    
+
     this.lastMuteState = newMuteState;
   }
 
   handleUnmuteAction() {
     const currentTime = Date.now();
-    
+
     // If this is the first unmute, start the 10-second window
     if (this.mutePressCount === 0) {
       this.firstPressTime = currentTime;
     }
-    
+
     // Increment unmute count
     this.mutePressCount++;
-    
+
     // Check if we've reached 5 unmutes
     if (this.mutePressCount >= 5) {
       this.triggerAdminPanel();
       this.resetMuteCounter();
       return;
     }
-    
+
     // Check if we're still within the 10-second window
     const timeElapsed = currentTime - this.firstPressTime;
     if (timeElapsed >= 10000) {
       this.resetMuteCounter();
       return;
     }
-    
+
     // Set timeout to reset counter when the 10-second window expires
     if (this.muteTimeout) {
       clearTimeout(this.muteTimeout);
@@ -1162,7 +1156,7 @@ class Core {
     xapi.Command.UserInterface.Extensions.Panel.Open({
       PanelId: 'system_admin'
     });
-    
+
     // Show a brief message to confirm the action
     xapi.Command.UserInterface.Message.TextLine.Display({
       Duration: 3,
@@ -1375,27 +1369,27 @@ async function preInit() {
   debug(2, `PreInit started...`);
 
 
-  clearInterval(coldbootWarningInterval);
+  clearInterval(bootWaitPromptIntervalId);
 
 
-xapi.Event.Message.Send.Text.on(text => {
-  if (systemconfig.system.debugInternalMessages) {
-    debug(1, `[INTERNAL MESSAGE] ${text}`);
-  }
-  if (typeof text === 'string') {
-    let actionMatch = text.match(/MCSACTION\$(.+)/);
-    let actionsMatch = text.match(/MCSACTIONS\$(.+)/);
-    if (actionMatch) {
-      if (core && core.uiManager && core.uiManager.processMatchAction) {
-        core.uiManager.processMatchAction('ACTION$' + actionMatch[1]);
-      }
-    } else if (actionsMatch) {
-      if (core && core.uiManager && core.uiManager.processMatchAction) {
-        core.uiManager.processMatchAction('ACTIONS$' + actionsMatch[1]);
+  xapi.Event.Message.Send.Text.on(text => {
+    if (systemconfig.system.debugInternalMessages) {
+      debug(1, `[INTERNAL MESSAGE] ${text}`);
+    }
+    if (typeof text === 'string') {
+      let actionMatch = text.match(/MCSACTION\$(.+)/);
+      let actionsMatch = text.match(/MCSACTIONS\$(.+)/);
+      if (actionMatch) {
+        if (core && core.uiManager && core.uiManager.processMatchAction) {
+          core.uiManager.processMatchAction('ACTION$' + actionMatch[1]);
+        }
+      } else if (actionsMatch) {
+        if (core && core.uiManager && core.uiManager.processMatchAction) {
+          core.uiManager.processMatchAction('ACTIONS$' + actionsMatch[1]);
+        }
       }
     }
-  }
-});
+  });
 
   debug(1, `Checking config validity...`);
   let validConfig = configValidityCheck();
@@ -1471,6 +1465,20 @@ async function init() {
 
   xapi.Command.Standby.Activate();
 
+  // Watchdog responder: reply to watchdog pings only once init is complete
+  debug(1, '[Watchdog] Registering PING responder (post-init)');
+  xapi.Event.Message.Send.Text.on(text => {
+    if (text === 'MCS_WD_PING') {
+      debug(1, '[Watchdog] Received PING -> sending PONG');
+      try {
+        xapi.Command.Message.Send({ Text: 'MCS_WD_PONG' });
+      }
+      catch (e) {
+        debug(3, `[Watchdog] Error sending PONG: ${e}`);
+      }
+    }
+  });
+
 
   //TESTAREA AFTERBOOT
 
@@ -1536,8 +1544,10 @@ async function checkUptimeAndRestart() {
   try {
     const uptime = await xapi.Status.SystemUnit.Uptime.get();
     if (uptime > systemconfig.system.coldBootTime) {
-      clearInterval(bootWaitPromptIntervalId); // Using the new name here
-      xapi.Command.Macros.Runtime.Restart();
+      if (!SKIP_FRAMEWORK_RESTART_AFTER_COLD_BOOT) {
+        clearInterval(bootWaitPromptIntervalId); // Using the new name here
+        xapi.Command.Macros.Runtime.Restart();
+      }
     }
   } catch (error) {
     console.error("Error getting uptime in interval:", error);

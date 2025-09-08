@@ -18,19 +18,6 @@ export class Audio {
     zapi.audio.getRemoteOutputIds = () => { return self.getRemoteOutputIds(); };
     zapi.audio.addAudioReportAnalyzer = (audioReporter) => { return new AudioReportAnalyzer(audioReporter); };
     zapi.audio.applyAudioConfig = (config, reset = false) => { return self.applyAudioConfig(config, reset) }
-
-    xapi.Event.UserInterface.Extensions.Widget.Action.on(action => {
-      if (action.Type == 'clicked') {
-        if (action.WidgetId == 'aconfig1') {
-          this.applyAudioConfig(config1);
-        }
-        else if (action.WidgetId == 'aconfig2') {
-          this.applyAudioConfig(config2);
-        }
-      }
-    });
-
-
   }
 
   getLocalInputId(name) {

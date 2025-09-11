@@ -367,8 +367,7 @@ export class Scenario {
           if (display.config.skipVideoMatrix) return;
           xapi.Command.Video.Matrix.Assign({
             Mode: 'Replace',
-            Output: display.config.connector,
-            RemoteMain: 4
+            Output: display.config.connector
           });
         });
       }

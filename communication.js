@@ -59,7 +59,7 @@ class HttpRequestQueue {
           httpClientMethod = xapi.Command.HttpClient.Delete;
           break;
         case 'PATCH':
-          httpClientMethod = xapi.Command.HttpClient.Patch
+          httpClientMethod = xapi.Command.HttpClient.Patch;
           break;
         default:
           reject(`Unknown HTTP method "${clientParameters.Method}"`);

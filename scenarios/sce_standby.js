@@ -17,6 +17,7 @@ function safeStringify(obj, cache = new Set()) {
 }
 
 
+
 export var Manifest = {
   fileName: 'sce_standby',
   id: 'standby',
@@ -51,23 +52,24 @@ export class Scenario {
   }
 
   start() {
-    xapi.Command.Audio.Microphones.Unmute();
+    xapi.Command.Audio.Microphones.Unmute().catch(() => {});
 
     //Clear prompts and alerts
-    xapi.Command.UserInterface.Message.Prompt.Clear();
-    xapi.Command.UserInterface.Message.Alert.Clear();
+    xapi.Command.UserInterface.Message.Prompt.Clear().catch(() => {});
+    xapi.Command.UserInterface.Message.Alert.Clear().catch(() => {});
 
     //Stop presentation
-    xapi.Command.Presentation.Stop();
+    xapi.Command.Presentation.Stop().catch(() => {});
 
+    //Stop HdmiPassthrough (only if active)
     try {
-      //Stop HdmiPassthrough
-      xapi.Command.Video.Output.HDMI.Passthrough.Stop();
-    } catch { e }
-
+      if (zapi.system && typeof zapi.system.getStatus === 'function' && zapi.system.getStatus('hdmiPassthrough') === 'Active') {
+        xapi.Command.Video.Output.HDMI.Passthrough.Stop().catch(() => {});
+      }
+    } catch (_) {}
 
     //Set default volume
-    xapi.Command.Audio.Volume.SetToDefault();
+    xapi.Command.Audio.Volume.SetToDefault().catch(() => {});
 
     //Disable HDMIPassthrough
 

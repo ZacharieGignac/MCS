@@ -645,7 +645,11 @@ class Core {
         if (event.OptionId == '1') {
           xapi.Command.Presentation.Stop();
           xapi.Command.Call.Disconnect();
-          xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+          try {
+            xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+          } catch (e) {
+            // HDMI Passthrough might not be supported on this device
+          }
           setTimeout(() => {
             xapi.Command.Standby.Activate();
           }, 2000);
@@ -723,7 +727,11 @@ class Core {
 
       }
       else {
-        xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+        try {
+          xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+        } catch (e) {
+          // HDMI Passthrough might not be supported on this device
+        }
         xapi.Command.Standby.Activate();
 
 
@@ -756,16 +764,25 @@ class Core {
     //Presenter track
     xapi.Command.UserInterface.Message.TextLine.Clear();
     if (systemconfig.system.usePresenterTrack) {
-      let presenterDetected = await xapi.Status.Cameras.PresenterTrack.PresenterDetected.get();
-      let presenterDetectedBool = String(presenterDetected).toLowerCase() === 'true';
-      this.systemStatus.setStatus('PresenterDetected', presenterDetectedBool, false);
-      xapi.Status.Cameras.PresenterTrack.PresenterDetected.on(value => {
-        if (this.systemStatus.getStatus('PresenterTrackWarnings') == 'on') {
-          let valBool = String(value).toLowerCase() === 'true';
-          this.systemStatus.setStatus('PresenterDetected', valBool);
-          this.processPresenterDetectedStatus(valBool);
-        }
-      });
+      try {
+        let presenterDetected = await xapi.Status.Cameras.PresenterTrack.PresenterDetected.get();
+        let presenterDetectedBool = String(presenterDetected).toLowerCase() === 'true';
+        this.systemStatus.setStatus('PresenterDetected', presenterDetectedBool, false);
+      } catch (e) {
+        // PresenterTrack might not be supported on this device
+        this.systemStatus.setStatus('PresenterDetected', false, false);
+      }
+      try {
+        xapi.Status.Cameras.PresenterTrack.PresenterDetected.on(value => {
+          if (this.systemStatus.getStatus('PresenterTrackWarnings') == 'on') {
+            let valBool = String(value).toLowerCase() === 'true';
+            this.systemStatus.setStatus('PresenterDetected', valBool);
+            this.processPresenterDetectedStatus(valBool);
+          }
+        });
+      } catch (e) {
+        // PresenterTrack event listener might not be supported on this device
+      }
     }
     this.systemStatus.onKeyChg('PresenterTrackWarnings', status => {
       if (status.value == 'off') {
@@ -775,16 +792,24 @@ class Core {
     if (systemconfig.system.forcePresenterTrackActivation) {
       this.systemStatus.onKeyChg('call', status => {
         if (status.value == 'Connected') {
-          xapi.Command.Cameras.PresenterTrack.Set({
-            Mode: 'Follow'
-          });
+          try {
+            xapi.Command.Cameras.PresenterTrack.Set({
+              Mode: 'Follow'
+            });
+          } catch (e) {
+            // PresenterTrack might not be supported on this device
+          }
         }
       });
       this.systemStatus.onKeyChg('hdmipassthrough', status => {
         if (status.value == 'Active') {
-          xapi.Command.Cameras.PresenterTrack.Set({
-            Mode: 'Follow'
-          });
+          try {
+            xapi.Command.Cameras.PresenterTrack.Set({
+              Mode: 'Follow'
+            });
+          } catch (e) {
+            // PresenterTrack might not be supported on this device
+          }
         }
       });
     }
@@ -947,8 +972,9 @@ class Core {
 
 
   async processPresenterDetectedStatus(status) {
-    let pts = await xapi.Status.Cameras.PresenterTrack.Status.get();
-    if (pts == 'Follow') {
+    try {
+      let pts = await xapi.Status.Cameras.PresenterTrack.Status.get();
+      if (pts == 'Follow') {
       if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('byod') == 'Active') {
         if (status != this.lastPresenterDetectedStatus) {
           this.lastPresenterDetectedStatus = status;
@@ -970,6 +996,9 @@ class Core {
     }
     else if (pts == 'Off') {
       xapi.Command.UserInterface.Message.TextLine.Clear();
+    }
+    } catch (e) {
+      // PresenterTrack Status might not be supported on this device
     }
 
   }
@@ -1032,7 +1061,11 @@ class Core {
       this.setDND();
     }
     if (systemconfig.system.onStandby.clearCallHistory) {
-      xapi.Command.CallHistory.DeleteAll();
+      try {
+        xapi.Command.CallHistory.DeleteAll();
+      } catch (e) {
+        // CallHistory might not be supported on this device
+      }
     }
 
     this.disableExtraOutput();
@@ -1063,7 +1096,11 @@ class Core {
 
   setDND() {
     this.setDNDInterval = setInterval(() => { this.setDND(); }, 82800000);
-    xapi.Command.Conference.DoNotDisturb.Activate({ Timeout: 1440 });
+    try {
+      xapi.Command.Conference.DoNotDisturb.Activate({ Timeout: 1440 });
+    } catch (e) {
+      // DoNotDisturb might not be supported on this device
+    }
   }
 
   displaySystemStatus() {
@@ -1071,17 +1108,25 @@ class Core {
     if (allStatus.DisplaySystemStatus != 'on')
       return;
 
-    xapi.Command.Video.Graphics.Text.Display({
-      Target: 'LocalOutput',
-      Text: `P:${allStatus.presentation.type} C:${allStatus.call} BYOD:${allStatus.byod} PD:${allStatus.PresenterDetected} PL:${allStatus.PresenterLocation} CPZ:${allStatus.ClearPresentationZone} PM:${allStatus.PresenterMics} AM:${allStatus.AudienceMics}`
-    });
+    try {
+      xapi.Command.Video.Graphics.Text.Display({
+        Target: 'LocalOutput',
+        Text: `P:${allStatus.presentation.type} C:${allStatus.call} BYOD:${allStatus.byod} PD:${allStatus.PresenterDetected} PL:${allStatus.PresenterLocation} CPZ:${allStatus.ClearPresentationZone} PM:${allStatus.PresenterMics} AM:${allStatus.AudienceMics}`
+      });
+    } catch (e) {
+      // Video.Graphics.Text.Display might not be supported on this device
+    }
   }
 
   clearDisplaySystemStatus() {
-    xapi.Command.Video.Graphics.Text.Display({
-      Target: 'LocalOutput',
-      Text: ''
-    });
+    try {
+      xapi.Command.Video.Graphics.Text.Display({
+        Target: 'LocalOutput',
+        Text: ''
+      });
+    } catch (e) {
+      // Video.Graphics.Text.Display might not be supported on this device
+    }
   }
 
   async initMuteButtonMonitoring() {
@@ -1295,6 +1340,7 @@ function mcsVersionPeripheralHeartbeat() {
 }
 
 async function preInit() {
+
   //Register a MCS peripheral to write macros version number to WCH
   xapi.Command.Peripherals.Connect(
     {

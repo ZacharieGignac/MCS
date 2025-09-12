@@ -162,14 +162,32 @@ export class DisplayDriver_CEC {
   constructor(device, config) {
     this.config = config;
     this.setOnInterval;
-    xapi.Config.Video.Output.Connector[this.config.connector].CEC.Mode.set('On');
-    debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Setting CEC mode to "On" for connector: ${this.config.connector}`);
+    this.cecSupported = false;
+
+    // Check if CEC is supported on this connector
+    try {
+      xapi.Config.Video.Output.Connector[this.config.connector].CEC.Mode.set('On');
+      this.cecSupported = true;
+      debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Setting CEC mode to "On" for connector: ${this.config.connector}`);
+    } catch (e) {
+      debug(2, `DRIVER DisplayDriver_CEC (${this.config.id}): CEC not supported on connector ${this.config.connector}: ${e.message}`);
+      this.cecSupported = false;
+    }
   }
   setPower(power) {
+    if (!this.cecSupported) {
+      debug(2, `DRIVER DisplayDriver_CEC (${this.config.id}): CEC not supported, ignoring power command`);
+      return;
+    }
+
     if (power == 'on') {
       this.setOnInterval = setInterval(() => {
-        xapi.Command.Video.CEC.Output.SendActiveSourceRequest(this.config.connector);
-        debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Sending SEND_ACTIVE_SOURCE_REQUEST on connector: ${this.config.connector}`);
+        try {
+          xapi.Command.Video.CEC.Output.SendActiveSourceRequest({ ConnectorId: this.config.connector });
+          debug(1, `DRIVER DisplayDriver_CEC (${this.config.id}): Sending SEND_ACTIVE_SOURCE_REQUEST on connector: ${this.config.connector}`);
+        } catch (e) {
+          debug(2, `DRIVER DisplayDriver_CEC (${this.config.id}): Failed to send active source request: ${e.message}`);
+        }
       }, 10000);
     }
     else {
@@ -204,10 +222,11 @@ export class DisplayDriver_serial_sonybpj {
     this.device = device;
     this.currentPower;
     this.currentBlanking;
-    xapi.Config.SerialPort.Outbound.Mode.set('On');
-    xapi.Config.SerialPort.Outbound.Port[this.config.port].BaudRate.set(38400);
-    xapi.Config.SerialPort.Outbound.Port[this.config.port].Description.set(this.config.id);
-    xapi.Config.SerialPort.Outbound.Port[this.config.port].Parity.set('Even');
+    this._lastErrorAt = 0;
+    this._errorDebounceMs = 5000;
+
+    this.serialPortConfigured = false;
+    this.configureSerialPort();
 
     this.serialCommands = {
       TERMINATOR: '\\r\\n',
@@ -224,6 +243,10 @@ export class DisplayDriver_serial_sonybpj {
     let self = this;
 
     this.stateInterval = setInterval(() => {
+      if (!self.serialPortConfigured) {
+        return;
+      }
+
       if (self.currentBlanking == true) {
         self.serialSend(self.serialCommands.BLANK).catch(e => self.handleSerialError(e));
       }
@@ -240,9 +263,35 @@ export class DisplayDriver_serial_sonybpj {
 
   }
 
+  configureSerialPort() {
+    try {
+      // Check if the port number is valid
+      if (!this.config.port || this.config.port < 1 || this.config.port > 4) {
+        throw new Error(`Invalid serial port number: ${this.config.port}. Port must be between 1 and 4.`);
+      }
+
+      xapi.Config.SerialPort.Outbound.Mode.set('On');
+      xapi.Config.SerialPort.Outbound.Port[this.config.port].BaudRate.set(38400);
+      xapi.Config.SerialPort.Outbound.Port[this.config.port].Description.set(this.config.id);
+      xapi.Config.SerialPort.Outbound.Port[this.config.port].Parity.set('Even');
+
+      this.serialPortConfigured = true;
+      debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Serial port ${this.config.port} configured successfully`);
+    } catch (e) {
+      debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Failed to configure serial port: ${JSON.stringify(e)}`);
+      this.serialPortConfigured = false;
+    }
+  }
+
   setPower(power) {
     power = power.toLowerCase();
     this.currentPower = power;
+
+    if (!this.serialPortConfigured) {
+      debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Serial port not configured, cannot send power command`);
+      return;
+    }
+
     if (power == 'on') {
       this.serialSend(this.serialCommands.POWERON).catch(e => this.handleSerialError(e));
     }
@@ -254,6 +303,12 @@ export class DisplayDriver_serial_sonybpj {
 
   setBlanking(blanking) {
     this.currentBlanking = blanking;
+
+    if (!this.serialPortConfigured) {
+      debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Serial port not configured, cannot send blanking command`);
+      return;
+    }
+
     if (blanking) {
       this.serialSend(this.serialCommands.BLANK).catch(e => this.handleSerialError(e));
     }
@@ -350,25 +405,32 @@ export class DisplayDriver_serial_sonybpj {
     this.sending = true;
     const { command, resolve, reject } = this.queue.shift();
 
-    return xapi.Command.SerialPort.PeripheralControl.Send({
-      PortId: this.config.port,
-      ResponseTerminator: this.serialCommands.TERMINATOR,
-      ResponseTimeout: this.timeout, // Timeout in milliseconds
-      Text: command
-    })
-      .then(response => {
-        resolve(response); // Always resolve here
-        return new Promise(res => setTimeout(res, this.pacing));
+    try {
+      return xapi.Command.SerialPort.PeripheralControl.Send({
+        PortId: this.config.port,
+        ResponseTerminator: this.serialCommands.TERMINATOR,
+        ResponseTimeout: this.timeout, // Timeout in milliseconds
+        Text: command
       })
-      .catch(e => {
-        reject('TIMEOUT'); // Reject only on timeout/error from xapi.Send
-        this.handleSerialError(e);
-        return new Promise(res => setTimeout(res, this.pacing));
-      })
-      .finally(() => {
-        this.sending = false;
-        return this.sendNextMessage();
-      });
+        .then(response => {
+          resolve(response); // Always resolve here
+          return new Promise(res => setTimeout(res, this.pacing));
+        })
+        .catch(e => {
+          reject('TIMEOUT'); // Reject only on timeout/error from xapi.Send
+          this.handleSerialError(e);
+          return new Promise(res => setTimeout(res, this.pacing));
+        })
+        .finally(() => {
+          this.sending = false;
+          return this.sendNextMessage();
+        });
+    } catch (e) {
+      this.sending = false;
+      reject('INVALID_COMMAND');
+      this.handleSerialError(e);
+      return Promise.resolve();
+    }
   }
   handleSerialError(e) {
     const now = Date.now();
@@ -978,10 +1040,10 @@ export class AudioInputDriver_codecpro {
     debug(1, `DRIVER AudioInput_codecpro (${this.config.id}): Off`);
     switch (this.config.input) {
       case 'microphone':
-        xapi.Config.Audio.Input.Microphone[this.config.connector].mode.set('Off');
+        xapi.Config.Audio.Input.Microphone[this.config.connector].Mode.set('Off');
         break;
       case 'hdmi':
-        xapi.Config.Audio.Input.HDMI[this.config.connector].mode.set('Off');
+        xapi.Config.Audio.Input.HDMI[this.config.connector].Mode.set('Off');
         break;
     }
   }
@@ -990,12 +1052,43 @@ export class AudioInputDriver_codecpro {
     debug(1, `DRIVER AudioInput_codecpro (${this.config.id}): On`);
     switch (this.config.input) {
       case 'microphone':
-        xapi.Config.Audio.Input.Microphone[this.config.connector].mode.set('On');
+        xapi.Config.Audio.Input.Microphone[this.config.connector].Mode.set('On');
         break;
       case 'hdmi':
-        xapi.Config.Audio.Input.HDMI[this.config.connector].mode.set('On');
+        xapi.Config.Audio.Input.HDMI[this.config.connector].Mode.set('On');
         break;
     }
+  }
+}
+
+export class AudioInputDriver_codeceq {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setGain(gain) {
+    debug(1, `DRIVER AudioInput_codeceq (${this.config.id}): setGain: ${gain}`);
+    xapi.Config.Audio.Input.Microphone[this.config.connector].Gain.set(gain);
+  }
+
+  setMode(mute) {
+    if (mute.toLowerCase() == 'off') {
+      this.mute();
+    }
+    else {
+      this.unmute();
+    }
+  }
+
+  off() {
+    debug(1, `DRIVER AudioInput_codeceq (${this.config.id}): Off`);
+    xapi.Config.Audio.Input.Microphone[this.config.connector].Mode.set('Off');
+  }
+
+  on() {
+    debug(1, `DRIVER AudioInput_codeceq (${this.config.id}): On`);
+    xapi.Config.Audio.Input.Microphone[this.config.connector].Mode.set('On');
   }
 }
 
@@ -1010,7 +1103,7 @@ export class AudioInputDriver_aes67 {
     // AES67 supports gain control per channel
     // Default to channel 1 if no channel specified in config
     const channel = this.config.channel || 1;
-    xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[channel].Level.set(gain);
+    xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[channel].Gain.set(gain);
   }
 
   setMode(mute) {
@@ -1024,12 +1117,12 @@ export class AudioInputDriver_aes67 {
 
   off() {
     debug(1, `DRIVER AudioInput_aes67 (${this.config.id}): Off`);
-    xapi.Config.Audio.Input.Ethernet[this.config.connector].mode.set('Off');
+    xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].Mode.set('Off');
   }
 
   on() {
     debug(1, `DRIVER AudioInput_aes67 (${this.config.id}): On`);
-    xapi.Config.Audio.Input.Ethernet[this.config.connector].mode.set('On');
+    xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].Mode.set('On');
   }
 }
 

@@ -219,11 +219,23 @@ export class Scenario {
     if (status.PresenterLocation == 'local') {
       if (status.UsePresenterTrack == ON && (status.call == 'Connected' || status.byod == 'Active')) {
         let camConnector = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERA, 'system.presentation.main')[0].config.connector;
-        xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
-        xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Follow' });
+        try {
+          xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
+        } catch (e) {
+          // SetMainVideoSource might not be supported
+        }
+        try {
+          xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Follow' });
+        } catch (e) {
+          // PresenterTrack might not be supported
+        }
       }
       else {
-        xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Off' });
+        try {
+          xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Off' });
+        } catch (e) {
+          // PresenterTrack might not be supported
+        }
         let presenterPreset = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERAPRESET, 'system.presentation.main')[0];
         if (status.AutoCamPresets == ON) {
           presenterPreset.activate();
@@ -232,7 +244,11 @@ export class Scenario {
       }
     }
     else if (status.PresenterLocation == 'remote') {
-      xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Off' });
+      try {
+        xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Off' });
+      } catch (e) {
+        // PresenterTrack might not be supported
+      }
       if (status.call == 'Connected' || status.byod == 'Active') {
         let audiencePreset = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERAPRESET, 'system.farend.main')[0];
         if (status.AutoCamPresets == ON) {
@@ -471,10 +487,14 @@ export class Scenario {
       if (status.AutoDisplays == ON) {
         displays.forEach(display => {
           if (display.config.skipVideoMatrix) return;
-          xapi.Command.Video.Matrix.Assign({
-            Mode: 'Replace',
-            Output: display.config.connector
-          });
+          try {
+            xapi.Command.Video.Matrix.Assign({
+              Mode: 'Replace',
+              Output: display.config.connector
+            });
+          } catch (e) {
+            // Video Matrix might not be supported
+          }
         });
       }
     };
@@ -483,11 +503,15 @@ export class Scenario {
       if (status.AutoDisplays == ON) {
         display.forEach(disp => {
           if (disp.config.skipVideoMatrix) return;
-          xapi.Command.Video.Matrix.Assign({
-            Mode: 'Replace',
-            Output: disp.config.connector,
-            RemoteMain: 1
-          });
+          try {
+            xapi.Command.Video.Matrix.Assign({
+              Mode: 'Replace',
+              Output: disp.config.connector,
+              RemoteMain: 1
+            });
+          } catch (e) {
+            // Video Matrix might not be supported
+          }
         });
       }
     };
@@ -497,9 +521,13 @@ export class Scenario {
         displays.forEach(display => {
           if (display.config.skipVideoMatrix) return;
           setTimeout(() => {
-            xapi.Command.Video.Matrix.Reset({
-              Output: display.config.connector
-            });
+            try {
+              xapi.Command.Video.Matrix.Reset({
+                Output: display.config.connector
+              });
+            } catch (e) {
+              // Video Matrix might not be supported
+            }
           }, 1000);
         });
       }

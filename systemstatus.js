@@ -233,9 +233,13 @@ export class SystemStatus {
       });
 
       /* Handle UI automapping */
-      let widgets = await xapi.Status.UserInterface.Extensions.Widget.get();
-      let amapWidgets = widgets.filter(obj => obj.WidgetId.startsWith("SS$"));
-
+      let amapWidgets = [];
+      try {
+        let widgets = await xapi.Status.UserInterface.Extensions.Widget.get();
+        amapWidgets = widgets.filter(obj => obj.WidgetId.startsWith("SS$"));
+      } catch (e) {
+        debug(2, `Failed to get UI extensions widgets: ${JSON.stringify(e)}`);
+      }
 
       for (let w of amapWidgets) {
         this.setStatus(w.WidgetId.split('$')[1], w.Value, false);

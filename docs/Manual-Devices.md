@@ -49,6 +49,12 @@ Aucunes.
 - `string getSource(void)`: Retourne la source actuelle.
 - `number getUsageHours(void)`: Retourne le nombre d'heure d'utilisation.
 
+#### Notes spécifiques: Sony (DisplayDriver_serial_sonybpj)
+- Répétition basée sur ACK: les commandes `power` et `blank`/`unblank` sont renvoyées périodiquement (toutes les `repeat` ms) jusqu'à ce que le projecteur réponde « ok ». À la première réponse « ok », les renvois s'arrêtent pour cet état demandé.
+- Détection « ok » robuste: l'ACK est détecté même si la réponse contient des guillemets, des espaces ou des caractères de contrôle. Les logs affichent la réponse brute (`RX`).
+- Bascule rapide non conflictuelle: en cas de changement d'état rapide (ex. `blank` → `unblank`), les anciennes commandes en file sont purgées et seul l'état le plus récent est relancé jusqu'à ACK, évitant les effets ping-pong.
+- Liaisons TX uniquement: si la voie RX n'est pas câblée, l'ACK n'est jamais reçu et le driver continue d'envoyer périodiquement (comportement intentionnel). Si désiré, ajouter un backoff ou un maximum de tentatives.
+
 ### Screen
 - `void setDefaults(void)`: Active la position par défaut spécifiée dans la configuration.
 - `void setPosition(string position)`: Défini la position de la toile

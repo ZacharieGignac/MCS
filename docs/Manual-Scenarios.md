@@ -25,7 +25,7 @@ export var Manifest = {
   features: {
     cameraControls: true,
     endCallButton: true,
-    byod: true, // Active automatiquement HDMI.Passthrough et/ou Webcam selon le système
+    byod: true, // Active automatiquement HDMI.Passthrough et/ou Webcam selon le système (BYOD unifié)
     joinGoogleMeet: false,
     joinWebex: true,
     joinZoom: false,
@@ -108,9 +108,9 @@ export class Scenario {
 - `features` : Permet d'afficher ou non les différentes fonctionnalités du système
   - `cameraControls` : Contrôles de caméra
   - `endCallButton` : Bouton "terminer l'appel"
-  - `hdmiPassthrough` : **DÉPRÉCIÉ** - Fonctionnalité "BYOD" (pour codec pro, room kit, room 55, etc..) *Utilisez `byod` à la place*
-  - `webcam` : **DÉPRÉCIÉ** - Fonctionnalité "BYOD" (pour EQ, BarPro, etc..) *Utilisez `byod` à la place*
-  - `byod` : Fonctionnalité "BYOD" (Bring Your Own Device) - compatible automatiquement avec tous les systèmes. Active automatiquement les UI features appropriées (HDMI.Passthrough et/ou Webcam) selon ce qui est disponible sur le système.
+  - `hdmiPassthrough` : DÉPRÉCIÉ - BYOD legacy. Utiliser `byod`.
+  - `webcam` : DÉPRÉCIÉ - BYOD legacy. Utiliser `byod`.
+  - `byod` : BYOD unifié. Active automatiquement les UI features (HDMI.Passthrough et/ou Webcam) selon le système.
   - `joinGoogleMeet` : Joindre Google Meet
   - `joinWebex` : Joindre Webex
   - `joinZoom` : Joindre Zoom
@@ -187,4 +187,7 @@ Dans `sce_como_type1`, le routage audio des entrées distantes utilise désormai
 Ce comportement repose sur:
 - `zapi.audio.getRemoteInputsDetailed()` pour obtenir `{ id, role }` des entrées distantes
 - Les méthodes `connectSpecificRemoteInputs` et `disconnectSpecificRemoteInputs` de `AudioOutputGroup` pour un routage ciblé
+
+## Conseils
+- Laisser le core activer le scénario de veille via `onStandby.enableScenario`; éviter de doubler l'activation dans un scénario à l'initialisation.
 

@@ -49,8 +49,7 @@ Dans cette section sont importés les scénarios. Les scénarios sont toujours i
 ```JS
 /****************************/
 //Import modules below
-import * as mod_autosauce from './mod_autosauce';
-import * as mod_hidcameraman from './mod_hidcameraman';
+import * as mod_autogrid from './mod_autogrid';
 /****************************/
 ```
 Dans cette section sont importés les modules. Les modules sont toujours importés avec un wildcard (*) et le nom des fichiers sont toujours préfixés de "mod_".
@@ -87,10 +86,12 @@ Cette section est un array de tout les imports des modules. Si l'import n'est pa
 ### Configuration, section "system"
 ```JS
   system: {
-    coldBootWait: 120,                            // Temps (secondes) qui détermine un "cold boot"
+    coldBootTime: 120,                            // Temps (secondes) qui détermine un "cold boot"
+    coldBootWait: 120,                            // Temps (secondes) à attendre après un "cold boot"
     debugLevel: DEBUGLEVEL.MEDIUM,                // Niveau de débug (LOW, MEDIUM, HIGH)
     debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
-    messagesPacing: 500,                          // Temps (ms) entre les messages de type "xpi.Command.Message"
+    messagesPacing: 500,                          // Temps (ms) entre les messages de type "xapi.Command.Message"
+    httpDispatcherClients: 1,                     // Nombre de clients HTTP concurrents pour le dispatcher interne
     initDelay: 1000,                              // Temps (ms) avant l'initialisation du système
     newSessionDelay: 5000,                        // Temps (ms) pour l'ouverture d'une nouvelle session. Une progressbar s'affiche.
     forceStandby: true,                           // <true, false> Forcer un standby à une heure précise, peu importe si un appel ou une présentation sont actifs
@@ -178,19 +179,17 @@ Cette section contient tous les messages pour l'interface utilisateur
 ```JS
   systemStatus: {
     //System status
-    Product: PRODUCT, //System, nom du produit
-    Version: VERSION, //System, version du produit
     PresenterLocation: 'local', //System, <local, remote>, emplacement du présentateur
     PresenterTrackWarnings: 'on', //System, <on, off>, affichage des messages d'avertissement PresenterTrack
     UsePresenterTrack: 'on', //System, <on, off>, utilisation de PresenterTrack
     AutoDisplays: 'on', //System, <on, off>, gestion des affichages automatique (doit être pris en charge dans le scénario)
     AutoScreens: 'on', //System, <on, off>, gestion des toiles motorisées automatique (doit être pris en charge dans le scénario)
     AutoLights: 'on', //System, <on, off>, gestion de l'éclairage automatique (doit être pris en charge dans le scénario)
+    AutoShades: 'off', //System, <on, off>, gestion des toiles solaires automatique (doit être pris en charge dans le scénario)
     AutoCamPresets: 'on', //System, <on, off> gestion des presets de caméra automatique (doit être pris en charge dans le scénario)
     AutoCamSelection: 'off', //System, <on, off> selection de la caméra automatique (doit être pris en charge dans le scénario)
     AudienceMics: 'on', //System, <on, off> Utilisation des microphones de l'auditoire (doit être pris en charge dans le scénario)
     PresenterMics: 'on', //System, <on, off> Utilisation des microphones du présentateur (doit êter pris en charge dans le scénario)
-    PresenterDetected: false, //System, <true, false>, indique si le présentateur est détecté par le système (utilise le statut de PresenterTrack)
     ClearPresentationZone: 'off', //System, <on, off>, indique si la zone de présentateur doit être dégagée (doit être pris en charge dans le scénario)
 
     //Scenario-specific status
@@ -325,7 +324,7 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 * **shades:DOWN** : Bouton, descends la toile
 
 ### AudioInput (entrée audio du codec)
-Attention, le niveau de ÀudioInput` va de 0 à 70.
+Attention, le niveau de `AudioInput` va de 0 à 70.
 
 #### AudioInputDriver_codecpro (entrées audio traditionnelles)
 ```JS
@@ -372,6 +371,13 @@ Attention, le niveau de ÀudioInput` va de 0 à 70.
       boost: 70                                         //Gain "Boost, utilisé par le module "AutoSauce"
     }
 ```
+
+### Remarques sur BYOD unifié (1.2.0+)
+Le statut `byod` est géré automatiquement:
+- Systèmes plus anciens: via `Video.Output.HDMI.Passthrough.Status`
+- Systèmes récents: via `Video.Output.Webcam.Status`
+
+Les scénarios qui activent `features.byod: true` verront automatiquement les UI Features appropriées (HDMI.Passthrough et/ou Webcam) s'activer selon ce qui est disponible sur le système.
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
 * **audioinput.presenter.sf1:MODE** : Toggle, affiche et configure le mode de l'entrée à "ON" ou "OFF"
 * **audioinput.presenter.sf1:LEVEL** : Slider, affiche et configure le gain de l'entrée. Automatiquement scalé entre 0 et 255 -> gainLowLimite et gainHighLimit

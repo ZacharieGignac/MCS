@@ -5,36 +5,37 @@
 ### Bugs connus
 
 ### Ajouts / Modifications
-* Ajout du support pour la configuration `pacing`, `repeat`, et `timeout` dans les drivers série (Sony, Panasonic, Epson) avec valeurs par défaut
-* Ajout des drivers `AudioInputDriver_aes67` et `AudioOutputDriver_aes67` pour les sources et sorties AES67 (Celine Mic Pro, Table Mic Pro, etc...) avec support du gain par canal
-* Retrait du type `ethernet` dans la configuration d'un device de type `AudioInput_codecpro`
-* Ajout du support pour la propriété `skipVideoMatrix:true` dans `sce_comotype1` pour les devices de type `DISPLAY``
-* SystemStatus `Occupancy:undefined` automatiquement ajouté au status. Peut servir pour déclarer la présence dans la salle, mais le système ne le fait pas de base
-* SystemStatus `PresenterDetected` retiré de la config, et est maintenant ajouté automatiquement
-* Ajout de l'action `SETSS$key,value` pour définir un SystemStatus
-* Ajout de la réception des messages texte `MCSACTION$ACTION,VALUE` et `MCSACTION$ACTION,VALUE&ACTION,VALUE` qui sont convertis en actions
-* Unmuter 5 fois (avec le bouton mute) ouvre le panneau `system_admin``
-* Nouveau macro séparé `watchdog.js` pour surveiller la santé du core (voir section Watchdog)
-* Audio (sce_como_type1): Routage sélectif des entrées distantes selon leur rôle. Toute entrée distante avec rôle `Presentation` est désormais acheminée vers le groupe `system.presentation.main` (et jamais vers `system.farend.main`). Les autres entrées suivent la logique selon `PresenterLocation`.
-* API Audio: Nouvelle méthode `zapi.audio.getRemoteInputsDetailed()` renvoyant la liste des entrées distantes avec leurs rôles (`[{ id, role, callId, streamId }]`).
-* Devices/AudioOutputGroup: Nouvelles méthodes `connectSpecificRemoteInputs(ids)` et `disconnectSpecificRemoteInputs(ids)` pour un routage ciblé des entrées distantes.
-* Journaux: Logs audio et scenario simplifiés et structurés (comptes, rôles, ids) pour faciliter le diagnostic.
-* **BYOD unifié**: Nouveau statut `byod` compatible automatiquement avec HDMI.Passthrough (anciens systèmes) et Webcam (nouveaux systèmes). Les scénarios avec `byod: true` activent automatiquement les UI features appropriées selon le système.
+* Drivers série (Sony, Panasonic, Epson): support des paramètres `pacing`, `repeat`, `timeout` avec valeurs par défaut, gestion d'erreurs centralisée et logs "debouncés".
+* Sony (DisplayDriver_serial_sonybpj): logique de répétition basée sur l'accusé de réception. Les commandes `power` et `blank`/`unblank` sont renvoyées au `repeat` jusqu'à réception d'un « ok », puis arrêt des renvois pour cet état.
+* Sony (DisplayDriver_serial_sonybpj): journalisation TX/RX détaillée (ligne envoyée et réponse brute), détection « ok » robuste (espaces, guillemets, caractères de contrôle).
+* Sony (DisplayDriver_serial_sonybpj): file d'attente nettoyée pour éviter les collisions lors des bascules rapides `blank`/`unblank` ou `power on/off` (priorise l'état le plus récent).
+* Sony (DisplayDriver_serial_sonybpj): si la voie RX n'est pas câblée (TX uniquement), le driver continue d'envoyer au `repeat` (comportement intentionnel).
+* AES67: nouveaux drivers `AudioInputDriver_aes67` et `AudioOutputDriver_aes67` (gain par canal, entrées/sorties 1-6 et canaux 1-8).
+* `AudioInput_codecpro`: retrait du type `ethernet` (utiliser AES67 dédié).
+* `sce_comotype1`: support de `skipVideoMatrix: true` pour les `DISPLAY`.
+* SystemStatus: `Occupancy` est initialisé automatiquement à `undefined`; `PresenterDetected` est désormais injecté automatiquement (à ne plus définir dans la config).
+* Action mapping: nouvelle action `SETSS$key,value` pour écrire un SystemStatus.
+* Messages XAPI: prise en charge de `MCSACTION$ACTION,VALUE` et `MCSACTIONS$ACTION,VALUE&ACTION,VALUE` (multiples actions).
+* Raccourci admin: 5 désactivations successives du mute micro ouvrent le panneau `system_admin`.
+* Watchdog: nouvelle macro `watchdog.js` pour surveiller le core (voir Watchdog ci-dessous).
+* Audio (sce_como_type1): routage des entrées distantes selon leur rôle. Les entrées avec rôle `Presentation` vont toujours vers `system.presentation.main`; les autres suivent `PresenterLocation`.
+* API Audio: `zapi.audio.getRemoteInputsDetailed()` expose `{ id, role, callId, streamId }`.
+* Devices/AudioOutputGroup: ajout de `connectSpecificRemoteInputs(ids)` et `disconnectSpecificRemoteInputs(ids)`.
+* Journaux: logs audio/scénarios simplifiés et structurés (rôles, ids) pour le diagnostic.
+* **BYOD unifié**: nouveau statut `byod` avec détection automatique HDMI.Passthrough (anciens systèmes) ou Webcam (nouveaux). Les scénarios avec `features.byod: true` activent automatiquement les UI features pertinentes.
 
 ### Bugfix
-* Les microphones sont maintenant unmuté lors de l'activation du scénario sce_standby
-* Le statut d'éclairage automatique ne se met pas à OFF lorsqu'on intéragit avec un bouton de scène d'éclairage
-* LightSceneDriver_gc_itachflex: Les requêtes HTTP ne se font pas de façon synchrone, ce qui peut entrainer un mauvais timing en cas de latence réseau
-* ScreenDriver_gc_itachflex: Les requêtes HTTP ne se font pas de façon synchrone, ce qui peut entrainer un mauvais timing enc as de latence réseau
-* core: `setPresenterLocation` appelait une fonction inexistante. La méthode met maintenant à jour `SystemStatus` avec validation des valeurs (`local`, `remote`).
-* core: Killswitch GPIO: l'écouteur était enregistré même si `killswitchGPIO` n'était pas défini. Ajout d'une garde et d'un try/catch pour éviter les plantages.
-* core/SystemStatus/UI: `PresenterDetected` est désormais converti en booléen avant mise à jour, évitant l'erreur "Switch expects a value: <on/off>".
-* modules: `getModule(id)` gère maintenant le cas module introuvable (retourne `undefined` et journalise) au lieu de provoquer un crash.
-* scenarios: `enableScenario(id)` gère les IDs dupliqués/introuvables, protège l'accès aux `panels`/`features` et émet `system_scenario_enable_failed` avec une raison.
-* devices: `getDevicesInGroup` et `getDevicesByTypeInGroup` gèrent les groupes introuvables et ignorent les devices non définis.
-* drivers (Display série Sony/Epson): gestion d'erreurs centralisée et logs "debouncés"; plus d'"Unhandled promise rejection TIMEOUT" quand le projecteur est débranché.
-* core (audio.extra): vérifications null/undefined sur les groupes d'entrées/sorties audio supplémentaires pour éviter les exceptions lors des connexions/déconnexions.
-* core: `toBool` accepte maintenant des valeurs non-string en toute sécurité.
+* `sce_standby`: unmute correct des micros à l'activation.
+* UI LightScenes: l'auto-lumière n'est plus forcée à OFF lors d'interactions de widgets s'il ne faut pas.
+* LightSceneDriver_gc_itachflex / ScreenDriver_gc_itachflex: séquençage HTTP asynchrone pour éviter les timings incorrects en cas de latence.
+* core: `setPresenterLocation` met à jour SystemStatus avec validation (`local`, `remote`).
+* core: Killswitch GPIO protégé par garde et try/catch quand non configuré.
+* core/SystemStatus/UI: `PresenterDetected` converti en booléen avant mise à jour (fini l'erreur "Switch expects a value: <on/off>").
+* modules: `getModule(id)` retourne `undefined` et journalise au lieu de planter.
+* scenarios: `enableScenario(id)` gère IDs dupliqués/introuvables, protège `panels`/`features`, émet `system_scenario_enable_failed`.
+* devices: `getDevicesInGroup` et `getDevicesByTypeInGroup` ignorent groupes/devices introuvables.
+* core (audio.extra): gardes null/undefined sur groupes d'entrées/sorties supplémentaires.
+* core: `toBool` robuste pour valeurs non-string.
 
 ## Watchdog
 Un macro séparé `watchdog.js` agit comme chien de garde pour vérifier que le core fonctionne et répondre dans des délais raisonnables.

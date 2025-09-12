@@ -224,6 +224,8 @@ export class DisplayDriver_serial_sonybpj {
     this.currentBlanking;
     this._lastErrorAt = 0;
     this._errorDebounceMs = 5000;
+    this._ack = { power: undefined, blanking: undefined };
+    this._pending = { power: false, blanking: false };
 
     this.serialPortConfigured = false;
     this.configureSerialPort();
@@ -247,18 +249,18 @@ export class DisplayDriver_serial_sonybpj {
         return;
       }
 
-      if (self.currentBlanking == true) {
-        self.serialSend(self.serialCommands.BLANK).catch(e => self.handleSerialError(e));
-      }
-      else {
-        self.serialSend(self.serialCommands.UNBLANK).catch(e => self.handleSerialError(e));
-      }
-      if (self.currentPower == 'on') {
-        self.serialSend(self.serialCommands.POWERON).catch(e => self.handleSerialError(e));
-      }
-      else {
-        self.serialSend(self.serialCommands.POWEROFF).catch(e => self.handleSerialError(e));
-      }
+      // Retry pending commands until acknowledged "ok"
+      try {
+        if (self._pending.blanking === true && typeof self.currentBlanking !== 'undefined') {
+          self._sendBlankingAttempt();
+        }
+      } catch (e) { self.handleSerialError(e); }
+
+      try {
+        if (self._pending.power === true && typeof self.currentPower !== 'undefined') {
+          self._sendPowerAttempt();
+        }
+      } catch (e) { self.handleSerialError(e); }
     }, self.repeat);
 
   }
@@ -286,35 +288,31 @@ export class DisplayDriver_serial_sonybpj {
   setPower(power) {
     power = power.toLowerCase();
     this.currentPower = power;
+    this._pending.power = true; // mark as needing acknowledgement
 
     if (!this.serialPortConfigured) {
       debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Serial port not configured, cannot send power command`);
       return;
     }
 
-    if (power == 'on') {
-      this.serialSend(this.serialCommands.POWERON).catch(e => this.handleSerialError(e));
-    }
-    else {
-      this.serialSend(this.serialCommands.POWEROFF).catch(e => this.handleSerialError(e));
-    }
+    // Clear any queued power commands and send immediately once (low latency)
+    this._clearQueuedDisplayCommands([this.serialCommands.POWERON, this.serialCommands.POWEROFF]);
+    this._sendPowerAttempt();
     debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): setPower: ${power}`);
   }
 
   setBlanking(blanking) {
     this.currentBlanking = blanking;
+    this._pending.blanking = true; // mark as needing acknowledgement
 
     if (!this.serialPortConfigured) {
       debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Serial port not configured, cannot send blanking command`);
       return;
     }
 
-    if (blanking) {
-      this.serialSend(this.serialCommands.BLANK).catch(e => this.handleSerialError(e));
-    }
-    else {
-      this.serialSend(this.serialCommands.UNBLANK).catch(e => this.handleSerialError(e));
-    }
+    // Clear any queued blank/unblank commands and send immediately once (low latency)
+    this._clearQueuedDisplayCommands([this.serialCommands.BLANK, this.serialCommands.UNBLANK]);
+    this._sendBlankingAttempt();
 
     debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): setBlanking: ${blanking}`);
   }
@@ -392,6 +390,64 @@ export class DisplayDriver_serial_sonybpj {
     });
   }
 
+  _isOkResponse(response) {
+    try {
+      const raw = (response && typeof response.Response !== 'undefined') ? String(response.Response) : String(response || '');
+      // Remove non-printable chars, quotes, reduce whitespace
+      let cleaned = raw
+        .replace(/[\u0000-\u001F\u007F]/g, '')
+        .replace(/"/g, '')
+        .toLowerCase()
+        .trim();
+      // Fast path exact
+      if (cleaned === 'ok') return true;
+      // Remove all whitespace and punctuation, keep letters only then compare
+      const lettersOnly = cleaned.replace(/[^a-z]/g, '');
+      if (lettersOnly === 'ok') return true;
+      // Substring check with word boundary
+      if (/\bok\b/.test(cleaned)) return true;
+      return false;
+    }
+    catch (_) { return false; }
+  }
+
+  _clearQueuedDisplayCommands(commandsToClear) {
+    try {
+      if (!Array.isArray(this.queue) || this.queue.length === 0) return;
+      this.queue = this.queue.filter(item => commandsToClear.indexOf(item.command) === -1);
+    } catch (_) {}
+  }
+
+  _sendBlankingAttempt() {
+    try {
+      const command = (this.currentBlanking === true) ? this.serialCommands.BLANK : this.serialCommands.UNBLANK;
+      this.serialSend(command)
+        .then(response => {
+          if (this._isOkResponse(response)) {
+            this._ack.blanking = this.currentBlanking;
+            this._pending.blanking = false;
+            debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Blanking acknowledged (${this.currentBlanking})`);
+          }
+        })
+        .catch(e => this.handleSerialError(e));
+    } catch (e) { this.handleSerialError(e); }
+  }
+
+  _sendPowerAttempt() {
+    try {
+      const command = (this.currentPower === 'on') ? this.serialCommands.POWERON : this.serialCommands.POWEROFF;
+      this.serialSend(command)
+        .then(response => {
+          if (this._isOkResponse(response)) {
+            this._ack.power = this.currentPower;
+            this._pending.power = false;
+            debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Power acknowledged (${this.currentPower})`);
+          }
+        })
+        .catch(e => this.handleSerialError(e));
+    } catch (e) { this.handleSerialError(e); }
+  }
+
   sendNextMessage() {
     if (this.queue.length === 0) {
       this.sending = false;
@@ -404,6 +460,7 @@ export class DisplayDriver_serial_sonybpj {
 
     this.sending = true;
     const { command, resolve, reject } = this.queue.shift();
+    try { debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): TX: ${String(command).trim()}`); } catch (_) {}
 
     try {
       return xapi.Command.SerialPort.PeripheralControl.Send({
@@ -413,6 +470,14 @@ export class DisplayDriver_serial_sonybpj {
         Text: command
       })
         .then(response => {
+          try {
+            const rx = (response && typeof response.Response !== 'undefined') ? String(response.Response).trim() : '';
+            if (rx !== '') {
+              debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): RX: ${rx}`);
+            } else {
+              debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): RX: <empty>`);
+            }
+          } catch (_) {}
           resolve(response); // Always resolve here
           return new Promise(res => setTimeout(res, this.pacing));
         })

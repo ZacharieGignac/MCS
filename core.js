@@ -1127,13 +1127,42 @@ class Core {
       return;
 
     try {
+      // Format system status with better readability and organization
+      const statusText = this.formatSystemStatusText(allStatus);
+      
       xapi.Command.Video.Graphics.Text.Display({
         Target: 'LocalOutput',
-        Text: `P:${allStatus.presentation.type} C:${allStatus.call} BYOD:${allStatus.byod} PD:${allStatus.PresenterDetected} PL:${allStatus.PresenterLocation} CPZ:${allStatus.ClearPresentationZone} PM:${allStatus.PresenterMics} AM:${allStatus.AudienceMics}`
+        Text: statusText
       });
     } catch (e) {
       // Video.Graphics.Text.Display might not be supported on this device
     }
+  }
+
+  formatSystemStatusText(allStatus) {
+    // Helper function to format boolean values
+    const formatBool = (value) => value ? 'ON' : 'OFF';
+    
+    // Helper function to format status values with better readability
+    const formatStatus = (value, trueText = 'ON', falseText = 'OFF') => {
+      if (typeof value === 'boolean') {
+        return value ? trueText : falseText;
+      }
+      return value || 'N/A';
+    };
+
+    // Build compact single-line status display with most critical information
+    const statusParts = [
+      `CALL:${formatStatus(allStatus.call)}`,
+      `PRES:${formatStatus(allStatus.presentation?.type, 'NOPRES')}`,
+      `BYOD:${formatStatus(allStatus.byod)}`,
+      `PD:${formatBool(allStatus.PresenterDetected)}`,
+      `PL:${formatStatus(allStatus.PresenterLocation)}`,
+      `SCE:${formatStatus(allStatus.currentScenario)}`,
+      `MODE:${formatStatus(allStatus.comotype1Mode)}`
+    ];
+
+    return statusParts.join(' | ');
   }
 
   clearDisplaySystemStatus() {
@@ -1262,20 +1291,31 @@ class Core {
 
   getSystemInfoText() {
     // Gather system information for display
-    const currentScenario = zapi.system.getStatus('currentScenario') || 'Unknown';
-    const coreVersion = zapi.system.getStatus('CoreVersion') || 'Unknown';
-    const uptime = zapi.system.getStatus('Uptime') || 'Unknown';
-    const temperature = zapi.system.getStatus('Temperature') || 'Unknown';
-    const presenterLocation = zapi.system.getStatus('PresenterLocation') || 'Unknown';
-    const presenterDetected = zapi.system.getStatus('PresenterDetected') ? 'Yes' : 'No';
-    const byod = zapi.system.getStatus('byod') || 'Unknown';
-    const call = zapi.system.getStatus('call') || 'Unknown';
-    const comotype1Mode = zapi.system.getStatus('comotype1Mode') || 'Unknown';
+    const allStatus = zapi.system.getAllStatus();
+    const currentScenario = allStatus.currentScenario || 'Unknown';
+    const coreVersion = allStatus.CoreVersion || 'Unknown';
+    const uptime = allStatus.Uptime || 'Unknown';
+    const temperature = allStatus.Temperature || 'Unknown';
+    const presenterLocation = allStatus.PresenterLocation || 'Unknown';
+    const presenterDetected = allStatus.PresenterDetected ? 'Yes' : 'No';
+    const byod = allStatus.byod || 'Unknown';
+    const call = allStatus.call || 'Unknown';
+    const comotype1Mode = allStatus.comotype1Mode || 'Unknown';
 
-    return `VER: ${coreVersion} | Uptime: ${uptime}<br>` +
-           `Call: ${call} | BYOD: ${byod}<br>` +
-           `PL: ${presenterLocation} | PD: ${presenterDetected}<br>` +
-           `SCE: ${currentScenario} | Mode: ${comotype1Mode} `;
+    // Format with better organization and readability
+    return `<b>MCS System Information</b><br><br>` +
+           `<b>System Health:</b><br>` +
+           `Version: ${coreVersion}<br>` +
+           `Uptime: ${uptime}<br>` +
+           `Temperature: ${temperature}<br><br>` +
+           `<b>Current Status:</b><br>` +
+           `Call: ${call}<br>` +
+           `BYOD: ${byod}<br>` +
+           `Presenter Location: ${presenterLocation}<br>` +
+           `Presenter Detected: ${presenterDetected}<br><br>` +
+           `<b>Configuration:</b><br>` +
+           `Scenario: ${currentScenario}<br>` +
+           `Mode: ${comotype1Mode}`;
   }
 }
 

@@ -491,6 +491,7 @@ export var config = {
     AudienceMics: 'on', //System, <on, off> Utilisation des microphones de l'auditoire (doit être pris en charge dans le scénario)
     PresenterMics: 'on', //System, <on, off> Utilisation des microphones du présentateur (doit êter pris en charge dans le scénario)
     ClearPresentationZone: 'off', //System, <on, off>, indique si la zone de présentateur doit être dégagée (doit être pris en charge dans le scénario)
+    DisplaySystemStatus: 'off', //System, <on, off>, affichage de l'overlay de statut système sur la sortie vidéo locale
     //Scenario-specific status
 
   },

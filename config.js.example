@@ -222,8 +222,9 @@ export var config = {
       type: DEVICETYPE.AUDIOINPUT,
       name: 'Table Mic Pro',
       device: devicesLibrary.AudioInput,
-      driver: driversLibrary.AudioOutputDriver_aes67,
+      driver: driversLibrary.AudioInputDriver_aes67,
       connector: 2,
+      channel: 1,  // AES67 channel (1-8), defaults to 1 if not specified
       defaultMode: 'on'
     },
     {

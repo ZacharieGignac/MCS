@@ -999,6 +999,40 @@ export class AudioInputDriver_codecpro {
   }
 }
 
+export class AudioInputDriver_aes67 {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setGain(gain) {
+    debug(1, `DRIVER AudioInput_aes67 (${this.config.id}): setGain: ${gain}`);
+    // AES67 supports gain control per channel
+    // Default to channel 1 if no channel specified in config
+    const channel = this.config.channel || 1;
+    xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[channel].Level.set(gain);
+  }
+
+  setMode(mute) {
+    if (mute.toLowerCase() == 'off') {
+      this.off();
+    }
+    else {
+      this.on();
+    }
+  }
+
+  off() {
+    debug(1, `DRIVER AudioInput_aes67 (${this.config.id}): Off`);
+    xapi.Config.Audio.Input.Ethernet[this.config.connector].mode.set('Off');
+  }
+
+  on() {
+    debug(1, `DRIVER AudioInput_aes67 (${this.config.id}): On`);
+    xapi.Config.Audio.Input.Ethernet[this.config.connector].mode.set('On');
+  }
+}
+
 export class AudioOutputDriver_codecpro {
   constructor(device, config) {
     this.config = config;

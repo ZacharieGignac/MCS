@@ -100,6 +100,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 
 - `byod`: Statut BYOD (Bring Your Own Device) - fonctionnalité de partage d'écran. Valeurs: `Active`, `Inactive`. Compatible automatiquement avec HDMI.Passthrough (anciens systèmes) et Webcam (nouveaux systèmes).
 - `hdmiPassthrough`: **DÉPRÉCIÉ** - Utilisez `byod` à la place. Maintenu pour compatibilité ascendante.
+- `currentMainVideoSource`: Source vidéo principale actuelle du système. Valeurs: ID de connecteur vidéo (ex: `1`, `2`, `3`) ou `Unknown` si non disponible. Utilisé par les scénarios pour l'affichage automatique de la source vidéo principale sur les moniteurs appropriés.
 
 ### Propriétés
 

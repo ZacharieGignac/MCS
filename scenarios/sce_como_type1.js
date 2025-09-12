@@ -168,6 +168,11 @@ export class Scenario {
         case 'AutoLights':
           this.evaluateLightscene(status.status);
           break;
+        case 'currentMainVideoSource':
+          if (status.status.PresenterLocation == REMOTE && status.status.call == 'Connected') {
+            this.evaluateDisplays(status.status);
+          }
+          break;
 
       }
     }
@@ -516,6 +521,26 @@ export class Scenario {
       }
     };
 
+    const matrixCurrentMainVideoToDisplay = (displays) => {
+      if (status.AutoDisplays == ON) {
+        displays.forEach(disp => {
+          if (disp.config.skipVideoMatrix) return;
+          try {
+            const currentMainVideoSource = zapi.system.getStatus('currentMainVideoSource');
+            if (currentMainVideoSource && currentMainVideoSource !== 'Unknown') {
+              xapi.Command.Video.Matrix.Assign({
+                Mode: 'Replace',
+                Output: disp.config.connector,
+                SourceId: [currentMainVideoSource]
+              });
+            }
+          } catch (e) {
+            // Video Matrix might not be supported
+          }
+        });
+      }
+    };
+
     const matrixReset = (displays) => {
       if (status.AutoDisplays == ON) {
         displays.forEach(display => {
@@ -582,7 +607,7 @@ export class Scenario {
           setDisplaysRole(presentationDisplays, SECOND);
           powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
           blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
-          matrixReset(farendDisplays);
+          matrixCurrentMainVideoToDisplay(farendDisplays);
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('5');
@@ -592,7 +617,7 @@ export class Scenario {
           setDisplaysRole(presentationDisplays, SECOND);
           powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
           blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
-          matrixReset(farendDisplays);
+          matrixCurrentMainVideoToDisplay(farendDisplays);
         }
       }
       //Permanent displays + NO clear zone
@@ -635,7 +660,7 @@ export class Scenario {
           setDisplaysRole(presentationDisplays, FIRST);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
-          matrixReset(farendDisplays);
+          matrixCurrentMainVideoToDisplay(farendDisplays);
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('10');
@@ -643,7 +668,7 @@ export class Scenario {
           setMonitors(DUALPRESENTATIONONLY);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, SECOND);
-          matrixRemoteToDisplay(farendDisplays);
+          matrixCurrentMainVideoToDisplay(farendDisplays);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
         }
@@ -716,7 +741,7 @@ export class Scenario {
           else {
             matrixBlankDisplay(presentationDisplays);
           }
-          matrixReset(farendDisplays);
+          matrixCurrentMainVideoToDisplay(farendDisplays);
         }
         else if (remotePresenterPresent && presentationActive) {
           //console.error('15');
@@ -731,7 +756,7 @@ export class Scenario {
           else {
             matrixBlankDisplay(presentationDisplays);
           }
-          matrixReset(farendDisplays);
+          matrixCurrentMainVideoToDisplay(farendDisplays);
         }
       }
       //WITHOUT Permanent displays + NO clear zone
@@ -778,7 +803,7 @@ export class Scenario {
           setDisplaysRole(presentationDisplays, FIRST);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
-          matrixReset(farendDisplays);
+          matrixCurrentMainVideoToDisplay(farendDisplays);
           matrixReset(presentationDisplays);
         }
         else if (remotePresenterPresent && presentationActive) {
@@ -787,7 +812,7 @@ export class Scenario {
           setMonitors(SINGLE);
           setDisplaysRole(farendDisplays, FIRST);
           setDisplaysRole(presentationDisplays, FIRST);
-          matrixRemoteToDisplay(farendDisplays);
+          matrixCurrentMainVideoToDisplay(farendDisplays);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
         }

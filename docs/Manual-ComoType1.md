@@ -24,6 +24,8 @@ Les affichages doivent faire parti groupe `system.presentation.main`.
 ### Sites distants (obligatoire)
 Un ou plusieurs affichages faisant face à la zone de présentation. Utilisé pour l'image des sites distants, ou pour la présentation lorsque le système n'est pas appel.
 
+**Comportement spécial pour présentateur à distance :** Lorsque le présentateur est à distance (paramètre "Emplacement du présentateur" = "À distance"), les affichages de sites distants afficheront automatiquement la source vidéo principale actuelle (`currentMainVideoSource`) au lieu de l'image du présentateur distant. Ce comportement s'applique que le présentateur partage du contenu ou non.
+
 ### BYOD (optionnel)
 Ce scénario n'intervient pas sur l'affichage utilisé pour le BYOD. Le comportement par défaut du codec est utilisé.
 

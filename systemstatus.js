@@ -204,6 +204,24 @@ export class SystemStatus {
     }
   }
 
+  async initMainVideoSourceStatus() {
+    try {
+      // Get current main video source
+      let mainVideoSource = await xapi.Status.Video.Input.MainVideoSource.get();
+      this.setStatus('currentMainVideoSource', mainVideoSource, false);
+      
+      // Listen for changes to main video source
+      xapi.Status.Video.Input.MainVideoSource.on(source => {
+        this.setStatus('currentMainVideoSource', source);
+      });
+      
+      debug(1, `Using MainVideoSource for currentMainVideoSource status`);
+    } catch (e) {
+      debug(3, `No MainVideoSource API available, setting to Unknown`);
+      this.setStatus('currentMainVideoSource', 'Unknown', false);
+    }
+  }
+
   async init() {
     return new Promise(async success => {
       debug(2, 'Starting SystemStatus...');
@@ -218,6 +236,9 @@ export class SystemStatus {
 
       //Set unified "byod" status (supports both HDMI.Passthrough and Webcam)
       await this.initByodStatus();
+
+      //Set main video source status
+      await this.initMainVideoSourceStatus();
 
       presentation.onChange(status => {
         if (!areObjectsIdentical(this._systemStatus.presentation, status)) {
@@ -245,11 +266,11 @@ export class SystemStatus {
         this.setStatus(w.WidgetId.split('$')[1], w.Value, false);
       }
 
-      //Display current status at 30 seconds interval
+      //Display current status at 10 seconds interval
       if (systemconfig.system.showStatusAndPerformanceReports) {
         setInterval(() => {
           debug(2, this._systemStatus);
-        }, 240000);
+        }, 30000);
       }
       this.setDefaults();
 
@@ -302,6 +323,10 @@ export class SystemStatus {
 
   getStatus(key) {
     return this._systemStatus[key];
+  }
+
+  getCurrentMainVideoSource() {
+    return this.getStatus('currentMainVideoSource');
   }
 
   getAllStatus() {

@@ -82,11 +82,24 @@ Les valeurs bool de systemStatus sont automatiquement converties en valeurs 'on'
 En d'autres mots, si une valeur de systemStatus est de type boolean, il est OBLIGATOIRE d'utiliser le préfixe "SS?" au lieu de "SS$" pour activer l'auto-mapping d'un widget.
 
 Exemples:
-* **SS$PresenterLocation** (button group avec 2 boutons: 'local', 'remote'): Affiche et défini l'emplacement du présentateur. Valeurs acceptées: `local`, `remote`.
+* **SS$PresenterLocation** (button group avec 2 boutons: 'local', 'remote'): Affiche et défini l'emplacement du présentateur. Valeurs acceptées: `local`, `remote`. **Note**: Maintenir ce widget enfoncé pendant 5 secondes ouvre le panneau d'administration.
 * **SS$byod** (texte): Affiche le statut BYOD (Bring Your Own Device). Valeurs: `Active`, `Inactive`. Compatible avec HDMI.Passthrough et Webcam.
 * **SS$AudienceMics** (toggle): Affiche et défini l'emplacement du présentateur
 * **SS$Version** (texte): Affiche la version actuelle du système
 * **SS?PresenterDetected** (toggle): Affiche si le présentateur est détecté (valeur bool). Conversion automatique en `on`/`off`.
+* **system_admin** (bouton): Widget spécial pour l'accès administrateur. 
+  - **Appui court**: Affiche les informations système dans une boîte de dialogue "Informations système" (version, uptime, statut d'appel, BYOD, localisation présentateur, détection présentateur, scénario actuel, mode comotype1)
+  - **Appui long (5 secondes)**: Ouvre le panneau d'administration `system_admin`
+
+## Accès au panneau d'administration
+Le système offre plusieurs méthodes pour accéder au panneau d'administration `system_admin`:
+
+1. **Widget dédié**: Créer un bouton avec l'ID `system_admin` 
+   - Appui court: Affiche les informations système (version, uptime, statut d'appel, BYOD, localisation présentateur, détection présentateur, scénario actuel, mode comotype1)
+   - Appui long (5 secondes): Ouvre le panneau d'administration
+2. **Widget PresenterLocation**: Maintenir le widget `SS$PresenterLocation` enfoncé pendant 5 secondes (méthode cachée)
+3. **Action directe**: Utiliser l'action `ACTION$PANELOPEN:system_admin` sur n'importe quel widget
+4. **Raccourci micro**: 5 désactivations successives du mute micro (voir README.md)
 
 # Action et Actions
 Le système possède un mécanisme de mapping d'action, c'est à dire le déclanchement d'actions (function) à partir d'une identifiation de widget.

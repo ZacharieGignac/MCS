@@ -670,6 +670,24 @@ class Core {
       clearTimeout(this.adminPanelTimeout);
     });
 
+    //Handle system_admin button short and long press
+    let systemAdminButton = self.uiManager.addWidgetMapping('system_admin');
+    systemAdminButton.on('pressed', () => {
+      this.systemAdminPressTime = Date.now();
+      this.systemAdminTimeout = setTimeout(() => {
+        this.openAdminPanel();
+      }, 5000);
+    });
+    systemAdminButton.on('released', () => {
+      const pressDuration = Date.now() - this.systemAdminPressTime;
+      clearTimeout(this.systemAdminTimeout);
+      
+      // If released before 5 seconds, show system info (short press)
+      if (pressDuration < 5000) {
+        this.showSystemInfo();
+      }
+    });
+
     self.uiManager.addActionMapping(/^SETSS$/, (key, value) => {
       zapi.system.setStatus(key, value);
     });
@@ -1209,6 +1227,55 @@ class Core {
       X: 10000,
       Y: 1
     });
+  }
+
+  openAdminPanel() {
+    // Open the system_admin panel via long press on system_admin button
+    xapi.Command.UserInterface.Extensions.Panel.Open({
+      PanelId: 'system_admin'
+    });
+
+    // Show a confirmation message
+    xapi.Command.UserInterface.Message.TextLine.Display({
+      Duration: 3,
+      Text: 'Admin panel opened via long press',
+      X: 10000,
+      Y: 1
+    });
+
+    debug(1, 'Admin panel opened via system_admin button long press');
+  }
+
+  showSystemInfo() {
+    // Display system information in a message box on short press
+    const systemInfo = this.getSystemInfoText();
+    
+    xapi.Command.UserInterface.Message.Prompt.Display({
+      Duration: 0,
+      Text: systemInfo,
+      Title: 'Informations système',
+      FeedbackId: 'system_info_display'
+    });
+
+    debug(1, 'System information displayed via system_admin button short press');
+  }
+
+  getSystemInfoText() {
+    // Gather system information for display
+    const currentScenario = zapi.system.getStatus('currentScenario') || 'Unknown';
+    const coreVersion = zapi.system.getStatus('CoreVersion') || 'Unknown';
+    const uptime = zapi.system.getStatus('Uptime') || 'Unknown';
+    const temperature = zapi.system.getStatus('Temperature') || 'Unknown';
+    const presenterLocation = zapi.system.getStatus('PresenterLocation') || 'Unknown';
+    const presenterDetected = zapi.system.getStatus('PresenterDetected') ? 'Yes' : 'No';
+    const byod = zapi.system.getStatus('byod') || 'Unknown';
+    const call = zapi.system.getStatus('call') || 'Unknown';
+    const comotype1Mode = zapi.system.getStatus('comotype1Mode') || 'Unknown';
+
+    return `VER: ${coreVersion} | Uptime: ${uptime}<br>` +
+           `Call: ${call} | BYOD: ${byod}<br>` +
+           `PL: ${presenterLocation} | PD: ${presenterDetected}<br>` +
+           `SCE: ${currentScenario} | Mode: ${comotype1Mode} `;
   }
 }
 

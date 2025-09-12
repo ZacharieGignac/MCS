@@ -17,6 +17,9 @@
 * Action mapping: nouvelle action `SETSS$key,value` pour écrire un SystemStatus.
 * Messages XAPI: prise en charge de `MCSACTION$ACTION,VALUE` et `MCSACTIONS$ACTION,VALUE&ACTION,VALUE` (multiples actions).
 * Raccourci admin: 5 désactivations successives du mute micro ouvrent le panneau `system_admin`.
+* Widget admin: nouveau widget `system_admin` avec double fonctionnalité:
+  - Appui court: affiche les informations système dans une boîte de dialogue "Informations système" (version, uptime, statut d'appel, BYOD, localisation présentateur, détection présentateur, scénario actuel, mode comotype1)
+  - Appui long (5 secondes): ouvre le panneau d'administration
 * Watchdog: nouvelle macro `watchdog.js` pour surveiller le core (voir Watchdog ci-dessous).
 * Audio (sce_como_type1): routage des entrées distantes selon leur rôle. Les entrées avec rôle `Presentation` vont toujours vers `system.presentation.main`; les autres suivent `PresenterLocation`.
 * API Audio: `zapi.audio.getRemoteInputsDetailed()` expose `{ id, role, callId, streamId }`.

@@ -326,6 +326,8 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 
 ### AudioInput (entrée audio du codec)
 Attention, le niveau de ÀudioInput` va de 0 à 70.
+
+#### AudioInputDriver_codecpro (entrées audio traditionnelles)
 ```JS
     {
       id: 'audioinput.presenter.sf1',                   //Identification unique
@@ -347,6 +349,29 @@ Attention, le niveau de ÀudioInput` va de 0 à 70.
       boost: 70                                         //Gain "Boost, utilisé par le module "AutoSauce"
     }
 ```
+
+#### AudioInputDriver_aes67 (entrées audio AES67)
+```JS
+    {
+      id: 'audioinput.aes67.tablemic',                  //Identification unique
+      type: DEVICETYPE.AUDIOINPUT,                      //Type = 'AUDIOINPUT'
+      name: 'Table Mic Pro',                            //Nom
+      device: devicesLibrary.AudioInput,                //Classe à utiliser
+      driver: driversLibrary.AudioInputDriver_aes67,    //Driver à utiliser par le device
+      connector: 2,                                     //Connecteur Ethernet AES67 (1-6)
+      channel: 1,                                       //Canal AES67 (1-8), défaut à 1 si non spécifié
+      bias: 0,                                          //Biais de niveau audio, peut être positif ou négatif. Utilisé par l'analyze d'entrée audio
+      gainLowLimit: 0,                                  //Limite basse du gain de l'entrée (0-70)
+      gainHighLimit: 70,                                //Limite supérieure du gain de l'entrée (0-70)
+      defaultGain: 45,                                  //Gain par défaut au démarrage du système
+      gainStep: 1,                                      //Gain ajouté ou retiré de la valeur actuelle lorsque les fonctions increase() et decrease() sont appelées
+      defaultMode: 'on',                                //Mode par défaut lors du démarrage du système
+      lowGain: 30,                                      //Gain "bas" (utilisé par les widgets de type "button group")
+      mediumGain: 45,                                   //Gain "moyen" (utilisé par les widgets de type "button group")
+      highGain: 60,                                     //Gain "haut" (utilisé par les widgets de type "button group")
+      boost: 70                                         //Gain "Boost, utilisé par le module "AutoSauce"
+    }
+```
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
 * **audioinput.presenter.sf1:MODE** : Toggle, affiche et configure le mode de l'entrée à "ON" ou "OFF"
 * **audioinput.presenter.sf1:LEVEL** : Slider, affiche et configure le gain de l'entrée. Automatiquement scalé entre 0 et 255 -> gainLowLimite et gainHighLimit
@@ -354,6 +379,8 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 
 ### AudioOutput (sortie audio du codec)
 Attention, le niveau de `AudioOutput` va de -24 à 0.
+
+#### AudioOutputDriver_codecpro (sorties audio traditionnelles)
 ```JS
     /* AUDIO OUTPUTS */
     {
@@ -374,6 +401,21 @@ Attention, le niveau de `AudioOutput` va de -24 à 0.
       highLevel: 0,                                      //Niveau "haut" (utlisé par les widgets de type "button group")
     },
 ```
+
+#### AudioOutputDriver_aes67 (sorties audio AES67)
+```JS
+    {
+      id: 'audiooutput.aes67.recording',                  //Identification unique
+      type: DEVICETYPE.AUDIOOUTPUT,                      //Type = 'AUDIOOUTPUT'
+      name: 'AES67 Recording',                           //Nom
+      device: devicesLibrary.AudioOutput,                //Classe à utiliser
+      driver: driversLibrary.AudioOutputDriver_aes67,    //Driver à utiliser par le device
+      connector: 2,                                      //Connecteur Ethernet AES67 (1-6)
+      defaultMode: 'on',                                 //Mode par défaut lors du démarrage du système
+    },
+```
+Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
+* **audiooutput.aes67.recording:MODE** : Toggle, affiche et configure le mode de la sortie à "ON" ou "OFF"
 
 ### CameraPreset
 #### Pour caméra Cisco

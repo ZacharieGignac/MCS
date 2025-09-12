@@ -20,9 +20,9 @@
         </Widget>
       </Row>
       <Row>
-        <Name>hdmipassThrough</Name>
+        <Name>byod</Name>
         <Widget>
-          <WidgetId>systemadmin|SS$hdmiPassthrough</WidgetId>
+          <WidgetId>systemadmin|SS$byod</WidgetId>
           <Name>?</Name>
           <Type>Text</Type>
           <Options>size=4;fontSize=normal;align=right</Options>

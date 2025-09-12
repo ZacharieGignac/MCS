@@ -25,8 +25,7 @@ export var Manifest = {
   features: {
     cameraControls: true,
     endCallButton: true,
-    hdmiPassthrough: true,
-    webcam:true,
+    byod: true, // Active automatiquement HDMI.Passthrough et/ou Webcam selon le système
     joinGoogleMeet: false,
     joinWebex: true,
     joinZoom: false,
@@ -109,8 +108,9 @@ export class Scenario {
 - `features` : Permet d'afficher ou non les différentes fonctionnalités du système
   - `cameraControls` : Contrôles de caméra
   - `endCallButton` : Bouton "terminer l'appel"
-  - `hdmiPassthrough` : Fonctionnalité "BYOD" (pour codec pro, room kit, room 55, etc..) *Interchangeable par la propriété `webcam`
-  - `webcam` : Fonctionnalité "BYOD" (pour EQ, BarPro, etc..) *Interchangeable par la propriété `hdmiPassthrough`
+  - `hdmiPassthrough` : **DÉPRÉCIÉ** - Fonctionnalité "BYOD" (pour codec pro, room kit, room 55, etc..) *Utilisez `byod` à la place*
+  - `webcam` : **DÉPRÉCIÉ** - Fonctionnalité "BYOD" (pour EQ, BarPro, etc..) *Utilisez `byod` à la place*
+  - `byod` : Fonctionnalité "BYOD" (Bring Your Own Device) - compatible automatiquement avec tous les systèmes. Active automatiquement les UI features appropriées (HDMI.Passthrough et/ou Webcam) selon ce qui est disponible sur le système.
   - `joinGoogleMeet` : Joindre Google Meet
   - `joinWebex` : Joindre Webex
   - `joinZoom` : Joindre Zoom

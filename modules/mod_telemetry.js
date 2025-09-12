@@ -65,7 +65,7 @@ class TelemetryManager {
     this.dailyReport.presentationLocal = false;
     this.dailyReport.presentationRemote = false;
     this.dailyReport.callCount = 0; // Initialize call count for daily report
-    this.dailyReport.hdmiPassthroughCount = 0; // Initialize HDMI Passthrough count for daily report
+    this.dailyReport.byodCount = 0; // Initialize BYOD count for daily report
     this.dailyReport.localComputerUsedCount = 0; // Initialize local computer count for daily report
     this.dailyReport.personnalComputerUsedCount = 0; // Initialize personnal computer count for daily report
     this.dailyReport.localComputerUsed = false;
@@ -79,7 +79,7 @@ class TelemetryManager {
       presentationSource: null // Add presentationSource to previous status
     };
     this.previousCallStatus = 'Idle'; // Initialize previous call status
-    this.previousHdmiPassthroughStatus = 'Inactive'; // Initialize HDMI Passthrough status
+    this.previousByodStatus = 'Inactive'; // Initialize BYOD status
 
 
     this.scheduleDailyReport();
@@ -87,7 +87,7 @@ class TelemetryManager {
     this.sessionCounter = 0;
     this.initSessionTracking();
     this.initVolumeTelemetry();
-    this.initStatusTelemetry(); // Initialize status telemetry to handle presentation, call and hdmiPassthrough
+    this.initStatusTelemetry(); // Initialize status telemetry to handle presentation, call and byod
     this.initRoomAnalyticsTelemetry();
 
     // Send telemetryClientVersion when module starts
@@ -112,8 +112,8 @@ class TelemetryManager {
         this.handleCallStatusEvent(eventData.status.call);
       }
 
-      if (eventData.status.hdmiPassthrough) {
-        this.handleHdmiPassthroughStatusEvent(eventData.status.hdmiPassthrough);
+      if (eventData.status.byod) {
+        this.handleByodStatusEvent(eventData.status.byod);
       }
     });
   }
@@ -236,23 +236,23 @@ class TelemetryManager {
   }
 
 
-  handleHdmiPassthroughStatusEvent(hdmiPassthroughStatus) {
-    const currentHdmiPassthroughStatus = hdmiPassthroughStatus.Mode || 'Inactive'; // Default to 'Inactive' if status is missing
+  handleByodStatusEvent(byodStatus) {
+    const currentByodStatus = byodStatus.Mode || 'Inactive'; // Default to 'Inactive' if status is missing
 
-    if (currentHdmiPassthroughStatus !== this.previousHdmiPassthroughStatus) {
-      debug(1, "mod_telemetry: HDMI Passthrough status changed via system status: " + currentHdmiPassthroughStatus);
+    if (currentByodStatus !== this.previousByodStatus) {
+      debug(1, "mod_telemetry: BYOD status changed via system status: " + currentByodStatus);
 
-      // Send immediate HDMI Passthrough status telemetry
-      this.send({ hdmiPassthroughStatus: currentHdmiPassthroughStatus });
-      debug(1, "mod_telemetry: Immediate HDMI Passthrough Status Telemetry Sent: " + JSON.stringify({ hdmiPassthroughStatus: currentHdmiPassthroughStatus }));
+      // Send immediate BYOD status telemetry
+      this.send({ byodStatus: currentByodStatus });
+      debug(1, "mod_telemetry: Immediate BYOD Status Telemetry Sent: " + JSON.stringify({ byodStatus: currentByodStatus }));
 
-      // Update session report if HDMI Passthrough becomes active during the session
-      if (currentHdmiPassthroughStatus === 'Active') {
-        zapi.telemetry.sessionReport.sessionReport.sessionHdmiPassthroughUsed = true;
-        this.dailyReport.hdmiPassthroughCount++; // Increment daily HDMI Passthrough count
+      // Update session report if BYOD becomes active during the session
+      if (currentByodStatus === 'Active') {
+        zapi.telemetry.sessionReport.sessionReport.sessionByodUsed = true;
+        this.dailyReport.byodCount++; // Increment daily BYOD count
       }
 
-      this.previousHdmiPassthroughStatus = currentHdmiPassthroughStatus; // Update previous HDMI Passthrough status
+      this.previousByodStatus = currentByodStatus; // Update previous BYOD status
     }
   }
 
@@ -556,7 +556,7 @@ class TelemetryManager {
     this.dailyReport.presentationLocal = false;
     this.dailyReport.presentationRemote = false;
     this.dailyReport.callCount = 0; // Reset call count for next day
-    this.dailyReport.hdmiPassthroughCount = 0; // Reset HDMI Passthrough count for next day
+    this.dailyReport.byodCount = 0; // Reset BYOD count for next day
     this.dailyReport.localComputerUsedCount = 0; // Reset local computer count for next day
     this.dailyReport.personnalComputerUsedCount = 0; // Reset personnal computer count for next day
     this.dailyReport.localComputerUsed = false;

@@ -19,6 +19,7 @@
 * API Audio: Nouvelle méthode `zapi.audio.getRemoteInputsDetailed()` renvoyant la liste des entrées distantes avec leurs rôles (`[{ id, role, callId, streamId }]`).
 * Devices/AudioOutputGroup: Nouvelles méthodes `connectSpecificRemoteInputs(ids)` et `disconnectSpecificRemoteInputs(ids)` pour un routage ciblé des entrées distantes.
 * Journaux: Logs audio et scenario simplifiés et structurés (comptes, rôles, ids) pour faciliter le diagnostic.
+* **BYOD unifié**: Nouveau statut `byod` compatible automatiquement avec HDMI.Passthrough (anciens systèmes) et Webcam (nouveaux systèmes). Les scénarios avec `byod: true` activent automatiquement les UI features appropriées selon le système.
 
 ### Bugfix
 * Les microphones sont maintenant unmuté lors de l'activation du scénario sce_standby

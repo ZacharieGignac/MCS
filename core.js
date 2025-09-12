@@ -633,7 +633,7 @@ class Core {
       }
     });
 
-    this.systemStatus.onKeyChg('hdmiPassthrough', (status) => {
+    this.systemStatus.onKeyChg('byod', (status) => {
       if (status.value !== 'Active') {
         this.handleHDMIPassThroughOff();
       }
@@ -949,7 +949,7 @@ class Core {
   async processPresenterDetectedStatus(status) {
     let pts = await xapi.Status.Cameras.PresenterTrack.Status.get();
     if (pts == 'Follow') {
-      if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('hdmiPassthrough') == 'Active') {
+      if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('byod') == 'Active') {
         if (status != this.lastPresenterDetectedStatus) {
           this.lastPresenterDetectedStatus = status;
           if (status == true) {
@@ -1073,7 +1073,7 @@ class Core {
 
     xapi.Command.Video.Graphics.Text.Display({
       Target: 'LocalOutput',
-      Text: `P:${allStatus.presentation.type} C:${allStatus.call} HPT:${allStatus.hdmiPassthrough} PD:${allStatus.PresenterDetected} PL:${allStatus.PresenterLocation} CPZ:${allStatus.ClearPresentationZone} PM:${allStatus.PresenterMics} AM:${allStatus.AudienceMics}`
+      Text: `P:${allStatus.presentation.type} C:${allStatus.call} BYOD:${allStatus.byod} PD:${allStatus.PresenterDetected} PL:${allStatus.PresenterLocation} CPZ:${allStatus.ClearPresentationZone} PM:${allStatus.PresenterMics} AM:${allStatus.AudienceMics}`
     });
   }
 

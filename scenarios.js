@@ -221,12 +221,14 @@ export class Scenarios {
     zapi.performance.setElapsedStart('Scenarios.setupFeatures');
     xapi.Config.UserInterface.Features.Call.CameraControls.set(features.cameraControls ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.End.set(features.endCallButton ? 'Auto' : 'Hidden');
-    if (features.hdmiPassthrough || features.webcam) {
+    // Handle BYOD features (unified or legacy)
+    if (features.byod || features.hdmiPassthrough || features.webcam) {
+      // Try to enable both features, let the system handle what's available
       xapi.Config.UserInterface.Features.Call.Webcam.set('Auto').catch(e => { });
       xapi.Config.UserInterface.Features.Call.HdmiPassthrough.set('Auto').catch(e => { });
     }
     else {
-
+      // Hide both features if BYOD is not enabled
       xapi.Config.UserInterface.Features.Call.Webcam.set('Hidden').catch(e => { });
       xapi.Config.UserInterface.Features.Call.HdmiPassthrough.set('Hidden').catch(e => { });
     }

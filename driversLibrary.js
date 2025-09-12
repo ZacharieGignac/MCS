@@ -1079,12 +1079,12 @@ export class AudioOutputDriver_aes67 {
 
   off() {
     debug(1, `DRIVER AudioOutput_aes67 (${this.config.id}): Off`);
-    xapi.Config.Audio.Input.Ethernet[2].mode.set('Off');
+    xapi.Config.Audio.Input.Ethernet[this.config.connector].mode.set('Off');
   }
 
   on() {
     debug(1, `DRIVER AudioOutput_aes67 (${this.config.id}): On`);
-    xapi.Config.Audio.Input.Ethernet[2].mode.set('On');
+    xapi.Config.Audio.Input.Ethernet[this.config.connector].mode.set('On');
   }
 }
 

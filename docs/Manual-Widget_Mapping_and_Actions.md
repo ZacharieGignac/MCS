@@ -83,6 +83,7 @@ En d'autres mots, si une valeur de systemStatus est de type boolean, il est OBLI
 
 Exemples:
 * **SS$PresenterLocation** (button group avec 2 boutons: 'local', 'remote'): Affiche et défini l'emplacement du présentateur. Valeurs acceptées: `local`, `remote`.
+* **SS$byod** (texte): Affiche le statut BYOD (Bring Your Own Device). Valeurs: `Active`, `Inactive`. Compatible avec HDMI.Passthrough et Webcam.
 * **SS$AudienceMics** (toggle): Affiche et défini l'emplacement du présentateur
 * **SS$Version** (texte): Affiche la version actuelle du système
 * **SS?PresenterDetected** (toggle): Affiche si le présentateur est détecté (valeur bool). Conversion automatique en `on`/`off`.

@@ -16,7 +16,7 @@ export var Manifest = {
   features: {
     cameraControls: true,
     endCallButton: true,
-    hdmiPassthrough: true,
+    byod: true, // Active automatiquement HDMI.Passthrough et/ou Webcam selon le système
     joinGoogleMeet: false,
     joinWebex: true,
     joinZoom: false,

@@ -60,8 +60,11 @@ export class Scenario {
     //Stop presentation
     xapi.Command.Presentation.Stop();
 
-    //Stop HdmiPassthrough
-    xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+    try {
+      //Stop HdmiPassthrough
+      xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+    } catch { e }
+
 
     //Set default volume
     xapi.Command.Audio.Volume.SetToDefault();

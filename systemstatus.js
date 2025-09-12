@@ -174,6 +174,36 @@ export class SystemStatus {
 
   }
 
+  async initByodStatus() {
+    try {
+      // Try HDMI.Passthrough first (older systems)
+      let hpt = await xapi.Status.Video.Output.HDMI.Passthrough.Status.get();
+      this.setStatus('byod', hpt, false);
+      this.setStatus('hdmiPassthrough', hpt, false); // Backward compatibility
+      xapi.Status.Video.Output.HDMI.Passthrough.Status.on(status => {
+        this.setStatus('byod', status);
+        this.setStatus('hdmiPassthrough', status, false); // Backward compatibility
+      });
+      debug(1, 'Using HDMI.Passthrough for BYOD status');
+    } catch (e) {
+      try {
+        // Fallback to Webcam (newer systems)
+        let webcam = await xapi.Status.Video.Output.Webcam.Status.get();
+        this.setStatus('byod', webcam, false);
+        this.setStatus('hdmiPassthrough', webcam, false); // Backward compatibility
+        xapi.Status.Video.Output.Webcam.Status.on(status => {
+          this.setStatus('byod', status);
+          this.setStatus('hdmiPassthrough', status, false); // Backward compatibility
+        });
+        debug(1, 'Using Webcam for BYOD status');
+      } catch (e2) {
+        debug(3, 'No BYOD API available, setting to Inactive');
+        this.setStatus('byod', 'Inactive', false);
+        this.setStatus('hdmiPassthrough', 'Inactive', false); // Backward compatibility
+      }
+    }
+  }
+
   async init() {
     return new Promise(async success => {
       debug(2, 'Starting SystemStatus...');
@@ -186,12 +216,8 @@ export class SystemStatus {
       let callStatus = await call.getCallStatus();
       this.setStatus('call', callStatus, false);
 
-      //Set special "hdmipassthrough" status
-      let hpt = await xapi.Status.Video.Output.HDMI.Passthrough.Status.get();
-      this.setStatus('hdmiPassthrough', hpt, false);
-      xapi.Status.Video.Output.HDMI.Passthrough.Status.on(hptstatus => {
-        this.setStatus('hdmiPassthrough', hptstatus);
-      });
+      //Set unified "byod" status (supports both HDMI.Passthrough and Webcam)
+      await this.initByodStatus();
 
       presentation.onChange(status => {
         if (!areObjectsIdentical(this._systemStatus.presentation, status)) {

@@ -96,6 +96,11 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
   - `callback` : Fonction qui sera executée lors du changement du statut particulier.
 - `sendSystemReport` : Envoie le rapport système.
 
+### Statuts système disponibles
+
+- `byod`: Statut BYOD (Bring Your Own Device) - fonctionnalité de partage d'écran. Valeurs: `Active`, `Inactive`. Compatible automatiquement avec HDMI.Passthrough (anciens systèmes) et Webcam (nouveaux systèmes).
+- `hdmiPassthrough`: **DÉPRÉCIÉ** - Utilisez `byod` à la place. Maintenu pour compatibilité ascendante.
+
 ### Propriétés
 
 - `systemReport`: Structure de donnée qui sera envoyée lors de l'envoi rapport système. Il est possible d'ajouter des données dans cette structure, par exemple: `sendSystemReport['myData'] = { payload:'test!', anotherProperty:'Ok!' }`

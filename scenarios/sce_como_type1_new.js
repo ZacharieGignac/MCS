@@ -30,7 +30,7 @@ export var Manifest = {
     shareStart: true,
     cameraControls: true,
     endCallButton: true,
-    hdmiPassthrough: true,
+    byod: true, // Active automatiquement HDMI.Passthrough et/ou Webcam selon le système
     joinGoogleMeet: false,
     joinWebex: true,
     joinZoom: true,
@@ -200,7 +200,7 @@ export class Scenario {
 
   evaluateCameras(status) {
     if (status.PresenterLocation == 'local') {
-      if (status.UsePresenterTrack == ON && (status.call == 'Connected' || status.hdmiPassthrough == 'Active')) {
+      if (status.UsePresenterTrack == ON && (status.call == 'Connected' || status.byod == 'Active')) {
         let camConnector = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERA, 'system.presentation.main')[0].config.connector;
         xapi.Command.Video.Input.SetMainVideoSource({ ConnectorId: camConnector });
         xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Follow' });
@@ -216,7 +216,7 @@ export class Scenario {
     }
     else if (status.PresenterLocation == 'remote') {
       xapi.Command.Cameras.PresenterTrack.Set({ Mode: 'Off' });
-      if (status.call == 'Connected' || status.hdmiPassthrough == 'Active') {
+      if (status.call == 'Connected' || status.byod == 'Active') {
         let audiencePreset = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERAPRESET, 'system.farend.main')[0];
         if (status.AutoCamPresets == ON) {
           audiencePreset.activate();

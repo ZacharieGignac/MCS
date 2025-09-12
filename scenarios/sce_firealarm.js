@@ -16,7 +16,7 @@ export var Manifest = {
   features: {
     cameraControls: false,
     endCallButton: false,
-    hdmiPassthrough: false,
+    byod: false, // Pas de BYOD pour ce scénario
     joinGoogleMeet: false,
     joinWebex: false,
     joinZoom: false,

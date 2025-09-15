@@ -360,14 +360,14 @@ class UiManager {
     }
   }
 
-  showProgressBar(title, text, seconds) {
+showProgressBar(title, text, seconds) {
     const totalSteps = 10;
     const interval = seconds * 1000 / totalSteps;
     let currentStep = 0;
 
     const intervalId = setInterval(() => {
       currentStep++;
-      const progressBar = '🟦'.repeat(currentStep) + '⬛'.repeat(totalSteps - currentStep);
+      const progressBar = '▓'.repeat(currentStep) + '░'.repeat(totalSteps - currentStep);
       xapi.Command.UserInterface.Message.Prompt.Display({
         Title: title,
         Text: text + '<br>' + progressBar

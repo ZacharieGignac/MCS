@@ -173,6 +173,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
   - `title`: Titre du message
   - `text`: Texte du message
   - `seconds`: Durée de la progressBar (secondes)
+  - `style`: Style de la progressBar (optionnel) - 'modern', 'gradient', 'dots', 'bars', 'retro', 'journey', 'rocket', 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'matrix', 'ocean', 'space', 'cooking', 'magic', 'city'
   
 ## Stockage (storage)
 

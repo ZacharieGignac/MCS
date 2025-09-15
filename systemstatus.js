@@ -266,11 +266,11 @@ export class SystemStatus {
         this.setStatus(w.WidgetId.split('$')[1], w.Value, false);
       }
 
-      //Display current status at 10 seconds interval
+      //Display current status at 5 minutes interval
       if (systemconfig.system.showStatusAndPerformanceReports) {
         setInterval(() => {
           debug(2, this._systemStatus);
-        }, 30000);
+        }, 300000);
       }
       this.setDefaults();
 

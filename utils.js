@@ -57,8 +57,13 @@ export class Storage {
   read(name) {
     for (let file of this.storage.files) {
       if (file.name == name) {
-        let decodedFileContent = atob(file.content);
-        return (decodedFileContent);
+        try {
+          let decodedFileContent = atob(file.content);
+          return (decodedFileContent);
+        } catch (error) {
+          try { debug(3, `Storage.read("${name}") decode error: ${error}`); } catch (_) {}
+          return undefined;
+        }
       }
     }
   }
@@ -83,13 +88,17 @@ export class Storage {
       workingFile.content = content;
       workingFile.size = size;
     }
-    let macroContent = btoa(JSON.stringify(this.storage));
-    await xapi.Command.Macros.Macro.Save({
-      Name: this.STORAGEFILE,
-      Overwrite: true,
-      Transpile: false
-    }, '//' + macroContent);
-    zapi.system.events.emit('system_storage_file_modified', name);
+    try {
+      let macroContent = btoa(JSON.stringify(this.storage));
+      await xapi.Command.Macros.Macro.Save({
+        Name: this.STORAGEFILE,
+        Overwrite: true,
+        Transpile: false
+      }, '//' + macroContent);
+      zapi.system.events.emit('system_storage_file_modified', name);
+    } catch (error) {
+      try { debug(3, `Storage.write("${name}") error: ${error}`); } catch (_) {}
+    }
   }
 
 
@@ -110,7 +119,7 @@ export class Storage {
         zapi.system.events.emit('system_storage_file_deleted', name);
       }
     }
-    this.write('storage.version', this.version);
+    try { await this.write('storage.version', this.version); } catch (error) { try { debug(3, `Storage.del("${name}") write error: ${error}`); } catch (_) {} }
   }
 
 
@@ -120,10 +129,14 @@ export class Storage {
     this.storage = {
       files: []
     };
-    this.write('storage.version', this.version);
-    this.write('storage.encoding', 'json');
-    this.write('storage.encapsulation', 'base64');
-    this.init();
+    try {
+      await this.write('storage.version', this.version);
+      await this.write('storage.encoding', 'json');
+      await this.write('storage.encapsulation', 'base64');
+      await this.init();
+    } catch (error) {
+      try { debug(3, `Storage.resetStorage() error: ${error}`); } catch (_) {}
+    }
   }
 }
 

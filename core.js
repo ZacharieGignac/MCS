@@ -1560,21 +1560,55 @@ async function preInit() {
 
 
   xapi.Event.Message.Send.Text.on(text => {
-    if (systemconfig.system.debugInternalMessages) {
-      debug(1, `[INTERNAL MESSAGE] ${text}`);
-    }
-    if (typeof text === 'string') {
-      let actionMatch = text.match(/MCSACTION\$(.+)/);
-      let actionsMatch = text.match(/MCSACTIONS\$(.+)/);
-      if (actionMatch) {
-        if (core && core.uiManager && core.uiManager.processMatchAction) {
-          core.uiManager.processMatchAction('ACTION$' + actionMatch[1]);
+    try {
+      if (systemconfig.system.debugInternalMessages) {
+        debug(1, `[INTERNAL MESSAGE] ${text}`);
+      }
+      if (typeof text === 'string') {
+        let actionMatch;
+        let actionsMatch;
+        try {
+          actionMatch = text.match(/MCSACTION\$(.+)/);
+          actionsMatch = text.match(/MCSACTIONS\$(.+)/);
         }
-      } else if (actionsMatch) {
-        if (core && core.uiManager && core.uiManager.processMatchAction) {
-          core.uiManager.processMatchAction('ACTIONS$' + actionsMatch[1]);
+        catch (e) {
+          try { debug(3, `[InternalMsg] Regex parse error: ${e}`); } catch (_) {}
+          return;
+        }
+
+        if (actionMatch) {
+          if (core && core.uiManager && core.uiManager.processMatchAction) {
+            try {
+              const maybePromise = core.uiManager.processMatchAction('ACTION$' + actionMatch[1]);
+              if (maybePromise && typeof maybePromise.then === 'function' && typeof maybePromise.catch === 'function') {
+                maybePromise.catch(err => {
+                  try { debug(3, `[InternalMsg] ACTION handler error (async): ${err}`); } catch (_) {}
+                });
+              }
+            }
+            catch (e) {
+              try { debug(3, `[InternalMsg] ACTION handler error (sync): ${e}`); } catch (_) {}
+            }
+          }
+        } else if (actionsMatch) {
+          if (core && core.uiManager && core.uiManager.processMatchAction) {
+            try {
+              const maybePromise = core.uiManager.processMatchAction('ACTIONS$' + actionsMatch[1]);
+              if (maybePromise && typeof maybePromise.then === 'function' && typeof maybePromise.catch === 'function') {
+                maybePromise.catch(err => {
+                  try { debug(3, `[InternalMsg] ACTIONS handler error (async): ${err}`); } catch (_) {}
+                });
+              }
+            }
+            catch (e) {
+              try { debug(3, `[InternalMsg] ACTIONS handler error (sync): ${e}`); } catch (_) {}
+            }
+          }
         }
       }
+    }
+    catch (e) {
+      try { debug(3, `[InternalMsg] Dispatcher error: ${e}`); } catch (_) {}
     }
   });
 

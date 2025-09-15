@@ -361,7 +361,7 @@ class UiManager {
   }
 
 showProgressBar(title, text, seconds) {
-    const totalSteps = 10;
+    const totalSteps = 20;
     const interval = seconds * 1000 / totalSteps;
     let currentStep = 0;
 

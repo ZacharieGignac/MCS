@@ -148,11 +148,15 @@ export class MessageQueue {
       return;
     }
     const message = this.queue.shift();
-    xapi.Command.Message.Send({ Text: message });
     this.sending = true;
-    setTimeout(() => {
-      this.sendNextMessage();
-    }, systemconfig.system.messagesPacing);
+    try {
+      xapi.Command.Message.Send({ Text: message });
+    }
+    catch (e) {
+      try { debug(3, `MessageQueue: send error: ${e}`); } catch (_) {}
+    }
+    this.sending = false;
+    setTimeout(() => { this.sendNextMessage(); }, systemconfig.system.messagesPacing);
   }
 }
 

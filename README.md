@@ -26,6 +26,12 @@
 * Devices/AudioOutputGroup: ajout de `connectSpecificRemoteInputs(ids)` et `disconnectSpecificRemoteInputs(ids)`.
 * Journaux: logs audio/scénarios simplifiés et structurés (rôles, ids) pour le diagnostic.
 * **BYOD unifié**: nouveau statut `byod` avec détection automatique HDMI.Passthrough (anciens systèmes) ou Webcam (nouveaux). Les scénarios avec `features.byod: true` activent automatiquement les UI features pertinentes.
+* Gestion des erreurs (robustesse):
+  - Bus d'événements: `SystemEvents.emit` protège chaque écouteur (sync/async) via try/catch, un handler défaillant ne bloque plus les autres.
+  - UI Action mappings: exécution des handlers protégée (try/catch) et capture des rejets asynchrones.
+  - Messages internes: le dispatcher des messages `MCSACTION$...` / `MCSACTIONS$...` est encapsulé (regex + exécution) pour éviter les erreurs au niveau global.
+  - Communication: la file d'envoi de messages (`MessageQueue`) journalise les erreurs de `xapi.Command.Message.Send` et continue toujours la file.
+  - Stockage: `Storage.read/write/del/resetStorage` sont entourés de try/catch; en cas d'erreur, un log est émis et l'exécution se poursuit.
 
 ### Bugfix
 * `sce_standby`: unmute correct des micros à l'activation.

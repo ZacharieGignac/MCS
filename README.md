@@ -51,15 +51,16 @@ Un macro séparé `watchdog.js` agit comme chien de garde pour vérifier que le 
 
 ### Principe
 - Le watchdog envoie un message texte XAPI (`MCS_WD_PING`).
-- Le core répond immédiatement avec (`MCS_WD_PONG`) même durant l'attente de cold boot.
+- Le core répond avec (`MCS_WD_PONG`) une fois l'initialisation du core terminée (le répondeur est enregistré post-init).
 - Le watchdog attend un PONG pendant 15 secondes.
 - Après 3 tentatives consécutives sans réponse (3 minutes), le watchdog redémarre le moteur de macros.
 
 ### Détails
-- Délai initial avant le premier ping: 1 minute.
-- Fréquence: 1 ping par minute.
-- Seuil de redémarrage: 3 PING sans PONG.
-- Redémarrage: `xapi.Command.Macros.Runtime.Restart()`.
+- Délai initial avant le premier ping (pendant le boot): 10 minutes.
+- Après réception du premier PONG, la fréquence passe à 1 ping par minute.
+- Fenêtre d'attente de PONG: 15 secondes.
+- Seuil de redémarrage: 3 PING consécutifs sans PONG.
+- Redémarrage exécuté via `xapi.Command.Macros.Runtime.Restart()`.
 
 ### Déploiement
 - Installer `watchdog.js` comme macro séparée (distincte de `core`).

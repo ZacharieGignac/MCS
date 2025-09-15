@@ -361,16 +361,17 @@ class UiManager {
   }
 
 showProgressBar(title, text, seconds) {
-    const totalSteps = 20;
+    const totalSteps = 30;
     const interval = seconds * 1000 / totalSteps;
     let currentStep = 0;
 
     const intervalId = setInterval(() => {
       currentStep++;
       const progressBar = '▓'.repeat(currentStep) + '░'.repeat(totalSteps - currentStep);
+      const remainingSeconds = Math.max(0, Math.ceil(seconds - ((currentStep * seconds) / totalSteps)));
       xapi.Command.UserInterface.Message.Prompt.Display({
         Title: title,
-        Text: text + '<br>' + progressBar
+        Text: text + '<br>' + progressBar + '<br>' + `Temps restant : ${remainingSeconds}s`
       });
 
       if (currentStep === totalSteps) {
@@ -1709,17 +1710,26 @@ async function checkUptimeAndRestart() {
 }
 
 function startColdBootWarning() {
-  let x = 0; // Declare x here
-  const waitChar = '🟦';
-  bootWaitPromptIntervalId = setInterval(() => { // Using the new name here to assign the interval ID
-    x++;
+  const totalSteps = 30;
+  const totalSeconds = systemconfig.system.coldBootWait;
+  const interval = (totalSeconds * 1000) / totalSteps;
+  let currentStep = 0;
+
+  bootWaitPromptIntervalId = setInterval(() => {
+    currentStep++;
+    const progressBar = '▓'.repeat(currentStep) + '░'.repeat(totalSteps - currentStep);
+    const remainingSeconds = Math.max(0, Math.ceil(totalSeconds - ((currentStep * totalSeconds) / totalSteps)));
     xapi.Command.UserInterface.Message.Prompt.Display({
       Duration: 0,
-      Text: str.systemStartingColdBootText + '<br>' + waitChar.repeat(x),
+      Text: str.systemStartingColdBootText + '<br>' + progressBar + '<br>' + `Temps restant : ${remainingSeconds}s`,
       Title: str.systemStartingColdBootTitle,
     });
     checkUptimeAndRestart();
-  }, 5000);
+
+    if (currentStep >= totalSteps) {
+      clearInterval(bootWaitPromptIntervalId);
+    }
+  }, interval);
 }
 
 handleBoot();

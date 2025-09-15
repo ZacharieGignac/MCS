@@ -89,7 +89,7 @@ export class Scenario {
 
   enable() {
     return new Promise(async success => {
-      zapi.ui.showProgressBar(systemconfig.strings.newSessionTitle, 'Un instant...', 5, 'gradient');
+      zapi.ui.showProgressBar(systemconfig.strings.newSessionTitle, '', 5);
       this.devices.displays.farend.forEach(display => {
         display.setBlanking(false);
         display.powerOn();

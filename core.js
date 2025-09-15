@@ -117,9 +117,22 @@ class SystemEvents {
   }
 
   emit(event, ...args) {
-    for (let e of this.events) {
+    // Use a shallow copy to avoid mutation issues if listeners add/remove during emit
+    const listeners = this.events.slice();
+    for (let e of listeners) {
       if (e.event == event) {
-        e.callback(...args);
+        try {
+          const maybePromise = e.callback(...args);
+          // Capture async rejections without awaiting
+          if (maybePromise && typeof maybePromise.then === 'function' && typeof maybePromise.catch === 'function') {
+            maybePromise.catch(err => {
+              try { debug(3, `SystemEvents.emit(\"${event}\"): listener error (async): ${err}`); } catch (_) {}
+            });
+          }
+        }
+        catch (err) {
+          try { debug(3, `SystemEvents.emit(\"${event}\"): listener error (sync): ${err}`); } catch (_) {}
+        }
       }
     }
   }
@@ -346,7 +359,17 @@ class UiManager {
 
       for (let map of this.actionMaps) {
         if (map.regex.test(action)) {
-          map.func(...paramsArray);
+          try {
+            const maybePromise = map.func(...paramsArray);
+            if (maybePromise && typeof maybePromise.then === 'function' && typeof maybePromise.catch === 'function') {
+              maybePromise.catch(err => {
+                try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (async): ${err}`); } catch (_) {}
+              });
+            }
+          }
+          catch (err) {
+            try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (sync): ${err}`); } catch (_) {}
+          }
         }
       }
     }
@@ -354,7 +377,17 @@ class UiManager {
     else {
       for (let map of this.actionMaps) {
         if (map.regex.test(act)) {
-          map.func();
+          try {
+            const maybePromise = map.func();
+            if (maybePromise && typeof maybePromise.then === 'function' && typeof maybePromise.catch === 'function') {
+              maybePromise.catch(err => {
+                try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (async): ${err}`); } catch (_) {}
+              });
+            }
+          }
+          catch (err) {
+            try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (sync): ${err}`); } catch (_) {}
+          }
         }
       }
     }

@@ -272,15 +272,39 @@ export class DisplayDriver_serial_sonybpj {
         throw new Error(`Invalid serial port number: ${this.config.port}. Port must be between 1 and 4.`);
       }
 
-      xapi.Config.SerialPort.Outbound.Mode.set('On');
-      xapi.Config.SerialPort.Outbound.Port[this.config.port].BaudRate.set(38400);
-      xapi.Config.SerialPort.Outbound.Port[this.config.port].Description.set(this.config.id);
-      xapi.Config.SerialPort.Outbound.Port[this.config.port].Parity.set('Even');
+      // Configure serial port settings with error handling for each step
+      try {
+        xapi.Config.SerialPort.Outbound.Mode.set('On');
+      } catch (e) {
+        debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Failed to set SerialPort.Outbound.Mode: ${e.message}`);
+        throw e;
+      }
+
+      try {
+        xapi.Config.SerialPort.Outbound.Port[this.config.port].BaudRate.set(38400);
+      } catch (e) {
+        debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Failed to set BaudRate for port ${this.config.port}: ${e.message}`);
+        throw e;
+      }
+
+      try {
+        xapi.Config.SerialPort.Outbound.Port[this.config.port].Description.set(this.config.id);
+      } catch (e) {
+        debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Failed to set Description for port ${this.config.port}: ${e.message}`);
+        throw e;
+      }
+
+      try {
+        xapi.Config.SerialPort.Outbound.Port[this.config.port].Parity.set('Even');
+      } catch (e) {
+        debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Failed to set Parity for port ${this.config.port}: ${e.message}`);
+        throw e;
+      }
 
       this.serialPortConfigured = true;
       debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Serial port ${this.config.port} configured successfully`);
     } catch (e) {
-      debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Failed to configure serial port: ${JSON.stringify(e)}`);
+      debug(2, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): Failed to configure serial port: ${e.message}`);
       this.serialPortConfigured = false;
     }
   }
@@ -1188,6 +1212,77 @@ export class AudioInputDriver_aes67 {
   on() {
     debug(1, `DRIVER AudioInput_aes67 (${this.config.id}): On`);
     xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].Mode.set('On');
+  }
+}
+
+export class AudioInputDriver_usb {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setGain(gain) {
+    debug(1, `DRIVER AudioInput_usb (${this.config.id}): setGain: ${gain}`);
+    // Try both Level and Gain settings as different systems use different APIs
+    // Handle errors silently since we don't know which API the device supports
+    const connectorId = this.config.connector;
+    
+    try {
+      xapi.config.get(`Audio.Input.USBInterface[${connectorId}].Level`).then(() => {
+        xapi.Config.Audio.Input.USBInterface[connectorId].Level.set(gain);
+      }).catch((e) => {
+        // Try Gain instead
+        xapi.config.get(`Audio.Input.USBInterface[${connectorId}].Gain`).then(() => {
+          // USB interfaces typically have a smaller gain range, try to constrain the value
+          let constrainedGain = Math.max(0, Math.min(gain, 24)); // Constrain between 0-24
+          if (constrainedGain !== gain) {
+            debug(1, `DRIVER AudioInput_usb (${this.config.id}): Constraining gain from ${gain} to ${constrainedGain} for USB interface`);
+          }
+          xapi.Config.Audio.Input.USBInterface[connectorId].Gain.set(constrainedGain);
+        }).catch((e2) => {
+          debug(2, `DRIVER AudioInput_usb (${this.config.id}): Both Level and Gain settings failed for connector ${connectorId}`);
+        });
+      });
+    } catch (e) {
+      debug(2, `DRIVER AudioInput_usb (${this.config.id}): setGain failed: ${e.message}`);
+    }
+  }
+
+  setMode(mute) {
+    if (mute.toLowerCase() == 'off') {
+      this.off();
+    }
+    else {
+      this.on();
+    }
+  }
+
+  off() {
+    debug(1, `DRIVER AudioInput_usb (${this.config.id}): Off`);
+    const connectorId = this.config.connector;
+    try {
+      xapi.config.get(`Audio.Input.USBInterface[${connectorId}].Mode`).then(() => {
+        xapi.Config.Audio.Input.USBInterface[connectorId].Mode.set('Off');
+      }).catch((e) => {
+        debug(2, `DRIVER AudioInput_usb (${this.config.id}): Failed to set mode Off: ${e.message}`);
+      });
+    } catch (e) {
+      debug(2, `DRIVER AudioInput_usb (${this.config.id}): Off failed: ${e.message}`);
+    }
+  }
+
+  on() {
+    debug(1, `DRIVER AudioInput_usb (${this.config.id}): On`);
+    const connectorId = this.config.connector;
+    try {
+      xapi.config.get(`Audio.Input.USBInterface[${connectorId}].Mode`).then(() => {
+        xapi.Config.Audio.Input.USBInterface[connectorId].Mode.set('On');
+      }).catch((e) => {
+        debug(2, `DRIVER AudioInput_usb (${this.config.id}): Failed to set mode On: ${e.message}`);
+      });
+    } catch (e) {
+      debug(2, `DRIVER AudioInput_usb (${this.config.id}): On failed: ${e.message}`);
+    }
   }
 }
 

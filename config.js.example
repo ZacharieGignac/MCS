@@ -200,7 +200,7 @@ export var config = {
       defaultPower: 'off',
       blankBeforePowerOff: false,
       powerOffDelay: 0,
-    }
+    },
     {
       id: 'display.byod',
       type: DEVICETYPE.DISPLAY,

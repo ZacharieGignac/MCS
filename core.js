@@ -714,7 +714,7 @@ class Core {
           }
         } catch (e) {
           try { debug(3, `system_update folder prompt handler error: ${e}`); } catch (_) {}
-          this.displayMessage('Mises à jour', 'Erreur lors du traitement de la sélection de version.');
+          this.displayMessage('Mises à jour', 'Erreur lors du traitement de la sélection de système.');
         }
       } else if (event.FeedbackId && event.FeedbackId.startsWith('system_update_files_p')) {
         // File selection or pagination
@@ -735,13 +735,28 @@ class Core {
           }
 
           const selIndex = currentStart + (idx - 1);
-          const fileName = this._systemUpdateFiles && this._systemUpdateFiles[selIndex];
-          if (fileName) {
-            this.displayMessage('Mise à jour sélectionnée', `Version: ${this._systemUpdateSelectedFolder}<br>Fichier: ${fileName}`);
+          const fileItem = this._systemUpdateFiles && this._systemUpdateFiles[selIndex];
+          if (fileItem) {
+            this._systemUpdatePendingFile = fileItem; // store for confirmation
+            this.showSystemUpdateConfirmPrompt(fileItem);
           }
         } catch (e) {
           try { debug(3, `system_update files prompt handler error: ${e}`); } catch (_) {}
           this.displayMessage('Mises à jour', 'Erreur lors du traitement du fichier sélectionné.');
+        }
+      } else if (event.FeedbackId === 'system_update_confirm') {
+        // Confirmation to apply selected update
+        try {
+          if (event.OptionId === '1') {
+            // Yes
+            (async () => { await this.applySelectedUpdate(); })();
+          } else {
+            // No / Cancel
+            this.displayMessage('Mises à jour', 'Mise à jour annulée par l’utilisateur.');
+          }
+        } catch (e) {
+          try { debug(3, `system_update confirm prompt handler error: ${e}`); } catch (_) {}
+          this.displayMessage('Mises à jour', 'Erreur lors du traitement de la confirmation.');
         }
       }
     });
@@ -1081,7 +1096,7 @@ class Core {
       xapi.Command.UserInterface.Message.Alert.Display({
         Duration: 3,
         Title: 'Mises à jour',
-        Text: 'Vérification des fichiers disponibles...'
+        Text: 'Vérification des systèmes disponibles...'
       });
 
       const url = 'https://api.github.com/repos/ZacharieGignac/MCS/contents/releases?ref=main';
@@ -1107,7 +1122,7 @@ class Core {
       }
 
       if (!folders || folders.length === 0) {
-        this.displayMessage('Mises à jour', 'Aucun dossier de version n\'a été trouvé dans \'releases\'.');
+        this.displayMessage('Mises à jour', 'Aucun système n\'a été trouvé dans \'releases\'.');
         return;
       }
 
@@ -1124,7 +1139,7 @@ class Core {
 
   showSystemUpdateFolderPromptPage(pageIndex) {
     if (!Array.isArray(this._systemUpdateFolders) || this._systemUpdateFolders.length === 0) {
-      this.displayMessage('Mises à jour', 'Aucun dossier de version n\'a été trouvé.');
+      this.displayMessage('Mises à jour', 'Aucun système n\'a été trouvé.');
       return;
     }
 
@@ -1138,8 +1153,8 @@ class Core {
 
     const promptParams = {
       Duration: 0,
-      Title: 'Versions disponibles',
-      Text: `Choisissez une version (page ${page + 1}/${totalPages})`
+      Title: 'Systèmes disponibles',
+      Text: `Choisissez un système (page ${page + 1}/${totalPages})`
     };
 
     slice.forEach((fname, i) => {
@@ -1158,7 +1173,7 @@ class Core {
       xapi.Command.UserInterface.Message.Prompt.Display(promptParams);
     } catch (e) {
       try { debug(3, `showSystemUpdateFolderPromptPage error: ${e}`); } catch (_) {}
-      this.displayMessage('Mises à jour', 'Erreur d\'affichage de la liste des versions.');
+      this.displayMessage('Mises à jour', 'Erreur d\'affichage de la liste des systèmes.');
     }
   }
 
@@ -1180,14 +1195,17 @@ class Core {
       try {
         const body = JSON.parse(response.Body);
         if (Array.isArray(body)) {
-          files = body.filter(item => item.type === 'file').map(item => item.name);
+          // keep full file objects we need (name + download_url)
+          files = body
+            .filter(item => item.type === 'file')
+            .map(item => ({ name: item.name, download_url: item.download_url, path: item.path }));
         }
       } catch (parseErr) {
         try { debug(3, `fetchAndShowFilesForFolder: JSON parse error: ${parseErr}`); } catch (_) {}
       }
 
       if (!files || files.length === 0) {
-        this.displayMessage('Mises à jour', `Aucun fichier disponible dans le dossier: ${folderName}`);
+        this.displayMessage('Mises à jour', `Aucun fichier disponible pour le système: ${folderName}`);
         return;
       }
 
@@ -1196,7 +1214,7 @@ class Core {
       this.showSystemUpdateFilesPromptPage(0);
     } catch (e) {
       try { debug(3, `fetchAndShowFilesForFolder error: ${e}`); } catch (_) {}
-      this.displayMessage('Mises à jour', 'Erreur lors du chargement des fichiers de la version.');
+      this.displayMessage('Mises à jour', 'Erreur lors du chargement des fichiers du système.');
     }
   }
 
@@ -1211,18 +1229,18 @@ class Core {
     const page = Math.max(0, Math.min(pageIndex, totalPages - 1));
     this._systemUpdateFilesPage = page;
 
-    const start = page * pageSize;
-    const slice = this._systemUpdateFiles.slice(start, start + pageSize);
+  const start = page * pageSize;
+  const slice = this._systemUpdateFiles.slice(start, start + pageSize);
 
     const folderName = this._systemUpdateSelectedFolder || '';
     const promptParams = {
       Duration: 0,
       Title: 'Fichiers disponibles',
-      Text: `Version: ${folderName} (page ${page + 1}/${totalPages})`
+      Text: `Système: ${folderName} (page ${page + 1}/${totalPages})`
     };
 
-    slice.forEach((fname, i) => {
-      promptParams[`Option.${i + 1}`] = fname;
+    slice.forEach((f, i) => {
+      promptParams[`Option.${i + 1}`] = f.name;
     });
 
     if (page < totalPages - 1) {
@@ -1238,6 +1256,59 @@ class Core {
     } catch (e) {
       try { debug(3, `showSystemUpdateFilesPromptPage error: ${e}`); } catch (_) {}
       this.displayMessage('Mises à jour', 'Erreur d\'affichage de la liste des fichiers.');
+    }
+  }
+
+  showSystemUpdateConfirmPrompt(fileItem) {
+    const folderName = this._systemUpdateSelectedFolder || '';
+    const fileName = fileItem?.name || String(fileItem);
+    xapi.Command.UserInterface.Message.Prompt.Display({
+      Duration: 0,
+      Title: 'Confirmer la mise à jour',
+      Text: `Êtes-vous absolument certain de vouloir appliquer cette mise à jour ?<br>Système: ${folderName}<br>Fichier: ${fileName}`,
+      FeedbackId: 'system_update_confirm',
+      'Option.1': 'Oui',
+      'Option.2': 'Non'
+    });
+  }
+
+  async applySelectedUpdate() {
+    try {
+      const folderName = this._systemUpdateSelectedFolder;
+      const fileItem = this._systemUpdatePendingFile;
+      if (!folderName || !fileItem) {
+        this.displayMessage('Mises à jour', 'Aucun fichier sélectionné.');
+        return;
+      }
+
+      // Resolve a direct download URL
+      // Prefer GitHub API-provided download_url; if missing, construct raw URL to the file in main branch
+      let downloadUrl = fileItem.download_url;
+      if (!downloadUrl) {
+        downloadUrl = `https://raw.githubusercontent.com/ZacharieGignac/MCS/main/releases/${encodeURIComponent(folderName)}/${encodeURIComponent(fileItem.name)}`;
+      }
+
+      // Show a short progress/info prompt
+      xapi.Command.UserInterface.Message.Prompt.Display({
+        Duration: 0,
+        Title: 'Mise à jour',
+        Text: `Téléchargement et application de la mise à jour...<br>${fileItem.name}`,
+        FeedbackId: 'system_update_running'
+      });
+
+      // Apply update using Provisioning Service Fetch
+      // See: Command.Provisioning.Service.Fetch
+      await xapi.Command.Provisioning.Service.Fetch({
+        URL: downloadUrl
+      });
+
+      // Clear the running prompt before showing success message
+      try { xapi.Command.UserInterface.Message.Prompt.Clear(); } catch (_) {}
+      // Success message
+      this.displayMessage('Mise à jour', 'La mise à jour a été demandée avec succès. Le système peut redémarrer ou appliquer des changements automatiquement.');
+    } catch (e) {
+      try { debug(3, `applySelectedUpdate error: ${e}`); } catch (_) {}
+      this.displayMessage('Mises à jour', 'Échec lors de l\'application de la mise à jour.');
     }
   }
 

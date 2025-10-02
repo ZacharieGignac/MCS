@@ -11,6 +11,7 @@
 * Sony (DisplayDriver_serial_sonybpj): file d'attente nettoyée pour éviter les collisions lors des bascules rapides `blank`/`unblank` ou `power on/off` (priorise l'état le plus récent).
 * Sony (DisplayDriver_serial_sonybpj): si la voie RX n'est pas câblée (TX uniquement), le driver continue d'envoyer au `repeat` (comportement intentionnel).
 * AES67: nouveaux drivers `AudioInputDriver_aes67` et `AudioOutputDriver_aes67` (gain par canal, entrées/sorties 1-6 et canaux 1-8).
+* USB Audio: nouveaux drivers `AudioInputDriver_usb` et `AudioOutputDriver_usb` pour contrôler les interfaces audio USB (gain 0-24 pour les entrées, mode uniquement pour les sorties).
 * `AudioInput_codecpro`: retrait du type `ethernet` (utiliser AES67 dédié).
 * `sce_comotype1`: support de `skipVideoMatrix: true` pour les `DISPLAY`.
 * SystemStatus: `Occupancy` est initialisé automatiquement à `undefined`; `PresenterDetected` est désormais injecté automatiquement (à ne plus définir dans la config).

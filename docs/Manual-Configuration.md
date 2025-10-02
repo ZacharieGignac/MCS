@@ -593,6 +593,7 @@ Cet appareil prends automatiquement en charge certaines actions.
       device: devicesLibrary.Camera,  //Classe à utiliser
       peripheralRequired: true,       //Périphérique requis
       peripheralId: 'FDO2515J291',    //Numéro de série de la caméra
+      peripheralCheckMethod: 'internal',
       connector: 1                    //Connecteur d'entrée sur le codec
     }
 ```

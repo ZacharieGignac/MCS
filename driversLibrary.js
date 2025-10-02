@@ -1375,6 +1375,55 @@ export class AudioOutputDriver_aes67 {
   }
 }
 
+export class AudioOutputDriver_usb {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setLevel(level) {
+    // USB audio outputs don't support setLevel
+    debug(2, `DRIVER AudioOutput_usb (${this.config.id}): setLevel not supported for USB interfaces`);
+  }
+
+  setMode(mute) {
+    if (mute.toLowerCase() == 'off') {
+      this.off();
+    }
+    else {
+      this.on();
+    }
+  }
+
+  off() {
+    debug(1, `DRIVER AudioOutput_usb (${this.config.id}): Off`);
+    const connectorId = this.config.connector;
+    try {
+      xapi.config.get(`Audio.Output.USBInterface[${connectorId}].Mode`).then(() => {
+        xapi.Config.Audio.Output.USBInterface[connectorId].Mode.set('Off');
+      }).catch((e) => {
+        debug(2, `DRIVER AudioOutput_usb (${this.config.id}): Failed to set mode Off: ${e.message}`);
+      });
+    } catch (e) {
+      debug(2, `DRIVER AudioOutput_usb (${this.config.id}): Off failed: ${e.message}`);
+    }
+  }
+
+  on() {
+    debug(1, `DRIVER AudioOutput_usb (${this.config.id}): On`);
+    const connectorId = this.config.connector;
+    try {
+      xapi.config.get(`Audio.Output.USBInterface[${connectorId}].Mode`).then(() => {
+        xapi.Config.Audio.Output.USBInterface[connectorId].Mode.set('On');
+      }).catch((e) => {
+        debug(2, `DRIVER AudioOutput_usb (${this.config.id}): Failed to set mode On: ${e.message}`);
+      });
+    } catch (e) {
+      debug(2, `DRIVER AudioOutput_usb (${this.config.id}): On failed: ${e.message}`);
+    }
+  }
+}
+
 export class LightDriver_isc_h21 {
   constructor(device, config) {
     this.config = config;

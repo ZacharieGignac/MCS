@@ -319,6 +319,32 @@ export var config = {
       highGain: 60,
       boost: 70
     },
+    {
+      id: 'audioinput.usb.microphone',
+      type: DEVICETYPE.AUDIOINPUT,
+      name: 'USB Microphone',
+      device: devicesLibrary.AudioInput,
+      driver: driversLibrary.AudioInputDriver_usb,
+      connector: 1,                                     // USB interface number (1-4)
+      gainLowLimit: 0,                                  // USB audio gain range is 0-24 (different from traditional 0-70)
+      gainHighLimit: 24,
+      defaultGain: 12,
+      gainStep: 1,
+      defaultMode: 'on',
+      lowGain: 8,
+      mediumGain: 12,
+      highGain: 18,
+      boost: 24
+    },
+    {
+      id: 'audiooutput.usb.speakers',
+      type: DEVICETYPE.AUDIOOUTPUT,
+      name: 'USB Speakers',
+      device: devicesLibrary.AudioOutput,
+      driver: driversLibrary.AudioOutputDriver_usb,
+      connector: 1,                                     // USB interface number (1-4)
+      defaultMode: 'on'                                 // USB audio output only supports mode control (no level/gain)
+    },
 
 
 

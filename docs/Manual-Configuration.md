@@ -373,6 +373,28 @@ Attention, le niveau de `AudioInput` va de 0 à 70.
     }
 ```
 
+#### AudioInputDriver_usb (entrées audio USB)
+```JS
+    {
+      id: 'audioinput.usb.microphone',                  //Identification unique
+      type: DEVICETYPE.AUDIOINPUT,                      //Type = 'AUDIOINPUT'
+      name: 'USB Microphone',                           //Nom
+      device: devicesLibrary.AudioInput,                //Classe à utiliser
+      driver: driversLibrary.AudioInputDriver_usb,      //Driver à utiliser par le device
+      connector: 1,                                     //Interface USB (1-N)
+      bias: 0,                                          //Biais de niveau audio, peut être positif ou négatif. Utilisé par l'analyze d'entrée audio
+      gainLowLimit: 0,                                  //Limite basse du gain de l'entrée (0-24 pour USB)
+      gainHighLimit: 24,                                //Limite supérieure du gain de l'entrée (0-24 pour USB)
+      defaultGain: 18,                                  //Gain par défaut au démarrage du système
+      gainStep: 1,                                      //Gain ajouté ou retiré de la valeur actuelle lorsque les fonctions increase() et decrease() sont appelées
+      defaultMode: 'on',                                //Mode par défaut lors du démarrage du système
+      lowGain: 12,                                      //Gain "bas" (utilisé par les widgets de type "button group")
+      mediumGain: 18,                                   //Gain "moyen" (utilisé par les widgets de type "button group")
+      highGain: 24,                                     //Gain "haut" (utilisé par les widgets de type "button group")
+      boost: 24                                         //Gain "Boost, utilisé par le module "AutoSauce"
+    }
+```
+
 ### Remarques sur BYOD unifié (1.2.0+)
 Le statut `byod` est géré automatiquement:
 - Systèmes plus anciens: via `Video.Output.HDMI.Passthrough.Status`
@@ -421,8 +443,22 @@ Attention, le niveau de `AudioOutput` va de -24 à 0.
       defaultMode: 'on',                                 //Mode par défaut lors du démarrage du système
     },
 ```
+
+#### AudioOutputDriver_usb (sorties audio USB)
+```JS
+    {
+      id: 'audiooutput.usb.speakers',                   //Identification unique
+      type: DEVICETYPE.AUDIOOUTPUT,                     //Type = 'AUDIOOUTPUT'
+      name: 'USB Speakers',                             //Nom
+      device: devicesLibrary.AudioOutput,               //Classe à utiliser
+      driver: driversLibrary.AudioOutputDriver_usb,     //Driver à utiliser par le device
+      connector: 1,                                     //Interface USB (1-N)
+      defaultMode: 'on',                                //Mode par défaut lors du démarrage du système
+    },
+```
 Cet appareil prends automatiquement en charge certain widgets. Les widgets doivent avoir une identification particulière.
 * **audiooutput.aes67.recording:MODE** : Toggle, affiche et configure le mode de la sortie à "ON" ou "OFF"
+* **audiooutput.usb.speakers:MODE** : Toggle, affiche et configure le mode de la sortie USB à "ON" ou "OFF"
 
 ### CameraPreset
 #### Pour caméra Cisco

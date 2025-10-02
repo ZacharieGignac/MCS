@@ -9,6 +9,7 @@
   - [LightScene](#lightscene)
   - [Light](#light)
   - [AudioInput](#audioinput)
+  - [AudioOutput](#audiooutput)
   - [AudioInputGroup](#audioinputgroup)
   - [AudioOutputGroup](#audiooutputgroup)
   - [AudioReporter](#audioreporter)
@@ -98,6 +99,24 @@ Aucunes.
 - `void setBoost(void)`: Configure le gain de l'entrée audio au niveau spécifié dans la configuration par la propriété "boost".
 - `void reset(void)`: Remet les paramètres spécifiés dans la configuration.
 - `void refresh(void)`: Réapplique les paramètres courant.
+
+#### Notes spécifiques: USB (AudioInputDriver_usb)
+- Support Gain/Level: les interfaces USB supportent soit `Level` soit `Gain`. Le driver essaie automatiquement `Level` en premier, puis `Gain` si `Level` n'est pas disponible.
+- Plage de gain contrainte: les valeurs de gain sont automatiquement contraintes entre 0-24 pour les interfaces USB (plage valide plus petite que les microphones traditionnels).
+- Gestion d'erreur silencieuse: si l'interface USB n'est pas disponible, les erreurs sont gérées silencieusement avec des messages de debug appropriés.
+
+### AudioOutput
+- `void setDefaults(void)`: Active les paramètres par défaut définis dans la configuration comme le mode.
+- `void setLevel(number level)`: Défini le niveau de sortie audio (non supporté pour les interfaces USB)
+  - `level`: niveau de sortie
+- `void setMode(string mode)`: Défini le mode de la sortie audio
+  - `mode`: 'on', 'off'
+- `void on(void)`: Active la sortie audio
+- `void off(void)`: Désactive la sortie audio
+
+#### Notes spécifiques: USB (AudioOutputDriver_usb)
+- Mode uniquement: les interfaces USB de sortie supportent seulement le contrôle de mode (On/Off), pas le contrôle de niveau.
+- Gestion d'erreur silencieuse: si l'interface USB n'est pas disponible, les erreurs sont gérées silencieusement avec des messages de debug appropriés.
 
 ### AudioInputGroup
 - `void connectToRemoteOutputs(void)`: Connecte le groupe d'entrée audio aux sorties audio des sites distants.

@@ -7,6 +7,7 @@ Documentation: voir docs/README.md pour l’index de la documentation.
 ### Bugs connus
 
 ### Ajouts / Modifications
+* Mises à jour (UI): nouveau flux de mise à jour accessible via le bouton `system_update` avec sélection du système (dossier), sélection du fichier, pagination (max 4 items par page) et confirmation explicite avant installation. L'installation se fait via `Provisioning.Service.Fetch`.
 * Drivers série (Sony, Panasonic, Epson): support des paramètres `pacing`, `repeat`, `timeout` avec valeurs par défaut, gestion d'erreurs centralisée et logs "debouncés".
 * Sony (DisplayDriver_serial_sonybpj): logique de répétition basée sur l'accusé de réception. Les commandes `power` et `blank`/`unblank` sont renvoyées au `repeat` jusqu'à réception d'un « ok », puis arrêt des renvois pour cet état.
 * Sony (DisplayDriver_serial_sonybpj): journalisation TX/RX détaillée (ligne envoyée et réponse brute), détection « ok » robuste (espaces, guillemets, caractères de contrôle).
@@ -50,6 +51,30 @@ Documentation: voir docs/README.md pour l’index de la documentation.
 * devices: `getDevicesInGroup` et `getDevicesByTypeInGroup` ignorent groupes/devices introuvables.
 * core (audio.extra): gardes null/undefined sur groupes d'entrées/sorties supplémentaires.
 * core: `toBool` robuste pour valeurs non-string.
+
+## Mises à jour logicielles (UI)
+
+À partir de la version 1.2.0, MCS intègre un flux de mise à jour directement depuis l'interface utilisateur RoomOS.
+
+### Accès
+- Appuyer sur le bouton UI `system_update`.
+
+### Parcours
+1) Choisir un « système » (dossier) listé sous `releases/` du dépôt GitHub.
+2) Choisir un fichier dans ce système. L'interface propose jusqu'à 4 éléments par page; utilisez « Suivant » pour paginer, « Fermer » pour quitter.
+3) Confirmer: une boîte de dialogue demande si vous êtes absolument certain d'appliquer la mise à jour sélectionnée (système + fichier).
+4) Application: en cas de confirmation, le périphérique lance la commande xAPI `Provisioning Service Fetch` avec l'URL de téléchargement du fichier choisi. Selon le package, le périphérique peut redémarrer ou appliquer les changements automatiquement.
+
+### Notes
+- Les textes des invites respectent les contraintes xAPI (pas de retours à la ligne bruts; utilisation de `<br>`).
+- Les listes utilisent des boutons d'options (max 5 avec le bouton de pagination/Laisser), pas d'HTML libre.
+- L’URL de téléchargement est résolue depuis GitHub (`download_url`) ou, à défaut, construite via `raw.githubusercontent.com` sur la branche `main`.
+- Ce flux ne filtre pas encore par extension; si nécessaire, ne proposez que des archives `.zip` dans vos dossiers `releases/<systeme>/`.
+
+### Dépannage
+- « Impossible d’accéder à GitHub »: vérifier la connectivité Internet et les proxys du périphérique.
+- « Aucun système trouvé »: assurez-vous que le dossier `releases/` du dépôt contient des sous-dossiers.
+- « Aucun fichier disponible pour le système »: placez les fichiers d’update dans `releases/<systeme>/`.
 
 ## Watchdog
 Un macro séparé `watchdog.js` agit comme chien de garde pour vérifier que le core fonctionne et répondre dans des délais raisonnables.

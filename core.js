@@ -126,12 +126,12 @@ class SystemEvents {
           // Capture async rejections without awaiting
           if (maybePromise && typeof maybePromise.then === 'function' && typeof maybePromise.catch === 'function') {
             maybePromise.catch(err => {
-              try { debug(3, `SystemEvents.emit(\"${event}\"): listener error (async): ${err}`); } catch (_) {}
+              try { debug(3, `SystemEvents.emit(\"${event}\"): listener error (async): ${err}`); } catch (_) { }
             });
           }
         }
         catch (err) {
-          try { debug(3, `SystemEvents.emit(\"${event}\"): listener error (sync): ${err}`); } catch (_) {}
+          try { debug(3, `SystemEvents.emit(\"${event}\"): listener error (sync): ${err}`); } catch (_) { }
         }
       }
     }
@@ -363,12 +363,12 @@ class UiManager {
             const maybePromise = map.func(...paramsArray);
             if (maybePromise && typeof maybePromise.then === 'function' && typeof maybePromise.catch === 'function') {
               maybePromise.catch(err => {
-                try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (async): ${err}`); } catch (_) {}
+                try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (async): ${err}`); } catch (_) { }
               });
             }
           }
           catch (err) {
-            try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (sync): ${err}`); } catch (_) {}
+            try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (sync): ${err}`); } catch (_) { }
           }
         }
       }
@@ -381,19 +381,19 @@ class UiManager {
             const maybePromise = map.func();
             if (maybePromise && typeof maybePromise.then === 'function' && typeof maybePromise.catch === 'function') {
               maybePromise.catch(err => {
-                try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (async): ${err}`); } catch (_) {}
+                try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (async): ${err}`); } catch (_) { }
               });
             }
           }
           catch (err) {
-            try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (sync): ${err}`); } catch (_) {}
+            try { debug(3, `UiManager.processAction(\"${act}\"): action handler error (sync): ${err}`); } catch (_) { }
           }
         }
       }
     }
   }
 
-showProgressBar(title, text, seconds) {
+  showProgressBar(title, text, seconds) {
     const totalSteps = 30;
     const interval = seconds * 1000 / totalSteps;
     let currentStep = 0;
@@ -689,6 +689,60 @@ class Core {
             xapi.Command.Standby.Activate();
           }, 2000);
         }
+      } else if (event.FeedbackId && event.FeedbackId.startsWith('system_update_folders_p')) {
+        // Folder selection or pagination
+        try {
+          const pageStr = event.FeedbackId.split('system_update_folders_p')[1];
+          const pageIdx = parseInt(pageStr, 10) || 0;
+          const idx = parseInt(event.OptionId, 10); // 1..5
+          const currentStart = pageIdx * 4;
+
+          if (idx === 5) {
+            const totalPages = Math.ceil((this._systemUpdateFolders?.length || 0) / 4);
+            if (pageIdx < totalPages - 1) {
+              this.showSystemUpdateFolderPromptPage(pageIdx + 1);
+            } else {
+              xapi.Command.UserInterface.Message.Prompt.Clear();
+            }
+            return;
+          }
+
+          const selIndex = currentStart + (idx - 1);
+          const folderName = this._systemUpdateFolders && this._systemUpdateFolders[selIndex];
+          if (folderName) {
+            (async () => { await this.fetchAndShowFilesForFolder(folderName); })();
+          }
+        } catch (e) {
+          try { debug(3, `system_update folder prompt handler error: ${e}`); } catch (_) {}
+          this.displayMessage('Mises à jour', 'Erreur lors du traitement de la sélection de version.');
+        }
+      } else if (event.FeedbackId && event.FeedbackId.startsWith('system_update_files_p')) {
+        // File selection or pagination
+        try {
+          const pageStr = event.FeedbackId.split('system_update_files_p')[1];
+          const pageIdx = parseInt(pageStr, 10) || 0;
+          const idx = parseInt(event.OptionId, 10); // 1..5
+          const currentStart = pageIdx * 4;
+
+          if (idx === 5) {
+            const totalPages = Math.ceil((this._systemUpdateFiles?.length || 0) / 4);
+            if (pageIdx < totalPages - 1) {
+              this.showSystemUpdateFilesPromptPage(pageIdx + 1);
+            } else {
+              xapi.Command.UserInterface.Message.Prompt.Clear();
+            }
+            return;
+          }
+
+          const selIndex = currentStart + (idx - 1);
+          const fileName = this._systemUpdateFiles && this._systemUpdateFiles[selIndex];
+          if (fileName) {
+            this.displayMessage('Mise à jour sélectionnée', `Version: ${this._systemUpdateSelectedFolder}<br>Fichier: ${fileName}`);
+          }
+        } catch (e) {
+          try { debug(3, `system_update files prompt handler error: ${e}`); } catch (_) {}
+          this.displayMessage('Mises à jour', 'Erreur lors du traitement du fichier sélectionné.');
+        }
       }
     });
     //Add UI-related mappings
@@ -716,7 +770,7 @@ class Core {
     systemAdminButton.on('released', () => {
       const pressDuration = Date.now() - this.systemAdminPressTime;
       clearTimeout(this.systemAdminTimeout);
-      
+
       // If released before 5 seconds, show system info (short press)
       if (pressDuration < 5000) {
         this.showSystemInfo();
@@ -729,7 +783,7 @@ class Core {
       try {
         await this.checkAndDisplayAvailableUpdates();
       } catch (e) {
-        try { debug(3, `system_update: error: ${e}`); } catch (_) {}
+        try { debug(3, `system_update: error: ${e}`); } catch (_) { }
         this.displayMessage('Mises à jour', 'Erreur lors de la vérification des mises à jour.');
       }
     });
@@ -1041,30 +1095,149 @@ class Core {
         ]
       });
 
+      let folders = [];
+      try {
+        const body = JSON.parse(response.Body);
+        if (Array.isArray(body)) {
+          // Keep only directories (versions)
+          folders = body.filter(item => item.type === 'dir').map(item => item.name);
+        }
+      } catch (parseErr) {
+        try { debug(3, `checkAndDisplayAvailableUpdates: JSON parse error: ${parseErr}`); } catch (_) { }
+      }
+
+      if (!folders || folders.length === 0) {
+        this.displayMessage('Mises à jour', 'Aucun dossier de version n\'a été trouvé dans \'releases\'.');
+        return;
+      }
+
+      // Store folders and show first page of prompt options
+      this._systemUpdateFolders = folders;
+      this._systemUpdateFoldersPage = 0;
+      this._systemUpdateSelectedFolder = undefined;
+      this.showSystemUpdateFolderPromptPage(0);
+    } catch (error) {
+      try { debug(3, `checkAndDisplayAvailableUpdates: request error: ${error}`); } catch (_) { }
+      this.displayMessage('Mises à jour', 'Impossible d\'accéder à GitHub pour vérifier les mises à jour.');
+    }
+  }
+
+  showSystemUpdateFolderPromptPage(pageIndex) {
+    if (!Array.isArray(this._systemUpdateFolders) || this._systemUpdateFolders.length === 0) {
+      this.displayMessage('Mises à jour', 'Aucun dossier de version n\'a été trouvé.');
+      return;
+    }
+
+    const pageSize = 4; // 4 folders per page, 5th reserved for Next
+    const totalPages = Math.ceil(this._systemUpdateFolders.length / pageSize);
+    const page = Math.max(0, Math.min(pageIndex, totalPages - 1));
+    this._systemUpdateFoldersPage = page;
+
+    const start = page * pageSize;
+    const slice = this._systemUpdateFolders.slice(start, start + pageSize);
+
+    const promptParams = {
+      Duration: 0,
+      Title: 'Versions disponibles',
+      Text: `Choisissez une version (page ${page + 1}/${totalPages})`
+    };
+
+    slice.forEach((fname, i) => {
+      promptParams[`Option.${i + 1}`] = fname;
+    });
+
+    if (page < totalPages - 1) {
+      promptParams['Option.5'] = 'Suivant';
+    } else {
+      promptParams['Option.5'] = 'Fermer';
+    }
+
+    promptParams['FeedbackId'] = `system_update_folders_p${page}`;
+
+    try {
+      xapi.Command.UserInterface.Message.Prompt.Display(promptParams);
+    } catch (e) {
+      try { debug(3, `showSystemUpdateFolderPromptPage error: ${e}`); } catch (_) {}
+      this.displayMessage('Mises à jour', 'Erreur d\'affichage de la liste des versions.');
+    }
+  }
+
+  async fetchAndShowFilesForFolder(folderName) {
+    try {
+      this._systemUpdateSelectedFolder = folderName;
+      const url = `https://api.github.com/repos/ZacharieGignac/MCS/contents/releases/${encodeURIComponent(folderName)}?ref=main`;
+      const response = await zapi.communication.httpClient.Get({
+        AllowInsecureHTTPS: true,
+        Url: url,
+        Timeout: 10,
+        Header: [
+          'User-Agent: MCS-Device',
+          'Accept: application/vnd.github.v3+json'
+        ]
+      });
+
       let files = [];
       try {
         const body = JSON.parse(response.Body);
         if (Array.isArray(body)) {
-          // Keep only files (exclude directories)
           files = body.filter(item => item.type === 'file').map(item => item.name);
         }
       } catch (parseErr) {
-        try { debug(3, `checkAndDisplayAvailableUpdates: JSON parse error: ${parseErr}`); } catch (_) {}
+        try { debug(3, `fetchAndShowFilesForFolder: JSON parse error: ${parseErr}`); } catch (_) {}
       }
 
       if (!files || files.length === 0) {
-        this.displayMessage('Mises à jour', 'Aucun fichier disponible dans \'releases\'.');
+        this.displayMessage('Mises à jour', `Aucun fichier disponible dans le dossier: ${folderName}`);
         return;
       }
 
-  // Format list for prompt (plain text, no HTML)
-  const listText = files.map(f => `- ${f}`).join('\n');
-  const text = `Fichiers disponibles dans releases:\n\n${listText}`;
+      this._systemUpdateFiles = files;
+      this._systemUpdateFilesPage = 0;
+      this.showSystemUpdateFilesPromptPage(0);
+    } catch (e) {
+      try { debug(3, `fetchAndShowFilesForFolder error: ${e}`); } catch (_) {}
+      this.displayMessage('Mises à jour', 'Erreur lors du chargement des fichiers de la version.');
+    }
+  }
 
-  this.displayMessage('Mises à jour disponibles', text);
-    } catch (error) {
-      try { debug(3, `checkAndDisplayAvailableUpdates: request error: ${error}`); } catch (_) {}
-      this.displayMessage('Mises à jour', 'Impossible d\'accéder à GitHub pour vérifier les mises à jour.');
+  showSystemUpdateFilesPromptPage(pageIndex) {
+    if (!Array.isArray(this._systemUpdateFiles) || this._systemUpdateFiles.length === 0) {
+      this.displayMessage('Mises à jour', 'Aucun fichier à afficher.');
+      return;
+    }
+
+    const pageSize = 4; // 4 files per page, 5th reserved for Next
+    const totalPages = Math.ceil(this._systemUpdateFiles.length / pageSize);
+    const page = Math.max(0, Math.min(pageIndex, totalPages - 1));
+    this._systemUpdateFilesPage = page;
+
+    const start = page * pageSize;
+    const slice = this._systemUpdateFiles.slice(start, start + pageSize);
+
+    const folderName = this._systemUpdateSelectedFolder || '';
+    const promptParams = {
+      Duration: 0,
+      Title: 'Fichiers disponibles',
+      Text: `Version: ${folderName} (page ${page + 1}/${totalPages})`
+    };
+
+    slice.forEach((fname, i) => {
+      promptParams[`Option.${i + 1}`] = fname;
+    });
+
+    if (page < totalPages - 1) {
+      promptParams['Option.5'] = 'Suivant';
+    } else {
+      promptParams['Option.5'] = 'Fermer';
+    }
+
+    promptParams['FeedbackId'] = `system_update_files_p${page}`;
+
+    try {
+      xapi.Command.UserInterface.Message.Prompt.Display(promptParams);
+    } catch (e) {
+      try { debug(3, `showSystemUpdateFilesPromptPage error: ${e}`); } catch (_) {}
+      this.displayMessage('Mises à jour', 'Erreur d\'affichage de la liste des fichiers.');
     }
   }
 
@@ -1096,28 +1269,28 @@ class Core {
     try {
       let pts = await xapi.Status.Cameras.PresenterTrack.Status.get();
       if (pts == 'Follow') {
-      if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('byod') == 'Active') {
-        if (status != this.lastPresenterDetectedStatus) {
-          this.lastPresenterDetectedStatus = status;
-          if (status == true) {
-            if (zapi.system.getStatus('UsePresenterTrack') == 'on' && zapi.system.getStatus('PresenterTrackWarnings') == 'on') {
-              this.displayPresenterTrackLockedMessage();
+        if (this.systemStatus.getStatus('call') == 'Connected' || this.systemStatus.getStatus('byod') == 'Active') {
+          if (status != this.lastPresenterDetectedStatus) {
+            this.lastPresenterDetectedStatus = status;
+            if (status == true) {
+              if (zapi.system.getStatus('UsePresenterTrack') == 'on' && zapi.system.getStatus('PresenterTrackWarnings') == 'on') {
+                this.displayPresenterTrackLockedMessage();
+              }
             }
-          }
-          else {
-            if (zapi.system.getStatus('UsePresenterTrack') == 'on' && zapi.system.getStatus('PresenterTrackWarnings') == 'on') {
-              this.displayPresenterTrackLostMessage();
+            else {
+              if (zapi.system.getStatus('UsePresenterTrack') == 'on' && zapi.system.getStatus('PresenterTrackWarnings') == 'on') {
+                this.displayPresenterTrackLostMessage();
+              }
             }
           }
         }
+        else {
+          xapi.Command.UserInterface.Message.TextLine.Clear();
+        }
       }
-      else {
+      else if (pts == 'Off') {
         xapi.Command.UserInterface.Message.TextLine.Clear();
       }
-    }
-    else if (pts == 'Off') {
-      xapi.Command.UserInterface.Message.TextLine.Clear();
-    }
     } catch (e) {
       // PresenterTrack Status might not be supported on this device
     }
@@ -1232,7 +1405,7 @@ class Core {
     try {
       // Format system status with better readability and organization
       const statusText = this.formatSystemStatusText(allStatus);
-      
+
       xapi.Command.Video.Graphics.Text.Display({
         Target: 'LocalOutput',
         Text: statusText
@@ -1245,7 +1418,7 @@ class Core {
   formatSystemStatusText(allStatus) {
     // Helper function to format boolean values
     const formatBool = (value) => value ? 'ON' : 'OFF';
-    
+
     // Helper function to format status values with better readability
     const formatStatus = (value, trueText = 'ON', falseText = 'OFF') => {
       if (typeof value === 'boolean') {
@@ -1381,7 +1554,7 @@ class Core {
   showSystemInfo() {
     // Display system information in a message box on short press
     const systemInfo = this.getSystemInfoText();
-    
+
     xapi.Command.UserInterface.Message.Prompt.Display({
       Duration: 0,
       Text: systemInfo,
@@ -1406,19 +1579,9 @@ class Core {
     const comotype1Mode = allStatus.comotype1Mode || 'Unknown';
 
     // Format with better organization and readability
-    return `<b>MCS System Information</b><br><br>` +
-           `<b>System Health:</b><br>` +
-           `Version: ${coreVersion}<br>` +
-           `Uptime: ${uptime}<br>` +
-           `Temperature: ${temperature}<br><br>` +
-           `<b>Current Status:</b><br>` +
-           `Call: ${call}<br>` +
-           `BYOD: ${byod}<br>` +
-           `Presenter Location: ${presenterLocation}<br>` +
-           `Presenter Detected: ${presenterDetected}<br><br>` +
-           `<b>Configuration:</b><br>` +
-           `Scenario: ${currentScenario}<br>` +
-           `Mode: ${comotype1Mode}`;
+    return `Version: ${coreVersion}<br>` +
+      `Uptime: ${uptime}<br>` +
+      `Temperature: ${temperature}`
   }
 
   displayMessage(title, text) {
@@ -1432,17 +1595,21 @@ class Core {
       // Log the message display for debugging
       debug(2, `MSG action: Displaying message - Title: "${title}"`);
 
+      // xAPI prompts don't support raw newlines in parameters
+      const safeTitle = String(title).replace(/\r?\n/g, ' / ');
+      const safeText = String(text).replace(/\r?\n/g, '<br>');
+
       // Display the message (always persistent - user must dismiss)
       xapi.Command.UserInterface.Message.Prompt.Display({
         Duration: 0,
-        Title: title,
-        Text: text,
+        Title: safeTitle,
+        Text: safeText,
         FeedbackId: 'msg_action_display'
       });
 
     } catch (error) {
       debug(3, `MSG action error: ${error}`);
-      
+
       // Fallback: try to display a simple alert if prompt fails
       try {
         xapi.Command.UserInterface.Message.Alert.Display({
@@ -1676,7 +1843,7 @@ async function preInit() {
           actionsMatch = text.match(/MCSACTIONS\$(.+)/);
         }
         catch (e) {
-          try { debug(3, `[InternalMsg] Regex parse error: ${e}`); } catch (_) {}
+          try { debug(3, `[InternalMsg] Regex parse error: ${e}`); } catch (_) { }
           return;
         }
 
@@ -1686,12 +1853,12 @@ async function preInit() {
               const maybePromise = core.uiManager.processMatchAction('ACTION$' + actionMatch[1]);
               if (maybePromise && typeof maybePromise.then === 'function' && typeof maybePromise.catch === 'function') {
                 maybePromise.catch(err => {
-                  try { debug(3, `[InternalMsg] ACTION handler error (async): ${err}`); } catch (_) {}
+                  try { debug(3, `[InternalMsg] ACTION handler error (async): ${err}`); } catch (_) { }
                 });
               }
             }
             catch (e) {
-              try { debug(3, `[InternalMsg] ACTION handler error (sync): ${e}`); } catch (_) {}
+              try { debug(3, `[InternalMsg] ACTION handler error (sync): ${e}`); } catch (_) { }
             }
           }
         } else if (actionsMatch) {
@@ -1700,19 +1867,19 @@ async function preInit() {
               const maybePromise = core.uiManager.processMatchAction('ACTIONS$' + actionsMatch[1]);
               if (maybePromise && typeof maybePromise.then === 'function' && typeof maybePromise.catch === 'function') {
                 maybePromise.catch(err => {
-                  try { debug(3, `[InternalMsg] ACTIONS handler error (async): ${err}`); } catch (_) {}
+                  try { debug(3, `[InternalMsg] ACTIONS handler error (async): ${err}`); } catch (_) { }
                 });
               }
             }
             catch (e) {
-              try { debug(3, `[InternalMsg] ACTIONS handler error (sync): ${e}`); } catch (_) {}
+              try { debug(3, `[InternalMsg] ACTIONS handler error (sync): ${e}`); } catch (_) { }
             }
           }
         }
       }
     }
     catch (e) {
-      try { debug(3, `[InternalMsg] Dispatcher error: ${e}`); } catch (_) {}
+      try { debug(3, `[InternalMsg] Dispatcher error: ${e}`); } catch (_) { }
     }
   });
 

@@ -368,7 +368,7 @@ Attention, le niveau de `AudioInput` va de 0 à 70.
       device: devicesLibrary.AudioInput,                //Classe à utiliser
       driver: driversLibrary.AudioInputDriver_codecpro, //Driver à utiliser par le device
       connector: 7,                                     //Connecteur d'entrée du codec
-      input: 'microphone',                              //Type d'entrée, microphone, hdmi, ethernet. Ethernet requiert la propriété "channel". (non testé)
+  input: 'microphone',                              //Type d'entrée: 'microphone' ou 'hdmi' (pour AES67, utiliser le driver dédié ci-dessous)
       bias: 0,                                          //Biais de niveau audio, peut être positif ou négatif. Utilisé par l'analyze d'entrée audio
       gainLowLimit: 20,                                 //Limite basse du gain de l'entrée
       gainHighLimit: 70,                                //Limite supérieure du gain de l'entrée
@@ -382,6 +382,29 @@ Attention, le niveau de `AudioInput` va de 0 à 70.
     }
 ```
 
+#### AudioInputDriver_codeceq (entrées audio sur codecs EQ/Bar/Board)
+Driver pour les appareils Webex Room/Board/Bar de la famille « EQ » où le réglage se fait via Microphone.Gain/Mode. Ce driver ne supporte que des connecteurs de type microphone; ne pas définir la propriété `input`.
+```JS
+    {
+      id: 'audioinput.presenter.eq1',                   //Identification unique
+      type: DEVICETYPE.AUDIOINPUT,                      //Type = 'AUDIOINPUT'
+      name: 'Mic - Table (EQ)',                         //Nom
+      device: devicesLibrary.AudioInput,                //Classe à utiliser
+      driver: driversLibrary.AudioInputDriver_codeceq,  //Driver à utiliser par le device
+      connector: 1,                                     //Connecteur Microphone (1-N) du codec EQ/Bar/Board
+      bias: 0,                                          //Biais de niveau audio, utilisé par l'analyse d'entrée audio
+      gainLowLimit: 20,                                 //Limite basse du gain (0-70 sur EQ)
+      gainHighLimit: 70,                                //Limite haute du gain (0-70 sur EQ)
+      defaultGain: 60,                                  //Gain par défaut
+      gainStep: 1,                                      //Pas d'incrément de gain
+      defaultMode: 'on',                                //Mode par défaut
+      lowGain: 60,
+      mediumGain: 65,
+      highGain: 70,
+      boost: 70
+    }
+```
+
 #### AudioInputDriver_aes67 (entrées audio AES67)
 ```JS
     {
@@ -391,6 +414,7 @@ Attention, le niveau de `AudioInput` va de 0 à 70.
       device: devicesLibrary.AudioInput,                //Classe à utiliser
       driver: driversLibrary.AudioInputDriver_aes67,    //Driver à utiliser par le device
       connector: 2,                                     //Connecteur Ethernet AES67 (1-6)
+      channel: 1,                                       //Canal AES67 (1-8)
       defaultMode: 'on',                                //Mode par défaut lors du démarrage du système
     }
 ```

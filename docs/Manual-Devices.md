@@ -105,6 +105,11 @@ Aucunes.
 - Plage de gain contrainte: les valeurs de gain sont automatiquement contraintes entre 0-24 pour les interfaces USB (plage valide plus petite que les microphones traditionnels).
 - Gestion d'erreur silencieuse: si l'interface USB n'est pas disponible, les erreurs sont gérées silencieusement avec des messages de debug appropriés.
 
+#### Notes spécifiques: EQ (AudioInputDriver_codeceq)
+- Connecteurs Microphone uniquement: ce driver adresse `Audio.Input.Microphone[connector].Gain/Mode` des appareils EQ/Bar/Board; ne pas utiliser `input: 'microphone'` dans la configuration (la propriété est ignorée).
+- Plage de gain 0-70: utiliser `gainLowLimit/gainHighLimit` dans cette plage. Les appels à `setMode('on'|'off')` basculent `Microphone[connector].Mode`.
+- Différences vs `codecpro`: pas de support pour `hdmi`/`ethernet` dans ce driver; pour AES67, utiliser `AudioInputDriver_aes67` dédié.
+
 ### AudioOutput
 - `void setDefaults(void)`: Active les paramètres par défaut définis dans la configuration comme le mode.
 - `void setLevel(number level)`: Défini le niveau de sortie audio (non supporté pour les interfaces USB)

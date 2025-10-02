@@ -723,6 +723,17 @@ class Core {
       }
     });
 
+    // Handle system update button press
+    let systemUpdateButton = self.uiManager.addWidgetMapping('system_update');
+    systemUpdateButton.on('pressed', async () => {
+      try {
+        await this.checkAndDisplayAvailableUpdates();
+      } catch (e) {
+        try { debug(3, `system_update: error: ${e}`); } catch (_) {}
+        this.displayMessage('Mises à jour', 'Erreur lors de la vérification des mises à jour.');
+      }
+    });
+
     self.uiManager.addActionMapping(/^SETSS$/, (key, value) => {
       zapi.system.setStatus(key, value);
     });
@@ -1008,6 +1019,53 @@ class Core {
     // Initialize mute button monitoring for admin panel trigger
     this.initMuteButtonMonitoring();
 
+  }
+
+  async checkAndDisplayAvailableUpdates() {
+    try {
+      // Inform user while fetching
+      xapi.Command.UserInterface.Message.Alert.Display({
+        Duration: 3,
+        Title: 'Mises à jour',
+        Text: 'Vérification des fichiers disponibles...'
+      });
+
+      const url = 'https://api.github.com/repos/ZacharieGignac/MCS/contents/releases?ref=main';
+      const response = await zapi.communication.httpClient.Get({
+        AllowInsecureHTTPS: true,
+        Url: url,
+        Timeout: 10,
+        Header: [
+          'User-Agent: MCS-Device',
+          'Accept: application/vnd.github.v3+json'
+        ]
+      });
+
+      let files = [];
+      try {
+        const body = JSON.parse(response.Body);
+        if (Array.isArray(body)) {
+          // Keep only files (exclude directories)
+          files = body.filter(item => item.type === 'file').map(item => item.name);
+        }
+      } catch (parseErr) {
+        try { debug(3, `checkAndDisplayAvailableUpdates: JSON parse error: ${parseErr}`); } catch (_) {}
+      }
+
+      if (!files || files.length === 0) {
+        this.displayMessage('Mises à jour', 'Aucun fichier disponible dans \'releases\'.');
+        return;
+      }
+
+  // Format list for prompt (plain text, no HTML)
+  const listText = files.map(f => `- ${f}`).join('\n');
+  const text = `Fichiers disponibles dans releases:\n\n${listText}`;
+
+  this.displayMessage('Mises à jour disponibles', text);
+    } catch (error) {
+      try { debug(3, `checkAndDisplayAvailableUpdates: request error: ${error}`); } catch (_) {}
+      this.displayMessage('Mises à jour', 'Impossible d\'accéder à GitHub pour vérifier les mises à jour.');
+    }
   }
 
   displayNextDiagnosticsMessages() {

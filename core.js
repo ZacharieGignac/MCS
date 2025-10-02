@@ -434,6 +434,7 @@ class Core {
     zapi.system.systemReport = {};
     zapi.system.systemReport.systemVersion = COREVERSION;
     zapi.system.sendSystemReport = () => this.sendSystemReport();
+    zapi.ui.displayMessage = (title, text) => this.displayMessage(title, text);
   }
 
   safeStringify(obj, cache = new Set()) {
@@ -745,6 +746,16 @@ class Core {
     self.uiManager.addActionMapping(/^SENDSYSTEMREPORT$/, () => {
       this.sendSystemReport();
     });
+
+    self.uiManager.addActionMapping(/^MSG$/, (title, text) => {
+      this.displayMessage(title, text);
+    });
+
+    self.uiManager.addActionMapping(/^TESTMSG$/, () => {
+      // Test the MSG action with different scenarios
+      this.displayMessage('Test Message', 'This is a test message from the MSG action system.<br><b>Bold text test</b><br>Message will stay until dismissed by user.');
+    });
+
     self.uiManager.addActionMapping(/^PANELCLOSE$/, () => {
       xapi.Command.UserInterface.Extensions.Panel.Close();
     });
@@ -1350,6 +1361,41 @@ class Core {
            `<b>Configuration:</b><br>` +
            `Scenario: ${currentScenario}<br>` +
            `Mode: ${comotype1Mode}`;
+  }
+
+  displayMessage(title, text) {
+    try {
+      // Validate parameters
+      if (!title || !text) {
+        debug(3, 'MSG action error: title and text parameters are required');
+        return;
+      }
+
+      // Log the message display for debugging
+      debug(2, `MSG action: Displaying message - Title: "${title}"`);
+
+      // Display the message (always persistent - user must dismiss)
+      xapi.Command.UserInterface.Message.Prompt.Display({
+        Duration: 0,
+        Title: title,
+        Text: text,
+        FeedbackId: 'msg_action_display'
+      });
+
+    } catch (error) {
+      debug(3, `MSG action error: ${error}`);
+      
+      // Fallback: try to display a simple alert if prompt fails
+      try {
+        xapi.Command.UserInterface.Message.Alert.Display({
+          Duration: 5,
+          Title: title || 'Message',
+          Text: text || 'An error occurred displaying the message'
+        });
+      } catch (fallbackError) {
+        debug(3, `MSG action fallback error: ${fallbackError}`);
+      }
+    }
   }
 }
 

@@ -131,6 +131,26 @@ Le système supporte aussi les préfixes comme décrit au début de ce document,
 * **PRESETSLOCK** : Vérouille les presets de caméra
 * **PRESETSUNLOCK** : Dévérouille les presets de caméra
 * **SETSS:key,value** : Définit le statut système (systemStatus) nommé "key" à la valeur "value".
+* **MSG:title,text** : Affiche un message persistant à l'utilisateur avec un titre et un contenu. Le message reste affiché jusqu'à ce que l'utilisateur le ferme.
+
+### Action MSG - Messages utilisateur
+
+L'action `MSG` permet d'afficher des messages informatifs, d'avertissement ou de confirmation à l'utilisateur. Ces messages sont persistants et restent affichés jusqu'à ce que l'utilisateur les ferme manuellement.
+
+**Syntaxe :** `MSG:title,text`
+
+**Paramètres :**
+- `title` : Titre du message (obligatoire)
+- `text` : Contenu du message (obligatoire, supporte HTML basique)
+
+**Utilisation via ZAPI :**
+```javascript
+// Afficher un message simple
+zapi.ui.displayMessage('Information', 'Le système est prêt');
+
+// Afficher un message avec formatage HTML
+zapi.ui.displayMessage('Statut', '<b>Connexion établie</b><br>Tous les systèmes opérationnels');
+```
 
 ## Exemples
 Activer le preset de caméra nommé "Tableau"
@@ -152,3 +172,23 @@ Activer le preset de caméra nommé "Tableau" et ouvrir le panneau "Controle" à
 Définir le statut système "MyStatus" à "on"
 
 ```ACTION$SETSS:MyStatus,on```
+
+Afficher un message d'information à l'utilisateur
+
+```ACTION$MSG:Information,Le système est prêt à être utilisé```
+
+Afficher un message d'avertissement avec formatage HTML
+
+```ACTION$MSG:Attention,&lt;b&gt;Maintenance programmée&lt;/b&gt;&lt;br&gt;Le système sera indisponible à 14h00```
+
+Afficher un message de confirmation et fermer le panel
+
+```ACTIONS$MSG:Session terminée,Votre session a été fermée avec succès&PANELCLOSE```
+
+Démarrer un scénario avec message d'information
+
+```ACTIONS$MSG:Démarrage,Configuration de la salle en cours...&ENABLESCENARIO:meeting```
+
+Afficher des instructions utilisateur avec formatage
+
+```ACTION$MSG:Instructions,&lt;b&gt;Pour commencer :&lt;/b&gt;&lt;br&gt;1. Connectez votre ordinateur&lt;br&gt;2. Appuyez sur Démarrer```

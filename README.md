@@ -16,6 +16,7 @@
 * `sce_comotype1`: support de `skipVideoMatrix: true` pour les `DISPLAY`.
 * SystemStatus: `Occupancy` est initialisé automatiquement à `undefined`; `PresenterDetected` est désormais injecté automatiquement (à ne plus définir dans la config).
 * Action mapping: nouvelle action `SETSS$key,value` pour écrire un SystemStatus.
+* Action mapping: nouvelle action `MSG:title,text` pour afficher des messages persistants à l'utilisateur
 * Messages XAPI: prise en charge de `MCSACTION$ACTION,VALUE` et `MCSACTIONS$ACTION,VALUE&ACTION,VALUE` (multiples actions).
 * Raccourci admin: 5 désactivations successives du mute micro ouvrent le panneau `system_admin`.
 * Widget admin: nouveau widget `system_admin` avec double fonctionnalité:

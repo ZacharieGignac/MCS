@@ -711,7 +711,7 @@ export class DisplayDriver_serial_panasonic {
 
     return xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.config.port,
-      ResponseTerminator: '\x03', // **MODIFIED: Using \xE0 as ResponseTerminator**
+      ResponseTerminator: '\\x03', // **MODIFIED: Using \xE0 as ResponseTerminator**
       ResponseTimeout: this.timeout, // Timeout in milliseconds
       Text: command
     })

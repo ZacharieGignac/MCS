@@ -1,7 +1,16 @@
 # Modules
+
+Table des matières
+- [Présentation](#modules)
+- [Exemple de module](#exemple-de-module)
+- [Import dans la configuration](#import-dans-la-configuration)
+- [Utilisation via zapi](#utilisation-via-zapi)
+
 Les modules sont des parties de code qui seront exécutés dans le même processus que le système.
 
 Ceci permet au module d'intéragir avec "zapi" et avec les devices.
+
+## Exemple de module
 
 Voici un exemple simple de module qui ajoute une function "test()" à zapi. Cette function est donc disponible par n'importe quel partie du système, que ce soit un autre module, un device, un scénario, etc...
 
@@ -41,6 +50,8 @@ export class Module {
 }
 ```
 
+## Import dans la configuration
+
 Le module doit être importé dans la configuration du système (`config.js`) de cette façon:
 ```JS
 import * as mod_example from './mod_example';
@@ -51,5 +62,7 @@ L'alias d'importation doit être ajoutée au array `modules[]` dans la configura
     mod_example
   ],
 ```
+
+## Utilisation via zapi
 
 La nouvelle function peut donc être appelée de cette facon: `zapi.test('Mon texte ici');`

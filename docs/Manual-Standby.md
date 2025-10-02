@@ -1,5 +1,11 @@
 # Standby; sce_standby
+
+Table des matières
+- [Présentation](#standby-sce_standby)
+- [Comportement à l’activation](#comportement-à-lactivation)
 Ce scénario inclus dans le système est le scénario de standby par défaut.
+
+## Comportement à l’activation
 
 Voici ce qui est effectué lors de l'activation du scénario sce_standby:
 - Arrêt de la présentation

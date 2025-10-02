@@ -1,5 +1,20 @@
 # Comodal (Type 1): sce_comotype1
+
+Table des matières
+- [Présentation](#comodal-type-1-sce_comotype1)
+- [Groupes requis](#groupes-requis)
+- [Affichages](#affichages)
+  - [Présentation](#présentation-obligatoire)
+  - [Sites distants](#sites-distants-obligatoire)
+  - [BYOD](#byod-optionnel)
+- [Toiles motorisées](#toiles-motorisées-optionnel)
+- [Scènes d’éclairage](#scènes-déclairage-optionnel)
+- [Groupes de sortie audio](#groupes-de-sortie-audio-obligatoire)
+- [Entrées audio](#entrées-audio)
+- [Contrôles UI](#contrôles-interface-utilisateur)
 Ce scénario est destiné aux salles comodales tel qu'installées en 2021. C'est un remplacement direct du logiciel d'origine.
+
+## Groupes requis
 
 Les groupes nommés, même si ils ne contiennent aucun appareil, **DOIVENT** être présent dans la configuration.
 

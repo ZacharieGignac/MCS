@@ -1,4 +1,36 @@
-# MCS (nom temporaire)
+# MCS
+
+Table des matières
+- [Aperçu](#mcs)
+- [Aspects principaux](#aspects-principaux)
+- [Configuration](#configuration)
+  - [Importation des scénarios](#importation-des-scénarios)
+  - [Importation des modules](#importation-des-modules)
+  - [Importation des appareils et drivers](#importation-des-appareils-devices-et-des-drivers)
+  - [Section scenarios](#configuration-section-scenarios)
+  - [Section modules](#configuration-section-modules)
+  - [Section system](#configuration-section-system)
+  - [Section audio](#configuration-section-audio)
+  - [Section strings](#configuration-section-strings)
+  - [Section systemStatus](#configuration-section-systemstatus)
+- [Section devices](#section-devices)
+  - [Display](#display-projecteur-téléviseur)
+  - [ControlSystem](#controlsystem-processeur-crestron-raspberry-pi)
+  - [Screen](#screen-toile-motorisée)
+  - [Shade](#shade-toiles-de-fenêtres)
+  - [AudioInput](#audioinput-entrée-audio-du-codec)
+  - [AudioOutput](#audiooutput-sortie-audio-du-codec)
+  - [CameraPreset](#camerapreset)
+  - [Light](#light-zone-déclairage-luminaire)
+  - [LightScene](#lightscene-scène-déclairage)
+  - [Caméra](#caméra)
+  - [AudioInputGroup](#audioinputgroup-groupe-dentrée-audio-tel-quaffiché-dans-audioconsole)
+  - [AudioOutputGroup](#audiooutputgroup-groupe-de-sortie-audio-tel-quaffiché-dans-audioconsole)
+  - [AudioReporter](#audioreporter-rapporteur-de-niveau-sonore)
+  - [Software Device](#software-device)
+- [Groupes](#groupes)
+  - [Définition, exemple](#définition-exemple)
+  - [Noms de groupes](#noms-de-groupes)
 MCS est une collection de macros pour les systèmes Cisco Webex, constituant un système intégré, modulaire, flexible et simple à utiliser, destiné à être utilisé comme point central de contrôle dans une salle de cours ou de réunion. La logique de la salle ainsi que son interface utilisateur peuvent donc être centralisés sur un seul appareil qui utilise un langage de programmation connu et moderne.
 
 ## Aspects principaux

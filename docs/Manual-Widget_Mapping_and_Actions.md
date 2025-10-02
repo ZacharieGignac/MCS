@@ -1,4 +1,4 @@
-# Table des Matières
+# Table des matières
 - [Intéraction avec les widgets](#intéraction-avec-les-widgets)
 - [Nomenclature](#nomenclature)
   - [Les préfixes](#les-préfixes)

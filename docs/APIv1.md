@@ -1,4 +1,18 @@
 # ZAPI
+
+Table des matières
+- [Présentation](#zapi)
+- [ZAPI Version 1](#zapi-version-1)
+  - [Dispositifs (devices)](#dispositifs-devices)
+  - [Scénarios (scenarios)](#scénarios-scenarios)
+  - [Modules (modules)](#modules-modules)
+  - [Système (system)](#système-system)
+  - [Performance (performance)](#performance-performance)
+  - [Audio (audio)](#audio-audio)
+  - [Interface Utilisateur (ui)](#interface-utilisateur-ui)
+  - [Stockage (storage)](#stockage-storage)
+  - [Communication (communication)](#communication-communication)
+  - [À la racine](#à-la-racine-zapi)
 Le système utilise son propre API nommé "zapi". L'api est accessible via l'importation du module "zapi.js".
 
 Plusieurs version de l'API peuvent être présente dans ce module, et sont toujours nommés "zapiv<version>", par exemple: zapiv1, zapiv2, zapiv3.

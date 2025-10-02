@@ -391,17 +391,7 @@ Attention, le niveau de `AudioInput` va de 0 à 70.
       device: devicesLibrary.AudioInput,                //Classe à utiliser
       driver: driversLibrary.AudioInputDriver_aes67,    //Driver à utiliser par le device
       connector: 2,                                     //Connecteur Ethernet AES67 (1-6)
-      channel: 1,                                       //Canal AES67 (1-8), défaut à 1 si non spécifié
-      bias: 0,                                          //Biais de niveau audio, peut être positif ou négatif. Utilisé par l'analyze d'entrée audio
-      gainLowLimit: 0,                                  //Limite basse du gain de l'entrée (0-70)
-      gainHighLimit: 70,                                //Limite supérieure du gain de l'entrée (0-70)
-      defaultGain: 45,                                  //Gain par défaut au démarrage du système
-      gainStep: 1,                                      //Gain ajouté ou retiré de la valeur actuelle lorsque les fonctions increase() et decrease() sont appelées
       defaultMode: 'on',                                //Mode par défaut lors du démarrage du système
-      lowGain: 30,                                      //Gain "bas" (utilisé par les widgets de type "button group")
-      mediumGain: 45,                                   //Gain "moyen" (utilisé par les widgets de type "button group")
-      highGain: 60,                                     //Gain "haut" (utilisé par les widgets de type "button group")
-      boost: 70                                         //Gain "Boost, utilisé par le module "AutoSauce"
     }
 ```
 

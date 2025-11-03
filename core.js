@@ -14,7 +14,7 @@ import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 
-const COREVERSION = '1.2.0-beta';
+const COREVERSION = '1.2.0';
 const ZAPIVERSION = 1;
 // If true, skip restarting Macro Runtime after cold boot and proceed with scheduled preInit()
 const SKIP_FRAMEWORK_RESTART_AFTER_COLD_BOOT = false;

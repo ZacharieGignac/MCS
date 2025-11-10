@@ -3,7 +3,9 @@
 
 Documentation: voir docs/README.md pour l’index de la documentation.
 
-## v1.2.0 (developement)
+Version courante: **1.2.0** (publiée le 2025-11-10) – Voir `CHANGELOG.md` pour l'historique.
+
+## v1.2.0 (version actuelle)
 ### Bugs connus
 
 ### Ajouts / Modifications
@@ -100,7 +102,7 @@ Un macro séparé `watchdog.js` agit comme chien de garde pour vérifier que le 
   - Délai initial: 60s, Intervalle: 60s, Attente PONG: 15s, Échecs avant restart: 3
 
 
-## v1.1.0 (version actuelle)
+## v1.1.0 (précédente)
 ### Bugs connus / limitation
 * Support manquant pour les microphone Ceiling Microphone Pro et Table Microphone Pro
 

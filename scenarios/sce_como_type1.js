@@ -118,7 +118,8 @@ export class Scenario {
     if (this.enabled) {
       try { debug(1, `ComoType1 status key=${status.key}`); } catch (e) {}
       switch (status.key) {
-        case 'hdmiPassthrough':
+        case 'byod':
+          // React to unified BYOD state (Active/Inactive) as well
           this.evaluateCameras(status.status);
           break;
         case 'call':

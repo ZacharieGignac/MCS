@@ -944,7 +944,7 @@ class Core {
           }
         }
       });
-      this.systemStatus.onKeyChg('hdmipassthrough', status => {
+      this.systemStatus.onKeyChg('hdmiPassthrough', status => {
         if (status.value == 'Active') {
           try {
             xapi.Command.Cameras.PresenterTrack.Set({

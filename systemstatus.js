@@ -181,8 +181,9 @@ export class SystemStatus {
       this.setStatus('byod', hpt, false);
       this.setStatus('hdmiPassthrough', hpt, false); // Backward compatibility
       xapi.Status.Video.Output.HDMI.Passthrough.Status.on(status => {
+        // Notify on BYOD and hdmiPassthrough changes
         this.setStatus('byod', status);
-        this.setStatus('hdmiPassthrough', status, false); // Backward compatibility
+        this.setStatus('hdmiPassthrough', status); // Backward compatibility
       });
       debug(1, 'Using HDMI.Passthrough for BYOD status');
     } catch (e) {
@@ -192,8 +193,9 @@ export class SystemStatus {
         this.setStatus('byod', webcam, false);
         this.setStatus('hdmiPassthrough', webcam, false); // Backward compatibility
         xapi.Status.Video.Output.Webcam.Status.on(status => {
+          // Notify on BYOD and hdmiPassthrough changes (Webcam-based BYOD)
           this.setStatus('byod', status);
-          this.setStatus('hdmiPassthrough', status, false); // Backward compatibility
+          this.setStatus('hdmiPassthrough', status); // Backward compatibility
         });
         debug(1, 'Using Webcam for BYOD status');
       } catch (e2) {

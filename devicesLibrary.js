@@ -410,7 +410,7 @@ export class Display {
           zapi.ui.setWidgetValue(this.config.id + ':POWERSTATUS', `OFF`);
           zapi.ui.setWidgetValue(this.config.id + ':POWER', 'off');
         }, delay);
-        if (this.config.blankBeforePowerOff) {
+        if (this.config.blankBeforePowerOff && this.config.supportsBlanking) {
           this.driver.setBlanking(true);
         }
       }
@@ -427,7 +427,7 @@ export class Display {
         zapi.ui.setWidgetValue(this.config.id + ':POWER', 'on');
         clearTimeout(this.powerOffTimeout);
         this.driver.setPower('on');
-        if (this.config.blankBeforePowerOff) {
+        if (this.config.blankBeforePowerOff && this.config.supportsBlanking) {
           this.driver.setBlanking(false);
         }
       }

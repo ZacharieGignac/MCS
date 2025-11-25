@@ -3,9 +3,17 @@
 
 Documentation: voir docs/README.md pour l’index de la documentation.
 
-Version courante: **1.2.0** (publiée le 2025-11-10) – Voir `CHANGELOG.md` pour l'historique.
+Version courante: **1.2.1** (publiée le 2025-11-25) – Voir `CHANGELOG.md` pour l'historique.
 
-## v1.2.0 (version actuelle)
+## v1.2.1 (version actuelle)
+### Bugs connus
+
+### Ajouts / Modifications
+* devices/Display: les écrans avec `supportsBlanking: false` n'envoient plus de commandes de blanking, même si `blankBeforePowerOff` est configuré à `true`.
+
+### Bugfix
+
+## v1.2.0
 ### Bugs connus
 
 ### Ajouts / Modifications

@@ -2,7 +2,7 @@
 
 Bienvenue dans la documentation de MCS. Utilisez l’index ci-dessous pour accéder rapidement aux sections. Chaque page comporte aussi une table des matières interne avec des liens cliquables.
 
-Version de la documentation: 1.2.0 — Voir aussi le fichier `CHANGELOG.md` à la racine du dépôt pour l'historique des versions.
+Version de la documentation: 1.2.1 — Voir aussi le fichier `CHANGELOG.md` à la racine du dépôt pour l'historique des versions.
 
 ## Index
 - Aperçu de l’API: [API v1 (ZAPI)](./APIv1.md)

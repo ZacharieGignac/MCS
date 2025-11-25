@@ -50,6 +50,11 @@ Aucunes.
 - `string getSource(void)`: Retourne la source actuelle.
 - `number getUsageHours(void)`: Retourne le nombre d'heure d'utilisation.
 
+#### Notes spécifiques: Blanking et `blankBeforePowerOff`
+- `supportsBlanking`: si cette propriété de configuration est `false`, aucune commande de blanking n'est envoyée au driver, même si `blankBeforePowerOff` est configuré à `true`.
+- `blankBeforePowerOff`: lorsque `true` **et** que `supportsBlanking === true`, le système enverra automatiquement `setBlanking(true)` avant l'extinction (`powerOff`) et `setBlanking(false)` au rallumage (`powerOn`).
+- Sécurité de configuration: il n'est plus nécessaire de désactiver `blankBeforePowerOff` pour les écrans qui ne supportent pas le blanking; la propriété `supportsBlanking: false` suffit à bloquer tout envoi de commandes de blanking.
+
 #### Notes spécifiques: Sony (DisplayDriver_serial_sonybpj)
 - Répétition basée sur ACK: les commandes `power` et `blank`/`unblank` sont renvoyées périodiquement (toutes les `repeat` ms) jusqu'à ce que le projecteur réponde « ok ». À la première réponse « ok », les renvois s'arrêtent pour cet état demandé.
 - Détection « ok » robuste: l'ACK est détecté même si la réponse contient des guillemets, des espaces ou des caractères de contrôle. Les logs affichent la réponse brute (`RX`).

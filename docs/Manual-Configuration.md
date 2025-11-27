@@ -28,6 +28,7 @@ Table des matières
   - [AudioOutputGroup](#audiooutputgroup-groupe-de-sortie-audio-tel-quaffiché-dans-audioconsole)
   - [AudioReporter](#audioreporter-rapporteur-de-niveau-sonore)
   - [Software Device](#software-device)
+  - [SerialPort](#serialport-logiciel-de-gestion-du-port-série)
 - [Groupes](#groupes)
   - [Définition, exemple](#définition-exemple)
   - [Noms de groupes](#noms-de-groupes)
@@ -42,6 +43,7 @@ MCS est une collection de macros pour les systèmes Cisco Webex, constituant un 
 * **Groupement** de différents type d'appareils dans des groupes nommés, dont plusieurs groupes standard
 * Architecture de **drivers** d'appareil, qui permet d'étendre les fonctionnalités de base à d'autres appareils du même type mais qui ne partagent pas tous le même fonctionnement (protocole, connectique)
 * Une grande collection d'appareils supportés directement dans la distribution (13) dont plusieurs supportant des drivers: Camera, LightScene, Light, AudioInputGroup, AudioOutputGroup, Display, CameraPreset, AudioInput, ControlSystem, Screen, SoftwareDevice, AudioReporter, Shade
+* Support d'un device logiciel supplémentaire `SerialPort` pour la gestion générique d'un port série du codec
 * Une grande collection de drivers supportés directement dans la distribution (14) pour une variété d'appareils
 * Un système de gestion et d'annonce de **statut système global**, avec événements, avec valeurs par défaut
 * **Mapping automatique des widgets** pour chaque appareil, pour chaque statut système, actions
@@ -668,6 +670,62 @@ Cet appareil prends automatiquement en charge certaines actions.
       peripheralCheckMethod: 'httprequest',                     //Méthode de vérification
       peripheralCheckStatusCode: 404                            //Code HTTP qui constitue un succès
     }
+```
+#### Exemple: SoftwareDevice avec `USBSerialDriver`
+Device de type `SOFTWAREDEVICE` utilisant le driver `USBSerialDriver` pour gérer le port série du codec et mettre en file les commandes.
+
+```JS
+    {
+      id: 'serial.codec',                             //Identification unique
+      type: DEVICETYPE.SOFTWAREDEVICE,                //Type = 'SOFTWAREDEVICE'
+      device: devicesLibrary.SoftwareDevice,          //Classe à utiliser
+      driver: driversLibrary.USBSerialDriver,         //Driver série
+      name: 'Codec Serial Port',                      //Nom (optionnel)
+      port: 1,                                        //Numéro du port série (1 à 4)
+      baudRate: 9600,                                 //Vitesse de transmission (optionnel, ex.: 9600, 38400)
+      parity: 'None',                                 //<None, Even, Odd>, selon le périphérique externe
+      terminator: '\\r\\n',                       //Caractères de fin de réponse (mettre null ou '' pour "no terminator")
+      pacing: 200,                                    //Temps (ms) entre deux commandes envoyées
+      timeout: 200                                    //Temps (ms) d'attente de réponse par commande
+    }
+```
+
+Utilisation typique dans un scénario (avec réponse attendue):
+
+```JS
+  const serialDevice = zapi.devices.getDevice('serial.codec');
+  const serial = serialDevice.driver; // Instance de USBSerialDriver
+
+  async function interrogerPeripherique() {
+    try {
+      const response = await serial.send('STATUS ?\\r\\n');
+      const raw = (response && typeof response.Response !== 'undefined')
+        ? String(response.Response).trim()
+        : '';
+      debug(1, `Réponse du périphérique série: ${raw}`);
+    }
+    catch (e) {
+      debug(2, `Erreur lors de la requête série: ${e}`);
+    }
+  }
+```
+
+Utilisation en mode "fire and forget" (pas de terminator / pas de réponse attendue):
+
+```JS
+  const serialDevice = zapi.devices.getDevice('serial.codec');
+  const serial = serialDevice.driver;
+
+  async function envoyerCommandeSansReponse() {
+    try {
+      // Dans la config du device, mettre terminator: null ou ''
+      await serial.send('PULSE 1\\r\\n');
+      // Aucun traitement de response.Response: la commande est simplement envoyée dans la file
+    }
+    catch (e) {
+      debug(2, `Erreur lors de l'envoi série: ${e}`);
+    }
+  }
 ```
 
 ## Groupes

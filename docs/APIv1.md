@@ -56,7 +56,7 @@ Même si cette fonctionnalité doit être utilisée avec grande prudence, il est
 - `LIGHTSCENE`: Scène d'éclairage
 - `SHADE`: Toile de fenêtre
 - `CAMERA`: Caméra
-- `SOFTWAREDEVICE`: Appareil "logiciel" ou "virtuel"
+- `SOFTWAREDEVICE`: Appareil "logiciel" ou "virtuel" (ex.: `SoftwareDevice`, `SerialPort`)
   
 ## Dispositifs (devices)
 

@@ -1098,10 +1098,21 @@ export class Screen {
 export class SoftwareDevice {
   constructor(config) {
     this.config = config;
+    if (this.config.driver) {
+      try {
+        this.driver = new this.config.driver(this, config);
+      }
+      catch (e) {
+        debug(3, `SoftwareDevice (constructor) ERROR: Could not load driver for device ${this.config.id}`);
+      }
+    }
   }
 
   reset() {
     debug(1, `DEVICE ${this.config.id}: RESET`);
+    if (this.driver && typeof this.driver.reset === 'function') {
+      this.driver.reset();
+    }
   }
 }
 

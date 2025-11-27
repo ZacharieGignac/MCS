@@ -154,3 +154,4 @@ Arrête l'observation des entrées audio et stoppe les rapports.
 Ajoute un callback pour les rapports. Chaque fois qu'un rapport est disponible, le rapport sera envoyé à tous les callbacks.
 
 - `callback`: function(report), envoi du rapport.
+

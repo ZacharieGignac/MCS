@@ -1637,3 +1637,106 @@ export class ShadeDriver_basic_isc {
   }
 }
 
+
+export class USBSerialDriver {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
+    this.queue = [];
+    this.sending = false;
+    this.pacing = this.config.pacing || 200;
+    this.timeout = this.config.timeout || 200;
+    this.terminator = (typeof this.config.terminator !== 'undefined') ? this.config.terminator : '\\r\\n';
+    this.port = this.config.port || 1;
+
+    try {
+      if (this.port < 1 || this.port > 4) {
+        throw new Error(`Invalid serial port number: ${this.port}. Port must be between 1 and 4.`);
+      }
+      xapi.Config.SerialPort.Outbound.Mode.set('On');
+      if (this.config.baudRate) {
+        xapi.Config.SerialPort.Outbound.Port[this.port].BaudRate.set(this.config.baudRate);
+      }
+      if (this.config.parity) {
+        xapi.Config.SerialPort.Outbound.Port[this.port].Parity.set(this.config.parity);
+      }
+      xapi.Config.SerialPort.Outbound.Port[this.port].Description.set(this.config.id || 'SerialPort');
+      this.serialPortConfigured = true;
+      debug(1, `DRIVER USBSerialDriver (${this.config.id}): Serial port configured on port ${this.port}`);
+    }
+    catch (e) {
+      this.serialPortConfigured = false;
+      debug(2, `DRIVER USBSerialDriver (${this.config.id}): Failed to configure serial port: ${e.message}`);
+    }
+  }
+
+  send(command) {
+    return new Promise((resolve, reject) => {
+      if (!this.serialPortConfigured) {
+        debug(2, `DRIVER USBSerialDriver (${this.config.id}): Serial port not configured, cannot send command`);
+        reject('SERIAL_NOT_CONFIGURED');
+        return;
+      }
+      this.queue.push({ command, resolve, reject });
+      if (!this.sending) {
+        this._sendNext();
+      }
+    });
+  }
+
+  sendRaw(text) {
+    return this.send(text);
+  }
+
+  _sendNext() {
+    if (this.queue.length === 0) {
+      this.sending = false;
+      return;
+    }
+    if (this.sending) {
+      return;
+    }
+    this.sending = true;
+    const { command, resolve, reject } = this.queue.shift();
+
+    debug(1, `DRIVER USBSerialDriver (${this.config.id}): TX: ${String(command).trim()}`);
+
+    const sendParams = {
+      PortId: this.port,
+      ResponseTimeout: this.timeout,
+      Text: command
+    };
+
+    if (this.terminator !== null && this.terminator !== '') {
+      sendParams.ResponseTerminator = this.terminator;
+    }
+
+    xapi.Command.SerialPort.PeripheralControl.Send(sendParams)
+      .then(response => {
+        try {
+          const rx = (response && typeof response.Response !== 'undefined') ? String(response.Response).trim() : '';
+          debug(1, `DRIVER USBSerialDriver (${this.config.id}): RX: ${rx === '' ? '<empty>' : rx}`);
+        }
+        catch (e) {
+          debug(2, `DRIVER USBSerialDriver (${this.config.id}): RX parse error: ${e.message}`);
+        }
+        resolve(response);
+        return new Promise(res => setTimeout(res, this.pacing));
+      })
+      .catch(e => {
+        debug(2, `DRIVER USBSerialDriver (${this.config.id}): Serial send error: ${e.message || e}`);
+        reject('TIMEOUT');
+        return new Promise(res => setTimeout(res, this.pacing));
+      })
+      .finally(() => {
+        this.sending = false;
+        this._sendNext();
+      });
+  }
+
+  reset() {
+    this.queue = [];
+    this.sending = false;
+  }
+}
+

@@ -1322,14 +1322,17 @@ export class Scenario {
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
 
-          xapi.Command.Video.Layout.LayoutFamily.Set({
-            LayoutFamily: 'Overlay',
-            Target: 'Local'
-          });
-          
-          xapi.Command.Video.ActiveSpeakerPIP.Set({
-            Position: systemconfig.system.defaultPipPosition || 'UpperRight',
-          });
+          if (systemconfig.system.defaultPipPosition) {
+            xapi.Command.Video.Layout.LayoutFamily.Set({
+              LayoutFamily: 'Overlay',
+              Target: 'Local'
+            });
+
+            xapi.Command.Video.ActiveSpeakerPIP.Set({
+              Position: systemconfig.system.defaultPipPosition,
+            });
+          }
+
 
 
 

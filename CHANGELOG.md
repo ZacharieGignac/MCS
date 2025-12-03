@@ -7,7 +7,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 - Scénario `sce_como_type2` : nouvelle version évoluée du scénario Comodale Type 1 avec support de groupes d'affichages supplémentaires (télésouffleur, affichages secondaires de présentation) et gestion fine des modes d'affichage. Voir `docs/Manual-ComoType2.md` pour la documentation complète.
 - Documentation complète des nouveaux drivers audio introduits en v1.2.0 : `AudioInputDriver_aes67`, `AudioOutputDriver_aes67`, `AudioInputDriver_usb`, `AudioOutputDriver_usb`, et `AudioInputDriver_codeceq`
 - Nouveau manuel `docs/Manual-ComoType2.md` documentant le scénario Comodale Type 2, ses différences avec le Type 1, les nouveaux groupes d'affichages, et les configurations avancées
-- Documentation complète du driver `USBSerialDriver` pour devices de type `SoftwareDevice`
+- Nouveau driver `USBSerialDriver` pour devices de type `SoftwareDevice` : communication série USB générique avec gestion automatique de la configuration du port série, file d'attente des commandes, et pacing entre les envois. Supporte les méthodes `send()`, `sendRaw()`, et `reset()`. Documentation complète dans `docs/Manual-Devices.md`.
 
 ### Bugfix
 

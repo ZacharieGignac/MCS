@@ -83,6 +83,24 @@ Une ou plusieurs entrées audio (microphones) pour l'auditoire.
 
 Doit faire parti du groupe `system.audio.audiencemics`.
 
+## Configuration système
+
+### Position PIP par défaut
+
+Le scénario Type 1 supporte la configuration `defaultPipPosition` dans la section `system` de la configuration. Cette option définit la position par défaut du PIP (Picture-in-Picture) lors de l'utilisation du layout "Overlay" (par exemple, lors d'une présentation avec un présentateur distant).
+
+**Valeurs possibles :** `UpperLeft`, `UpperCenter`, `UpperRight`, `CenterLeft`, `CenterRight`, `LowerLeft`, `LowerRight`
+
+**Exemple de configuration :**
+```javascript
+system: {
+  // ... autres paramètres ...
+  defaultPipPosition: 'UpperLeft',
+}
+```
+
+Si cette option n'est pas définie, le PIP ne sera pas repositionné automatiquement.
+
 ## Contrôles, interface utilisateur
 Ce scénario cachera tous les panels et boutons affichera son propre panneau de paramètres nommé "comotype1_settings", qui comporte les paramètres/contrôles suivants. Il est fortement recommandé de retirer/ajouter les contrôles selon le besoin et la configuration particulière du système. Il est aussi fortement recommandé d'avoir un bouton de fermeture de session, comme celui de base du système qui est généralement nommé `*ACTION$STANDBY`
 - Général

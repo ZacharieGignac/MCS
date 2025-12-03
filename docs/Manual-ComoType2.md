@@ -458,6 +458,22 @@ Le scénario Type 2 répond aux SystemStatus suivants :
 | `AudienceMics` | `on`, `off` | Active/désactive les micros audience |
 | `comotype2Mode` | `1-20`, `-1` | Mode actuel du scénario |
 
+### Position PIP par défaut
+
+Le scénario Type 2 supporte la configuration `defaultPipPosition` dans la section `system` de la configuration. Cette option définit la position par défaut du PIP (Picture-in-Picture) lors de l'utilisation du layout "Overlay" (par exemple, lors d'une présentation avec un présentateur distant).
+
+**Valeurs possibles :** `UpperLeft`, `UpperCenter`, `UpperRight`, `CenterLeft`, `CenterRight`, `LowerLeft`, `LowerRight`
+
+**Valeur par défaut :** `UpperRight` (si non spécifié)
+
+**Exemple de configuration :**
+```javascript
+system: {
+  // ... autres paramètres ...
+  defaultPipPosition: 'UpperLeft',
+}
+```
+
 ### Panel UI
 
 Le scénario utilise le panel `comotype2_settings` qui doit être créé dans `UI/comotype2_settings.xml`.

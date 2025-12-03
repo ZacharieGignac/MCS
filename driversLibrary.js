@@ -439,7 +439,7 @@ export class DisplayDriver_serial_sonybpj {
     try {
       if (!Array.isArray(this.queue) || this.queue.length === 0) return;
       this.queue = this.queue.filter(item => commandsToClear.indexOf(item.command) === -1);
-    } catch (_) {}
+    } catch (_) { }
   }
 
   _sendBlankingAttempt() {
@@ -484,7 +484,7 @@ export class DisplayDriver_serial_sonybpj {
 
     this.sending = true;
     const { command, resolve, reject } = this.queue.shift();
-    try { debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): TX: ${String(command).trim()}`); } catch (_) {}
+    try { debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): TX: ${String(command).trim()}`); } catch (_) { }
 
     try {
       return xapi.Command.SerialPort.PeripheralControl.Send({
@@ -501,7 +501,7 @@ export class DisplayDriver_serial_sonybpj {
             } else {
               debug(1, `DRIVER DisplayDriver_serial_sonybpj (${this.config.id}): RX: <empty>`);
             }
-          } catch (_) {}
+          } catch (_) { }
           resolve(response); // Always resolve here
           return new Promise(res => setTimeout(res, this.pacing));
         })
@@ -1226,7 +1226,7 @@ export class AudioInputDriver_usb {
     // Try both Level and Gain settings as different systems use different APIs
     // Handle errors silently since we don't know which API the device supports
     const connectorId = this.config.connector;
-    
+
     try {
       xapi.config.get(`Audio.Input.USBInterface[${connectorId}].Level`).then(() => {
         xapi.Config.Audio.Input.USBInterface[connectorId].Level.set(gain);
@@ -1617,6 +1617,16 @@ export class ControlSystemDriver_isc {
         zapi.communication.sendMessage(`${this.config.name}:HEARTBEAT;CODEC`);
       }, this.config.heartbeatInterval);
     }
+        xapi.Status.Standby.State.on(status => {
+      if (status == 'Standby') {
+        debug(1, `Sending STANDBY_ON to ISC ${this.config.name}`);
+        zapi.communication.sendMessage(`STANDBY_ON`);
+      }
+      else if (status == 'Off') {
+        debug(1, `Sending STANDBY_OFF to ISC ${this.config.name}`);
+        zapi.communication.sendMessage(`STANDBY_OFF`);
+      }
+    });
   }
 }
 

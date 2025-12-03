@@ -1103,24 +1103,14 @@ export class Scenario {
           console.error('17');
           zapi.system.setStatus('comotype2Mode', 17);
 
-          setMonitors(TRIPLEPRESENTATIONONLY);
 
-
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
           powerOnDisplays(farendDisplays);
           unblankDisplays(farendDisplays);
-          //matrixRemoteToDisplay has been disable for now because of a bug in RoomOS (freeze)
-          //matrixRemoteToDisplay(farendDisplays, 2000);
 
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, PRESENTATIONONLY);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
 
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, PRESENTATIONONLY);
+
           if (UseTeleprompter == ON) {
             powerOnDisplays(teleprompterDisplays);
             unblankDisplays(teleprompterDisplays);
@@ -1131,7 +1121,7 @@ export class Scenario {
           }
 
           //Secondary presentation displays
-  
+
           if (UseSecondaryPresentationDisplays == ON) {
             powerOnDisplays(secondaryPresentationDisplays);
             unblankDisplays(secondaryPresentationDisplays);
@@ -1140,25 +1130,40 @@ export class Scenario {
             powerOffDisplays(secondaryPresentationDisplays);
             blankDisplays(secondaryPresentationDisplays);
           }
-            
+
+          setMonitors(TRIPLE);
+
+          //Farend displays
+          setDisplaysRole(farendDisplays, FIRST);
+
+          //Presentation displays
+          setDisplaysRole(presentationDisplays, PRESENTATIONONLY);
+          await delay(10000);
+          setDisplaysRole(presentationDisplays, SECOND);
+
+          setDisplaysRole(teleprompterDisplays, SECOND);
+
+
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
           console.error('18');
           zapi.system.setStatus('comotype2Mode', 18);
-          setMonitors(TRIPLEPRESENTATIONONLY);
+          setMonitors(TRIPLE);
+
 
           //Farend displays
           setDisplaysRole(farendDisplays, FIRST);
           powerOnDisplays(farendDisplays);
           unblankDisplays(farendDisplays);
 
+
           //Presentation displays
-          setDisplaysRole(presentationDisplays, PRESENTATIONONLY);
+          setDisplaysRole(presentationDisplays, SECOND);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
 
           //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, PRESENTATIONONLY);
+          setDisplaysRole(teleprompterDisplays, SECOND);
           if (UseTeleprompter == ON) {
             powerOnDisplays(teleprompterDisplays);
             unblankDisplays(teleprompterDisplays);
@@ -1169,7 +1174,7 @@ export class Scenario {
           }
 
           //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, PRESENTATIONONLY);
+
           if (UseSecondaryPresentationDisplays == ON) {
             powerOnDisplays(secondaryPresentationDisplays);
             unblankDisplays(secondaryPresentationDisplays);
@@ -1198,7 +1203,7 @@ export class Scenario {
           setDisplaysRole(teleprompterDisplays, FIRST);
           powerOffDisplays(teleprompterDisplays);
           blankDisplays(teleprompterDisplays);
-          
+
           //Secondary presentation displays
           setDisplaysRole(secondaryPresentationDisplays, FIRST);
           powerOffDisplays(secondaryPresentationDisplays);

@@ -11,6 +11,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 - Configuration `system.defaultPipPosition` : permet de définir la position par défaut du PIP (Picture-in-Picture) lors de l'utilisation du layout "Overlay". Valeurs possibles : `UpperLeft`, `UpperCenter`, `UpperRight`, `CenterLeft`, `CenterRight`, `LowerLeft`, `LowerRight`. Supporté par les scénarios `sce_como_type1` et `sce_como_type2`.
 
 ### Bugfix
+- core: Protection try-catch pour `Video.Output.HDMI.Passthrough.Stop()` lors de la fermeture de session et de la mise en veille pour éviter les erreurs sur les systèmes ne supportant pas cette fonctionnalité.
 
 ## [1.2.1] - 2025-11-25
 ### Ajouts / Modifications

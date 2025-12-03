@@ -345,7 +345,8 @@ Le scénario Type 2 possède 20 modes distincts, identifiés par `comotype2Mode`
 
 Pour éviter les clignotements lors de changements rapides d'état, le scénario implémente un mécanisme de « debouncing » lors du réglage des rôles de moniteurs (`MonitorRole`).
 
-- Activation via `system.enableStateEvaluationDebounce: true` dans la configuration système.
+- Activation via `sce_como_type2.enableStateEvaluationDebounce: true` dans la configuration.
+- Peut également être configuré sous `system.enableStateEvaluationDebounce` (fallback).
 - Par connecteur, la dernière demande de rôle est appliquée après un court délai, les demandes précédentes sont annulées.
 - Réduit les appels xAPI redondants et les changements de rôle inutiles pendant les transitions rapides.
 
@@ -395,10 +396,19 @@ Cette logique assure une expérience cohérente lors des sessions BYOD (HDMI Pas
 
 Certains affichages de présentation peuvent nécessiter un délai supplémentaire pour accepter un changement de rôle. Un correctif optionnel est disponible:
 
-- Configurez `system.fix.SlowPresentationDisplaysDelay` (en millisecondes).
-- Le scénario définit d’abord le rôle `PresentationOnly`, attend le délai configuré (ex: 10000 ms), puis applique le rôle `Second`.
+- Configurez `sce_como_type2.slowPresentationDisplaysDelay` (en millisecondes).
+- Peut également être configuré sous `system.SlowPresentationDisplaysDelay` (fallback).
+- Le scénario définit d'abord le rôle `PresentationOnly`, attend le délai configuré (ex: 10000 ms), puis applique le rôle `Second`.
 
 Ce contournement améliore la fiabilité des bascules de rôle pour les affichages plus lents.
+
+**Exemple de configuration :**
+```javascript
+sce_como_type2: {
+  enableStateEvaluationDebounce: true,
+  slowPresentationDisplaysDelay: 10000
+}
+```
 
 ### Configuration Video Matrix
 

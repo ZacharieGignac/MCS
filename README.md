@@ -1,157 +1,327 @@
-# MCS
-"MODULAR CONTROL SYSTEM". Original.
+# MCS - Modular Control System
 
-Documentation: voir docs/README.md pour l'index de la documentation.
+**Version:** 1.3.0-dev  
+**License:** MIT
 
-Version courante: **1.3.0-dev** (en développement) – Voir `CHANGELOG.md` pour l'historique.
+> Un système de contrôle modulaire et extensible pour les équipements de visioconférence Cisco Webex, conçu pour orchestrer des environnements collaboratifs complexes.
 
-## v1.3.0-dev (version actuelle en développement)
-### Bugs connus
+---
 
-### Ajouts / Modifications
-* devices/Display: les écrans avec `supportsBlanking: false` n'envoient plus de commandes de blanking, même si `blankBeforePowerOff` est configuré à `true`.
-* Scénario `sce_como_type2`: nouvelle version évoluée du scénario Comodale Type 1 avec support de groupes d'affichages supplémentaires (télésouffleur, affichages secondaires de présentation) et gestion fine des modes d'affichage. Voir `docs/Manual-ComoType2.md` pour la documentation complète.
+## 📋 Vue d'ensemble
 
-### Bugfix
+MCS (Modular Control System) est une plateforme de contrôle avancée fonctionnant comme macro sur les codecs Webex. Il offre une architecture modulaire permettant de créer des expériences utilisateur personnalisées et d'automatiser la gestion d'équipements audiovisuels.
 
-## v1.2.0
-### Bugs connus
+### Principales caractéristiques
 
-### Ajouts / Modifications
-* Mises à jour (UI): nouveau flux de mise à jour accessible via le bouton `system_update` avec sélection du système (dossier), sélection du fichier, pagination (max 4 items par page) et confirmation explicite avant installation. L'installation se fait via `Provisioning.Service.Fetch`.
-* Drivers série (Sony, Panasonic, Epson): support des paramètres `pacing`, `repeat`, `timeout` avec valeurs par défaut, gestion d'erreurs centralisée et logs "debouncés".
-* Sony (DisplayDriver_serial_sonybpj): logique de répétition basée sur l'accusé de réception. Les commandes `power` et `blank`/`unblank` sont renvoyées au `repeat` jusqu'à réception d'un « ok », puis arrêt des renvois pour cet état.
-* Sony (DisplayDriver_serial_sonybpj): journalisation TX/RX détaillée (ligne envoyée et réponse brute), détection « ok » robuste (espaces, guillemets, caractères de contrôle).
-* Sony (DisplayDriver_serial_sonybpj): file d'attente nettoyée pour éviter les collisions lors des bascules rapides `blank`/`unblank` ou `power on/off` (priorise l'état le plus récent).
-* Sony (DisplayDriver_serial_sonybpj): si la voie RX n'est pas câblée (TX uniquement), le driver continue d'envoyer au `repeat` (comportement intentionnel).
-* AES67: nouveaux drivers `AudioInputDriver_aes67` et `AudioOutputDriver_aes67` (gain par canal, entrées/sorties 1-6 et canaux 1-8).
-* USB Audio: nouveaux drivers `AudioInputDriver_usb` et `AudioOutputDriver_usb` pour contrôler les interfaces audio USB (gain 0-24 pour les entrées, mode uniquement pour les sorties).
-* Codecs EQ/Bar/Board: nouveau driver `AudioInputDriver_codeceq` (réglage via Microphone.Gain/Mode, connecteurs microphone uniquement).
-* `AudioInput_codecpro`: retrait du type `ethernet` (utiliser AES67 dédié).
-* `sce_comotype1`: support de `skipVideoMatrix: true` pour les `DISPLAY`.
-* SystemStatus: `Occupancy` est initialisé automatiquement à `undefined`; `PresenterDetected` est désormais injecté automatiquement (à ne plus définir dans la config).
-* Action mapping: nouvelle action `SETSS$key,value` pour écrire un SystemStatus.
-* Action mapping: nouvelle action `MSG:title,text` pour afficher des messages persistants à l'utilisateur
-* Messages XAPI: prise en charge de `MCSACTION$ACTION,VALUE` et `MCSACTIONS$ACTION,VALUE&ACTION,VALUE` (multiples actions).
-* Raccourci admin: 5 désactivations successives du mute micro ouvrent le panneau `system_admin`.
-* Widget admin: nouveau widget `system_admin` avec double fonctionnalité:
-  - Appui court: affiche les informations système dans une boîte de dialogue "Informations système" (version, uptime, statut d'appel, BYOD, localisation présentateur, détection présentateur, scénario actuel, mode comotype1)
-  - Appui long (5 secondes): ouvre le panneau d'administration
-* Watchdog: nouvelle macro `watchdog.js` pour surveiller le core (voir Watchdog ci-dessous).
-* Audio (sce_como_type1): routage des entrées distantes selon leur rôle. Les entrées avec rôle `Presentation` vont toujours vers `system.presentation.main`; les autres suivent `PresenterLocation`.
-* API Audio: `zapi.audio.getRemoteInputsDetailed()` expose `{ id, role, callId, streamId }`.
-* Devices/AudioOutputGroup: ajout de `connectSpecificRemoteInputs(ids)` et `disconnectSpecificRemoteInputs(ids)`.
-* Journaux: logs audio/scénarios simplifiés et structurés (rôles, ids) pour le diagnostic.
-* **BYOD unifié**: nouveau statut `byod` avec détection automatique HDMI.Passthrough (anciens systèmes) ou Webcam (nouveaux). Les scénarios avec `features.byod: true` activent automatiquement les UI features pertinentes.
-* Gestion des erreurs (robustesse):
-  - Bus d'événements: `SystemEvents.emit` protège chaque écouteur (sync/async) via try/catch, un handler défaillant ne bloque plus les autres.
-  - UI Action mappings: exécution des handlers protégée (try/catch) et capture des rejets asynchrones.
-  - Messages internes: le dispatcher des messages `MCSACTION$...` / `MCSACTIONS$...` est encapsulé (regex + exécution) pour éviter les erreurs au niveau global.
-  - Communication: la file d'envoi de messages (`MessageQueue`) journalise les erreurs de `xapi.Command.Message.Send` et continue toujours la file.
-  - Stockage: `Storage.read/write/del/resetStorage` sont entourés de try/catch; en cas d'erreur, un log est émis et l'exécution se poursuit.
+- **Architecture modulaire** : Système à plugins permettant l'ajout de fonctionnalités personnalisées sans modifier le core
+- **Gestion multi-périphériques** : Contrôle unifié des écrans, projecteurs, éclairages, volets, audio et caméras
+- **Scénarios intelligents** : Workflows automatisés adaptés aux différents modes d'utilisation (visioconférence, présentation, BYOD)
+- **Interface utilisateur dynamique** : Génération automatique d'interfaces Touch10/Navigator basée sur la configuration
+- **API extensible** : Framework `zapi` offrant des abstractions de haut niveau pour le développement
 
-### Bugfix
-* `sce_standby`: unmute correct des micros à l'activation.
-* UI LightScenes: l'auto-lumière n'est plus forcée à OFF lors d'interactions de widgets s'il ne faut pas.
-* LightSceneDriver_gc_itachflex / ScreenDriver_gc_itachflex: séquençage HTTP asynchrone pour éviter les timings incorrects en cas de latence.
-* core: `setPresenterLocation` met à jour SystemStatus avec validation (`local`, `remote`).
-* core: Killswitch GPIO protégé par garde et try/catch quand non configuré.
-* core/SystemStatus/UI: `PresenterDetected` converti en booléen avant mise à jour (fini l'erreur "Switch expects a value: <on/off>").
-* modules: `getModule(id)` retourne `undefined` et journalise au lieu de planter.
-* scenarios: `enableScenario(id)` gère IDs dupliqués/introuvables, protège `panels`/`features`, émet `system_scenario_enable_failed`.
-* devices: `getDevicesInGroup` et `getDevicesByTypeInGroup` ignorent groupes/devices introuvables.
-* core (audio.extra): gardes null/undefined sur groupes d'entrées/sorties supplémentaires.
-* core: `toBool` robuste pour valeurs non-string.
+---
 
-## Mises à jour logicielles (UI)
+## 🏗️ Architecture
 
-À partir de la version 1.2.0, MCS intègre un flux de mise à jour directement depuis l'interface utilisateur RoomOS.
+### Composants principaux
 
-### Accès
-- Appuyer sur le bouton UI `system_update`.
+```
+MCS/
+├── core.js              # Moteur principal du système
+├── config.js            # Configuration des devices et scénarios
+├── devices.js           # Gestion des périphériques
+├── scenarios.js         # Gestionnaire de scénarios
+├── modules.js           # Système de modules (plugins)
+├── communication.js     # Communication inter-système
+├── watchdog.js          # Surveillance et auto-récupération
+├── devicesLibrary.js    # Bibliothèque de drivers
+├── driversLibrary.js    # Implémentations des drivers
+└── docs/                # Documentation complète
+```
 
-### Parcours
-1) Choisir un « système » (dossier) listé sous `releases/` du dépôt GitHub.
-2) Choisir un fichier dans ce système. L'interface propose jusqu'à 4 éléments par page; utilisez « Suivant » pour paginer, « Fermer » pour quitter.
-3) Confirmer: une boîte de dialogue demande si vous êtes absolument certain d'appliquer la mise à jour sélectionnée (système + fichier).
-4) Application: en cas de confirmation, le périphérique lance la commande xAPI `Provisioning Service Fetch` avec l'URL de téléchargement du fichier choisi. Selon le package, le périphérique peut redémarrer ou appliquer les changements automatiquement.
+### Concepts clés
 
-### Notes
-- Les textes des invites respectent les contraintes xAPI (pas de retours à la ligne bruts; utilisation de `<br>`).
-- Les listes utilisent des boutons d'options (max 5 avec le bouton de pagination/Laisser), pas d'HTML libre.
-- L’URL de téléchargement est résolue depuis GitHub (`download_url`) ou, à défaut, construite via `raw.githubusercontent.com` sur la branche `main`.
-- Ce flux ne filtre pas encore par extension; si nécessaire, ne proposez que des archives `.zip` dans vos dossiers `releases/<systeme>/`.
+#### Devices (Périphériques)
 
-### Dépannage
-- « Impossible d’accéder à GitHub »: vérifier la connectivité Internet et les proxys du périphérique.
-- « Aucun système trouvé »: assurez-vous que le dossier `releases/` du dépôt contient des sous-dossiers.
-- « Aucun fichier disponible pour le système »: placez les fichiers d’update dans `releases/<systeme>/`.
+Les **devices** représentent les équipements physiques ou logiques que MCS contrôle. Chaque device possède un type, un ID unique et un driver.
 
-## Watchdog
-Un macro séparé `watchdog.js` agit comme chien de garde pour vérifier que le core fonctionne et répondre dans des délais raisonnables.
+**Types supportés :**
+- `DISPLAY` / `SCREEN` : Écrans, projecteurs, volets
+- `LIGHTSCENE` / `LIGHT` : Scènes d'éclairage et lumières individuelles
+- `AUDIOINPUT` / `AUDIOOUTPUT` : Entrées et sorties audio (micro, haut-parleurs)
+- `AUDIOINPUTGROUP` / `AUDIOOUTPUTGROUP` : Groupes audio pour routage intelligent
+- `CAMERA` / `CAMERAPRESET` : Caméras et positions prédéfinies
+- `SOFTWAREDEVICE` : Périphériques logiciels personnalisés
 
-### Principe
-- Le watchdog envoie un message texte XAPI (`MCS_WD_PING`).
-- Le core répond avec (`MCS_WD_PONG`) une fois l'initialisation du core terminée (le répondeur est enregistré post-init).
-- Le watchdog attend un PONG pendant 15 secondes.
-- Après 3 tentatives consécutives sans réponse (3 minutes), le watchdog redémarre le moteur de macros.
+#### Drivers
 
-### Détails
-- Délai initial avant le premier ping (pendant le boot): 10 minutes.
-- Après réception du premier PONG, la fréquence passe à 1 ping par minute.
-- Fenêtre d'attente de PONG: 15 secondes.
-- Seuil de redémarrage: 3 PING consécutifs sans PONG.
-- Redémarrage exécuté via `xapi.Command.Macros.Runtime.Restart()`.
+Les **drivers** implémentent la logique de contrôle spécifique à chaque type d'équipement :
+- Drivers série : Sony, Epson, Panasonic (projecteurs)
+- Drivers réseau : iTach Flex (relais IP), AES67 (audio réseau)
+- Drivers USB : Audio USB, communication série USB
+- Drivers xAPI : CEC, caméras Cisco, audio codec
 
-### Déploiement
-- Installer `watchdog.js` comme macro séparée (distincte de `core`).
-- Aucun paramètre requis; les constantes par défaut sont:
-  - PING: `MCS_WD_PING`
-  - PONG: `MCS_WD_PONG`
-  - Délai initial: 60s, Intervalle: 60s, Attente PONG: 15s, Échecs avant restart: 3
+#### Scénarios
 
+Les **scénarios** définissent le comportement du système selon le contexte d'utilisation. Un scénario orchestre :
+- L'interface utilisateur (panneaux, widgets)
+- Les modes opérationnels (présentation, visioconférence, standby)
+- Le routage audio/vidéo
+- L'activation automatique des équipements
 
-## v1.1.0 (précédente)
-### Bugs connus / limitation
-* Support manquant pour les microphone Ceiling Microphone Pro et Table Microphone Pro
+**Scénarios inclus :**
+- `sce_como_type1` / `sce_como_type2` : Systèmes Comodale (salles de visioconférence avancées)
+- `sce_standby` : Gestion de mise en veille intelligente
+- `sce_firealarm` : Intégration alarme incendie
+- `sce_example` : Modèle de démarrage
 
-### Ajouts / Modifications
-* Nouveau type de device, `AudioOutput`, qui permet de contrôler les sorties audio
-* Nouveau type de driver, `AudioOutputDriver_codecpro` qui permet de contrôler les sorties audio sur un codec pro, utilisé par le driver `AudioOutput`
-* MCS rapporte maintenant sa version dans Webex Control Hub, en ajoutant un faux périphérique nommé "MCS", avec une valeur avec la nommenclature "mcs-x.x.x"
-* Structure `zapi.telemetry` pour supporter la télémétrie
-* Module `mod_telemetry` en example pour un module de télémétrie complexe
-* Propriété `supportsSystemStatus` <true/false> et `systemStatusRequestInterval` pour les devices de type DISPLAY 
-* Propriété `supportsFilterStatus` <true/false> et `filterStatusRequestInterval` pour les devices de type DISPLAY
-* Modification majeure de `Display`, `DisplayDriver_serial_sonybpj`, `DisplayDriver_serial_epson`, `DisplayDriver_serial_panasonic` pour pemettre la télémétrie (si disponible), la communication avec le display en mode asynchrone
-* `DisplayDriver_serial_sonybpj` supporte maintenant la communication avec le projecteur pour obtenir les informations suivantes: Statut du projecteur, statut du filtre, nombre d'heures de la lampe
-* `DisplayDriver_serial_epson` supporte maintenant la communication avec le projecteur pour obtenir les informations suivantes: Statut du projecteur, nombre d'heures de la lampe
-* `DisplayDriver_serial_panasonic` supporte maintenant la communication avec le projecteur pour obtenir les informations suivantes: Statut du projecteur (incluant filtre), nombre d'heure de la lampe
+#### Modules
 
-### Bugfix
-* Arrangé le contrôle de gain et de mute sur les entrées `AudioInput` de type `HDMI` ou `Ethernet`
-* Arrangé quelques nesting qui empêchent le transpiler de restaurer un backup (core, mod_cafeine)
-* La mise en veille n'est plus bloquée lorsque la session est fermée par l'utilisateur et qu'une présentation ou un appel est actif
-* Gestion de l'alimentation CEC (`DisplayDriver_CEC`) qui s'assure d'allumer les affichages CEC lorsqu'ils sont requis
-* Ajouté .gitignore pour les fichiers de metadata de MacOS
+Les **modules** ajoutent des fonctionnalités optionnelles au système :
+- `mod_autogrid` : Bascule automatique en mode grille lors des appels
+- `mod_cafeine` : Optimise l'allumage des écrans (blanking au lieu d'extinction)
+- `mod_regisseur` : Contrôle caméra automatique basé sur les événements
+- `mod_telemetry` : Collecte de données de télémétrie
+- `mod_psacamcontrols` : Contrôles caméra personnalisés
 
+#### SystemStatus
 
-## v1.0.1
-### Bugs connus
-* Pour une raison encore inconnue, le message de PresenterTrack peut être affiché même lorsque le système n'est pas en appel ou en mode hdmiPassthrough. Une tentative de correction est appliquée dans cette version.
+Le **SystemStatus** est un système de variables globales permettant la communication entre composants :
+- `Occupancy` : Occupation de la salle
+- `PresenterDetected` : Détection du présentateur
+- `PresenterLocation` : Localisation (local/remote)
+- `byod` : État BYOD (Bring Your Own Device)
+- Variables personnalisées pour workflows spécifiques
 
-### Ajouts / Modification
-* Module `mod_cafeine`: Empêche les affichages d'être éteint si l'affichage supporte le "blanking". Accélère l'allumage des affichages, mais peut diminuer la durée de vie des équipements
-* Module `mod_autogrid`: Configure automatiquement la conférence en mode "grille" à la connexion
-* Nouveau widget mapping pour les devices de type `Light` pour afficher le pourcentage dans un label. Syntaxe: `my.light.id:LEVEL%`
-* Ajout du driver de toile motorisée `ScreenDriver_gc_itachflex` pour contrôle à partir d'un module "Global Caché iTach Flex" + "Relay Flex Cable"
-* Ajout du driver de scène d'éclairage `LightSceneDriver_gc_itachflex` pour contrôle à partir d'un module "Global Caché iTach Flex" + "Relay Flex Cable"
-* Ajout du feature "Webcam" dans le manifest d'un scénario pour les codecs EQ et BarPro (au lieu de hdmiPassthrough)
+---
 
-### Bugfix
-* L'Activation de la scène d'éclairage lors du mode veille ne s'effectue pas
-* Modification de la méthode de détection des appels (Idle, Connected)
-* Retirer le message de PresenterTrack quand le système n'est pas en appel ou en mode hdmiPassthrough
-* Les requètes HTTP au travers `zapi.communication.httpClient` n'envoyaient pas de "body" dans la requête. Il faut utiliser la propriété `Body` dans les paramêtres de la requête.
-* Désactivation automatique du mode hdmipassthrough lors de la fermeture de session
-* Désactivation automatique du mode hdmipassthrough dans le scénario standby
+## 🚀 Démarrage rapide
+
+### Prérequis
+
+- Codec Webex avec RoomOS (Room Kit, Board, Desk, etc.)
+- Accès administrateur au codec
+- Connaissances en JavaScript ES6+
+
+### Installation
+
+1. **Copier la configuration exemple :**
+   ```bash
+   cp config.js.example config.js
+   ```
+
+2. **Éditer `config.js`** selon votre environnement :
+   - Définir vos devices (écrans, audio, caméras)
+   - Configurer le scénario souhaité
+   - Activer les modules nécessaires
+
+3. **Déployer sur le codec :**
+   - Via l'interface web : Intégrations > Macro Editor
+   - Téléverser tous les fichiers `.js`
+   - Activer la macro `core`
+
+4. **Déployer le watchdog (recommandé) :**
+   - Téléverser `watchdog.js` comme macro séparée
+   - L'activer pour surveiller le core
+
+### Configuration minimale
+
+```javascript
+// config.js - Exemple minimal
+const CONFIG = {
+  devices: [
+    {
+      id: 'main_display',
+      type: 'DISPLAY',
+      driver: driversLibrary.DisplayDriver_CEC,
+      name: 'Écran principal'
+    }
+  ],
+  
+  scenario: scenarios.standby,
+  
+  modules: []
+};
+```
+
+---
+
+## 📚 Documentation
+
+La documentation complète est disponible dans le dossier [`docs/`](./docs/):
+
+### Guides utilisateur
+- **[Index de la documentation](./docs/README.md)** - Point d'entrée principal
+- **[Configuration](./docs/Manual-Configuration.md)** - Guide de configuration
+- **[Devices](./docs/Manual-Devices.md)** - Types de périphériques et drivers
+- **[Scénarios](./docs/Manual-Scenarios.md)** - Création de scénarios
+- **[Modules](./docs/Manual-Modules.md)** - Développement de modules
+- **[Événements](./docs/Manual-Events.md)** - Système d'événements
+- **[Interface utilisateur](./docs/Manual-Widget_Mapping_and_Actions.md)** - Mapping des widgets
+
+### Guides spécifiques
+- **[Scénario ComoType1](./docs/Manual-ComoType1.md)** - Système Comodale Type 1
+- **[Scénario ComoType2](./docs/Manual-ComoType2.md)** - Système Comodale Type 2 (avancé)
+- **[Mode Standby](./docs/Manual-Standby.md)** - Gestion de la mise en veille
+
+### Référence technique
+- **[API v1](./docs/APIv1.md)** - Documentation de l'API zapi
+- **[CHANGELOG](./CHANGELOG.md)** - Historique des versions
+
+---
+
+## 🔧 Fonctionnalités avancées
+
+### Mises à jour OTA (Over-The-Air)
+
+MCS intègre un système de mise à jour depuis l'interface Touch10/Navigator :
+- Sélection du système et de la version depuis GitHub
+- Pagination et navigation intuitive
+- Confirmation avant installation
+- Déploiement via `Provisioning.Service.Fetch`
+
+**Utilisation :** Appuyer sur le bouton `system_update` dans l'interface.
+
+### Watchdog automatique
+
+Le watchdog surveille la santé du core et redémarre automatiquement en cas de non-réponse :
+- Ping/Pong via messages XAPI internes
+- Timeout de 15 secondes
+- Redémarrage après 3 échecs consécutifs
+- Journalisation complète des incidents
+
+### Routage audio intelligent
+
+Le système gère automatiquement le routage audio selon le contexte :
+- Détection des entrées distantes par rôle (Presentation vs. autres)
+- Routage dynamique selon `PresenterLocation`
+- Support des groupes audio pour configurations complexes
+- Contrôle fin du gain par canal (AES67, USB)
+
+### Intégration Webex Control Hub
+
+MCS rapporte sa version dans Control Hub en créant un périphérique virtuel nommé "MCS" avec la version actuelle, facilitant l'inventaire et le suivi des déploiements.
+
+---
+
+## 🛠️ Développement
+
+### Structure du zapi
+
+Le framework `zapi` (v1) expose les API suivantes :
+
+```javascript
+zapi.devices      // Gestion des devices
+zapi.scenarios    // Contrôle des scénarios
+zapi.modules      // Gestion des modules
+zapi.audio        // API audio avancée
+zapi.systemStatus // Variables globales
+zapi.ui           // Contrôle de l'interface
+zapi.communication // Communication inter-système
+zapi.telemetry    // Collecte de télémétrie
+```
+
+### Créer un module personnalisé
+
+```javascript
+// modules/mod_example.js
+const zapi = require('zapi').v1;
+
+module.exports = {
+  id: 'my_module',
+  name: 'Mon Module',
+  version: '1.0.0',
+  
+  init: function() {
+    zapi.systemStatus.onChange('Occupancy', (value) => {
+      console.log('Occupation changée:', value);
+    });
+  },
+  
+  deinit: function() {
+    // Nettoyage
+  }
+};
+```
+
+### Créer un driver personnalisé
+
+```javascript
+// driversLibrary.js
+class MyCustomDriver {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
+  }
+  
+  powerOn() {
+    // Logique d'allumage
+  }
+  
+  powerOff() {
+    // Logique d'extinction
+  }
+}
+```
+
+---
+
+## 📊 Cas d'usage
+
+### Salle de visioconférence Comodale
+
+Configuration multi-écrans avec gestion intelligente de l'affichage :
+- Écrans de présentation (local + distant)
+- Télésouffleur pour le présentateur
+- Affichages secondaires
+- Routage audio contextuel
+- Modes d'affichage dynamiques (20 modes)
+
+### Salle de classe hybride
+
+Intégration BYOD avec gestion automatique :
+- Détection HDMI Passthrough ou Webcam
+- Bascule automatique des sources
+- Contrôle d'éclairage selon le mode
+- Enregistrement et diffusion
+
+### Salle de conseil
+
+Contrôle total de l'environnement :
+- Gestion des volets motorisés
+- Scènes d'éclairage prédéfinies
+- Projecteurs et écrans multiples
+- Presets caméra pour différentes configurations
+
+---
+
+## 🔐 Sécurité et bonnes pratiques
+
+- **Ne jamais commettre `config.js`** : Utilisez `config.js.example` comme modèle
+- **Valider les configurations** : Vérifier les IDs, ports série et adresses IP
+- **Tester les drivers** : Valider chaque driver avant déploiement en production
+- **Monitoring** : Activer le watchdog pour la surveillance continue
+- **Logs** : Consulter les logs macro pour le débogage
+- **Sauvegardes** : Exporter régulièrement les configurations
+
+---
+
+## 📝 Changelog
+
+Consultez [CHANGELOG.md](./CHANGELOG.md) pour l'historique complet des versions.
+
+**Version actuelle :** 1.3.0-dev (en développement)
+
+---
+
+## 📧 Support
+
+Pour obtenir de l'aide :
+1. Consultez la documentation dans `docs/`
+2. Vérifiez les logs de la macro dans l'interface du codec
+3. Consultez le CHANGELOG pour les problèmes connus
+4. Contactez l'équipe de support technique
+
+---
+
+**Développé avec ❤️ pour les environnements collaboratifs Cisco Webex**

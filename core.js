@@ -681,7 +681,7 @@ class Core {
           xapi.Command.Presentation.Stop();
           xapi.Command.Call.Disconnect();
           try {
-            xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+            xapi.Command.Video.Output.HDMI.Passthrough.Stop().catch(() => {});
           } catch (e) {
             // HDMI Passthrough might not be supported on this device
           }
@@ -871,7 +871,7 @@ class Core {
       }
       else {
         try {
-          xapi.Command.Video.Output.HDMI.Passthrough.Stop();
+          xapi.Command.Video.Output.HDMI.Passthrough.Stop().catch(() => {});
         } catch (e) {
           // HDMI Passthrough might not be supported on this device
         }

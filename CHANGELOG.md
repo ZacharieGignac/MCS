@@ -8,6 +8,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 - Documentation complète des nouveaux drivers audio introduits en v1.2.0 : `AudioInputDriver_aes67`, `AudioOutputDriver_aes67`, `AudioInputDriver_usb`, `AudioOutputDriver_usb`, et `AudioInputDriver_codeceq`
 - Nouveau manuel `docs/Manual-ComoType2.md` documentant le scénario Comodale Type 2, ses différences avec le Type 1, les nouveaux groupes d'affichages, et les configurations avancées
 - Nouveau driver `USBSerialDriver` pour devices de type `SoftwareDevice` : communication série USB générique avec gestion automatique de la configuration du port série, file d'attente des commandes, et pacing entre les envois. Supporte les méthodes `send()`, `sendRaw()`, et `reset()`. Documentation complète dans `docs/Manual-Devices.md`.
+- Configuration `system.defaultPipPosition` : permet de définir la position par défaut du PIP (Picture-in-Picture) lors de l'utilisation du layout "Overlay". Valeurs possibles : `UpperLeft`, `UpperCenter`, `UpperRight`, `CenterLeft`, `CenterRight`, `LowerLeft`, `LowerRight`. Supporté par les scénarios `sce_como_type1` et `sce_como_type2`.
 
 ### Bugfix
 

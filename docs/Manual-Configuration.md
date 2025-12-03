@@ -138,6 +138,11 @@ Cette section est un array de tout les imports des modules. Si l'import n'est pa
     disableAutoLightsWhenWidgetInteraction: true, // <true, false> Détermine si le contrôle automatique de l'éclairage est automatiquement désactivé lorsqu'un widget de Light ou LightScene est touché par l'utilisateur
     systemReportApiKey: 'key',                    // Clé d'api de "paste.ee" utilisé pour l'envoi de rapport système
     showStatusAndPerformanceReports:false,        //Affiche le rapport de status après le boot et à interval (pour le developement)
+    // Anti-scintillement des rôles d'affichage (debounce)
+    enableStateEvaluationDebounce: true,          // <true, false> Active un debouncing lors de l'évaluation pour éviter les flickers de MonitorRole
+    // Affichages de présentation lents (séquencement PresentationOnly -> Second)
+    SlowPresentationDisplaysDelay: 10000,         // Délais (ms) pour appliquer "Second" après "PresentationOnly" sur les affichages de présentation lents
+
     onStandby: {
       setDND: false,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
       clearCallHistory: false,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby
@@ -147,6 +152,16 @@ Cette section est un array de tout les imports des modules. Si l'import n'est pa
       enableScenario: 'comotype1'                 // Scénario à activer lors de la sortie du standby (wakeup).
     }
   }
+
+#### Variante spécifique au scénario Type 2
+- Les paramètres de debouncing et du correctif pour affichages lents peuvent aussi être définis dans le bloc `sce_como_type2` pour s’appliquer uniquement au scénario Type 2.
+```JS
+  sce_como_type2: {
+    enableStateEvaluationDebounce: true,
+    slowPresentationDisplaysDelay: 10000
+  }
+```
+- Le scénario lit d’abord ces valeurs spécifiques; s’il ne les trouve pas, il utilise les valeurs définies sous `system`.
 ```
 
 ### Configuration, section "audio"

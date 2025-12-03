@@ -1,4 +1,6 @@
 /* jshint esversion:8 */
+
+
 import xapi from 'xapi';
 import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
@@ -29,7 +31,7 @@ export var Manifest = {
   id: 'comotype2',
   friendlyName: 'Salle Comodale (Type 2)',
   version: '1.0.0-dev',
-  description: 'Comportement normal pour une salle comodale de type 2 (évolution de type1)',
+  description: 'Comportement normal pour une salle comodale de type 2 (évolution de type1). Includes display role debouncing to prevent flicker from rapid state changes.',
   panels: {
     hide: ['*'],
     show: ['comotype2_settings']
@@ -59,6 +61,8 @@ export class Scenario {
     var self = this;
     this.devices = {};
 
+    this._displayRoleTimers = {};   // Maps connector ID -> setTimeout timer ID
+    this._displayDesiredRoles = {}; // Maps connector ID -> last requested role
 
     zapi.system.onStatusChange(status => { self.onStatusChange(status); });
 
@@ -467,16 +471,77 @@ export class Scenario {
     var UseTeleprompter = status.UseTeleprompter;
     var UseSecondaryPresentationDisplays = status.UseSecondaryPresentationDisplays;
 
-    //console.error(status);
+
+    // Helpers to read debounce and slow-display settings from scenario-specific config or system fallback
+    const getDebounceEnabled = () => {
+      try {
+        if (systemconfig.sce_como_type2 && typeof systemconfig.sce_como_type2.enableStateEvaluationDebounce === 'boolean') {
+          return systemconfig.sce_como_type2.enableStateEvaluationDebounce === true;
+        }
+        return !!(systemconfig.system && systemconfig.system.enableStateEvaluationDebounce === true);
+      } catch (e) { return !!(systemconfig.system && systemconfig.system.enableStateEvaluationDebounce === true); }
+    };
+    const getSlowDisplayDelay = () => {
+      try {
+        if (systemconfig.sce_como_type2 && typeof systemconfig.sce_como_type2.slowPresentationDisplaysDelay === 'number') {
+          return systemconfig.sce_como_type2.slowPresentationDisplaysDelay;
+        }
+        if (systemconfig.system && typeof systemconfig.system.SlowPresentationDisplaysDelay === 'number') {
+          return systemconfig.system.SlowPresentationDisplaysDelay;
+        }
+      } catch (e) {}
+      return 0;
+    };
+
     const setDisplaysRole = (displays, role, delay = 0) => {
       if (status.AutoDisplays == ON) {
-
+        const debounceEnabled = getDebounceEnabled();
+        
+        displays.forEach(display => {
+          const connector = display.config.connector;
+          
+          if (debounceEnabled) {
+            debug(1, `ComoType2 setDisplaysRole with debouncing: connector=${connector}, role=${role}, delay=${delay}ms`);
+            // Debouncing enabled: cancel previous timers and track desired state
+            const timerId = this._displayRoleTimers[connector];
+            
+            // Cancel any existing pending timer for this connector
+            if (timerId) {
+              clearTimeout(timerId);
+            }
+            
+            // Skip scheduling if the desired role matches the last request and delay is 0
+            const lastDesired = this._displayDesiredRoles[connector];
+            if (lastDesired === role && delay === 0) {
+              return;
+            }
+            
+            // Track the desired role for this connector
+            this._displayDesiredRoles[connector] = role;
+            
+            // Schedule the role change
+            this._displayRoleTimers[connector] = setTimeout(() => {
+              try {
+                xapi.Config.Video.Output.Connector[connector].MonitorRole.set(role);
+              } catch (e) {
+                // MonitorRole.set might fail if connector is invalid
+              }
+              // Clean up after execution
+              delete this._displayRoleTimers[connector];
+            }, delay);
+          } else {
+            // No debouncing: apply role change immediately (with delay if specified)
+            debug(1, `ComoType2 setDisplaysRole without debouncing: connector=${connector}, role=${role}, delay=${delay}ms`);
+            setTimeout(() => {
+              try {
+                xapi.Config.Video.Output.Connector[connector].MonitorRole.set(role);
+              } catch (e) {
+                // MonitorRole.set might fail if connector is invalid
+              }
+            }, delay);
+          }
+        });
       }
-      displays.forEach(display => {
-        setTimeout(() => {
-          xapi.Config.Video.Output.Connector[display.config.connector].MonitorRole.set(role);
-        }, delay);
-      });
     };
 
     const setMonitors = (monitors) => {
@@ -1137,12 +1202,17 @@ export class Scenario {
           setDisplaysRole(farendDisplays, FIRST);
 
           //Presentation displays
-          setDisplaysRole(presentationDisplays, PRESENTATIONONLY);
-          await delay(10000);
-          setDisplaysRole(presentationDisplays, SECOND);
 
-          setDisplaysRole(teleprompterDisplays, SECOND);
 
+          const slowDelay = getSlowDisplayDelay();
+          if (slowDelay && slowDelay > 0) {
+            debug(1,`Fix for slow presentation displays enabled, delaying presentation display role setting by ${slowDelay} ms`);
+            setDisplaysRole(presentationDisplays, PRESENTATIONONLY);
+            await delay(slowDelay);
+            setDisplaysRole(presentationDisplays, SECOND);
+          } else {
+            setDisplaysRole(presentationDisplays, SECOND);
+          }
 
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {

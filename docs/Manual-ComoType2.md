@@ -24,7 +24,7 @@ Le scénario **Comodale Type 2** (`sce_como_type2`) est une évolution du scéna
 - **Gestion audio intelligente** avec routage basé sur les rôles (Presentation vs. autres)
 - **Configuration granulaire** des comportements d'affichage
 
-**Version:** 1.0.0-dev  
+**Version:** 1.3.0-dev  
 **ID du scénario:** `comotype2`  
 **Fichier:** `sce_como_type2.js`
 
@@ -341,6 +341,16 @@ Le scénario Type 2 possède 20 modes distincts, identifiés par `comotype2Mode`
 
 ## Fonctionnalités avancées
 
+### Anti-scintillement des rôles d'affichage (debounce)
+
+Pour éviter les clignotements lors de changements rapides d'état, le scénario implémente un mécanisme de « debouncing » lors du réglage des rôles de moniteurs (`MonitorRole`).
+
+- Activation via `system.enableStateEvaluationDebounce: true` dans la configuration système.
+- Par connecteur, la dernière demande de rôle est appliquée après un court délai, les demandes précédentes sont annulées.
+- Réduit les appels xAPI redondants et les changements de rôle inutiles pendant les transitions rapides.
+
+Effet pratique: lors de bascules de présentation/appel successives, les affichages conservent une transition fluide sans flicker.
+
 ### Détection automatique des rôles audio
 
 Le scénario Type 2 utilise la fonctionnalité `zapi.audio.getRemoteInputsDetailed()` pour détecter les flux audio entrants et leurs rôles :
@@ -361,6 +371,34 @@ Lorsqu'une présentation démarre ou qu'un appel se connecte, le scénario lance
 3. S'arrête dès qu'un flux de présentation est détecté
 
 Cette sonde évite les délais de routage audio lors du démarrage de présentation.
+
+### Override audio pour les flux de présentation
+
+Lorsqu’un flux distant avec rôle `Presentation` est détecté, le scénario applique un override explicite:
+
+- Connexion des entrées `Presentation` vers `audiooutputgroups.presentation`.
+- Déconnexion des mêmes entrées de `audiooutputgroups.farend` pour éviter un double acheminement.
+- Les autres entrées distantes continuent de suivre la logique par `PresenterLocation`.
+
+Cela garantit que le son de la présentation distante est toujours dirigé vers le groupe de présentation, indépendamment d’autres états.
+
+### Logique caméra unifiée avec BYOD
+
+La gestion des caméras tient compte de l’état BYOD unifié (`byod`):
+
+- Si le présentateur est local et que `UsePresenterTrack == on` et qu’un appel est connecté ou `byod == Active`, le flux principal vidéo est réglé sur la caméra de présentation et `PresenterTrack` passe en `Follow`.
+- Sinon, `PresenterTrack` est désactivé et des presets sont activés selon `AutoCamPresets` et la localisation (`local`/`remote`).
+
+Cette logique assure une expérience cohérente lors des sessions BYOD (HDMI Passthrough ou Webcam) et des appels.
+
+### Correctif pour affichages de présentation lents
+
+Certains affichages de présentation peuvent nécessiter un délai supplémentaire pour accepter un changement de rôle. Un correctif optionnel est disponible:
+
+- Configurez `system.fix.SlowPresentationDisplaysDelay` (en millisecondes).
+- Le scénario définit d’abord le rôle `PresentationOnly`, attend le délai configuré (ex: 10000 ms), puis applique le rôle `Second`.
+
+Ce contournement améliore la fiabilité des bascules de rôle pour les affichages plus lents.
 
 ### Configuration Video Matrix
 

@@ -4,7 +4,8 @@ import xapi from 'xapi';
 /*****************************/
 //Import scenarios here with syntax: import * as SCE_Name from './SCE_Name';
 import * as sce_standby from './sce_standby';
-import * as sce_como_type1 from './sce_como_type1';
+import * as sce_como_type2 from './sce_como_type2';
+import * as sce_techtools from './sce_techtools';
 //Add scenarios to config.scenarios below.
 /****************************/
 
@@ -13,7 +14,8 @@ import * as sce_como_type1 from './sce_como_type1';
 
 /****************************/
 //Import modules below
-//import * as mod_regisseur from './mod_regisseur';
+import * as mod_autogrid from './mod_autogrid';
+import * as mod_telemetry from './mod_telemetry';
 /****************************/
 
 
@@ -23,9 +25,6 @@ import * as sce_como_type1 from './sce_como_type1';
 import * as devicesLibrary from './devicesLibrary';
 import * as driversLibrary from './driversLibrary';
 /****************************/
-
-
-
 
 
 
@@ -55,14 +54,21 @@ const DEVICETYPE = {
 };
 
 export var config = {
+
+  sce_como_type2:{
+    slowPresentationDisplaysDelay: 10000,
+    enableStateEvaluationDebounce: true
+  },
+
   scenarios: [
     sce_standby,
-    sce_como_type1,
+    sce_como_type2
   ],
 
   modules: [
-   
+    mod_autogrid
   ],
+
 
   system: {
     killswitchGPIO: 4,
@@ -83,7 +89,7 @@ export var config = {
     presenterTrackConnector: 6,                   // Numéro du connecteur d'entrée sur lequel est connecté la caméra utilisée par le PresenterTrack
     settingsMenu: 'Locked',                       // <Locked, Unlocked> Détermine si le panneau de paramètre est vérouillé
     disableAutoLightsWhenWidgetInteraction: true, // <true, false> Détermine si le contrôle automatique de l'éclairage est automatiquement désactivé lorsqu'un widget de Light ou LightScene est touché par l'utilisateur
-    systemReportApiKey: 'key here',                    // Clé d'api de "paste.ee" utilisé pour l'envoi de rapport système
+    systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',                    // Clé d'api de "paste.ee" utilisé pour l'envoi de rapport système
     showStatusAndPerformanceReports: true,        //Affiche le rapport de status après le boot et à interval (pour le developement)
     mainVideoSource: 6,
     onStandby: {
@@ -92,9 +98,11 @@ export var config = {
       enableScenario: 'standby'                   // Scénario à activer lors du standby. Le système est livré avec un scénario conseillé nommé "standby", fichier "sce_standby"
     },
     onWakeup: {
-      enableScenario: 'comotype1'                 // Scénario à activer lors de la sortie du standby (wakeup).
+      enableScenario: 'comotype2'                 // Scénario à activer lors de la sortie du standby (wakeup).
     }
   },
+  // Correctifs globaux (au même niveau que "system")
+  // (aucun correctif global requis actuellement)
   audio: {
     extra: {
       enabled: false,
@@ -150,83 +158,104 @@ export var config = {
 
   devices: [
     {
-      id: 'display.projector',                      //Identification unique
+      id: 'serial.tridonic',                               // Identification unique
+      type: DEVICETYPE.SOFTWAREDEVICE,                  // Type = 'SOFTWAREDEVICE'
+      device: devicesLibrary.SoftwareDevice,            // Classe générique SoftwareDevice
+      driver: driversLibrary.USBSerialDriver,           // Driver série (USBSerialDriver)
+
+      name: 'Tridonic DALI-BM RS232',                        // Nom optionnel pour les logs
+
+      // Configuration du port série du codec
+      port: 1,                                          // Port série du codec (1 à 4)
+      baudRate: 19200,                                   // Vitesse: 9600, 19200, 38400, etc.
+      parity: 'None',                                   // 'None', 'Even', 'Odd' (selon le périphérique)
+
+      // Gestion des échanges
+      terminator: '',                               // Fin de réponse (null/'' = fire-and-forget)
+      pacing: 100,                                      // Délai (ms) entre deux commandes envoyées
+      timeout: 0,                                     // Timeout (ms) de réponse pour chaque commande
+    },
+
+    {
+      id: 'display.proj',                      //Identification unique
       type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
       name: 'PROJ',                                 //Nom, utilisé par le driver pour la communication
       device: devicesLibrary.Display,               //Classe à utiliser
-      driver: driversLibrary.DisplayDriver_serial_sonybpj, //Driver à utiliser par le device
+      driver: driversLibrary.DisplayDriver_isc, //Driver à utiliser par le device
       connector: 1,                                 //Connecteur HDMI de sortie sur le codec
+      supportsSystemStatus: false,                    //Défini si l'affichage supporte le rapport de l'état général
+      systemStatusRequestInterval: 10000,          //Interval de demande de status du système
+      supportsFilterStatus: false,                   //Défini si l'affichage supporte le rapport de l'état du filtre
+      filterStatusRequestInterval: 36000,            //Interval de demande du status du filtre
+      supportsUsageHours: false,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
+      usageHoursRequestInterval: 10000,            //Interval de demande du temps d'utilisation
       supportsPower: true,                          //Défini si l'affichage supporte les commandes d'alimentation (ON, OFF)
       supportsBlanking: true,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
       supportsSource: false,                        //Défini si l'affichage supporte le changement de source (HDMI1, HDMI2, SDI)
-      supportsUsageHours: false,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
       defaultPower: 'off',                          //Alimentation par défaut lors du démarrage du système (ON, OFF)
-      defaultBlanking: false,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
+      defaultBlanking: true,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
+      blankBeforePowerOff: false,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
+      powerOffDelay: 300000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
+      port: 1,                                        //Numéro du port série
+    },
+    {
+      id: 'display.secondary',                      //Identification unique
+      type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
+      name: 'PODS',                                 //Nom, utilisé par le driver pour la communication
+      device: devicesLibrary.Display,               //Classe à utiliser
+      driver: driversLibrary.DisplayDriver_isc, //Driver à utiliser par le device
+      connector: 1,                                 //Connecteur HDMI de sortie sur le codec
+      supportsSystemStatus: false,                    //Défini si l'affichage supporte le rapport de l'état général
+      systemStatusRequestInterval: 10000,          //Interval de demande de status du système
+      supportsFilterStatus: false,                   //Défini si l'affichage supporte le rapport de l'état du filtre
+      filterStatusRequestInterval: 36000,            //Interval de demande du status du filtre
+      supportsUsageHours: false,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
+      usageHoursRequestInterval: 10000,            //Interval de demande du temps d'utilisation
+      supportsPower: true,                          //Défini si l'affichage supporte les commandes d'alimentation (ON, OFF)
+      supportsBlanking: true,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
+      supportsSource: false,                        //Défini si l'affichage supporte le changement de source (HDMI1, HDMI2, SDI)
+      defaultPower: 'off',                          //Alimentation par défaut lors du démarrage du système (ON, OFF)
+      defaultBlanking: true,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
       blankBeforePowerOff: true,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
       powerOffDelay: 300000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
-      usageHoursRequestInterval: 100000,            //Interval de demande du temps d'utilisation
-      port: 1,                                       //Numéro du port série
-      pacing: 500,                                   //Délai entre les commandes série (en ms). Valeur par défaut: 500
-      repeat: 2000,                                  //Interval de répétition des commandes d'état (en ms). Valeur par défaut: 2000
-      timeout: 100                                   //Timeout pour les réponses série (en ms). Valeur par défaut: 100
+      port: 1                                        //Numéro du port série
     },
+
     {
-      id: 'display.monitor',
+      id: 'display.farend',
       type: DEVICETYPE.DISPLAY,
-      name: 'TV',
+      name: 'FAREND',
       device: devicesLibrary.Display,
-      driver: driversLibrary.DisplayDriver_CEC,
+      driver: driversLibrary.DisplayDriver_isc,          //Driver à utiliser par le device
       connector: 3,
       supportsPower: true,
-      supportsBlanking: false,
+      supportsBlanking: true,
       supportsSource: false,
       supportsUsageHours: false,
       defaultPower: 'off',
-      blankBeforePowerOff: false,
-      powerOffDelay: 0,
+      defaultBlanking: true,
+      blankBeforePowerOff: true,
+      powerOffDelay: 300000,
     },
     {
-      id: 'display.monitor2',
+      id: 'display.teleprompter',
       type: DEVICETYPE.DISPLAY,
-      name: 'TV2',
+      name: 'TELEPROMPTER',
       device: devicesLibrary.Display,
-      driver: driversLibrary.DisplayDriver_CEC,
-      connector: 3,
-      skipVideoMatrix: true,  //Second display on the same connector, skip video matrix
+      driver: driversLibrary.DisplayDriver_isc,       //Driver à utiliser par le device
+      connector: 1,
       supportsPower: true,
-      supportsBlanking: false,
+      supportsBlanking: true,
       supportsSource: false,
       supportsUsageHours: false,
       defaultPower: 'off',
-      blankBeforePowerOff: false,
-      powerOffDelay: 0,
+      defaultBlanking: true,
+      blankBeforePowerOff: true,
+      powerOffDelay: 300000,
     },
-    {
-      id: 'display.byod',
-      type: DEVICETYPE.DISPLAY,
-      name: 'BYOD',
-      device: devicesLibrary.Display,
-      driver: driversLibrary.DisplayDriver_NONE,
-      connector: 2,
-      supportsPower: false,
-      supportsBlanking: false,
-      supportsSource: false,
-      supportsUsageHours: false,
-      defaultPower: 'on',
-      blankBeforePowerOff: false,
-      powerOffDelay: 0,
-    },
+
     /* AUDIO INPUTS */
-    {
-      id: 'audioinput.aes67',
-      type: DEVICETYPE.AUDIOINPUT,
-      name: 'Table Mic Pro',
-      device: devicesLibrary.AudioInput,
-      driver: driversLibrary.AudioInputDriver_aes67,
-      connector: 2,
-      channel: 1,  // AES67 channel (1-8), defaults to 1 if not specified
-      defaultMode: 'on'
-    },
+    /*
     {
       id: 'audioinput.presenter.ceiling',                   //Identification unique
       type: DEVICETYPE.AUDIOINPUT,                      //Type = 'AUDIOINPUT'
@@ -234,7 +263,7 @@ export var config = {
       device: devicesLibrary.AudioInput,                //Classe à utiliser
       driver: driversLibrary.AudioInputDriver_codecpro, //Driver à utiliser par le device
       connector: 7,                                     //Connecteur d'entrée du codec
-      input: 'microphone',                              //Type d'entrée, microphone, hdmi
+      input: 'microphone',                              //Type d'entrée, microphone, hdmi, ethernet. Ethernet requiert la propriété "channel". (non testé)
       bias: 0,                                          //Biais de niveau audio, peut être positif ou négatif. Utilisé par l'analyze d'entrée audio
       gainLowLimit: 20,                                 //Limite basse du gain de l'entrée
       gainHighLimit: 70,                                //Limite supérieure du gain de l'entrée
@@ -284,6 +313,15 @@ export var config = {
       boost: 70
     },
     {
+      id: 'audioinput.aes67',
+      type: DEVICETYPE.AUDIOINPUT,
+      name: 'Table Mic Pro',
+      device: devicesLibrary.AudioInput,
+      driver: driversLibrary.AudioOutputDriver_aes67,
+      connector: 2,
+      defaultMode: 'on'
+    },
+    {
       id: 'audioinput.ceilingmic.2',
       type: DEVICETYPE.AUDIOINPUT,
       name: 'Micro plafond 2',
@@ -319,32 +357,27 @@ export var config = {
       highGain: 60,
       boost: 70
     },
+    */
+    /* AUDIO OUTPUTS */
+    /*
     {
-      id: 'audioinput.usb.microphone',
-      type: DEVICETYPE.AUDIOINPUT,
-      name: 'USB Microphone',
-      device: devicesLibrary.AudioInput,
-      driver: driversLibrary.AudioInputDriver_usb,
-      connector: 1,                                     // USB interface number (1-4)
-      gainLowLimit: 0,                                  // USB audio gain range is 0-24 (different from traditional 0-70)
-      gainHighLimit: 24,
-      defaultGain: 12,
-      gainStep: 1,
-      defaultMode: 'on',
-      lowGain: 8,
-      mediumGain: 12,
-      highGain: 18,
-      boost: 24
-    },
-    {
-      id: 'audiooutput.usb.speakers',
+      id: 'audiooutput.snubwoofer',
       type: DEVICETYPE.AUDIOOUTPUT,
-      name: 'USB Speakers',
+      name: 'SnubWoofer',
       device: devicesLibrary.AudioOutput,
-      driver: driversLibrary.AudioOutputDriver_usb,
-      connector: 1,                                     // USB interface number (1-4)
-      defaultMode: 'on'                                 // USB audio output only supports mode control (no level/gain)
+      driver: driversLibrary.AudioOutputDriver_codecpro,
+      connector: 5,
+      output: 'line', //line, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioOutput_codecpro
+      levelLowLimit: -20,
+      levelHighLimit: 0,
+      defaultLevel: -10,
+      levelStep: 1,
+      defaultMode: 'on',
+      lowLevel: -15,
+      mediumLevel: -10,
+      highLevel: 0,
     },
+    */
 
 
 
@@ -397,6 +430,71 @@ export var config = {
       peripheralId: 'FDO2737J6H1',
       connector: 1
     },
+    /*
+        {
+          id: 'light.presenter',                      //Identification unique
+          name: 'LIGHTS_ZONE3',                              //Nom, utilisé par le driver pour la communication
+          type: DEVICETYPE.LIGHT,                     //Type = 'LIGHT'
+          device: devicesLibrary.Light,               //Classe à utiliser
+          driver: driversLibrary.LightDriver_isc_h21, //Driver utilisé par la classe
+          sliderEvent: 'released',                     //<changed, released> Événement à utiliser pour le changement du widget "slider". l'événement "changed" s'execute quand on glisse le widget (peut être demandant pour certain systèmes), "released" s'execute lorsqu'on lève le doigt
+          supportsPower: false,                       //Défini si l'éclairage supporte les commandes d'alimentation. Si false, une lumière éteinte est dim à 0
+          supportsDim: true,                          //Défini si l'éclairage supporte les commandes de tamisage
+          defaultPower: 'on',                         //Défini l'état d'alimentation par défaut au démarrage du système
+          defaultDim: 100                             //Défini le tamisage par défaut au démarrage du système
+        },
+    */
+    /* LightScenes */
+    /*
+    {
+      id: 'lightscene.normal',                          //Identification unique
+      name: 'LS_NORMAL',                                //Nom
+      type: DEVICETYPE.LIGHTSCENE,                    //Type = 'LIGHTSCENE'
+      device: devicesLibrary.LightScene,              //Classe à utiliser
+      driver: driversLibrary.LightSceneDriver_gc_itachflex, //Driver utilisé par la classe. Ce driver contrôle des drivers de type "Light"
+      host: '169.254.1.30',
+      relay: 1,
+      pulseLength: 2000
+    },
+    {
+      id: 'lightscene.presentation',                          //Identification unique
+      name: 'LS_PRESENTATION',                                //Nom
+      type: DEVICETYPE.LIGHTSCENE,                    //Type = 'LIGHTSCENE'
+      device: devicesLibrary.LightScene,              //Classe à utiliser
+      driver: driversLibrary.LightSceneDriver_gc_itachflex, //Driver utilisé par la classe. Ce driver contrôle des drivers de type "Light"
+      host: '169.254.1.30',
+      relay: 2,
+      pulseLength: 2000
+    },
+*/
+    /* Screen */
+    /*
+    {
+      id: 'screen.main',                          //Identification unique
+      type: DEVICETYPE.SCREEN,                    //Type = 'SCREEN'
+      name: 'SCREEN2',                            //Nom
+      device: devicesLibrary.Screen,              //Classe à utiliser
+      driver: driversLibrary.ScreenDriver_gc_itachflex,   //Driver à utiliser par le device (GPIO)
+      host: '169.254.1.30',                        //Host ou IP du Global Caché iTach
+      upRelay: 3,                                    //Relais pour monter la toile
+      downRelay: 4,                                    //Relais pour descendre la toile
+      pulseLength: 3000,
+      defaultPosition: 'up'                       //Position par défaut
+    },
+    */
+    /*
+    {
+      id: 'screen.main',                          //Identification unique
+      type: DEVICETYPE.SCREEN,                    //Type = 'SCREEN'
+      name: 'SCREEN',                            //Nom
+      device: devicesLibrary.Screen,              //Classe à utiliser
+      driver: driversLibrary.ScreenDriver_gpio,   //Driver à utiliser par le device (GPIO)
+      pin1: 1,
+      pin2: 2,                                     //Pin GPIO pour monter la toile
+      defaultPosition: 'up'                       //Position par défaut
+    },
+    */
+
 
     /* AUDIO INPUT GROUPS */
     {
@@ -443,26 +541,36 @@ export var config = {
     //Default general groups
     {
       id: 'system.presentation.main',
-      devices: ['display.projector', 'campreset.presenter', 'camera.presenter', 'aog.room', 'screen.main']
+      devices: ['display.proj', 'campreset.presenter', 'camera.presenter', 'aog.room']
+    },
+
+    {
+      id: 'system.presentation.secondary',
+      devices: ['display.secondary']
+    },
+
+    {
+      id: 'system.presentation.teleprompter',
+      devices: ['display.teleprompter']
     },
 
     {
       id: 'system.farend.main',
-      devices: ['display.monitor', 'campreset.audience', 'camera.audience', 'aog.monitor']
+      devices: ['display.farend', 'campreset.audience', 'camera.audience', 'aog.monitor']
     },
     {
       id: 'system.byod.main',
-      devices: ['display.byod']
+      devices: []
     },
 
     //Audio input configuration
     {
       id: 'system.audio.allmics',
-      devices: ['audioinput.presenter.ceiling', 'audioinput.presenter.bat1', 'audioinput.ceilingmic.1', 'audioinput.ceilingmic.2', 'audioinput.ceilingmic.3']
+      devices: []
     },
     {
       id: 'system.audio.presentermics',
-      devices: ['audioinput.presenter.ceiling', 'audioinput.presenter.bat1']
+      devices: []
     },
     {
       id: 'system.audio.presentationsources',
@@ -470,7 +578,7 @@ export var config = {
     },
     {
       id: 'system.audio.audiencemics',
-      devices: ['audioinput.ceilingmic.1', 'audioinput.ceilingmic.2', 'audioinput.ceilingmic.3']
+      devices: []
     },
 
     //Lightscenes groups
@@ -505,20 +613,24 @@ export var config = {
 
   systemStatus: {
     //System status
+    DisplaySystemStatus: 'off',
     PresenterLocation: 'local', //System, <local, remote>, emplacement du présentateur
     PresenterTrackWarnings: 'on', //System, <on, off>, affichage des messages d'avertissement PresenterTrack
     UsePresenterTrack: 'on', //System, <on, off>, utilisation de PresenterTrack
     AutoDisplays: 'on', //System, <on, off>, gestion des affichages automatique (doit être pris en charge dans le scénario)
-    AutoScreens: 'off', //System, <on, off>, gestion des toiles motorisées automatique (doit être pris en charge dans le scénario)
-    AutoLights: 'off', //System, <on, off>, gestion de l'éclairage automatique (doit être pris en charge dans le scénario)
+    AutoScreens: 'on', //System, <on, off>, gestion des toiles motorisées automatique (doit être pris en charge dans le scénario)
+    AutoLights: 'on', //System, <on, off>, gestion de l'éclairage automatique (doit être pris en charge dans le scénario)
     AutoShades: 'off', //System, <on, off>, gestion des toiles solaires automatique (doit être pris en charge dans le scénario)
     AutoCamPresets: 'on', //System, <on, off> gestion des presets de caméra automatique (doit être pris en charge dans le scénario)
     AutoCamSelection: 'on', //System, <on, off> selection de la caméra automatique (doit être pris en charge dans le scénario)
     AudienceMics: 'on', //System, <on, off> Utilisation des microphones de l'auditoire (doit être pris en charge dans le scénario)
     PresenterMics: 'on', //System, <on, off> Utilisation des microphones du présentateur (doit êter pris en charge dans le scénario)
     ClearPresentationZone: 'off', //System, <on, off>, indique si la zone de présentateur doit être dégagée (doit être pris en charge dans le scénario)
-    DisplaySystemStatus: 'off', //System, <on, off>, affichage de l'overlay de statut système sur la sortie vidéo locale
     //Scenario-specific status
+
+    //sce_como_type2
+    UseTeleprompter: 'on', //<on, off>, indique si le télésouffleur doit être utilisé pour afficher la présentation (groupe system.presentation.teleprompter)
+    UseSecondaryPresentationDisplays: 'on' //<on, off>, indique si les affichages de présentation secondaires doivent être utilisés pour la présentation (groupe system.presentation.secondary)
 
   },
 

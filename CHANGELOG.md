@@ -2,11 +2,18 @@
 
 Toutes les modifications notables de ce projet seront documentées dans ce fichier.
 
-## [1.2.1] - En cours
+## [1.3.0-dev] - En cours
 ### Ajouts / Modifications
 - Scénario `sce_como_type2` : nouvelle version évoluée du scénario Comodale Type 1 avec support de groupes d'affichages supplémentaires (télésouffleur, affichages secondaires de présentation) et gestion fine des modes d'affichage. Voir `docs/Manual-ComoType2.md` pour la documentation complète.
 - Documentation complète des nouveaux drivers audio introduits en v1.2.0 : `AudioInputDriver_aes67`, `AudioOutputDriver_aes67`, `AudioInputDriver_usb`, `AudioOutputDriver_usb`, et `AudioInputDriver_codeceq`
 - Nouveau manuel `docs/Manual-ComoType2.md` documentant le scénario Comodale Type 2, ses différences avec le Type 1, les nouveaux groupes d'affichages, et les configurations avancées
+- Documentation complète du driver `USBSerialDriver` pour devices de type `SoftwareDevice`
+
+### Bugfix
+
+## [1.2.1] - 2025-11-25
+### Ajouts / Modifications
+- devices/Display: les écrans avec `supportsBlanking: false` n'envoient plus de commandes de blanking, même si `blankBeforePowerOff` est configuré à `true`.
 
 ### Bugfix
 

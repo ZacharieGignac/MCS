@@ -1,10 +1,11 @@
 # Résumé des mises à jour de la documentation
 
-Date : 3 décembre 2025
+Date : 3 décembre 2025  
+Version : 1.3.0-dev (précédemment 1.2.1)
 
 ## Vue d'ensemble
 
-Cette mise à jour documente les nouveautés introduites depuis la version 1.2.0, notamment le nouveau scénario **sce_como_type2** et les drivers audio ajoutés.
+Cette mise à jour documente les nouveautés introduites depuis la version 1.2.0, notamment le nouveau scénario **sce_como_type2** et les drivers audio ajoutés (complétés en version 1.2.1).
 
 ## Fichiers modifiés
 

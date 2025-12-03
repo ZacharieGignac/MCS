@@ -484,4 +484,4 @@ export const config = {
 
 ---
 
-**Note finale :** Le scénario Comodale Type 2 est actuellement en version de développement (1.0.0-dev). Des ajustements et améliorations peuvent être apportés selon les retours d'utilisation.
+**Note finale :** Le scénario Comodale Type 2 est en production depuis la version 1.2.1. Des ajustements et améliorations peuvent être apportés selon les retours d'utilisation.

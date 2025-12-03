@@ -1,11 +1,11 @@
 # MCS
 "MODULAR CONTROL SYSTEM". Original.
 
-Documentation: voir docs/README.md pour l’index de la documentation.
+Documentation: voir docs/README.md pour l'index de la documentation.
 
-Version courante: **1.2.1** (publiée le 2025-11-25) – Voir `CHANGELOG.md` pour l'historique.
+Version courante: **1.3.0-dev** (en développement) – Voir `CHANGELOG.md` pour l'historique.
 
-## v1.2.1 (version actuelle)
+## v1.3.0-dev (version actuelle en développement)
 ### Bugs connus
 
 ### Ajouts / Modifications

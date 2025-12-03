@@ -351,7 +351,7 @@ Le type `SoftwareDevice` permet de créer des devices logiciels personnalisés q
 
 #### Propriétés de configuration
 
-- `port` **(requis)**: Numéro du port série (1 à 4)
+- `port` **(requis)**: Numéro du port série (Limité à 1 pour l'instant)
 - `baudRate` (optionnel): Vitesse de communication (9600, 19200, 38400, 115200, etc.)
 - `parity` (optionnel): Parité de communication
   - `'None'`: Aucune parité

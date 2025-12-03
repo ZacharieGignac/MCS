@@ -105,6 +105,105 @@ Aucunes.
 - `void reset(void)`: Remet les paramètres spécifiés dans la configuration.
 - `void refresh(void)`: Réapplique les paramètres courant.
 
+#### Drivers disponibles
+
+##### AudioInputDriver_codecpro
+Driver pour les entrées audio sur les codecs Pro (microphone, HDMI).
+
+**Paramètres de configuration :**
+```javascript
+{
+  id: 'mic_presenter',
+  type: 'AUDIOINPUT',
+  driver: AudioInputDriver_codecpro,
+  input: 'microphone',  // 'microphone' ou 'hdmi'
+  connector: 1,
+  // ... autres paramètres
+}
+```
+
+**Propriétés supportées :**
+- `input`: Type d'entrée (`microphone` ou `hdmi`)
+- `connector`: Numéro du connecteur
+
+**Note :** Le type `ethernet` a été retiré en v1.2.0. Utiliser `AudioInputDriver_aes67` pour les entrées AES67.
+
+##### AudioInputDriver_codeceq
+Driver pour les entrées microphone sur les codecs EQ, Bar et Board.
+
+**Paramètres de configuration :**
+```javascript
+{
+  id: 'mic_eq_1',
+  type: 'AUDIOINPUT',
+  driver: AudioInputDriver_codeceq,
+  connector: 1,
+  gainLowLimit: 0,
+  gainHighLimit: 70,
+  // ... autres paramètres
+}
+```
+
+**Propriétés supportées :**
+- `connector`: Numéro du connecteur microphone
+- Contrôle via `Audio.Input.Microphone[connector].Gain` et `Audio.Input.Microphone[connector].Mode`
+
+**Notes :**
+- Uniquement pour les connecteurs microphone (pas HDMI/Ethernet)
+- Plage de gain recommandée : 0-70
+
+##### AudioInputDriver_aes67
+Driver pour les entrées audio AES67 (Ethernet audio).
+
+**Paramètres de configuration :**
+```javascript
+{
+  id: 'aes67_input_1',
+  type: 'AUDIOINPUT',
+  driver: AudioInputDriver_aes67,
+  connector: 1,
+  channel: 1,  // Canal 1-8
+  gainLowLimit: 0,
+  gainHighLimit: 24,
+  // ... autres paramètres
+}
+```
+
+**Propriétés supportées :**
+- `connector`: Numéro du connecteur Ethernet
+- `channel`: Numéro du canal (1-8)
+- Contrôle du gain par canal
+
+**Canaux supportés :**
+- Canaux 1 à 8 disponibles selon la configuration AES67
+
+##### AudioInputDriver_usb
+Driver pour les interfaces audio USB.
+
+**Paramètres de configuration :**
+```javascript
+{
+  id: 'usb_audio_in',
+  type: 'AUDIOINPUT',
+  driver: AudioInputDriver_usb,
+  connector: 1,
+  gainLowLimit: 0,
+  gainHighLimit: 24,
+  // ... autres paramètres
+}
+```
+
+**Propriétés supportées :**
+- `connector`: Numéro de l'interface USB
+- Support automatique de `Level` ou `Gain` selon l'appareil
+- Plage de gain contrainte : 0-24 (plus restrictive que les microphones traditionnels)
+
+**Notes :**
+- Le driver tente d'abord `Audio.Input.USBInterface[connector].Level`
+- Si non supporté, utilise `Audio.Input.USBInterface[connector].Gain`
+- Les valeurs de gain sont automatiquement contraintes entre 0-24
+- Gestion d'erreur silencieuse si l'interface USB n'est pas disponible
+
 #### Notes spécifiques: USB (AudioInputDriver_usb)
 - Support Gain/Level: les interfaces USB supportent soit `Level` soit `Gain`. Le driver essaie automatiquement `Level` en premier, puis `Gain` si `Level` n'est pas disponible.
 - Plage de gain contrainte: les valeurs de gain sont automatiquement contraintes entre 0-24 pour les interfaces USB (plage valide plus petite que les microphones traditionnels).
@@ -124,6 +223,72 @@ Aucunes.
 - `void on(void)`: Active la sortie audio
 - `void off(void)`: Désactive la sortie audio
 
+#### Drivers disponibles
+
+##### AudioOutputDriver_codecpro
+Driver pour les sorties audio sur les codecs Pro (Line, HDMI).
+
+**Paramètres de configuration :**
+```javascript
+{
+  id: 'audio_out_line_1',
+  type: 'AUDIOOUTPUT',
+  driver: AudioOutputDriver_codecpro,
+  output: 'line',  // 'line' ou 'hdmi'
+  connector: 1,
+  levelLowLimit: -24,
+  levelHighLimit: 0,
+  // ... autres paramètres
+}
+```
+
+**Propriétés supportées :**
+- `output`: Type de sortie (`line` ou `hdmi`)
+- `connector`: Numéro du connecteur
+- Contrôle du niveau de sortie
+
+##### AudioOutputDriver_aes67
+Driver pour les sorties audio AES67 (Ethernet audio).
+
+**Paramètres de configuration :**
+```javascript
+{
+  id: 'aes67_output_1',
+  type: 'AUDIOOUTPUT',
+  driver: AudioOutputDriver_aes67,
+  connector: 1,
+  // ... autres paramètres
+}
+```
+
+**Propriétés supportées :**
+- `connector`: Numéro du connecteur Ethernet
+- Contrôle du mode uniquement (On/Off)
+
+**Note :** Les sorties AES67 ne supportent pas le contrôle de niveau.
+
+##### AudioOutputDriver_usb
+Driver pour les interfaces audio USB en sortie.
+
+**Paramètres de configuration :**
+```javascript
+{
+  id: 'usb_audio_out',
+  type: 'AUDIOOUTPUT',
+  driver: AudioOutputDriver_usb,
+  connector: 1,
+  // ... autres paramètres
+}
+```
+
+**Propriétés supportées :**
+- `connector`: Numéro de l'interface USB
+- Contrôle du mode uniquement (On/Off)
+
+**Notes :**
+- Les interfaces USB de sortie ne supportent pas le contrôle de niveau
+- Gestion d'erreur silencieuse si l'interface USB n'est pas disponible
+
 #### Notes spécifiques: USB (AudioOutputDriver_usb)
 - Mode uniquement: les interfaces USB de sortie supportent seulement le contrôle de mode (On/Off), pas le contrôle de niveau.
 - Gestion d'erreur silencieuse: si l'interface USB n'est pas disponible, les erreurs sont gérées silencieusement avec des messages de debug appropriés.
@@ -142,6 +307,7 @@ Aucunes.
 - `void connectSpecificRemoteInputs(string[] remoteInputIds)`: Connecte uniquement les entrées distantes spécifiées au groupe de sortie audio local
 - `void disconnectSpecificRemoteInputs(string[] remoteInputIds)`: Déconnecte uniquement les entrées distantes spécifiées du groupe de sortie audio local
 - `void updateInputGain(AudioInputGroup audioInputGroup, AudioOutputGroup audioOutputGroup)`: Défini le gain dans le lien entre le groupe d'entrée local et le groupe de sortie local
+
 ## AudioReporter
 
 ### `void start(void)`
@@ -154,4 +320,129 @@ Arrête l'observation des entrées audio et stoppe les rapports.
 Ajoute un callback pour les rapports. Chaque fois qu'un rapport est disponible, le rapport sera envoyé à tous les callbacks.
 
 - `callback`: function(report), envoi du rapport.
+
+## SoftwareDevice
+
+Le type `SoftwareDevice` permet de créer des devices logiciels personnalisés qui ne correspondent pas aux types standards. Il est particulièrement utile pour intégrer des drivers personnalisés comme `USBSerialDriver`.
+
+### Méthodes
+
+- `void reset(void)`: Réinitialise le device logiciel (appelle le reset du driver si disponible)
+
+### Driver: USBSerialDriver
+
+`USBSerialDriver` est un driver générique pour la communication série USB. Il gère automatiquement la configuration du port série, la mise en file d'attente des commandes, et le pacing entre les envois.
+
+#### Configuration
+
+```javascript
+{
+  id: 'my_serial_device',
+  type: 'SOFTWAREDEVICE',
+  driver: USBSerialDriver,
+  port: 1,                    // Port série (1-4)
+  baudRate: 9600,             // Vitesse de communication (optionnel)
+  parity: 'None',             // Parité: 'None', 'Even', 'Odd' (optionnel)
+  terminator: '\\r\\n',       // Terminateur de réponse (défaut: '\\r\\n')
+  pacing: 200,                // Délai entre les commandes en ms (défaut: 200)
+  timeout: 200                // Timeout de réponse en ms (défaut: 200)
+}
+```
+
+#### Propriétés de configuration
+
+- `port` **(requis)**: Numéro du port série (1 à 4)
+- `baudRate` (optionnel): Vitesse de communication (9600, 19200, 38400, 115200, etc.)
+- `parity` (optionnel): Parité de communication
+  - `'None'`: Aucune parité
+  - `'Even'`: Parité paire
+  - `'Odd'`: Parité impaire
+- `terminator` (optionnel): Caractère(s) de terminaison pour les réponses
+  - Défaut: `'\\r\\n'` (Carriage Return + Line Feed)
+  - Peut être `null` ou `''` pour désactiver
+- `pacing` (optionnel): Délai en millisecondes entre chaque commande (défaut: 200ms)
+- `timeout` (optionnel): Délai d'attente maximal pour une réponse en millisecondes (défaut: 200ms)
+
+#### Méthodes du driver
+
+##### `Promise<response> send(string command)`
+Envoie une commande série et retourne une promesse avec la réponse.
+
+```javascript
+const serialDevice = zapi.devices.getDevice('my_serial_device');
+const serial = serialDevice.driver;
+
+serial.send('QUERY?\\r\\n')
+  .then(response => {
+    console.log('Réponse:', response.Response);
+  })
+  .catch(error => {
+    console.error('Erreur:', error);
+  });
+```
+
+##### `Promise<response> sendRaw(string text)`
+Alias de `send()`. Envoie une commande brute.
+
+##### `void reset()`
+Réinitialise le driver en vidant la file d'attente et en arrêtant les envois en cours.
+
+```javascript
+serial.reset();
+```
+
+#### Exemple complet d'utilisation
+
+```javascript
+// Configuration dans config.js
+const serialConfig = {
+  id: 'projector_serial',
+  type: 'SOFTWAREDEVICE',
+  driver: driversLibrary.USBSerialDriver,
+  port: 1,
+  baudRate: 9600,
+  parity: 'None',
+  terminator: '\\r\\n',
+  pacing: 300,
+  timeout: 500
+};
+
+// Utilisation dans un module ou scénario
+const projectorSerial = zapi.devices.getDevice('projector_serial');
+const driver = projectorSerial.driver;
+
+// Envoyer une commande power on
+driver.send('PWR ON\\r\\n')
+  .then(response => {
+    console.log('Projecteur allumé:', response.Response);
+  })
+  .catch(error => {
+    console.error('Erreur d\'allumage:', error);
+  });
+
+// Interroger l'état
+driver.send('PWR?\\r\\n')
+  .then(response => {
+    const status = response.Response.trim();
+    console.log('État du projecteur:', status);
+  });
+```
+
+#### Fonctionnalités avancées
+
+**File d'attente automatique**: Les commandes sont automatiquement mises en file et exécutées séquentiellement avec le `pacing` défini.
+
+**Gestion d'erreur**: Si le port série n'est pas disponible, le driver rejette les promesses avec `'SERIAL_NOT_CONFIGURED'`.
+
+**Logs de debug**: Le driver affiche les logs TX (transmission) et RX (réception) pour faciliter le débogage.
+
+**Protection contre les erreurs**: Les erreurs de parsing ou de communication sont gérées et loggées sans faire planter le système.
+
+#### Notes importantes
+
+- Le port série doit être entre 1 et 4 (limitation du codec)
+- Si le `baudRate` ou la `parity` ne sont pas spécifiés, les valeurs par défaut du port série sont conservées
+- Le driver configure automatiquement `SerialPort.Outbound.Mode` à `On`
+- Les réponses vides sont indiquées comme `<empty>` dans les logs
+- Le `terminator` doit correspondre au caractère de fin de ligne attendu par l'appareil connecté
 

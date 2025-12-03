@@ -14,7 +14,7 @@ import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 
-const COREVERSION = '1.2.0-release';
+const COREVERSION = '1.3.0-dev';
 const ZAPIVERSION = 1;
 // If true, skip restarting Macro Runtime after cold boot and proceed with scheduled preInit()
 const SKIP_FRAMEWORK_RESTART_AFTER_COLD_BOOT = false;
@@ -44,7 +44,7 @@ async function killswitchInit() {
   }
 }
 //INIT
-//GPIO Killswitch check on boot
+//GPIO Killswitch check on boot (codec pro only)
 
 killswitchInit();
 

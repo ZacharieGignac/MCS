@@ -10,6 +10,7 @@ Version courante: **1.2.1** (publiée le 2025-11-25) – Voir `CHANGELOG.md` pou
 
 ### Ajouts / Modifications
 * devices/Display: les écrans avec `supportsBlanking: false` n'envoient plus de commandes de blanking, même si `blankBeforePowerOff` est configuré à `true`.
+* Scénario `sce_como_type2`: nouvelle version évoluée du scénario Comodale Type 1 avec support de groupes d'affichages supplémentaires (télésouffleur, affichages secondaires de présentation) et gestion fine des modes d'affichage. Voir `docs/Manual-ComoType2.md` pour la documentation complète.
 
 ### Bugfix
 

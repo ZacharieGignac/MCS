@@ -20,6 +20,10 @@ const SECOND = 'Second';
 const PRESENTATIONONLY = 'PresentationOnly';
 const AUTO = 'Auto';
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export var Manifest = {
   fileName: 'sce_como_type2',
   id: 'comotype2',
@@ -435,7 +439,16 @@ export class Scenario {
     }
   }
 
-  async evaluateDisplays(status) {
+  evaluateDisplays(status) {
+    if (this.evaluateDisplaysTimer) {
+      clearTimeout(this.evaluateDisplaysTimer);
+    }
+    this.evaluateDisplaysTimer = setTimeout(() => {
+      this._executeEvaluateDisplays(status);
+    }, 200);
+  }
+
+  async _executeEvaluateDisplays(status) {
     debug(1, 'ComoType2 evaluating displays...');
 
     /******************
@@ -873,9 +886,8 @@ export class Scenario {
 
           //Presentation displays
           setDisplaysRole(presentationDisplays, FIRST);
-          blankDisplays(presentationDisplays);
           powerOnDisplays(presentationDisplays);
-          unblankDisplays(presentationDisplays);//ICI
+          unblankDisplays(presentationDisplays);
 
           //Teleprompter displays
           setDisplaysRole(teleprompterDisplays, FIRST);
@@ -1028,12 +1040,14 @@ export class Scenario {
         else if (remotePresenterPresent && presentationActive) {
           console.error('15');
           zapi.system.setStatus('comotype2Mode', 15);
-          setMonitors(SINGLE);
+          setMonitors(TRIPLEPRESENTATIONONLY);
 
           //Farend displays
           setDisplaysRole(farendDisplays, FIRST);
-          powerOffDisplays(farendDisplays);
-          blankDisplays(farendDisplays);
+          powerOnDisplays(farendDisplays);
+          unblankDisplays(farendDisplays);
+          matrixReset(farendDisplays);
+          matrixRemoteToDisplay(farendDisplays, 2000);
 
           //Presentation displays
           setDisplaysRole(presentationDisplays, FIRST);
@@ -1047,7 +1061,6 @@ export class Scenario {
 
 
           //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, PRESENTATIONONLY);
           powerOnDisplays(secondaryPresentationDisplays);
           unblankDisplays(secondaryPresentationDisplays);
 
@@ -1089,20 +1102,25 @@ export class Scenario {
         else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
           console.error('17');
           zapi.system.setStatus('comotype2Mode', 17);
-          setMonitors(SINGLE);
+
+          setMonitors(TRIPLEPRESENTATIONONLY);
+
 
           //Farend displays
           setDisplaysRole(farendDisplays, FIRST);
           powerOnDisplays(farendDisplays);
           unblankDisplays(farendDisplays);
+          //matrixRemoteToDisplay has been disable for now because of a bug in RoomOS (freeze)
+          //matrixRemoteToDisplay(farendDisplays, 2000);
+
 
           //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
+          setDisplaysRole(presentationDisplays, PRESENTATIONONLY);
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
 
           //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
+          setDisplaysRole(teleprompterDisplays, PRESENTATIONONLY);
           if (UseTeleprompter == ON) {
             powerOnDisplays(teleprompterDisplays);
             unblankDisplays(teleprompterDisplays);
@@ -1113,7 +1131,7 @@ export class Scenario {
           }
 
           //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, PRESENTATIONONLY);
+  
           if (UseSecondaryPresentationDisplays == ON) {
             powerOnDisplays(secondaryPresentationDisplays);
             unblankDisplays(secondaryPresentationDisplays);
@@ -1122,6 +1140,7 @@ export class Scenario {
             powerOffDisplays(secondaryPresentationDisplays);
             blankDisplays(secondaryPresentationDisplays);
           }
+            
         }
         else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
           console.error('18');

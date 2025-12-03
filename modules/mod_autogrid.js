@@ -6,7 +6,7 @@ export var Manifest = {
   id: 'autogrid',  //Identification unique
   friendlyName: 'Auto Grid Layout On Call', //Nom familier
   version: '1.0.1', //Version
-  description: `Utilise automatiquement le mode "grille" lors d'un appel` //Description
+  description: `Utilise automatiquement le mode "grille" lors d'un appel` //Description!
 };
 
 export class Module {

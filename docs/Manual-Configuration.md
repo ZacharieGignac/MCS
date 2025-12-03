@@ -138,6 +138,8 @@ Cette section est un array de tout les imports des modules. Si l'import n'est pa
     disableAutoLightsWhenWidgetInteraction: true, // <true, false> Détermine si le contrôle automatique de l'éclairage est automatiquement désactivé lorsqu'un widget de Light ou LightScene est touché par l'utilisateur
     systemReportApiKey: 'key',                    // Clé d'api de "paste.ee" utilisé pour l'envoi de rapport système
     showStatusAndPerformanceReports:false,        //Affiche le rapport de status après le boot et à interval (pour le developement)
+    mainVideoSource: 6,                           // Numéro du connecteur vidéo principal (pour la caméra principale)
+    defaultPipPosition: 'UpperLeft',              // <UpperLeft, UpperCenter, UpperRight, CenterLeft, CenterRight, LowerLeft, LowerRight> Position par défaut du PIP (Picture-in-Picture) lors de l'utilisation du layout "Overlay"
     // Anti-scintillement des rôles d'affichage (debounce)
     enableStateEvaluationDebounce: true,          // <true, false> Active un debouncing lors de l'évaluation pour éviter les flickers de MonitorRole
     // Affichages de présentation lents (séquencement PresentationOnly -> Second)

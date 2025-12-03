@@ -60,6 +60,7 @@ export var config = {
     enableStateEvaluationDebounce: true
   },
 
+
   scenarios: [
     sce_standby,
     sce_como_type2
@@ -92,6 +93,9 @@ export var config = {
     systemReportApiKey: 'apq9apYKMbgagowb9yo0qPIq6zdLEMYhQM21f9ocP',                    // Clé d'api de "paste.ee" utilisé pour l'envoi de rapport système
     showStatusAndPerformanceReports: true,        //Affiche le rapport de status après le boot et à interval (pour le developement)
     mainVideoSource: 6,
+    defaultPipPosition: 'UpperLeft',
+    //enableStateEvaluationDebounce: true,        // <true, false> Active un "debounce" lors de l'évaluation des scénarios (utile pour éviter les évaluations multiples lors de changements rapides de status)
+    //SlowPresentationDisplaysDelay: 10000, //Délais pour setter les rôles des affichages de présentation (utile pour les systèmes lents)
     onStandby: {
       setDND: true,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
       clearCallHistory: true,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby
@@ -101,8 +105,6 @@ export var config = {
       enableScenario: 'comotype2'                 // Scénario à activer lors de la sortie du standby (wakeup).
     }
   },
-  // Correctifs globaux (au même niveau que "system")
-  // (aucun correctif global requis actuellement)
   audio: {
     extra: {
       enabled: false,

@@ -489,36 +489,36 @@ export class Scenario {
         if (systemconfig.system && typeof systemconfig.system.SlowPresentationDisplaysDelay === 'number') {
           return systemconfig.system.SlowPresentationDisplaysDelay;
         }
-      } catch (e) {}
+      } catch (e) { }
       return 0;
     };
 
     const setDisplaysRole = (displays, role, delay = 0) => {
       if (status.AutoDisplays == ON) {
         const debounceEnabled = getDebounceEnabled();
-        
+
         displays.forEach(display => {
           const connector = display.config.connector;
-          
+
           if (debounceEnabled) {
             debug(1, `ComoType2 setDisplaysRole with debouncing: connector=${connector}, role=${role}, delay=${delay}ms`);
             // Debouncing enabled: cancel previous timers and track desired state
             const timerId = this._displayRoleTimers[connector];
-            
+
             // Cancel any existing pending timer for this connector
             if (timerId) {
               clearTimeout(timerId);
             }
-            
+
             // Skip scheduling if the desired role matches the last request and delay is 0
             const lastDesired = this._displayDesiredRoles[connector];
             if (lastDesired === role && delay === 0) {
               return;
             }
-            
+
             // Track the desired role for this connector
             this._displayDesiredRoles[connector] = role;
-            
+
             // Schedule the role change
             this._displayRoleTimers[connector] = setTimeout(() => {
               try {
@@ -1206,7 +1206,7 @@ export class Scenario {
 
           const slowDelay = getSlowDisplayDelay();
           if (slowDelay && slowDelay > 0) {
-            debug(1,`Fix for slow presentation displays enabled, delaying presentation display role setting by ${slowDelay} ms`);
+            debug(1, `Fix for slow presentation displays enabled, delaying presentation display role setting by ${slowDelay} ms`);
             setDisplaysRole(presentationDisplays, PRESENTATIONONLY);
             await delay(slowDelay);
             setDisplaysRole(presentationDisplays, SECOND);
@@ -1284,17 +1284,16 @@ export class Scenario {
         else if (remotePresenterPresent && presentationActive) {
           console.error('20');
           zapi.system.setStatus('comotype2Mode', 20);
+          matrixReset(farendDisplays);
+
           setMonitors(SINGLE);
 
           //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
+          setDisplaysRole(farendDisplays, PRESENTATIONONLY);
           powerOffDisplays(farendDisplays);
           blankDisplays(farendDisplays);
 
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST, 1000);
-          powerOnDisplays(presentationDisplays);
-          unblankDisplays(presentationDisplays);
+
 
           //Teleprompter displays
           setDisplaysRole(teleprompterDisplays, PRESENTATIONONLY);
@@ -1308,7 +1307,6 @@ export class Scenario {
           }
 
           //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, PRESENTATIONONLY);
           if (UseSecondaryPresentationDisplays == ON) {
             powerOnDisplays(secondaryPresentationDisplays);
             unblankDisplays(secondaryPresentationDisplays);
@@ -1317,6 +1315,23 @@ export class Scenario {
             powerOffDisplays(secondaryPresentationDisplays);
             blankDisplays(secondaryPresentationDisplays);
           }
+
+
+          //Presentation displays
+          setDisplaysRole(presentationDisplays, SECOND, 3000);
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
+
+          xapi.Command.Video.Layout.LayoutFamily.Set({
+            LayoutFamily: 'Overlay',
+            Target: 'Local'
+          });
+          
+          xapi.Command.Video.ActiveSpeakerPIP.Set({
+            Position: systemconfig.system.defaultPipPosition || 'UpperRight',
+          });
+
+
 
         }
       }

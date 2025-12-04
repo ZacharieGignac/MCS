@@ -4,6 +4,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 
 ## [1.3.0-dev] - En cours
 ### Ajouts / Modifications
+- Scénario `sce_como_type2` : Réécriture majeure et simplification. Passage de 20 à 12 modes de fonctionnement (`CLEARZONE.1-6` et `NORMAL.1-6`). Gestion dynamique des affichages permanents intégrée aux modes. Amélioration de la logique de basculement et de la stabilité.
 - Scénario `sce_como_type2` : nouvelle version évoluée du scénario Comodale Type 1 avec support de groupes d'affichages supplémentaires (télésouffleur, affichages secondaires de présentation) et gestion fine des modes d'affichage. Voir `docs/Manual-ComoType2.md` pour la documentation complète.
 - Documentation complète des nouveaux drivers audio introduits en v1.2.0 : `AudioInputDriver_aes67`, `AudioOutputDriver_aes67`, `AudioInputDriver_usb`, `AudioOutputDriver_usb`, et `AudioInputDriver_codeceq`
 - Nouveau manuel `docs/Manual-ComoType2.md` documentant le scénario Comodale Type 2, ses différences avec le Type 1, les nouveaux groupes d'affichages, et les configurations avancées

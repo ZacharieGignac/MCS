@@ -63,6 +63,8 @@ export class Scenario {
 
     this._displayRoleTimers = {};   // Maps connector ID -> setTimeout timer ID
     this._displayDesiredRoles = {}; // Maps connector ID -> last requested role
+    this._displayPowerTimers = new Map(); // Maps display object -> setTimeout timer ID
+    this._displayBlankingTimers = new Map(); // Maps display object -> setTimeout timer ID
 
     zapi.system.onStatusChange(status => { self.onStatusChange(status); });
 
@@ -195,17 +197,6 @@ export class Scenario {
 
       }
     }
-  }
-
-  displayEnableMessage() {
-    xapi.Command.UserInterface.Message.Prompt.Display({
-      title: systemconfig.strings.newSessionTitle,
-      text: `Veuillez patienter ${systemconfig.system.newSessionDelay / 1000} secondes.`,
-    });
-
-    setTimeout(() => {
-      xapi.Command.UserInterface.Message.Prompt.Clear();
-    }, systemconfig.system.newSessionDelay);
   }
 
 
@@ -425,6 +416,7 @@ export class Scenario {
     if (status.AutoScreens == ON) {
       var needPresentationScreen = (status.call == 'Connected' && status.PresenterLocation == REMOTE) || status.presentation.type != 'NOPRESENTATION';
       var needClearZone = status.ClearPresentationZone == ON ? true : false;
+      
 
       if (needPresentationScreen) {
         if (needClearZone) {
@@ -466,10 +458,11 @@ export class Scenario {
     var presenterLocation = status.PresenterLocation;
     var presentationActive = status.presentation.type != 'NOPRESENTATION';
     var callConnected = status.call == 'Connected';
-    var remotePresenterPresent = callConnected && presenterLocation == REMOTE;
+    //var remotePresenterPresent = callConnected;
     var presentationSupportsBlanking = this.devices.displays.presentation.filter(disp => disp.config.supportsBlanking).length == this.devices.displays.presentation.length;
     var UseTeleprompter = status.UseTeleprompter;
     var UseSecondaryPresentationDisplays = status.UseSecondaryPresentationDisplays;
+    var presentationDisplaysStartDelay = systemconfig.sce_como_type2?.presentationDisplaysStartDelay || 0;
 
 
     // Helpers to read debounce and slow-display settings from scenario-specific config or system fallback
@@ -480,17 +473,6 @@ export class Scenario {
         }
         return !!(systemconfig.system && systemconfig.system.enableStateEvaluationDebounce === true);
       } catch (e) { return !!(systemconfig.system && systemconfig.system.enableStateEvaluationDebounce === true); }
-    };
-    const getSlowDisplayDelay = () => {
-      try {
-        if (systemconfig.sce_como_type2 && typeof systemconfig.sce_como_type2.slowPresentationDisplaysDelay === 'number') {
-          return systemconfig.sce_como_type2.slowPresentationDisplaysDelay;
-        }
-        if (systemconfig.system && typeof systemconfig.system.SlowPresentationDisplaysDelay === 'number') {
-          return systemconfig.system.SlowPresentationDisplaysDelay;
-        }
-      } catch (e) { }
-      return 0;
     };
 
     const setDisplaysRole = (displays, role, delay = 0) => {
@@ -550,34 +532,82 @@ export class Scenario {
       }
     };
 
-    const powerOffDisplays = (displays) => {
+    const powerOffDisplays = (displays, delay = 0) => {
       if (status.AutoDisplays == ON) {
         displays.forEach(display => {
-          display.off();
+          if (this._displayPowerTimers.has(display)) {
+            clearTimeout(this._displayPowerTimers.get(display));
+            this._displayPowerTimers.delete(display);
+          }
+          if (delay > 0) {
+            const timer = setTimeout(() => {
+              display.off();
+              this._displayPowerTimers.delete(display);
+            }, delay);
+            this._displayPowerTimers.set(display, timer);
+          } else {
+            display.off();
+          }
         });
       }
     };
 
-    const powerOnDisplays = (displays) => {
+    const powerOnDisplays = (displays, delay = 0) => {
       if (status.AutoDisplays == ON) {
         displays.forEach(display => {
-          display.on();
+          if (this._displayPowerTimers.has(display)) {
+            clearTimeout(this._displayPowerTimers.get(display));
+            this._displayPowerTimers.delete(display);
+          }
+          if (delay > 0) {
+            const timer = setTimeout(() => {
+              display.on();
+              this._displayPowerTimers.delete(display);
+            }, delay);
+            this._displayPowerTimers.set(display, timer);
+          } else {
+            display.on();
+          }
         });
       }
     };
 
-    const blankDisplays = (displays) => {
+    const blankDisplays = (displays, delay = 0) => {
       if (status.AutoDisplays == ON) {
         displays.forEach(display => {
-          display.setBlanking(true);
+          if (this._displayBlankingTimers.has(display)) {
+            clearTimeout(this._displayBlankingTimers.get(display));
+            this._displayBlankingTimers.delete(display);
+          }
+          if (delay > 0) {
+            const timer = setTimeout(() => {
+              display.setBlanking(true);
+              this._displayBlankingTimers.delete(display);
+            }, delay);
+            this._displayBlankingTimers.set(display, timer);
+          } else {
+            display.setBlanking(true);
+          }
         });
       }
     };
 
-    const unblankDisplays = (displays) => {
+    const unblankDisplays = (displays, delay = 0) => {
       if (status.AutoDisplays == ON) {
         displays.forEach(display => {
-          display.setBlanking(false);
+          if (this._displayBlankingTimers.has(display)) {
+            clearTimeout(this._displayBlankingTimers.get(display));
+            this._displayBlankingTimers.delete(display);
+          }
+          if (delay > 0) {
+            const timer = setTimeout(() => {
+              display.setBlanking(false);
+              this._displayBlankingTimers.delete(display);
+            }, delay);
+            this._displayBlankingTimers.set(display, timer);
+          } else {
+            display.setBlanking(false);
+          }
         });
       }
     };
@@ -660,341 +690,151 @@ export class Scenario {
     var teleprompterDisplays = this.devices.displays.teleprompter;
     var secondaryPresentationDisplays = this.devices.displays.secondary;
 
-
-
-    //With permanent displays for presentation
-
-    if (permanentDisplays) {
-      if (needClearZone) {
-        //Permanent displays + Clear zone
-        if (!presentationActive && !remotePresenterPresent) {
-          console.error('1');
-          zapi.system.setStatus('comotype2Mode', 1);
-          setMonitors(TRIPLEPRESENTATIONONLY);
-          //Farend displays
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-          setDisplaysRole(farendDisplays, FIRST);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
-          blankDisplays(presentationDisplays);
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          powerOffDisplays(teleprompterDisplays);
-          blankDisplays(teleprompterDisplays);
-
-
-          //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
-          powerOffDisplays(secondaryPresentationDisplays);
-          blankDisplays(secondaryPresentationDisplays);
-
-
-          matrixReset(farendDisplays);
-        }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
-          console.error('2');
-          zapi.system.setStatus('comotype2Mode', 2);
-          setMonitors(TRIPLEPRESENTATIONONLY);
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
-          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          if (UseTeleprompter == ON) {
-            powerOnDisplays(teleprompterDisplays);
-            unblankDisplays(teleprompterDisplays);
-          }
-          else {
-            powerOffDisplays(teleprompterDisplays);
-            blankDisplays(teleprompterDisplays);
-          }
-
-          //Secondary presentation displays
-          if (UseSecondaryPresentationDisplays == ON) {
-            powerOnDisplays(secondaryPresentationDisplays);
-            unblankDisplays(secondaryPresentationDisplays);
-          }
-          else {
-            powerOffDisplays(secondaryPresentationDisplays);
-            blankDisplays(secondaryPresentationDisplays);
-          }
-
-          matrixReset(farendDisplays);
-        }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
-          console.error('3');
-          zapi.system.setStatus('comotype2Mode', 3);
-          setMonitors(TRIPLEPRESENTATIONONLY);
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
-          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          if (UseTeleprompter == ON) {
-            powerOnDisplays(teleprompterDisplays);
-            unblankDisplays(teleprompterDisplays);
-          }
-          else {
-            powerOffDisplays(teleprompterDisplays);
-            blankDisplays(teleprompterDisplays);
-          }
-
-          //Secondary presentation displays
-          if (UseSecondaryPresentationDisplays == ON) {
-            powerOnDisplays(secondaryPresentationDisplays);
-            unblankDisplays(secondaryPresentationDisplays);
-          }
-          else {
-            powerOffDisplays(secondaryPresentationDisplays);
-            blankDisplays(secondaryPresentationDisplays);
-          }
-
-          matrixReset(farendDisplays);
-        }
-        else if (remotePresenterPresent && !presentationActive) {
-          console.error('4');
-          zapi.system.setStatus('comotype2Mode', 4);
-          setMonitors(SINGLE);
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
-          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          powerOffDisplays(teleprompterDisplays);
-          blankDisplays(teleprompterDisplays);
-
-          //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
-          powerOffDisplays(secondaryPresentationDisplays);
-          blankDisplays(secondaryPresentationDisplays);
-
-        }
-        else if (remotePresenterPresent && presentationActive) {
-          console.error('5');
-          zapi.system.setStatus('comotype2Mode', 5);
-          setMonitors(SINGLE);
-
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
-          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, PRESENTATIONONLY);
-          if (UseTeleprompter == ON) {
-            powerOnDisplays(teleprompterDisplays);
-            unblankDisplays(teleprompterDisplays);
-          }
-          else {
-            powerOffDisplays(teleprompterDisplays);
-            blankDisplays(teleprompterDisplays);
-          }
-
-          setDisplaysRole(secondaryPresentationDisplays, PRESENTATIONONLY);
-          //Secondary presentation displays
-          if (UseSecondaryPresentationDisplays == ON) {
-            powerOnDisplays(secondaryPresentationDisplays);
-            unblankDisplays(secondaryPresentationDisplays);
-          }
-          else {
-            powerOffDisplays(secondaryPresentationDisplays);
-            blankDisplays(secondaryPresentationDisplays);
-          }
-        }
-      }
-      //Permanent displays + NO clear zone
-      else {
-        if (!presentationActive && !remotePresenterPresent) {
-          console.error('6');
-          zapi.system.setStatus('comotype2Mode', 6);
-          setMonitors(TRIPLEPRESENTATIONONLY);
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
-          blankDisplays(presentationDisplays);
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          powerOffDisplays(teleprompterDisplays);
-          blankDisplays(teleprompterDisplays);
-
-
-          //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
-          powerOffDisplays(secondaryPresentationDisplays);
-          blankDisplays(secondaryPresentationDisplays);
-
-          matrixReset(farendDisplays);
-        }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
-          console.error('7');
-          zapi.system.setStatus('comotype2Mode', 7);
-          setMonitors(TRIPLEPRESENTATIONONLY);
-
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOnDisplays(presentationDisplays);
-          unblankDisplays(presentationDisplays);
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          if (UseTeleprompter == ON) {
-            powerOnDisplays(teleprompterDisplays);
-            unblankDisplays(teleprompterDisplays);
-          }
-          else {
-            powerOffDisplays(teleprompterDisplays);
-            blankDisplays(teleprompterDisplays);
-          }
-
-          //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
-          if (UseSecondaryPresentationDisplays == ON) {
-            powerOnDisplays(secondaryPresentationDisplays);
-            unblankDisplays(secondaryPresentationDisplays);
-          }
-          else {
-            powerOffDisplays(secondaryPresentationDisplays);
-            blankDisplays(secondaryPresentationDisplays);
-          }
-
-          matrixReset(farendDisplays);
-        }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
-          console.error('8');
-          zapi.system.setStatus('comotype2Mode', 8);
-          setMonitors(TRIPLEPRESENTATIONONLY);
-
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOnDisplays(presentationDisplays);
-          unblankDisplays(presentationDisplays);
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          if (UseTeleprompter == ON) {
-            powerOnDisplays(teleprompterDisplays);
-            unblankDisplays(teleprompterDisplays);
-          }
-          else {
-            powerOffDisplays(teleprompterDisplays);
-            blankDisplays(teleprompterDisplays);
-          }
-
-          //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
-          if (UseSecondaryPresentationDisplays == ON) {
-            powerOnDisplays(secondaryPresentationDisplays);
-            unblankDisplays(secondaryPresentationDisplays);
-          }
-          else {
-            powerOffDisplays(secondaryPresentationDisplays);
-            blankDisplays(secondaryPresentationDisplays);
-          }
-
-          matrixReset(farendDisplays);
-        }
-        else if (remotePresenterPresent && !presentationActive) {
-          console.error('9');
-          zapi.system.setStatus('comotype2Mode', 9);
-          setMonitors(SINGLE);
-
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          blankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOnDisplays(presentationDisplays);
-          unblankDisplays(presentationDisplays);
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          powerOffDisplays(teleprompterDisplays);
-          blankDisplays(teleprompterDisplays);
-
-
-          //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
-          powerOffDisplays(secondaryPresentationDisplays);
-          blankDisplays(secondaryPresentationDisplays);
-
-        }
-        else if (remotePresenterPresent && presentationActive) {
-          console.error('10');
-          zapi.system.setStatus('comotype2Mode', 10);
-          setMonitors(DUALPRESENTATIONONLY);
-          setDisplaysRole(farendDisplays, FIRST);
-          setDisplaysRole(presentationDisplays, SECOND);
-          matrixCurrentMainVideoToDisplay(farendDisplays);
-          powerOnDisplays(presentationDisplays);
-          unblankDisplays(presentationDisplays);
-        }
-      }
-
-
-    }
-
-
-
-
-    //Without permanent displays for presentation
-    else {
-      //console.error('NO PRERMANENT DISPLAYS!');
-
       if (needClearZone) {
         //console.error('NEED CLEAR ZONE');
-        //WITHOUT Permanent displays + Clear zone
-        if (!presentationActive && !remotePresenterPresent) {
-          console.error('11');
-          zapi.system.setStatus('comotype2Mode', 11);
-          setMonitors(TRIPLEPRESENTATIONONLY);
+        //No call, no presentation
+        //TESTED OK
+        if (!presentationActive && !callConnected) {
+          console.error('CLEARZONE.1');
+          zapi.system.setStatus('comotype2Mode', 'CLEARZONE.1');
+
+          setMonitors(TRIPLE);
+
+          //Farend displays
+          setDisplaysRole(farendDisplays, FIRST);
+          powerOnDisplays(farendDisplays);
+          unblankDisplays(farendDisplays);
+
+          //Presentation displays
+          setDisplaysRole(presentationDisplays, SECOND);
+          powerOffDisplays(presentationDisplays);
+          blankDisplays(presentationDisplays);
+
+
+          //Teleprompter displays
+          setDisplaysRole(teleprompterDisplays, SECOND);
+          powerOffDisplays(teleprompterDisplays);
+          blankDisplays(teleprompterDisplays);
+
+
+          //Secondary presentation displays
+          powerOffDisplays(secondaryPresentationDisplays);
+          blankDisplays(secondaryPresentationDisplays);
+
+        }
+
+        //no call, presentation
+        //TESTED OK
+        if (presentationActive && !callConnected) {
+          console.error('CLEARZONE.2');
+          zapi.system.setStatus('comotype2Mode', 'CLEARZONE.2');
+
+
+          setMonitors(TRIPLE);
+
+          //Farend displays
+          setDisplaysRole(farendDisplays, FIRST);
+          powerOnDisplays(farendDisplays);
+          unblankDisplays(farendDisplays);
+
+          //Presentation displays
+          setDisplaysRole(presentationDisplays, SECOND);
+          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          powerOffDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
+
+          //Teleprompter displays
+          setDisplaysRole(teleprompterDisplays, SECOND);
+          if (UseTeleprompter == ON) {
+            powerOnDisplays(teleprompterDisplays);
+            unblankDisplays(teleprompterDisplays);
+          }
+
+          //Secondary presentation displays
+          if (UseSecondaryPresentationDisplays == ON) {
+            powerOnDisplays(secondaryPresentationDisplays);
+            unblankDisplays(secondaryPresentationDisplays);
+          }
+        }
+
+        //call, no presentation
+        //TESTED OK
+        if (callConnected && !presentationActive && presenterLocation == LOCAL) {
+          console.error('CLEARZONE.3');
+          zapi.system.setStatus('comotype2Mode', 'CLEARZONE.3');
+
+          setMonitors(TRIPLE);
+
+          //Farend displays
+          setDisplaysRole(farendDisplays, FIRST);
+          powerOnDisplays(farendDisplays);
+          unblankDisplays(farendDisplays);
+
+          //Presentation displays
+          setDisplaysRole(presentationDisplays, SECOND);
+          powerOffDisplays(presentationDisplays);
+          blankDisplays(presentationDisplays);
+
+          //Teleprompter displays
+          setDisplaysRole(teleprompterDisplays, SECOND);
+          powerOffDisplays(teleprompterDisplays);
+          blankDisplays(teleprompterDisplays);
+
+          //Secondary presentation displays
+          powerOffDisplays(secondaryPresentationDisplays);
+          blankDisplays(secondaryPresentationDisplays);
+        }
+
+        //call, presentation active
+        //TESTED OK
+        if (callConnected && presentationActive) {
+          console.error('CLEARZONE.4');
+          zapi.system.setStatus('comotype2Mode', 'CLEARZONE.4');
+
+          setMonitors(TRIPLE);
+
+          //Farend displays
+          setDisplaysRole(farendDisplays, FIRST);
+          powerOnDisplays(farendDisplays);
+          unblankDisplays(farendDisplays);
+
+          //Presentation displays
+          setDisplaysRole(presentationDisplays, SECOND);
+          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          unblankDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          powerOffDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
+
+          //Teleprompter displays
+          setDisplaysRole(teleprompterDisplays, SECOND);
+          if (UseTeleprompter == ON) {
+
+            powerOnDisplays(teleprompterDisplays);
+            unblankDisplays(teleprompterDisplays);
+          }
+          else {
+            powerOffDisplays(teleprompterDisplays);
+            blankDisplays(teleprompterDisplays);
+          }
+
+          //Secondary presentation displays
+          if (UseSecondaryPresentationDisplays == ON) {
+            powerOnDisplays(secondaryPresentationDisplays);
+            unblankDisplays(secondaryPresentationDisplays);
+          }
+          else {
+            powerOffDisplays(secondaryPresentationDisplays);
+            blankDisplays(secondaryPresentationDisplays);
+          }
+        }
+
+        //call, remote presenter, no presentation
+        if (callConnected && !presentationActive && presenterLocation == REMOTE) {
+          console.error('CLEARZONE.5');
+          zapi.system.setStatus('comotype2Mode', 'CLEARZONE.5');
+
+          setMonitors(TRIPLE);
 
           //Farend displays
           setDisplaysRole(farendDisplays, FIRST);
@@ -1003,8 +843,10 @@ export class Scenario {
 
           //Presentation displays
           setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
-          blankDisplays(presentationDisplays);
+          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          powerOffDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
 
           //Teleprompter displays
           setDisplaysRole(teleprompterDisplays, FIRST);
@@ -1012,170 +854,31 @@ export class Scenario {
           blankDisplays(teleprompterDisplays);
 
           //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
           powerOffDisplays(secondaryPresentationDisplays);
           blankDisplays(secondaryPresentationDisplays);
-
-          matrixReset(farendDisplays);
         }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
-          console.error('12');
-          zapi.system.setStatus('comotype2Mode', 12);
-          setMonitors(TRIPLEPRESENTATIONONLY);
+
+        //call, remote presenter, presentation active
+        if (callConnected && presentationActive && presenterLocation == REMOTE) {
+          console.error('CLEARZONE.6');
+          zapi.system.setStatus('comotype2Mode', 'CLEARZONE.6');
+
+          setMonitors(TRIPLE);
 
           //Farend displays
           setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
+          powerOffDisplays(farendDisplays, presentationDisplaysStartDelay);
+          blankDisplays(farendDisplays, presentationDisplaysStartDelay);
 
           //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
-          blankDisplays(presentationDisplays);
-
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          powerOnDisplays(teleprompterDisplays);
-          unblankDisplays(teleprompterDisplays);
-
-          //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
-          powerOnDisplays(secondaryPresentationDisplays);
-          unblankDisplays(secondaryPresentationDisplays);
-
-          matrixReset(farendDisplays);
-        }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
-          console.error('13');
-          zapi.system.setStatus('comotype2Mode', 13);
-          setMonitors(TRIPLEPRESENTATIONONLY);
-
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
-          blankDisplays(presentationDisplays);
-
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          powerOnDisplays(teleprompterDisplays);
-          unblankDisplays(teleprompterDisplays);
-
-          //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
-          powerOnDisplays(secondaryPresentationDisplays);
-          unblankDisplays(secondaryPresentationDisplays);
-
-          matrixReset(farendDisplays);
-        }
-        else if (remotePresenterPresent && !presentationActive) {
-          console.error('14');
-          zapi.system.setStatus('comotype2Mode', 14);
-          setMonitors(SINGLE);
-
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
-          blankDisplays(presentationDisplays);
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          powerOffDisplays(teleprompterDisplays);
-          blankDisplays(teleprompterDisplays);
-
-          //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
-          powerOffDisplays(secondaryPresentationDisplays);
-          blankDisplays(secondaryPresentationDisplays);
-
-          matrixReset(farendDisplays);
-
-        }
-        else if (remotePresenterPresent && presentationActive) {
-          console.error('15');
-          zapi.system.setStatus('comotype2Mode', 15);
-          setMonitors(TRIPLEPRESENTATIONONLY);
-
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-          matrixReset(farendDisplays);
-          matrixRemoteToDisplay(farendDisplays, 2000);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
-          blankDisplays(presentationDisplays);
+          setDisplaysRole(presentationDisplays, FIRST, 2000);
+          powerOnDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => disp.config.alwaysUse));
+          powerOffDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
+          blankDisplays(presentationDisplays.filter(disp => !disp.config.alwaysUse));
 
           //Teleprompter displays
           setDisplaysRole(teleprompterDisplays, PRESENTATIONONLY);
-          powerOnDisplays(teleprompterDisplays);
-          unblankDisplays(teleprompterDisplays);
-
-
-          //Secondary presentation displays
-          powerOnDisplays(secondaryPresentationDisplays);
-          unblankDisplays(secondaryPresentationDisplays);
-
-          matrixReset(farendDisplays);
-        }
-      }
-      //WITHOUT Permanent displays + NO clear zone
-      else {
-        //console.error('DOES NOT NEED CLEAR ZONE');
-        if (!presentationActive && !remotePresenterPresent) {
-          console.error('16');
-          zapi.system.setStatus('comotype2Mode', 16);
-          setMonitors(TRIPLEPRESENTATIONONLY);
-
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, FIRST);
-          powerOffDisplays(presentationDisplays);
-          blankDisplays(presentationDisplays);
-
-          //Teleprompter displays
-          setDisplaysRole(teleprompterDisplays, FIRST);
-          powerOffDisplays(teleprompterDisplays);
-          blankDisplays(teleprompterDisplays);
-
-          //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
-          powerOffDisplays(secondaryPresentationDisplays);
-          blankDisplays(secondaryPresentationDisplays);
-
-          matrixReset(farendDisplays);
-          matrixReset(presentationDisplays);
-          matrixReset(teleprompterDisplays);
-        }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == LOCAL) {
-          console.error('17');
-          zapi.system.setStatus('comotype2Mode', 17);
-
-
-          powerOnDisplays(farendDisplays);
-          unblankDisplays(farendDisplays);
-
-          powerOnDisplays(presentationDisplays);
-          unblankDisplays(presentationDisplays);
-
-
           if (UseTeleprompter == ON) {
             powerOnDisplays(teleprompterDisplays);
             unblankDisplays(teleprompterDisplays);
@@ -1186,7 +889,6 @@ export class Scenario {
           }
 
           //Secondary presentation displays
-
           if (UseSecondaryPresentationDisplays == ON) {
             powerOnDisplays(secondaryPresentationDisplays);
             unblankDisplays(secondaryPresentationDisplays);
@@ -1195,37 +897,56 @@ export class Scenario {
             powerOffDisplays(secondaryPresentationDisplays);
             blankDisplays(secondaryPresentationDisplays);
           }
-
-          setMonitors(TRIPLE);
-
-          //Farend displays
-          setDisplaysRole(farendDisplays, FIRST);
-
-          //Presentation displays
-
-
-          const slowDelay = getSlowDisplayDelay();
-          if (slowDelay && slowDelay > 0) {
-            debug(1, `Fix for slow presentation displays enabled, delaying presentation display role setting by ${slowDelay} ms`);
-            setDisplaysRole(presentationDisplays, PRESENTATIONONLY);
-            await delay(slowDelay);
-            setDisplaysRole(presentationDisplays, SECOND);
-          } else {
-            setDisplaysRole(presentationDisplays, SECOND);
-          }
-
+ 
         }
-        else if (presentationActive && !remotePresenterPresent && presenterLocation == REMOTE) {
-          console.error('18');
-          zapi.system.setStatus('comotype2Mode', 18);
-          setMonitors(TRIPLE);
+      }
+      //NO clear zone
+      else {
 
+        //No call, no presentation
+        //TESTED OK
+        if (!presentationActive && !callConnected) {
+          console.error('NORMAL.1');
+          zapi.system.setStatus('comotype2Mode', 'NORMAL.1');
+
+          setMonitors(TRIPLE);
 
           //Farend displays
           setDisplaysRole(farendDisplays, FIRST);
           powerOnDisplays(farendDisplays);
           unblankDisplays(farendDisplays);
 
+          //Presentation displays
+          setDisplaysRole(presentationDisplays, SECOND);
+          powerOffDisplays(presentationDisplays);
+          blankDisplays(presentationDisplays);
+
+
+          //Teleprompter displays
+          setDisplaysRole(teleprompterDisplays, SECOND);
+          powerOffDisplays(teleprompterDisplays);
+          blankDisplays(teleprompterDisplays);
+
+
+          //Secondary presentation displays
+          powerOffDisplays(secondaryPresentationDisplays);
+          blankDisplays(secondaryPresentationDisplays);
+
+        }
+
+        //no call, presentation
+        //TESTED OK
+        if (presentationActive && !callConnected) {
+          console.error('NORMAL.2');
+          zapi.system.setStatus('comotype2Mode', 'NORMAL.2');
+
+
+          setMonitors(TRIPLE);
+
+          //Farend displays
+          setDisplaysRole(farendDisplays, FIRST);
+          powerOnDisplays(farendDisplays);
+          unblankDisplays(farendDisplays);
 
           //Presentation displays
           setDisplaysRole(presentationDisplays, SECOND);
@@ -1238,13 +959,73 @@ export class Scenario {
             powerOnDisplays(teleprompterDisplays);
             unblankDisplays(teleprompterDisplays);
           }
+
+          //Secondary presentation displays
+          if (UseSecondaryPresentationDisplays == ON) {
+            powerOnDisplays(secondaryPresentationDisplays);
+            unblankDisplays(secondaryPresentationDisplays);
+          }
+        }
+
+        //call, no presentation
+        //TESTED OK
+        if (callConnected && !presentationActive) {
+          console.error('NORMAL.3');
+          zapi.system.setStatus('comotype2Mode', 'NORMAL.3');
+
+          setMonitors(TRIPLE);
+
+          //Farend displays
+          setDisplaysRole(farendDisplays, FIRST);
+          powerOnDisplays(farendDisplays);
+          unblankDisplays(farendDisplays);
+
+          //Presentation displays
+          setDisplaysRole(presentationDisplays, SECOND);
+          powerOffDisplays(presentationDisplays);
+          blankDisplays(presentationDisplays);
+
+          //Teleprompter displays
+          setDisplaysRole(teleprompterDisplays, SECOND);
+          powerOffDisplays(teleprompterDisplays);
+          blankDisplays(teleprompterDisplays);
+
+          //Secondary presentation displays
+          powerOffDisplays(secondaryPresentationDisplays);
+          blankDisplays(secondaryPresentationDisplays);
+        }
+
+        //call, presentation active
+        //TESTED OK
+        if (callConnected && presentationActive) {
+          console.error('NORMAL.4');
+          zapi.system.setStatus('comotype2Mode', 'NORMAL.4');
+
+          setMonitors(TRIPLE);
+
+          //Farend displays
+          setDisplaysRole(farendDisplays, FIRST);
+          powerOnDisplays(farendDisplays);
+          unblankDisplays(farendDisplays);
+
+          //Presentation displays
+          setDisplaysRole(presentationDisplays, SECOND);
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
+
+          //Teleprompter displays
+          setDisplaysRole(teleprompterDisplays, SECOND);
+          if (UseTeleprompter == ON) {
+
+            powerOnDisplays(teleprompterDisplays);
+            unblankDisplays(teleprompterDisplays);
+          }
           else {
             powerOffDisplays(teleprompterDisplays);
             blankDisplays(teleprompterDisplays);
           }
 
           //Secondary presentation displays
-
           if (UseSecondaryPresentationDisplays == ON) {
             powerOnDisplays(secondaryPresentationDisplays);
             unblankDisplays(secondaryPresentationDisplays);
@@ -1254,15 +1035,18 @@ export class Scenario {
             blankDisplays(secondaryPresentationDisplays);
           }
         }
-        else if (remotePresenterPresent && !presentationActive) {
-          console.error('19');
-          zapi.system.setStatus('comotype2Mode', 19);
-          setMonitors(SINGLE);
+
+        //call, remote presenter, no presentation
+        if (callConnected && !presentationActive && presenterLocation == REMOTE) {
+          console.error('NORMAL.5');
+          zapi.system.setStatus('comotype2Mode', 'NORMAL.5');
+
+          setMonitors(TRIPLE);
 
           //Farend displays
           setDisplaysRole(farendDisplays, FIRST);
-          powerOffDisplays(farendDisplays);
-          blankDisplays(farendDisplays);
+          powerOffDisplays(farendDisplays, presentationDisplaysStartDelay);
+          blankDisplays(farendDisplays, presentationDisplaysStartDelay);
 
           //Presentation displays
           setDisplaysRole(presentationDisplays, FIRST);
@@ -1275,25 +1059,26 @@ export class Scenario {
           blankDisplays(teleprompterDisplays);
 
           //Secondary presentation displays
-          setDisplaysRole(secondaryPresentationDisplays, FIRST);
           powerOffDisplays(secondaryPresentationDisplays);
           blankDisplays(secondaryPresentationDisplays);
-
-          matrixReset(presentationDisplays);
         }
-        else if (remotePresenterPresent && presentationActive) {
-          console.error('20');
-          zapi.system.setStatus('comotype2Mode', 20);
-          matrixReset(farendDisplays);
 
-          setMonitors(SINGLE);
+        //call, remote presenter, presentation active
+        if (callConnected && presentationActive && presenterLocation == REMOTE) {
+          console.error('NORMAL.6');
+          zapi.system.setStatus('comotype2Mode', 'NORMAL.6');
+
+          setMonitors(TRIPLE);
 
           //Farend displays
-          setDisplaysRole(farendDisplays, PRESENTATIONONLY);
-          powerOffDisplays(farendDisplays);
-          blankDisplays(farendDisplays);
+          setDisplaysRole(farendDisplays, FIRST);
+          powerOffDisplays(farendDisplays, presentationDisplaysStartDelay);
+          blankDisplays(farendDisplays, presentationDisplaysStartDelay);
 
-
+          //Presentation displays
+          setDisplaysRole(presentationDisplays, FIRST, 2000);
+          powerOnDisplays(presentationDisplays);
+          unblankDisplays(presentationDisplays);
 
           //Teleprompter displays
           setDisplaysRole(teleprompterDisplays, PRESENTATIONONLY);
@@ -1315,31 +1100,10 @@ export class Scenario {
             powerOffDisplays(secondaryPresentationDisplays);
             blankDisplays(secondaryPresentationDisplays);
           }
-
-
-          //Presentation displays
-          setDisplaysRole(presentationDisplays, SECOND, 3000);
-          powerOnDisplays(presentationDisplays);
-          unblankDisplays(presentationDisplays);
-
-          if (systemconfig.system.defaultPipPosition) {
-            xapi.Command.Video.Layout.LayoutFamily.Set({
-              LayoutFamily: 'Overlay',
-              Target: 'Local'
-            });
-
-            xapi.Command.Video.ActiveSpeakerPIP.Set({
-              Position: systemconfig.system.defaultPipPosition,
-            });
-          }
-
-
-
-
+ 
         }
+       
       }
-
-    }
   }
 
 

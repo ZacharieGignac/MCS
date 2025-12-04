@@ -53,13 +53,14 @@ Le Type 2 introduit deux nouveaux groupes d'affichages absents du Type 1 :
 
 ### Modes de fonctionnement étendus
 
-Le Type 2 possède **20 modes distincts** (vs 20 pour Type 1), permettant une gestion beaucoup plus fine des configurations d'affichage selon :
+Le Type 2 possède **12 modes distincts** (simplification par rapport aux 20 modes de l'ancienne version), permettant une gestion claire des configurations d'affichage selon :
 - Présence de présentateur (local/distant)
 - État de présentation (active/inactive)
 - Mode "Clear Presentation Zone" (activé/désactivé)
-- Configuration des affichages permanents
 - Activation du télésouffleur (`UseTeleprompter`)
 - Activation des affichages secondaires (`UseSecondaryPresentationDisplays`)
+
+La gestion des affichages permanents (`alwaysUse: true`) est désormais intégrée dynamiquement dans chaque mode plutôt que de multiplier les modes.
 
 ### Rôles des moniteurs étendus
 
@@ -266,38 +267,50 @@ zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.CAMERAPRESET, 'system.farend.mai
 
 ## Modes de fonctionnement
 
-Le scénario Type 2 possède 20 modes distincts, identifiés par `comotype2Mode` (1-20). Ces modes déterminent la configuration exacte des affichages, toiles et éclairages.
+Le scénario Type 2 possède 12 modes distincts, identifiés par `comotype2Mode`. Ces modes sont divisés en deux groupes : `CLEARZONE` (quand `ClearPresentationZone` est actif) et `NORMAL`.
 
 ### Facteurs déterminant le mode
 
-1. **PermanentDisplays :** Présence d'affichages avec `alwaysUse: true`
-2. **needClearZone :** État du SystemStatus `ClearPresentationZone`
-3. **presentationActive :** Une présentation est en cours
-4. **remotePresenterPresent :** Un appel est connecté ET `PresenterLocation == REMOTE`
-5. **presenterLocation :** `LOCAL` ou `REMOTE`
-6. **UseTeleprompter :** Activation des télésouffleurs
-7. **UseSecondaryPresentationDisplays :** Activation des affichages secondaires
+1. **needClearZone :** État du SystemStatus `ClearPresentationZone`
+2. **presentationActive :** Une présentation est en cours
+3. **callConnected :** Un appel est en cours
+4. **presenterLocation :** `LOCAL` ou `REMOTE`
 
-### Exemples de modes
+### Liste des modes
 
-#### Mode 1 : Aucune activité, Clear Zone, Affichages permanents
-- **Configuration :** `TriplePresentationOnly`
-- **Affichages présentation :** Éteints et blankés
-- **Affichages distants :** Allumés
-- **Télésouffleur :** Éteint
-- **Affichages secondaires :** Éteints
+#### Modes CLEARZONE (Zone de présentation dégagée)
 
-#### Mode 7 : Présentation locale active, pas de Clear Zone, Affichages permanents
-- **Configuration :** `TriplePresentationOnly`
-- **Affichages présentation :** Allumés et déblankés
-- **Affichages distants :** Allumés
-- **Télésouffleur :** Selon `UseTeleprompter`
-- **Affichages secondaires :** Selon `UseSecondaryPresentationDisplays`
+Ces modes sont actifs quand `ClearPresentationZone` est sur `on`. Ils privilégient la visibilité de la zone de présentation (souvent le mur où l'on écrit).
 
-#### Mode 10 : Présentateur distant + présentation, pas de Clear Zone, Affichages permanents
-- **Configuration :** `DualPresentationOnly`
-- **Affichages présentation :** `SECOND` (présentation)
-- **Affichages distants :** `FIRST` (participants distants)
+- **CLEARZONE.1** : Aucun appel, pas de présentation.
+- **CLEARZONE.2** : Aucun appel, présentation active.
+- **CLEARZONE.3** : Appel connecté, pas de présentation, présentateur LOCAL.
+- **CLEARZONE.4** : Appel connecté, présentation active (Présentateur LOCAL).
+- **CLEARZONE.5** : Appel connecté, pas de présentation, présentateur REMOTE.
+- **CLEARZONE.6** : Appel connecté, présentation active, présentateur REMOTE.
+
+#### Modes NORMAL (Fonctionnement standard)
+
+Ces modes sont actifs quand `ClearPresentationZone` est sur `off`.
+
+- **NORMAL.1** : Aucun appel, pas de présentation.
+- **NORMAL.2** : Aucun appel, présentation active.
+- **NORMAL.3** : Appel connecté, pas de présentation (Présentateur LOCAL).
+- **NORMAL.4** : Appel connecté, présentation active (Présentateur LOCAL).
+- **NORMAL.5** : Appel connecté, pas de présentation, présentateur REMOTE.
+- **NORMAL.6** : Appel connecté, présentation active, présentateur REMOTE.
+
+### Comportement des affichages par mode
+
+Chaque mode configure les groupes d'affichages (Présentation, Distant, Télésouffleur, Secondaire) de manière spécifique.
+Les affichages configurés avec `alwaysUse: true` (Affichages permanents) restent allumés même si le mode prévoit de les éteindre (sauf cas spécifiques de blanking).
+
+#### Exemple : Mode NORMAL.6 (Appel + Présentation + Présentateur Distant)
+- **Affichages Distants :** Allumés (Affichent les participants)
+- **Affichages Présentation :** Allumés (Affichent la présentation)
+- **Télésouffleur :** Affiche la présentation uniquement (si activé)
+- **Affichages Secondaires :** Allumés (si activés)
+
 - **Video Matrix :** Appliquée pour router la source vidéo courante
 
 #### Mode 17 : Présentation locale, pas de Clear Zone, SANS affichages permanents

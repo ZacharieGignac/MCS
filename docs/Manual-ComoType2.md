@@ -360,7 +360,7 @@ Pour éviter les clignotements lors de changements rapides d'état, le scénario
 
 - **MonitorRole :** Les changements de rôle des moniteurs sont temporisés.
 - **Power & Blanking :** Les commandes d'alimentation et de blanking sont également gérées par des timers pour assurer des transitions fluides et respecter les délais des équipements.
-- **Configuration :** Activation via `sce_como_type2.enableStateEvaluationDebounce: true` dans la configuration (ou `system.enableStateEvaluationDebounce` en fallback).
+- **Configuration :** Activation via `sce_como_type2.enableStateEvaluationDebounce: true` dans la configuration.
 
 Ce mécanisme réduit les appels xAPI redondants et assure que seule la dernière demande d'état est appliquée après une courte période de stabilisation.
 

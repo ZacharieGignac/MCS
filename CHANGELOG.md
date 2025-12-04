@@ -6,6 +6,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 ### Ajouts / Modifications
 - Scénario `sce_como_type2` : Réécriture majeure et simplification. Passage de 20 à 12 modes de fonctionnement (`CLEARZONE.1-6` et `NORMAL.1-6`). Gestion dynamique des affichages permanents intégrée aux modes. Amélioration de la logique de basculement et de la stabilité.
 - Scénario `sce_como_type2` : Extension du mécanisme de debouncing aux commandes d'alimentation et de blanking des affichages pour une meilleure stabilité visuelle.
+- Scénario `sce_como_type2` : Suppression du fallback vers la configuration système pour `enableStateEvaluationDebounce`. Ce paramètre doit désormais être défini spécifiquement dans l'objet `sce_como_type2` de la configuration.
 - Scénario `sce_como_type1` et `sce_como_type2` : Ajout d'un mécanisme de "Probe" (sondage) pour détecter l'arrivée tardive des flux audio de présentation distants et appliquer le routage intelligent.
 - Scénario `sce_como_type2` : nouvelle version évoluée du scénario Comodale Type 1 avec support de groupes d'affichages supplémentaires (télésouffleur, affichages secondaires de présentation) et gestion fine des modes d'affichage. Voir `docs/Manual-ComoType2.md` pour la documentation complète.
 - Documentation complète des nouveaux drivers audio introduits en v1.2.0 : `AudioInputDriver_aes67`, `AudioOutputDriver_aes67`, `AudioInputDriver_usb`, `AudioOutputDriver_usb`, et `AudioInputDriver_codeceq`

@@ -94,7 +94,6 @@ export var config = {
     showStatusAndPerformanceReports: true,        //Affiche le rapport de status après le boot et à interval (pour le developement)
     mainVideoSource: 6,
     defaultPipPosition: 'UpperLeft',
-    //enableStateEvaluationDebounce: true,        // <true, false> Active un "debounce" lors de l'évaluation des scénarios (utile pour éviter les évaluations multiples lors de changements rapides de status)
     onStandby: {
       setDND: true,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
       clearCallHistory: true,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby

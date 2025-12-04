@@ -471,8 +471,8 @@ export class Scenario {
         if (systemconfig.sce_como_type2 && typeof systemconfig.sce_como_type2.enableStateEvaluationDebounce === 'boolean') {
           return systemconfig.sce_como_type2.enableStateEvaluationDebounce === true;
         }
-        return !!(systemconfig.system && systemconfig.system.enableStateEvaluationDebounce === true);
-      } catch (e) { return !!(systemconfig.system && systemconfig.system.enableStateEvaluationDebounce === true); }
+        return false;
+      } catch (e) { return false; }
     };
 
     const setDisplaysRole = (displays, role, delay = 0) => {

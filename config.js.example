@@ -56,7 +56,7 @@ const DEVICETYPE = {
 export var config = {
 
   sce_como_type2:{
-    slowPresentationDisplaysDelay: 10000,
+    presentationDisplaysStartDelay: 2000,
     enableStateEvaluationDebounce: true
   },
 
@@ -95,7 +95,6 @@ export var config = {
     mainVideoSource: 6,
     defaultPipPosition: 'UpperLeft',
     //enableStateEvaluationDebounce: true,        // <true, false> Active un "debounce" lors de l'évaluation des scénarios (utile pour éviter les évaluations multiples lors de changements rapides de status)
-    //SlowPresentationDisplaysDelay: 10000, //Délais pour setter les rôles des affichages de présentation (utile pour les systèmes lents)
     onStandby: {
       setDND: true,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
       clearCallHistory: true,                    // <true, false> Détermine si l'historique d'appel est supprimé lors du standby

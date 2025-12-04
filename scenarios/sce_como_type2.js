@@ -1100,6 +1100,17 @@ export class Scenario {
             powerOffDisplays(secondaryPresentationDisplays);
             blankDisplays(secondaryPresentationDisplays);
           }
+
+          if (systemconfig.system.defaultPipPosition) {
+            xapi.Command.Video.Layout.LayoutFamily.Set({
+              LayoutFamily: 'Overlay',
+              Target: 'Local'
+            });
+
+            xapi.Command.Video.ActiveSpeakerPIP.Set({
+              Position: systemconfig.system.defaultPipPosition,
+            });
+          }
  
         }
        

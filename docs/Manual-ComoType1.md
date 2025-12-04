@@ -72,6 +72,15 @@ Un ou plusieurs groupes de sortie audio pour le son des sites distants.
 
 Doit faire parti du groupe `system.farend.main`.
 
+### Routage audio intelligent
+Le scénario utilise un routage audio intelligent pour les entrées distantes :
+- Les entrées identifiées avec le rôle `Presentation` sont automatiquement routées vers le groupe `system.presentation.main`.
+- Les autres entrées sont routées selon l'emplacement du présentateur (`PresenterLocation`) :
+  - Si `local` : vers `system.farend.main`.
+  - Si `remote` : vers `system.presentation.main`.
+
+Un mécanisme de sondage ("Probe") détecte l'arrivée tardive des flux audio de présentation pour appliquer le routage correct même si le flux démarre après le début de l'appel.
+
 ## Entrées audio
 ### Microphones présentateur (optionnel)
 Une ou plusieurs entrées audio (microphones) pour le présentateur.

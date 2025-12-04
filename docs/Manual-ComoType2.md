@@ -74,9 +74,9 @@ Le Type 2 utilise des rôles de moniteur supplémentaires pour supporter les con
 ### Gestion audio intelligente
 
 Les deux scénarios partagent la même logique de routage audio intelligent introduite en v1.2.0 :
-- Détection et routage automatique des flux audio avec rôle `Presentation`
-- Routage conditionnel des autres flux selon `PresenterLocation`
-- Support de la méthode `connectSpecificRemoteInputs()` / `disconnectSpecificRemoteInputs()`
+- Détection et routage automatique des flux audio avec rôle `Presentation` vers le groupe `system.presentation.main`.
+- Routage conditionnel des autres flux selon `PresenterLocation`.
+- **Nouveau :** Un mécanisme de sondage ("Probe") détecte l'arrivée tardive des flux audio de présentation pour appliquer le routage correct même si le flux démarre après le début de l'appel.
 
 ## Groupes d'affichages
 
@@ -354,16 +354,22 @@ Les affichages configurés avec `alwaysUse: true` (Affichages permanents) resten
 
 ## Fonctionnalités avancées
 
-### Anti-scintillement des rôles d'affichage (debounce)
+### Debouncing et Stabilité (Anti-scintillement)
 
-Pour éviter les clignotements lors de changements rapides d'état, le scénario implémente un mécanisme de « debouncing » lors du réglage des rôles de moniteurs (`MonitorRole`).
+Pour éviter les clignotements lors de changements rapides d'état, le scénario implémente un mécanisme de « debouncing » étendu.
 
-- Activation via `sce_como_type2.enableStateEvaluationDebounce: true` dans la configuration.
-- Peut également être configuré sous `system.enableStateEvaluationDebounce` (fallback).
-- Par connecteur, la dernière demande de rôle est appliquée après un court délai, les demandes précédentes sont annulées.
-- Réduit les appels xAPI redondants et les changements de rôle inutiles pendant les transitions rapides.
+- **MonitorRole :** Les changements de rôle des moniteurs sont temporisés.
+- **Power & Blanking :** Les commandes d'alimentation et de blanking sont également gérées par des timers pour assurer des transitions fluides et respecter les délais des équipements.
+- **Configuration :** Activation via `sce_como_type2.enableStateEvaluationDebounce: true` dans la configuration (ou `system.enableStateEvaluationDebounce` en fallback).
 
-Effet pratique: lors de bascules de présentation/appel successives, les affichages conservent une transition fluide sans flicker.
+Ce mécanisme réduit les appels xAPI redondants et assure que seule la dernière demande d'état est appliquée après une courte période de stabilisation.
+
+### Gestion des transitions d'affichage (Transition fluide)
+
+Lors du passage à un mode où le présentateur distant est affiché sur l'écran principal (et donc retiré des écrans distants), un délai peut être configuré pour maintenir l'image sur les écrans distants le temps que l'écran principal s'allume ou change de source.
+
+- **Configuration :** `sce_como_type2.presentationDisplaysStartDelay` (en ms).
+- **Usage :** Permet d'éviter une période de "noir" lors de la bascule du présentateur distant vers l'écran principal. Les écrans distants restent allumés pendant ce délai avant de s'éteindre.
 
 ### Détection automatique des rôles audio
 

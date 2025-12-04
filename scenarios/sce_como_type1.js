@@ -817,6 +817,8 @@ export class Scenario {
           powerOnDisplays(presentationDisplays);
           unblankDisplays(presentationDisplays);
 
+        
+          
           if (systemconfig.system.defaultPipPosition) {
             xapi.Command.Video.Layout.LayoutFamily.Set({
               LayoutFamily: 'Overlay',
@@ -827,6 +829,7 @@ export class Scenario {
               Position: systemconfig.system.defaultPipPosition,
             });
           }
+            
         }
       }
 

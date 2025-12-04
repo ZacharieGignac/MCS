@@ -142,8 +142,8 @@ Cette section est un array de tout les imports des modules. Si l'import n'est pa
     defaultPipPosition: 'UpperLeft',              // <UpperLeft, UpperCenter, UpperRight, CenterLeft, CenterRight, LowerLeft, LowerRight> Position par défaut du PIP (Picture-in-Picture) lors de l'utilisation du layout "Overlay"
     // Anti-scintillement des rôles d'affichage (debounce)
     enableStateEvaluationDebounce: true,          // <true, false> Active un debouncing lors de l'évaluation pour éviter les flickers de MonitorRole
-    // Affichages de présentation lents (séquencement PresentationOnly -> Second)
-    SlowPresentationDisplaysDelay: 10000,         // Délais (ms) pour appliquer "Second" après "PresentationOnly" sur les affichages de présentation lents
+    // Transition fluide pour présentateur distant
+    presentationDisplaysStartDelay: 0,            // Délais (ms) avant d'éteindre les écrans distants lors de la bascule du présentateur vers l'écran principal
 
     onStandby: {
       setDND: false,                              // <true, false> Détermine si le mode "ne pas déranger" est activé lors du standby
@@ -158,7 +158,7 @@ Cette section est un array de tout les imports des modules. Si l'import n'est pa
   // Configuration spécifique au scénario Comodale Type 2
   sce_como_type2: {
     enableStateEvaluationDebounce: true,          // <true, false> Active un debouncing lors de l'évaluation pour éviter les flickers de MonitorRole
-    slowPresentationDisplaysDelay: 10000          // Délais (ms) pour appliquer "Second" après "PresentationOnly" sur les affichages de présentation lents
+    presentationDisplaysStartDelay: 2000          // Délais (ms) avant d'éteindre les écrans distants lors de la bascule du présentateur vers l'écran principal
   }
 ```
 

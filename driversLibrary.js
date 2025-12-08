@@ -972,9 +972,15 @@ export class DisplayDriver_serial_sharp {
     this.config = config;
     this.device = device;
     this.port = this.config.port || 1;
-    this.pacing = this.config.pacing || 300;
+    this.pacing = this.config.pacing || 100;
+    this.repeat = this.config.repeat || 2000;
+    this.timeout = 200; // Fixed 200ms wait (no response expected)
     this.queue = [];
     this.sending = false;
+    this.currentPower = undefined;
+    this.currentBlanking = undefined;
+    this._lastErrorAt = 0;
+    this._errorDebounceMs = 5000;
 
     this.serialCommands = {
       ENABLE_SERIAL: 'RSPW0001',
@@ -987,6 +993,11 @@ export class DisplayDriver_serial_sharp {
 
     this._configureSerial();
     this._enableSerialControl();
+
+    // State enforcement loop
+    this.stateInterval = setInterval(() => {
+      this._enforceState();
+    }, this.repeat);
   }
 
   _configureSerial() {
@@ -1002,19 +1013,34 @@ export class DisplayDriver_serial_sharp {
   }
 
   _enableSerialControl() {
-    this._enqueue(this.serialCommands.ENABLE_SERIAL);
+    this.serialSend(this.serialCommands.ENABLE_SERIAL).catch(e => this.handleSerialError(e));
     debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): Enabling serial control (RSPW0001)`);
   }
 
   setPower(power) {
     power = power.toLowerCase();
+    this.currentPower = power;
     const cmd = power === 'on' ? this.serialCommands.POWER_ON : this.serialCommands.POWER_OFF;
-    this._enqueue(cmd);
+    this.serialSend(cmd).catch(e => this.handleSerialError(e));
+    debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): setPower: ${power}`);
   }
 
   setBlanking(blanking) {
+    this.currentBlanking = blanking;
     const cmd = blanking ? this.serialCommands.BLANK_ON : this.serialCommands.BLANK_OFF;
-    this._enqueue(cmd);
+    this.serialSend(cmd).catch(e => this.handleSerialError(e));
+    debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): setBlanking: ${blanking}`);
+  }
+
+  _enforceState() {
+    if (this.currentPower) {
+      const cmd = this.currentPower === 'on' ? this.serialCommands.POWER_ON : this.serialCommands.POWER_OFF;
+      this.serialSend(cmd).catch(e => this.handleSerialError(e));
+    }
+    if (this.currentBlanking !== undefined) {
+      const cmd = this.currentBlanking ? this.serialCommands.BLANK_ON : this.serialCommands.BLANK_OFF;
+      this.serialSend(cmd).catch(e => this.handleSerialError(e));
+    }
   }
 
   setSource() { debug(2, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): setSource not implemented`); }
@@ -1022,36 +1048,61 @@ export class DisplayDriver_serial_sharp {
   requestUsageHours() { }
   custom() { }
 
-  _enqueue(cmd) {
-    const payload = cmd + this.serialCommands.TERMINATOR;
-    this.queue.push(payload);
-    if (!this.sending) {
-      this._processQueue();
-    }
+  serialSend(command) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ command, resolve, reject });
+      if (!this.sending) {
+        this.sendNextMessage();
+      }
+    });
   }
 
-  async _processQueue() {
+  sendNextMessage() {
     if (this.queue.length === 0) {
       this.sending = false;
-      return;
+      return Promise.resolve();
+    }
+
+    if (this.sending) {
+      return Promise.resolve();
     }
 
     this.sending = true;
-    const command = this.queue.shift();
-    try {
-      debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): TX [${command.replace(/\r/g, '\\r')}]`);
-      await xapi.Command.SerialPort.PeripheralControl.Send({
-        PortId: this.port,
-        Text: command,
-        ResponseTimeout: 100
-      });
-    } catch (e) {
-      debug(2, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): Send error: ${e.message}`);
-    }
+    const { command, resolve, reject } = this.queue.shift();
+    const payload = command + this.serialCommands.TERMINATOR;
 
-    setTimeout(() => {
-      this._processQueue();
-    }, this.pacing);
+    try { debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): TX [${payload.replace(/\r/g, '\\r')}]`); } catch (_) { }
+
+    return xapi.Command.SerialPort.PeripheralControl.Send({
+      PortId: this.port,
+      Text: payload,
+      // ResponseTerminator: this.serialCommands.TERMINATOR, // No response expected
+      ResponseTimeout: this.timeout
+    })
+      .then(response => {
+        const rawRx = (response && response.Response) ? response.Response : '';
+        debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): RX RAW [${rawRx.replace(/\r/g, '\\r').replace(/\n/g, '\\n')}]`);
+        resolve(response);
+        return new Promise(res => setTimeout(res, this.pacing));
+      })
+      .catch(e => {
+        debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): TX Error (ignoring): ${e.message}`);
+        resolve();
+        return new Promise(res => setTimeout(res, this.pacing));
+      })
+      .finally(() => {
+        this.sending = false;
+        return this.sendNextMessage();
+      });
+  }
+
+  handleSerialError(e) {
+    const now = Date.now();
+    if (now - this._lastErrorAt >= this._errorDebounceMs) {
+      this._lastErrorAt = now;
+      const msg = (e && e.message) ? e.message : String(e);
+      debug(2, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): ${msg}`);
+    }
   }
 }
 

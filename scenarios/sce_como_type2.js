@@ -750,11 +750,19 @@ export class Scenario {
             powerOnDisplays(teleprompterDisplays);
             unblankDisplays(teleprompterDisplays);
           }
+          else {
+            powerOffDisplays(teleprompterDisplays);
+            blankDisplays(teleprompterDisplays);
+          }
 
           //Secondary presentation displays
           if (UseSecondaryPresentationDisplays == ON) {
             powerOnDisplays(secondaryPresentationDisplays);
             unblankDisplays(secondaryPresentationDisplays);
+          }
+          else {
+            powerOffDisplays(secondaryPresentationDisplays);
+            blankDisplays(secondaryPresentationDisplays);
           }
         }
 

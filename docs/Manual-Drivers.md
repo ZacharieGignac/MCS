@@ -61,6 +61,7 @@ Driver pour écrans Sharp contrôlés via RS-232.
 **Fonctionnalités supportées:**
 * Alimentation (Power On/Off)
 * Blanking (Mute vidéo)
+* Activation automatique du contrôle série (`RSPW0001`) au démarrage
 * *Note: Le changement de source n'est pas implémenté.*
 
 **Exemple de configuration:**

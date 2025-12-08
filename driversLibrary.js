@@ -977,6 +977,7 @@ export class DisplayDriver_serial_sharp {
     this.sending = false;
 
     this.serialCommands = {
+      ENABLE_SERIAL: 'RSPW0001',
       POWER_ON: 'POWR0001',
       POWER_OFF: 'POWR0000',
       BLANK_ON: 'AVMT0001',
@@ -985,6 +986,7 @@ export class DisplayDriver_serial_sharp {
     };
 
     this._configureSerial();
+    this._enableSerialControl();
   }
 
   _configureSerial() {
@@ -997,6 +999,11 @@ export class DisplayDriver_serial_sharp {
     } catch (e) {
       debug(2, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): Serial config failed: ${e.message}`);
     }
+  }
+
+  _enableSerialControl() {
+    this._enqueue(this.serialCommands.ENABLE_SERIAL);
+    debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): Enabling serial control (RSPW0001)`);
   }
 
   setPower(power) {

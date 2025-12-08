@@ -1750,3 +1750,113 @@ export class USBSerialDriver {
   }
 }
 
+export class TridonicDALI_BM {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
+    this.queue = [];
+    this.sending = false;
+    this.pacing = 50;
+    this.port = this.config.port || 1;
+
+    try {
+      xapi.Config.SerialPort.Outbound.Mode.set('On');
+      xapi.Config.SerialPort.Outbound.Port[this.port].BaudRate.set(19200);
+      xapi.Config.SerialPort.Outbound.Port[this.port].Parity.set('None');
+      xapi.Config.SerialPort.Outbound.Port[this.port].Description.set('TridonicDALI');
+      debug(1, `DRIVER TridonicDALI_BM (${this.config.id}): Serial port ${this.port} configured`);
+    } catch (e) {
+      debug(2, `DRIVER TridonicDALI_BM (${this.config.id}): Failed to configure serial port: ${e.message}`);
+    }
+  }
+
+  sendDaliCommand(zone, intensity) {
+    const prefix = 0xA3;
+    const reserved = 0x00;
+    let checksum = prefix ^ reserved ^ reserved ^ reserved ^ zone ^ intensity;
+    
+    // Build escaped hex string for serial transmission (e.g. "\xA3\x00\x00...")
+    // The xAPI requires hex values to be escaped in the Text parameter
+    let bytes = [prefix, reserved, reserved, reserved, zone, intensity, checksum];
+    let commandString = bytes.map(b => '\\x' + b.toString(16).padStart(2, '0').toUpperCase()).join('');
+    
+    debug(1, `DRIVER TridonicDALI_BM (${this.config.id}): sendDaliCommand zone=${zone}, intensity=${intensity}, checksum=${checksum}`);
+
+    this.queue.push(commandString);
+    if (!this.sending) {
+      this._processQueue();
+    }
+  }
+
+  async _processQueue() {
+    if (this.queue.length === 0) {
+      this.sending = false;
+      return;
+    }
+
+    this.sending = true;
+    const command = this.queue.shift();
+
+    try {
+
+      await xapi.Command.SerialPort.PeripheralControl.Send({
+        PortId: this.port,
+        Text: command,
+        ResponseTimeout: 100
+      });
+    } catch (e) {
+      debug(2, `DRIVER TridonicDALI_BM (${this.config.id}): Exception caught - ${e.message}`);
+      if (!String(e.message).includes('Timeout')) {
+        debug(2, `DRIVER TridonicDALI_BM (${this.config.id}): Send error: ${e.message}`);
+      }
+    }
+
+    setTimeout(() => {
+      this._processQueue();
+    }, this.pacing);
+  }
+}
+
+export class LightDriver_TridonicDALI {
+  constructor(device, config) {
+    this.device = device;
+    this.config = config;
+  }
+
+  _getGateway() {
+    if (this.config.gatewayId) {
+      let gatewayDevice = zapi.devices.getDevice(this.config.gatewayId);
+      if (gatewayDevice && gatewayDevice.driver) {
+        return gatewayDevice.driver;
+      }
+    }
+    debug(2, `DRIVER LightDriver_TridonicDALI (${this.config.id}): No gatewayId configured or gateway driver not found.`);
+    return null;
+  }
+
+  on() {
+    let gateway = this._getGateway();
+    if (gateway) {
+      gateway.sendDaliCommand(this.config.zone, 254);
+      debug(1, `DRIVER LightDriver_TridonicDALI (${this.config.id}): ON -> Zone ${this.config.zone}`);
+    }
+  }
+
+  off() {
+    let gateway = this._getGateway();
+    if (gateway) {
+      gateway.sendDaliCommand(this.config.zone, 0);
+      debug(1, `DRIVER LightDriver_TridonicDALI (${this.config.id}): OFF -> Zone ${this.config.zone}`);
+    }
+  }
+
+  dim(level) {
+    let gateway = this._getGateway();
+    if (gateway) {
+      let val = Math.round((level / 100) * 254);
+      gateway.sendDaliCommand(this.config.zone, val);
+      debug(1, `DRIVER LightDriver_TridonicDALI (${this.config.id}): DIM ${level}% -> ${val} -> Zone ${this.config.zone}`);
+    }
+  }
+}
+

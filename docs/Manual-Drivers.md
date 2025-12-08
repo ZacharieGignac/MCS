@@ -1,0 +1,49 @@
+# Drivers
+
+Ce document décrit les drivers disponibles dans `driversLibrary.js` et leur configuration.
+
+## Tridonic
+
+### TridonicDALI_BM
+Driver de passerelle pour l'interface Tridonic DALI via port série. Ce driver est responsable de la communication avec le matériel Tridonic.
+
+* **Device Class**: `SoftwareDevice`
+* **Configuration**:
+  * `port`: (number) Le port série du codec utilisé (défaut: 1). Le driver configure automatiquement le port à 19200 baud, 8N1.
+
+**Exemple de configuration:**
+```javascript
+{
+  id: 'gateway.dali',
+  type: DEVICETYPE.SOFTWAREDEVICE,
+  device: devicesLibrary.SoftwareDevice,
+  driver: driversLibrary.TridonicDALI_BM,
+  name: 'Tridonic DALI Gateway',
+  port: 1
+}
+```
+
+### LightDriver_TridonicDALI
+Driver pour contrôler une zone d'éclairage DALI via la passerelle `TridonicDALI_BM`.
+
+* **Device Class**: `Light`
+* **Configuration**:
+  * `gatewayId`: (string) L'ID du device `TridonicDALI_BM` à utiliser.
+  * `zone`: (number) L'adresse de zone DALI (0-15) ou adresse courte (0-254) selon la configuration DALI (Note: le code utilise la valeur telle quelle).
+
+**Exemple de configuration:**
+```javascript
+{
+  id: 'light.zone1',
+  type: DEVICETYPE.LIGHT,
+  name: 'Zone 1',
+  device: devicesLibrary.Light,
+  driver: driversLibrary.LightDriver_TridonicDALI,
+  gatewayId: 'gateway.dali',
+  zone: 1,
+  supportsPower: true,
+  supportsDim: true,
+  defaultPower: 'off',
+  defaultDim: 100
+}
+```

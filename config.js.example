@@ -55,7 +55,7 @@ const DEVICETYPE = {
 
 export var config = {
 
-  sce_como_type2:{
+  sce_como_type2: {
     enableStateEvaluationDebounce: false,
     presentationDisplaysStartDelay: 10000
   },
@@ -160,35 +160,67 @@ export var config = {
     {
       id: 'controlsystem.isc',                     //Identification unique
       type: DEVICETYPE.CONTROLSYSTEM,              //Type = 'CONTROLSYSTEM'
-      name: 'ISC_MAIN',                            //Nom utilisé pour les échanges série/IP
+      name: 'CRESTRON',                            //Nom utilisé pour les échanges série/IP
       device: devicesLibrary.ControlSystem,        //Classe ControlSystem
       driver: driversLibrary.ControlSystemDriver_isc, //Driver ISC
       syncRestart: true,                           //Redémarre le contrôleur quand le codec redémarre
       heartbeatInterval: 60000                     //Intervalle (ms) entre les messages de heartbeat
     },
     {
-      id: 'serial.tridonic',                               // Identification unique
-      type: DEVICETYPE.SOFTWAREDEVICE,                  // Type = 'SOFTWAREDEVICE'
-      device: devicesLibrary.SoftwareDevice,            // Classe générique SoftwareDevice
-      driver: driversLibrary.USBSerialDriver,           // Driver série (USBSerialDriver)
-
-      name: 'Tridonic DALI-BM RS232',                        // Nom optionnel pour les logs
-
-      // Configuration du port série du codec
-      port: 1,                                          // Port série du codec (1 à 4)
-      baudRate: 19200,                                   // Vitesse: 9600, 19200, 38400, etc.
-      parity: 'None',                                   // 'None', 'Even', 'Odd' (selon le périphérique)
-
-      // Gestion des échanges
-      terminator: '',                               // Fin de réponse (null/'' = fire-and-forget)
-      pacing: 100,                                      // Délai (ms) entre deux commandes envoyées
-      timeout: 0,                                     // Timeout (ms) de réponse pour chaque commande
+      id: 'gateway.dali',
+      type: DEVICETYPE.SOFTWAREDEVICE,
+      device: devicesLibrary.SoftwareDevice,
+      driver: driversLibrary.TridonicDALI_BM,
+      name: 'Tridonic DALI Gateway',
+      port: 1
+    },
+    {
+      id: 'light.zone128',
+      type: DEVICETYPE.LIGHT,
+      name: 'Test Light',
+      device: devicesLibrary.Light,
+      driver: driversLibrary.LightDriver_TridonicDALI,
+      sliderEvent: 'released',                     //<changed, released> Événement à utiliser pour le changement du widget "slider". l'événement "changed" s'execute quand on glisse le widget (peut être demandant pour certain systèmes), "released" s'execute lorsqu'on lève le doigt
+      supportsPower: false,                       //Défini si l'éclairage supporte les commandes d'alimentation. Si false, une lumière éteinte est dim à 0
+      supportsDim: true,                          //Défini si l'éclairage supporte les commandes de tamisage
+      defaultPower: 'on',                         //Défini l'état d'alimentation par défaut au démarrage du système
+      defaultDim: 100,                             //Défini le tamisage par défaut au démarrage du système
+      gatewayId: 'gateway.dali',
+      zone: 128
+    },
+        {
+      id: 'light.zone130',
+      type: DEVICETYPE.LIGHT,
+      name: 'Test Light',
+      device: devicesLibrary.Light,
+      driver: driversLibrary.LightDriver_TridonicDALI,
+      sliderEvent: 'released',                     //<changed, released> Événement à utiliser pour le changement du widget "slider". l'événement "changed" s'execute quand on glisse le widget (peut être demandant pour certain systèmes), "released" s'execute lorsqu'on lève le doigt
+      supportsPower: false,                       //Défini si l'éclairage supporte les commandes d'alimentation. Si false, une lumière éteinte est dim à 0
+      supportsDim: true,                          //Défini si l'éclairage supporte les commandes de tamisage
+      defaultPower: 'on',                         //Défini l'état d'alimentation par défaut au démarrage du système
+      defaultDim: 100,                             //Défini le tamisage par défaut au démarrage du système
+      gatewayId: 'gateway.dali',
+      zone: 130
+    },
+        {
+      id: 'light.zone132',
+      type: DEVICETYPE.LIGHT,
+      name: 'Test Light',
+      device: devicesLibrary.Light,
+      driver: driversLibrary.LightDriver_TridonicDALI,
+      sliderEvent: 'released',                     //<changed, released> Événement à utiliser pour le changement du widget "slider". l'événement "changed" s'execute quand on glisse le widget (peut être demandant pour certain systèmes), "released" s'execute lorsqu'on lève le doigt
+      supportsPower: false,                       //Défini si l'éclairage supporte les commandes d'alimentation. Si false, une lumière éteinte est dim à 0
+      supportsDim: true,                          //Défini si l'éclairage supporte les commandes de tamisage
+      defaultPower: 'on',                         //Défini l'état d'alimentation par défaut au démarrage du système
+      defaultDim: 100,                             //Défini le tamisage par défaut au démarrage du système
+      gatewayId: 'gateway.dali',
+      zone: 132
     },
 
     {
-      id: 'display.proj',                      //Identification unique
+      id: 'display.proj1',                      //Identification unique
       type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
-      name: 'PROJ',                                 //Nom, utilisé par le driver pour la communication
+      name: 'PROJ1',                                 //Nom, utilisé par le driver pour la communication
       device: devicesLibrary.Display,               //Classe à utiliser
       driver: driversLibrary.DisplayDriver_isc, //Driver à utiliser par le device
       connector: 1,                                 //Connecteur HDMI de sortie sur le codec
@@ -205,8 +237,29 @@ export var config = {
       defaultBlanking: true,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
       blankBeforePowerOff: false,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
       powerOffDelay: 300000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
-      port: 1,                                        //Numéro du port série
     },
+    {
+      id: 'display.proj2',                      //Identification unique
+      type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
+      name: 'PROJ2',                                 //Nom, utilisé par le driver pour la communication
+      device: devicesLibrary.Display,               //Classe à utiliser
+      driver: driversLibrary.DisplayDriver_isc, //Driver à utiliser par le device
+      connector: 1,                                 //Connecteur HDMI de sortie sur le codec
+      supportsSystemStatus: false,                    //Défini si l'affichage supporte le rapport de l'état général
+      systemStatusRequestInterval: 10000,          //Interval de demande de status du système
+      supportsFilterStatus: false,                   //Défini si l'affichage supporte le rapport de l'état du filtre
+      filterStatusRequestInterval: 36000,            //Interval de demande du status du filtre
+      supportsUsageHours: false,                    //Défini si l'affichage supporte le rapport de temps d'utilisation
+      usageHoursRequestInterval: 10000,            //Interval de demande du temps d'utilisation
+      supportsPower: true,                          //Défini si l'affichage supporte les commandes d'alimentation (ON, OFF)
+      supportsBlanking: true,                      //Défini si l'affichage supporte les commandes de blanking (BLANK, UNBLANK)
+      supportsSource: false,                        //Défini si l'affichage supporte le changement de source (HDMI1, HDMI2, SDI)
+      defaultPower: 'off',                          //Alimentation par défaut lors du démarrage du système (ON, OFF)
+      defaultBlanking: true,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
+      blankBeforePowerOff: false,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
+      powerOffDelay: 300000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
+    },
+    /*
     {
       id: 'display.secondary',                      //Identification unique
       type: DEVICETYPE.DISPLAY,                     //Type = 'DISPLAY'
@@ -227,8 +280,8 @@ export var config = {
       defaultBlanking: true,                       //Blanking par défaut lors du démarrage du système (BLANK, UNBLANK)
       blankBeforePowerOff: true,                    //Défini si l'affichage doit être BLANK entre le moment où il reçoit la commande "OFF" et le moment où il est réellement OFF (powerOffDelay)
       powerOffDelay: 300000,                          //Délais entre la commande OFF du système et le véritable changement d'alimentation à OFF
-      port: 1                                        //Numéro du port série
     },
+    */
 
     {
       id: 'display.farend',
@@ -454,6 +507,56 @@ export var config = {
         },
     */
     /* LightScenes */
+{
+      id: 'lightscene.on',                          //Identification unique
+      name: 'ON',                                //Nom
+      type: DEVICETYPE.LIGHTSCENE,                    //Type = 'LIGHTSCENE'
+      device: devicesLibrary.LightScene,              //Classe à utiliser
+      driver: driversLibrary.LightSceneDriver_lights, //Driver utilisé par la classe. Ce driver contrôle des drivers de type "Light"
+      lights: [                                       //Array contenant les "Light" à contrôler et leur paramètres
+        {
+          id: 'light.zone128',                      //"id" du device de type "Light"
+          power: 'on',                                //Statut d'alimentation
+          dim: 100                                    //Statut de tamisage
+        },
+        {
+          id: 'light.zone130',
+          power: 'on',
+          dim: 100
+        },
+        {
+          id: 'light.zone132',
+          power: 'on',
+          dim: 100
+        }
+      ]
+    },
+
+{
+      id: 'lightscene.off',                          //Identification unique
+      name: 'OFF',                                //Nom
+      type: DEVICETYPE.LIGHTSCENE,                    //Type = 'LIGHTSCENE'
+      device: devicesLibrary.LightScene,              //Classe à utiliser
+      driver: driversLibrary.LightSceneDriver_lights, //Driver utilisé par la classe. Ce driver contrôle des drivers de type "Light"
+      lights: [                                       //Array contenant les "Light" à contrôler et leur paramètres
+        {
+          id: 'light.zone128',                      //"id" du device de type "Light"
+          power: 'off',                                //Statut d'alimentation
+          dim: 0                                    //Statut de tamisage
+        },
+        {
+          id: 'light.zone130',
+          power: 'on',
+          dim: 0
+        },
+        {
+          id: 'light.zone132',
+          power: 'on',
+          dim: 0
+        }
+      ]
+    },
+
     /*
     {
       id: 'lightscene.normal',                          //Identification unique
@@ -550,12 +653,12 @@ export var config = {
     //Default general groups
     {
       id: 'system.presentation.main',
-      devices: ['display.proj', 'campreset.presenter', 'camera.presenter', 'aog.room']
+      devices: ['display.proj1', 'display.proj2', 'campreset.presenter', 'camera.presenter', 'aog.room']
     },
 
     {
       id: 'system.presentation.secondary',
-      devices: ['display.secondary']
+      devices: [/*'display.secondary'*/]
     },
 
     {

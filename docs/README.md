@@ -8,6 +8,7 @@ Version de la documentation: 1.3.0-dev — Voir aussi le fichier `CHANGELOG.md` 
 - Aperçu de l'API: [API v1 (ZAPI)](./APIv1.md)
 - Configuration du système: [Manual-Configuration](./Manual-Configuration.md)
 - Appareils pris en charge et méthodes: [Manual-Devices](./Manual-Devices.md)
+- Drivers: [Manual-Drivers](./Manual-Drivers.md)
 - Modules: [Manual-Modules](./Manual-Modules.md)
 - Scénarios: [Manual-Scenarios](./Manual-Scenarios.md)
 - Événements: [Manual-Events](./Manual-Events.md)

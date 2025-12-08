@@ -695,7 +695,7 @@ export class Scenario {
         //No call, no presentation
         //TESTED OK
         if (!presentationActive && !callConnected) {
-          console.error('CLEARZONE.1');
+          debug(1, 'ComoType2 mode CLEARZONE.1 (no call, no presentation, clear zone)');
           zapi.system.setStatus('comotype2Mode', 'CLEARZONE.1');
 
           setMonitors(TRIPLE);
@@ -726,7 +726,7 @@ export class Scenario {
         //no call, presentation
         //TESTED OK
         if (presentationActive && !callConnected) {
-          console.error('CLEARZONE.2');
+          debug(1, 'ComoType2 mode CLEARZONE.2 (presentation only, clear zone)');
           zapi.system.setStatus('comotype2Mode', 'CLEARZONE.2');
 
 
@@ -769,7 +769,7 @@ export class Scenario {
         //call, no presentation
         //TESTED OK
         if (callConnected && !presentationActive && presenterLocation == LOCAL) {
-          console.error('CLEARZONE.3');
+          debug(1, 'ComoType2 mode CLEARZONE.3 (call local, no presentation, clear zone)');
           zapi.system.setStatus('comotype2Mode', 'CLEARZONE.3');
 
           setMonitors(TRIPLE);
@@ -797,7 +797,7 @@ export class Scenario {
         //call, presentation active
         //TESTED OK
         if (callConnected && presentationActive) {
-          console.error('CLEARZONE.4');
+          debug(1, 'ComoType2 mode CLEARZONE.4 (call with presentation, clear zone)');
           zapi.system.setStatus('comotype2Mode', 'CLEARZONE.4');
 
           setMonitors(TRIPLE);
@@ -839,7 +839,7 @@ export class Scenario {
 
         //call, remote presenter, no presentation
         if (callConnected && !presentationActive && presenterLocation == REMOTE) {
-          console.error('CLEARZONE.5');
+          debug(1, 'ComoType2 mode CLEARZONE.5 (remote presenter, no presentation, clear zone)');
           zapi.system.setStatus('comotype2Mode', 'CLEARZONE.5');
 
           setMonitors(TRIPLE);
@@ -868,7 +868,7 @@ export class Scenario {
 
         //call, remote presenter, presentation active
         if (callConnected && presentationActive && presenterLocation == REMOTE) {
-          console.error('CLEARZONE.6');
+          debug(1, 'ComoType2 mode CLEARZONE.6 (remote presenter with presentation, clear zone)');
           zapi.system.setStatus('comotype2Mode', 'CLEARZONE.6');
 
           setMonitors(TRIPLE);
@@ -914,7 +914,7 @@ export class Scenario {
         //No call, no presentation
         //TESTED OK
         if (!presentationActive && !callConnected) {
-          console.error('NORMAL.1');
+          debug(1, 'ComoType2 mode NORMAL.1 (no call, no presentation)');
           zapi.system.setStatus('comotype2Mode', 'NORMAL.1');
 
           setMonitors(TRIPLE);
@@ -945,7 +945,7 @@ export class Scenario {
         //no call, presentation
         //TESTED OK
         if (presentationActive && !callConnected) {
-          console.error('NORMAL.2');
+          debug(1, 'ComoType2 mode NORMAL.2 (presentation only)');
           zapi.system.setStatus('comotype2Mode', 'NORMAL.2');
 
 
@@ -986,7 +986,7 @@ export class Scenario {
         //call, no presentation
         //TESTED OK
         if (callConnected && !presentationActive) {
-          console.error('NORMAL.3');
+          debug(1, 'ComoType2 mode NORMAL.3 (call, no presentation)');
           zapi.system.setStatus('comotype2Mode', 'NORMAL.3');
 
           setMonitors(TRIPLE);
@@ -1014,7 +1014,7 @@ export class Scenario {
         //call, presentation active
         //TESTED OK
         if (callConnected && presentationActive) {
-          console.error('NORMAL.4');
+          debug(1, 'ComoType2 mode NORMAL.4 (call with presentation)');
           zapi.system.setStatus('comotype2Mode', 'NORMAL.4');
 
           setMonitors(TRIPLE);
@@ -1054,7 +1054,7 @@ export class Scenario {
 
         //call, remote presenter, no presentation
         if (callConnected && !presentationActive && presenterLocation == REMOTE) {
-          console.error('NORMAL.5');
+          debug(1, 'ComoType2 mode NORMAL.5 (remote presenter, no presentation)');
           zapi.system.setStatus('comotype2Mode', 'NORMAL.5');
 
           setMonitors(TRIPLE);
@@ -1081,7 +1081,7 @@ export class Scenario {
 
         //call, remote presenter, presentation active
         if (callConnected && presentationActive && presenterLocation == REMOTE) {
-          console.error('NORMAL.6');
+          debug(1, 'ComoType2 mode NORMAL.6 (remote presenter with presentation)');
           zapi.system.setStatus('comotype2Mode', 'NORMAL.6');
 
           setMonitors(TRIPLE);

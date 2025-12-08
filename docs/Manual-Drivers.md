@@ -64,6 +64,9 @@ Driver pour écrans Sharp contrôlés via RS-232.
 * Activation automatique du contrôle série (`RSPW0001`) au démarrage
 * *Note: Le changement de source n'est pas implémenté.*
 
+**Note importante :**
+Si le système utilise un écran Sharp, celui-ci doit être **allumé** avant de démarrer MCS pour la première fois. MCS tentera de configurer l'écran pour activer la communication série (commande `RSPW0001`). Si l'écran n'est pas sous tension à ce moment, ce paramètre ne sera pas appliqué et le contrôle pourrait ne pas fonctionner (notamment si le mode éco désactive le port série en veille).
+
 **Exemple de configuration:**
 ```javascript
 {

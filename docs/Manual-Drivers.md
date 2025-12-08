@@ -209,12 +209,41 @@ Driver pour les entrées audio du Codec Pro (Microphone ou HDMI).
   * `input`: (string) Type d'entrée: 'microphone' ou 'hdmi'.
   * `connector`: (number) Numéro du connecteur physique.
 
+**Exemple de configuration:**
+```javascript
+{
+  id: 'audio.mic1',
+  type: DEVICETYPE.AUDIOINPUT,
+  name: 'Microphone 1',
+  device: devicesLibrary.AudioInput,
+  driver: driversLibrary.AudioInputDriver_codecpro,
+  input: 'microphone',
+  connector: 1,
+  gainStep: 1,
+  defaultGain: 50
+}
+```
+
 ### AudioInputDriver_codeceq
 Driver pour les entrées audio du Codec EQ / Room Kit EQ.
 
 * **Device Class**: `AudioInput`
 * **Configuration**:
   * `connector`: (number) Numéro du connecteur physique (Microphone).
+
+**Exemple de configuration:**
+```javascript
+{
+  id: 'audio.mic1',
+  type: DEVICETYPE.AUDIOINPUT,
+  name: 'Microphone 1',
+  device: devicesLibrary.AudioInput,
+  driver: driversLibrary.AudioInputDriver_codeceq,
+  connector: 1,
+  gainStep: 1,
+  defaultGain: 50
+}
+```
 
 ### AudioInputDriver_aes67
 Driver pour les entrées audio AES67.
@@ -224,12 +253,41 @@ Driver pour les entrées audio AES67.
   * `connector`: (number) Numéro du connecteur Ethernet.
   * `channel`: (number) Canal audio (défaut: 1).
 
+**Exemple de configuration:**
+```javascript
+{
+  id: 'audio.aes67.1',
+  type: DEVICETYPE.AUDIOINPUT,
+  name: 'Microphone Plafond',
+  device: devicesLibrary.AudioInput,
+  driver: driversLibrary.AudioInputDriver_aes67,
+  connector: 1,
+  channel: 1,
+  gainStep: 1,
+  defaultGain: 0
+}
+```
+
 ### AudioInputDriver_usb
 Driver pour les entrées audio USB.
 
 * **Device Class**: `AudioInput`
 * **Configuration**:
   * `connector`: (number) Numéro de l'interface USB.
+
+**Exemple de configuration:**
+```javascript
+{
+  id: 'audio.usb.1',
+  type: DEVICETYPE.AUDIOINPUT,
+  name: 'USB Input',
+  device: devicesLibrary.AudioInput,
+  driver: driversLibrary.AudioInputDriver_usb,
+  connector: 1,
+  gainStep: 1,
+  defaultGain: 0
+}
+```
 
 ### AudioOutputDriver_codecpro
 Driver pour les sorties audio du Codec Pro (Line ou HDMI).
@@ -239,6 +297,19 @@ Driver pour les sorties audio du Codec Pro (Line ou HDMI).
   * `output`: (string) Type de sortie: 'line' ou 'hdmi'.
   * `connector`: (number) Numéro du connecteur physique.
 
+**Exemple de configuration:**
+```javascript
+{
+  id: 'audio.out.line1',
+  type: DEVICETYPE.AUDIOOUTPUT,
+  name: 'Line Out 1',
+  device: devicesLibrary.AudioOutput,
+  driver: driversLibrary.AudioOutputDriver_codecpro,
+  output: 'line',
+  connector: 1
+}
+```
+
 ### AudioOutputDriver_aes67
 Driver pour les sorties audio AES67.
 
@@ -246,12 +317,36 @@ Driver pour les sorties audio AES67.
 * **Configuration**:
   * `connector`: (number) Numéro du connecteur Ethernet.
 
+**Exemple de configuration:**
+```javascript
+{
+  id: 'audio.out.aes67.1',
+  type: DEVICETYPE.AUDIOOUTPUT,
+  name: 'AES67 Out 1',
+  device: devicesLibrary.AudioOutput,
+  driver: driversLibrary.AudioOutputDriver_aes67,
+  connector: 1
+}
+```
+
 ### AudioOutputDriver_usb
 Driver pour les sorties audio USB.
 
 * **Device Class**: `AudioOutput`
 * **Configuration**:
   * `connector`: (number) Numéro de l'interface USB.
+
+**Exemple de configuration:**
+```javascript
+{
+  id: 'audio.out.usb.1',
+  type: DEVICETYPE.AUDIOOUTPUT,
+  name: 'USB Out 1',
+  device: devicesLibrary.AudioOutput,
+  driver: driversLibrary.AudioOutputDriver_usb,
+  connector: 1
+}
+```
 
 ## Autres Drivers
 
@@ -267,6 +362,22 @@ Driver générique pour communication série via adaptateur USB (supporté par c
   * `pacing`: (number) Délais entre envois (ms).
   * `timeout`: (number) Timeout de réponse (ms).
 
+**Exemple de configuration:**
+```javascript
+{
+  id: 'serial.device',
+  type: DEVICETYPE.SOFTWAREDEVICE,
+  name: 'Generic Serial Device',
+  device: devicesLibrary.SoftwareDevice,
+  driver: driversLibrary.USBSerialDriver,
+  port: 1,
+  baudRate: 9600,
+  parity: 'None',
+  terminator: '\\r\\n',
+  pacing: 200
+}
+```
+
 ### ScreenDriver_gpio
 Driver pour écran motorisé contrôlé par GPIO.
 
@@ -275,6 +386,33 @@ Driver pour écran motorisé contrôlé par GPIO.
   * `pin`: (number) Pour contrôle simple (1 pin).
   * `pin1`, `pin2`: (number) Pour contrôle double (2 pins, Up/Down).
   * `defaultPosition`: (string) Position par défaut ('up' ou 'down').
+
+**Exemple de configuration (Simple):**
+```javascript
+{
+  id: 'screen.main',
+  type: DEVICETYPE.SCREEN,
+  name: 'Toile',
+  device: devicesLibrary.Screen,
+  driver: driversLibrary.ScreenDriver_gpio,
+  pin: 1,
+  defaultPosition: 'up'
+}
+```
+
+**Exemple de configuration (Double):**
+```javascript
+{
+  id: 'screen.main',
+  type: DEVICETYPE.SCREEN,
+  name: 'Toile',
+  device: devicesLibrary.Screen,
+  driver: driversLibrary.ScreenDriver_gpio,
+  pin1: 1,
+  pin2: 2,
+  defaultPosition: 'up'
+}
+```
 
 ### ScreenDriver_gc_itachflex
 Driver pour écran motorisé contrôlé par Global Caché iTach Flex.
@@ -286,9 +424,37 @@ Driver pour écran motorisé contrôlé par Global Caché iTach Flex.
   * `downRelay`: (number) ID du relais pour la descente.
   * `pulseLength`: (number) Durée de l'impulsion en ms (défaut: 1000).
 
+**Exemple de configuration:**
+```javascript
+{
+  id: 'screen.main',
+  type: DEVICETYPE.SCREEN,
+  name: 'Toile',
+  device: devicesLibrary.Screen,
+  driver: driversLibrary.ScreenDriver_gc_itachflex,
+  host: '192.168.1.50',
+  upRelay: 1,
+  downRelay: 2,
+  pulseLength: 1000,
+  defaultPosition: 'up'
+}
+```
+
 ### DisplayDriver_CEC
 Driver pour écran contrôlé via HDMI CEC.
 
 * **Device Class**: `Display`
 * **Configuration**:
   * `connector`: (number) Numéro du connecteur HDMI de sortie.
+
+**Exemple de configuration:**
+```javascript
+{
+  id: 'display.tv',
+  type: DEVICETYPE.DISPLAY,
+  name: 'TV CEC',
+  device: devicesLibrary.Display,
+  driver: driversLibrary.DisplayDriver_CEC,
+  connector: 1
+}
+```

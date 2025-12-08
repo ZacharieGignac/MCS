@@ -966,6 +966,88 @@ export class ScreenDriver_isc_h21 {
   }
 }
 
+// Sharp RS-232C (POWR/AVMT, 4+4+\r, ASCII)
+export class DisplayDriver_serial_sharp {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+    this.port = this.config.port || 1;
+    this.pacing = this.config.pacing || 300;
+    this.queue = [];
+    this.sending = false;
+
+    this.serialCommands = {
+      POWER_ON: 'POWR0001',
+      POWER_OFF: 'POWR0000',
+      BLANK_ON: 'AVMT0001',
+      BLANK_OFF: 'AVMT0000',
+      TERMINATOR: '\r'
+    };
+
+    this._configureSerial();
+  }
+
+  _configureSerial() {
+    try {
+      xapi.Config.SerialPort.Outbound.Mode.set('On');
+      xapi.Config.SerialPort.Outbound.Port[this.port].BaudRate.set(9600);
+      xapi.Config.SerialPort.Outbound.Port[this.port].Parity.set('None');
+      xapi.Config.SerialPort.Outbound.Port[this.port].Description.set(`${this.config.id}_sharp`);
+      debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): Serial port ${this.port} configured (9600 8N1)`);
+    } catch (e) {
+      debug(2, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): Serial config failed: ${e.message}`);
+    }
+  }
+
+  setPower(power) {
+    power = power.toLowerCase();
+    const cmd = power === 'on' ? this.serialCommands.POWER_ON : this.serialCommands.POWER_OFF;
+    this._enqueue(cmd);
+  }
+
+  setBlanking(blanking) {
+    const cmd = blanking ? this.serialCommands.BLANK_ON : this.serialCommands.BLANK_OFF;
+    this._enqueue(cmd);
+  }
+
+  setSource() { debug(2, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): setSource not implemented`); }
+  getUsageHours() { return 0; }
+  requestUsageHours() { }
+  custom() { }
+
+  _enqueue(cmd) {
+    const payload = cmd + this.serialCommands.TERMINATOR;
+    this.queue.push(payload);
+    if (!this.sending) {
+      this._processQueue();
+    }
+  }
+
+  async _processQueue() {
+    if (this.queue.length === 0) {
+      this.sending = false;
+      return;
+    }
+
+    this.sending = true;
+    const command = this.queue.shift();
+    try {
+      debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): TX [${command.replace(/\r/g, '\\r')}]`);
+      await xapi.Command.SerialPort.PeripheralControl.Send({
+        PortId: this.port,
+        Text: command,
+        ResponseTimeout: 100
+      });
+    } catch (e) {
+      debug(2, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): Send error: ${e.message}`);
+    }
+
+    setTimeout(() => {
+      this._processQueue();
+    }, this.pacing);
+  }
+}
+
 
 export class ScreenDriver_isc {
   constructor(device, config) {

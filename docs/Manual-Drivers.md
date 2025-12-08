@@ -85,6 +85,7 @@ Driver pour écrans Sharp contrôlés via RS-232.
   * `pacing`: (number) Délais en ms entre l'envoi de deux commandes (défaut: 100).
   * `repeat`: (number) Intervalle en ms pour la répétition des commandes d'état (défaut: 2000).
   * `timeout`: (number) Timeout de réponse en ms (Fixé à 200ms).
+  * `debug`: (boolean) Active les logs détaillés TX/RX du port série lorsqu'à `true` (défaut: `false`).
 
 **Fonctionnalités supportées:**
 * Alimentation (Power On/Off)

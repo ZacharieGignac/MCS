@@ -971,6 +971,7 @@ export class DisplayDriver_serial_sharp {
   constructor(device, config) {
     this.config = config;
     this.device = device;
+    this.debugEnabled = !!this.config.debug;
     this.port = this.config.port || 1;
     this.pacing = this.config.pacing || 100;
     this.repeat = this.config.repeat || 2000;
@@ -1070,8 +1071,9 @@ export class DisplayDriver_serial_sharp {
     this.sending = true;
     const { command, resolve, reject } = this.queue.shift();
     const payload = command + this.serialCommands.TERMINATOR;
-
-    try { debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): TX [${payload.replace(/\r/g, '\\r')}]`); } catch (_) { }
+    if (this.debugEnabled) {
+      try { debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): TX [${payload.replace(/\r/g, '\\r')}]`); } catch (_) { }
+    }
 
     return xapi.Command.SerialPort.PeripheralControl.Send({
       PortId: this.port,
@@ -1080,13 +1082,17 @@ export class DisplayDriver_serial_sharp {
       ResponseTimeout: this.timeout
     })
       .then(response => {
-        const rawRx = (response && response.Response) ? response.Response : '';
-        debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): RX RAW [${rawRx.replace(/\r/g, '\\r').replace(/\n/g, '\\n')}]`);
+        if (this.debugEnabled) {
+          const rawRx = (response && response.Response) ? response.Response : '';
+          debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): RX RAW [${rawRx.replace(/\r/g, '\\r').replace(/\n/g, '\\n')}]`);
+        }
         resolve(response);
         return new Promise(res => setTimeout(res, this.pacing));
       })
       .catch(e => {
-        debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): TX Error (ignoring): ${e.message}`);
+        if (this.debugEnabled) {
+          debug(1, `DRIVER DisplayDriver_serial_sharp (${this.config.id}): TX Error (ignoring): ${e.message}`);
+        }
         resolve();
         return new Promise(res => setTimeout(res, this.pacing));
       })

@@ -4,6 +4,9 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 
 ## [1.3.0-dev] - En cours
 ### Ajouts / Modifications
+- Nouveaux drivers Tridonic DALI : `TridonicDALI_BM` (passerelle série) et `LightDriver_TridonicDALI` (contrôle d'éclairage). Documentation disponible dans `docs/Manual-Drivers.md`.
+- Nouveau manuel `docs/Manual-Drivers.md` pour documenter les drivers spécifiques et leur configuration.
+- Mise à jour de `docs/README.md` pour inclure le lien vers le manuel des drivers.
 - Scénario `sce_como_type2` : Réécriture majeure et simplification. Passage de 20 à 12 modes de fonctionnement (`CLEARZONE.1-6` et `NORMAL.1-6`). Gestion dynamique des affichages permanents intégrée aux modes. Amélioration de la logique de basculement et de la stabilité.
 - Scénario `sce_como_type2` : Extension du mécanisme de debouncing aux commandes d'alimentation et de blanking des affichages pour une meilleure stabilité visuelle.
 - Scénario `sce_como_type2` : Suppression du fallback vers la configuration système pour `enableStateEvaluationDebounce`. Ce paramètre doit désormais être défini spécifiquement dans l'objet `sce_como_type2` de la configuration.

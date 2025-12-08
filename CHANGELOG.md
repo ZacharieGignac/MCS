@@ -6,7 +6,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 ### Ajouts / Modifications
 - Nouveau driver Sharp : `DisplayDriver_serial_sharp` pour le contrôle d'écrans via RS-232 (Power, Blanking). Envoi automatique de `RSPW0001` à l'initialisation.
 - `LightSceneDriver_lights` : Support des tableaux d'IDs pour contrôler plusieurs lumières avec les mêmes paramètres dans une scène.
-- Nouveaux drivers Tridonic DALI : `TridonicDALI_BM` (passerelle série) et `LightDriver_TridonicDALI` (contrôle d'éclairage). Documentation disponible dans `docs/Manual-Drivers.md`.
+- Nouveaux drivers Tridonic DALI : `Tridonic_DALIBM` (passerelle série) et `LightDriver_TridonicDALI` (contrôle d'éclairage). Documentation disponible dans `docs/Manual-Drivers.md`.
 - Nouveau manuel `docs/Manual-Drivers.md` pour documenter les drivers spécifiques et leur configuration.
 - Mise à jour de `docs/README.md` pour inclure le lien vers le manuel des drivers.
 - Scénario `sce_como_type2` : Réécriture majeure et simplification. Passage de 20 à 12 modes de fonctionnement (`CLEARZONE.1-6` et `NORMAL.1-6`). Gestion dynamique des affichages permanents intégrée aux modes. Amélioration de la logique de basculement et de la stabilité.

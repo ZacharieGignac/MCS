@@ -1844,7 +1844,7 @@ export class USBSerialDriver {
   }
 }
 
-export class TridonicDALI_BM {
+export class Tridonic_DALIBM {
   constructor(device, config) {
     this.device = device;
     this.config = config;
@@ -1858,9 +1858,9 @@ export class TridonicDALI_BM {
       xapi.Config.SerialPort.Outbound.Port[this.port].BaudRate.set(19200);
       xapi.Config.SerialPort.Outbound.Port[this.port].Parity.set('None');
       xapi.Config.SerialPort.Outbound.Port[this.port].Description.set('TridonicDALI');
-      debug(1, `DRIVER TridonicDALI_BM (${this.config.id}): Serial port ${this.port} configured`);
+      debug(1, `DRIVER Tridonic_DALIBM (${this.config.id}): Serial port ${this.port} configured`);
     } catch (e) {
-      debug(2, `DRIVER TridonicDALI_BM (${this.config.id}): Failed to configure serial port: ${e.message}`);
+      debug(2, `DRIVER Tridonic_DALIBM (${this.config.id}): Failed to configure serial port: ${e.message}`);
     }
   }
 
@@ -1874,7 +1874,7 @@ export class TridonicDALI_BM {
     let bytes = [prefix, reserved, reserved, reserved, zone, intensity, checksum];
     let commandString = bytes.map(b => '\\x' + b.toString(16).padStart(2, '0').toUpperCase()).join('');
     
-    debug(1, `DRIVER TridonicDALI_BM (${this.config.id}): sendDaliCommand zone=${zone}, intensity=${intensity}, checksum=${checksum}`);
+    debug(1, `DRIVER Tridonic_DALIBM (${this.config.id}): sendDaliCommand zone=${zone}, intensity=${intensity}, checksum=${checksum}`);
 
     this.queue.push(commandString);
     if (!this.sending) {
@@ -1899,9 +1899,9 @@ export class TridonicDALI_BM {
         ResponseTimeout: 100
       });
     } catch (e) {
-      debug(2, `DRIVER TridonicDALI_BM (${this.config.id}): Exception caught - ${e.message}`);
+      debug(2, `DRIVER Tridonic_DALIBM (${this.config.id}): Exception caught - ${e.message}`);
       if (!String(e.message).includes('Timeout')) {
-        debug(2, `DRIVER TridonicDALI_BM (${this.config.id}): Send error: ${e.message}`);
+        debug(2, `DRIVER Tridonic_DALIBM (${this.config.id}): Send error: ${e.message}`);
       }
     }
 

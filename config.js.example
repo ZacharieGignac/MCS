@@ -170,7 +170,7 @@ export var config = {
       id: 'gateway.dali',
       type: DEVICETYPE.SOFTWAREDEVICE,
       device: devicesLibrary.SoftwareDevice,
-      driver: driversLibrary.TridonicDALI_BM,
+      driver: driversLibrary.Tridonic_DALIBM,
       name: 'Tridonic DALI Gateway',
       port: 1
     },

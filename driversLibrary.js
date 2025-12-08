@@ -1619,12 +1619,12 @@ export class ControlSystemDriver_isc {
     }
         xapi.Status.Standby.State.on(status => {
       if (status == 'Standby') {
-        debug(1, `Sending STANDBY_ON to ISC ${this.config.name}`);
-        zapi.communication.sendMessage(`STANDBY_ON`);
+        debug(1, `Sending ${this.config.name}:STANDBY_ON to ${this.config.name}`);
+        zapi.communication.sendMessage(`${this.config.name}:STANDBY_ON`);
       }
       else if (status == 'Off') {
-        debug(1, `Sending STANDBY_OFF to ISC ${this.config.name}`);
-        zapi.communication.sendMessage(`STANDBY_OFF`);
+        debug(1, `Sending ${this.config.name}:STANDBY_OFF to ${this.config.name}`);
+        zapi.communication.sendMessage(`${this.config.name}:STANDBY_OFF`);
       }
     });
   }

@@ -4,6 +4,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 
 ## [1.3.0-dev] - En cours
 ### Ajouts / Modifications
+- `LightSceneDriver_lights` : Support des tableaux d'IDs pour contrôler plusieurs lumières avec les mêmes paramètres dans une scène.
 - Nouveaux drivers Tridonic DALI : `TridonicDALI_BM` (passerelle série) et `LightDriver_TridonicDALI` (contrôle d'éclairage). Documentation disponible dans `docs/Manual-Drivers.md`.
 - Nouveau manuel `docs/Manual-Drivers.md` pour documenter les drivers spécifiques et leur configuration.
 - Mise à jour de `docs/README.md` pour inclure le lien vers le manuel des drivers.

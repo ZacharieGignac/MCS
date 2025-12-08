@@ -574,19 +574,14 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
       driver: driversLibrary.LightSceneDriver_lights, //Driver utilisé par la classe. Ce driver contrôle des drivers de type "Light"
       lights: [                                       //Array contenant les "Light" à contrôler et leur paramètres
         {
-          id: 'light.presenter',                      //"id" du device de type "Light"
+          id: 'light.presenter',                      //"id" du device de type "Light" (peut aussi être un tableau d'IDs: ['light.1', 'light.2'])
           power: 'on',                                //Statut d'alimentation
           dim: 100                                    //Statut de tamisage
         },
         {
-          id: 'light.board',
+          id: ['light.board', 'light.audience'],      //Exemple avec plusieurs IDs
           power: 'on',
           dim: 100                                    
-        },
-        {
-          id: 'light.audience',
-          power: 'on',
-          dim: 100
         }
       ]
     }

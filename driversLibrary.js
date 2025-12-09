@@ -1256,7 +1256,7 @@ export class AudioInputDriver_codecpro {
   }
 
   setGain(gain) {
-    debug(1, `DRIVER AudioInput_codecpro (${this.config.id}): setGain: ${gain}`);
+    debug(1, `DRIVER AudioInputDriver_codecpro (${this.config.id}): setGain: ${gain}`);
     switch (this.config.input) {
       case "microphone":
         xapi.Config.Audio.Input.Microphone[this.config.connector].Level.set(gain);
@@ -1277,7 +1277,7 @@ export class AudioInputDriver_codecpro {
   }
 
   off() {
-    debug(1, `DRIVER AudioInput_codecpro (${this.config.id}): Off`);
+    debug(1, `DRIVER AudioInputDriver_codecpro (${this.config.id}): Off`);
     switch (this.config.input) {
       case 'microphone':
         xapi.Config.Audio.Input.Microphone[this.config.connector].Mode.set('Off');
@@ -1289,7 +1289,7 @@ export class AudioInputDriver_codecpro {
   }
 
   on() {
-    debug(1, `DRIVER AudioInput_codecpro (${this.config.id}): On`);
+    debug(1, `DRIVER AudioInputDriver_codecpro (${this.config.id}): On`);
     switch (this.config.input) {
       case 'microphone':
         xapi.Config.Audio.Input.Microphone[this.config.connector].Mode.set('On');
@@ -1308,7 +1308,7 @@ export class AudioInputDriver_codeceq {
   }
 
   setGain(gain) {
-    debug(1, `DRIVER AudioInput_codeceq (${this.config.id}): setGain: ${gain}`);
+    debug(1, `DRIVER AudioInputDriver_codeceq (${this.config.id}): setGain: ${gain}`);
     xapi.Config.Audio.Input.Microphone[this.config.connector].Gain.set(gain);
   }
 
@@ -1322,12 +1322,12 @@ export class AudioInputDriver_codeceq {
   }
 
   off() {
-    debug(1, `DRIVER AudioInput_codeceq (${this.config.id}): Off`);
+    debug(1, `DRIVER AudioInputDriver_codeceq (${this.config.id}): Off`);
     xapi.Config.Audio.Input.Microphone[this.config.connector].Mode.set('Off');
   }
 
   on() {
-    debug(1, `DRIVER AudioInput_codeceq (${this.config.id}): On`);
+    debug(1, `DRIVER AudioInputDriver_codeceq (${this.config.id}): On`);
     xapi.Config.Audio.Input.Microphone[this.config.connector].Mode.set('On');
   }
 }
@@ -1339,7 +1339,7 @@ export class AudioInputDriver_aes67 {
   }
 
   setGain(gain) {
-    debug(1, `DRIVER AudioInput_aes67 (${this.config.id}): setGain: ${gain}`);
+    debug(1, `DRIVER AudioInputDriver_aes67 (${this.config.id}): setGain: ${gain}`);
     // AES67 supports gain control per channel
     // Default to channel 1 if no channel specified in config
     const channel = this.config.channel || 1;
@@ -1356,12 +1356,12 @@ export class AudioInputDriver_aes67 {
   }
 
   off() {
-    debug(1, `DRIVER AudioInput_aes67 (${this.config.id}): Off`);
+    debug(1, `DRIVER AudioInputDriver_aes67 (${this.config.id}): Off`);
     xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].Mode.set('Off');
   }
 
   on() {
-    debug(1, `DRIVER AudioInput_aes67 (${this.config.id}): On`);
+    debug(1, `DRIVER AudioInputDriver_aes67 (${this.config.id}): On`);
     xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].Mode.set('On');
   }
 }
@@ -1373,7 +1373,7 @@ export class AudioInputDriver_usb {
   }
 
   setGain(gain) {
-    debug(1, `DRIVER AudioInput_usb (${this.config.id}): setGain: ${gain}`);
+    debug(1, `DRIVER AudioInputDriver_usb (${this.config.id}): setGain: ${gain}`);
     // Try both Level and Gain settings as different systems use different APIs
     // Handle errors silently since we don't know which API the device supports
     const connectorId = this.config.connector;
@@ -1387,15 +1387,15 @@ export class AudioInputDriver_usb {
           // USB interfaces typically have a smaller gain range, try to constrain the value
           let constrainedGain = Math.max(0, Math.min(gain, 24)); // Constrain between 0-24
           if (constrainedGain !== gain) {
-            debug(1, `DRIVER AudioInput_usb (${this.config.id}): Constraining gain from ${gain} to ${constrainedGain} for USB interface`);
+            debug(1, `DRIVER AudioInputDriver_usb (${this.config.id}): Constraining gain from ${gain} to ${constrainedGain} for USB interface`);
           }
           xapi.Config.Audio.Input.USBInterface[connectorId].Gain.set(constrainedGain);
         }).catch((e2) => {
-          debug(2, `DRIVER AudioInput_usb (${this.config.id}): Both Level and Gain settings failed for connector ${connectorId}`);
+          debug(2, `DRIVER AudioInputDriver_usb (${this.config.id}): Both Level and Gain settings failed for connector ${connectorId}`);
         });
       });
     } catch (e) {
-      debug(2, `DRIVER AudioInput_usb (${this.config.id}): setGain failed: ${e.message}`);
+      debug(2, `DRIVER AudioInputDriver_usb (${this.config.id}): setGain failed: ${e.message}`);
     }
   }
 
@@ -1409,30 +1409,30 @@ export class AudioInputDriver_usb {
   }
 
   off() {
-    debug(1, `DRIVER AudioInput_usb (${this.config.id}): Off`);
+    debug(1, `DRIVER AudioInputDriver_usb (${this.config.id}): Off`);
     const connectorId = this.config.connector;
     try {
       xapi.config.get(`Audio.Input.USBInterface[${connectorId}].Mode`).then(() => {
         xapi.Config.Audio.Input.USBInterface[connectorId].Mode.set('Off');
       }).catch((e) => {
-        debug(2, `DRIVER AudioInput_usb (${this.config.id}): Failed to set mode Off: ${e.message}`);
+        debug(2, `DRIVER AudioInputDriver_usb (${this.config.id}): Failed to set mode Off: ${e.message}`);
       });
     } catch (e) {
-      debug(2, `DRIVER AudioInput_usb (${this.config.id}): Off failed: ${e.message}`);
+      debug(2, `DRIVER AudioInputDriver_usb (${this.config.id}): Off failed: ${e.message}`);
     }
   }
 
   on() {
-    debug(1, `DRIVER AudioInput_usb (${this.config.id}): On`);
+    debug(1, `DRIVER AudioInputDriver_usb (${this.config.id}): On`);
     const connectorId = this.config.connector;
     try {
       xapi.config.get(`Audio.Input.USBInterface[${connectorId}].Mode`).then(() => {
         xapi.Config.Audio.Input.USBInterface[connectorId].Mode.set('On');
       }).catch((e) => {
-        debug(2, `DRIVER AudioInput_usb (${this.config.id}): Failed to set mode On: ${e.message}`);
+        debug(2, `DRIVER AudioInputDriver_usb (${this.config.id}): Failed to set mode On: ${e.message}`);
       });
     } catch (e) {
-      debug(2, `DRIVER AudioInput_usb (${this.config.id}): On failed: ${e.message}`);
+      debug(2, `DRIVER AudioInputDriver_usb (${this.config.id}): On failed: ${e.message}`);
     }
   }
 }
@@ -1444,7 +1444,7 @@ export class AudioOutputDriver_codecpro {
   }
 
   setLevel(level) {
-    debug(1, `DRIVER AudioOutput_codecpro (${this.config.id}): setLevel: ${level}`);
+    debug(1, `DRIVER AudioOutputDriver_codecpro (${this.config.id}): setLevel: ${level}`);
     switch (this.config.output) {
       case "line":
         xapi.Config.Audio.Output.Line[this.config.connector].Level.set(level);
@@ -1472,7 +1472,7 @@ export class AudioOutputDriver_codecpro {
   }
 
   off() {
-    debug(1, `DRIVER AudioOutput_codecpro (${this.config.id}): Off`);
+    debug(1, `DRIVER AudioOutputDriver_codecpro (${this.config.id}): Off`);
     switch (this.config.output) {
       case 'line':
         xapi.Config.Audio.Output.Line[this.config.connector].mode.set('Off');
@@ -1484,7 +1484,66 @@ export class AudioOutputDriver_codecpro {
   }
 
   on() {
-    debug(1, `DRIVER AudioOutput_codecpro (${this.config.id}): On`);
+    debug(1, `DRIVER AudioOutputDriver_codecpro (${this.config.id}): On`);
+    switch (this.config.output) {
+      case 'line':
+        xapi.Config.Audio.Output.Line[this.config.connector].mode.set('On');
+        break;
+      case 'hdmi':
+        xapi.Config.Audio.Output.HDMI[this.config.connector].mode.set('On');
+        break;
+    }
+  }
+}
+
+export class AudioOutputDriver_codeceq {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setLevel(level) {
+    debug(1, `DRIVER AudioOutputDriver_codeceq (${this.config.id}): setLevel: ${level}`);
+    switch (this.config.output) {
+      case "line":
+        xapi.Config.Audio.Output.Line[this.config.connector].Gain.set(level);
+        setTimeout(() => {
+          xapi.Config.Audio.Output.Line[this.config.connector].Gain.set(level);
+        }, 2000)
+
+        break;
+      case "hdmi":
+        xapi.Config.Audio.Output.HDMI[this.config.connector].Gain.set(level);
+        setTimeout(() => {
+          xapi.Config.Audio.Output.HDMI[this.config.connector].Gain.set(level);
+        }, 2000);
+        break;
+    }
+  }
+
+  setMode(mute) {
+    if (mute.toLowerCase() == 'off') {
+      this.mute();
+    }
+    else {
+      this.unmute();
+    }
+  }
+
+  off() {
+    debug(1, `DRIVER AudioOutputDriver_codeceq (${this.config.id}): Off`);
+    switch (this.config.output) {
+      case 'line':
+        xapi.Config.Audio.Output.Line[this.config.connector].mode.set('Off');
+        break;
+      case 'hdmi':
+        xapi.Config.Audio.Output.HDMI[this.config.connector].mode.set('Off');
+        break;
+    }
+  }
+
+  on() {
+    debug(1, `DRIVER AudioOutputDriver_codeceq (${this.config.id}): On`);
     switch (this.config.output) {
       case 'line':
         xapi.Config.Audio.Output.Line[this.config.connector].mode.set('On');
@@ -1516,12 +1575,12 @@ export class AudioOutputDriver_aes67 {
   }
 
   off() {
-    debug(1, `DRIVER AudioOutput_aes67 (${this.config.id}): Off`);
+    debug(1, `DRIVER AudioOutputDriver_aes67 (${this.config.id}): Off`);
     xapi.Config.Audio.Input.Ethernet[this.config.connector].mode.set('Off');
   }
 
   on() {
-    debug(1, `DRIVER AudioOutput_aes67 (${this.config.id}): On`);
+    debug(1, `DRIVER AudioOutputDriver_aes67 (${this.config.id}): On`);
     xapi.Config.Audio.Input.Ethernet[this.config.connector].mode.set('On');
   }
 }
@@ -1534,7 +1593,7 @@ export class AudioOutputDriver_usb {
 
   setLevel(level) {
     // USB audio outputs don't support setLevel
-    debug(2, `DRIVER AudioOutput_usb (${this.config.id}): setLevel not supported for USB interfaces`);
+    debug(2, `DRIVER AudioOutputDriver_usb (${this.config.id}): setLevel not supported for USB interfaces`);
   }
 
   setMode(mute) {
@@ -1547,30 +1606,30 @@ export class AudioOutputDriver_usb {
   }
 
   off() {
-    debug(1, `DRIVER AudioOutput_usb (${this.config.id}): Off`);
+    debug(1, `DRIVER AudioOutputDriver_usb (${this.config.id}): Off`);
     const connectorId = this.config.connector;
     try {
       xapi.config.get(`Audio.Output.USBInterface[${connectorId}].Mode`).then(() => {
         xapi.Config.Audio.Output.USBInterface[connectorId].Mode.set('Off');
       }).catch((e) => {
-        debug(2, `DRIVER AudioOutput_usb (${this.config.id}): Failed to set mode Off: ${e.message}`);
+        debug(2, `DRIVER AudioOutputDriver_usb (${this.config.id}): Failed to set mode Off: ${e.message}`);
       });
     } catch (e) {
-      debug(2, `DRIVER AudioOutput_usb (${this.config.id}): Off failed: ${e.message}`);
+      debug(2, `DRIVER AudioOutputDriver_usb (${this.config.id}): Off failed: ${e.message}`);
     }
   }
 
   on() {
-    debug(1, `DRIVER AudioOutput_usb (${this.config.id}): On`);
+    debug(1, `DRIVER AudioOutputDriver_usb (${this.config.id}): On`);
     const connectorId = this.config.connector;
     try {
       xapi.config.get(`Audio.Output.USBInterface[${connectorId}].Mode`).then(() => {
         xapi.Config.Audio.Output.USBInterface[connectorId].Mode.set('On');
       }).catch((e) => {
-        debug(2, `DRIVER AudioOutput_usb (${this.config.id}): Failed to set mode On: ${e.message}`);
+        debug(2, `DRIVER AudioOutputDriver_usb (${this.config.id}): Failed to set mode On: ${e.message}`);
       });
     } catch (e) {
-      debug(2, `DRIVER AudioOutput_usb (${this.config.id}): On failed: ${e.message}`);
+      debug(2, `DRIVER AudioOutputDriver_usb (${this.config.id}): On failed: ${e.message}`);
     }
   }
 }

@@ -18,6 +18,7 @@
   - [AudioInputDriver_aes67](#audioinputdriver_aes67)
   - [AudioInputDriver_usb](#audioinputdriver_usb)
   - [AudioOutputDriver_codecpro](#audiooutputdriver_codecpro)
+  - [AudioOutputDriver_codeceq](#audiooutputdriver_codeceq)
   - [AudioOutputDriver_aes67](#audiooutputdriver_aes67)
   - [AudioOutputDriver_usb](#audiooutputdriver_usb)
 - [Autres Drivers](#autres-drivers)
@@ -309,6 +310,27 @@ Driver pour les sorties audio du Codec Pro (Line ou HDMI).
   name: 'Line Out 1',
   device: devicesLibrary.AudioOutput,
   driver: driversLibrary.AudioOutputDriver_codecpro,
+  output: 'line',
+  connector: 1
+}
+```
+
+### AudioOutputDriver_codeceq
+Driver pour les sorties audio du Codec EQ (Line ou HDMI).
+
+* **Device Class**: `AudioOutput`
+* **Configuration**:
+  * `output`: (string) Type de sortie: 'line' ou 'hdmi'.
+  * `connector`: (number) Numéro du connecteur physique.
+
+**Exemple de configuration:**
+```javascript
+{
+  id: 'audio.out.line1',
+  type: DEVICETYPE.AUDIOOUTPUT,
+  name: 'Line Out 1',
+  device: devicesLibrary.AudioOutput,
+  driver: driversLibrary.AudioOutputDriver_codeceq,
   output: 'line',
   connector: 1
 }

@@ -20,13 +20,14 @@ export var Manifest = {
   fileName: 'sce_como_type1',
   id: 'comotype1',
   friendlyName: 'Salle Comodale (Type 1)',
-  version: '1.2.0',
+  version: '1.2.1',
   description: 'Comportement normal pour une salle comodale de type 1',
   panels: {
     hide: ['*'],
     show: ['comotype1_settings']
   },
   features: {
+    aiNotes: false,
     shareStart: true,
     cameraControls: true,
     endCallButton: true,

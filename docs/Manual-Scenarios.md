@@ -192,6 +192,19 @@ Cette function est executée quand le scénario est activé et que le scénario 
 ## Activation d'un scénario
 Le système a besoin d'au moins 1 scénario pour fonctionner. Lorsque le système tombe en veille, il activera le scénario indiqué dans la configuration `config.system.onStandby.enableScenario`. Lorsqu'il se réveille, il activara le scénario indiqué dans la configuration `config.system.onWakeup.enableScenario`
 
+## Note sur la fonctionnalité AI Notes
+
+### Ajout de la prise en charge d'AI Notes
+Depuis la version de décembre 2025, les scénarios de type 1 et type 2, ainsi que la logique principale des scénarios, prennent en charge la fonctionnalité `aiNotes`.
+
+- Dans les fichiers `sce_como_type1.js` et `sce_como_type2.js`, une nouvelle propriété `aiNotes: false,` a été ajoutée à l'objet `features` du manifeste du scénario.
+- Dans la logique principale (`scenarios.js`), la ligne suivante permet d'activer ou de masquer la fonctionnalité AI Notes selon la configuration du scénario :
+  - `xapi.config.UserInterface.Features.Call.AINotes.set(features.aiNotes ? 'Auto' : 'Hidden');`
+
+Cela permet d'activer ou désactiver la prise de notes assistée par IA selon le scénario sélectionné.
+
+---
+
 ## Note sur `sce_como_type1` et `sce_como_type2` (Audio)
 Dans `sce_como_type1` et `sce_como_type2`, le routage audio des entrées distantes utilise désormais les rôles fournis par le codec:
 - Toute entrée distante avec rôle `Presentation` est toujours connectée au groupe `system.presentation.main` et jamais au groupe `system.farend.main`.

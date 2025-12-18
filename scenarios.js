@@ -232,6 +232,7 @@ export class Scenarios {
       xapi.Config.UserInterface.Features.Call.Webcam.set('Hidden').catch(e => { });
       xapi.Config.UserInterface.Features.Call.HdmiPassthrough.set('Hidden').catch(e => { });
     }
+    xapi.config.UserInterface.Features.Call.AINotes.set(features.aiNotes ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.JoinWebex.set(features.joinWebex ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.JoinGoogleMeet.set(features.joinGoogleMeet ? 'Auto' : 'Hidden');
     xapi.Config.UserInterface.Features.Call.JoinZoom.set(features.joinZoom ? 'Auto' : 'Hidden');

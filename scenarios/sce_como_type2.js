@@ -37,6 +37,7 @@ export var Manifest = {
     show: ['comotype2_settings']
   },
   features: {
+    aiNotes: false,
     shareStart: true,
     cameraControls: true,
     endCallButton: true,

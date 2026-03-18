@@ -107,15 +107,15 @@ Aucunes.
 
 #### Drivers disponibles
 
-##### AudioInputDriver_codecpro
-Driver pour les entrées audio sur les codecs Pro (microphone, HDMI).
+##### AudioInputDriver_generic
+Driver universel remplaçant `codecpro` et `codeceq` pour les entrées audio analogiques sur tous les codecs (Pro, EQ, Bar, Board). Il s'adapte automatiquement et gère soit la propriété `Level`, soit la propriété `Gain` selon le matériel.
 
 **Paramètres de configuration :**
 ```javascript
 {
   id: 'mic_presenter',
   type: 'AUDIOINPUT',
-  driver: AudioInputDriver_codecpro,
+  driver: AudioInputDriver_generic,
   input: 'microphone',  // 'microphone' ou 'hdmi'
   connector: 1,
   // ... autres paramètres
@@ -126,31 +126,7 @@ Driver pour les entrées audio sur les codecs Pro (microphone, HDMI).
 - `input`: Type d'entrée (`microphone` ou `hdmi`)
 - `connector`: Numéro du connecteur
 
-**Note :** Le type `ethernet` a été retiré en v1.2.0. Utiliser `AudioInputDriver_aes67` pour les entrées AES67.
-
-##### AudioInputDriver_codeceq
-Driver pour les entrées microphone sur les codecs EQ, Bar et Board.
-
-**Paramètres de configuration :**
-```javascript
-{
-  id: 'mic_eq_1',
-  type: 'AUDIOINPUT',
-  driver: AudioInputDriver_codeceq,
-  connector: 1,
-  gainLowLimit: 0,
-  gainHighLimit: 70,
-  // ... autres paramètres
-}
-```
-
-**Propriétés supportées :**
-- `connector`: Numéro du connecteur microphone
-- Contrôle via `Audio.Input.Microphone[connector].Gain` et `Audio.Input.Microphone[connector].Mode`
-
-**Notes :**
-- Uniquement pour les connecteurs microphone (pas HDMI/Ethernet)
-- Plage de gain recommandée : 0-70
+**Note :** Le type `ethernet` a été retiré. Utiliser `AudioInputDriver_aes67` pour les entrées AES67.
 
 ##### AudioInputDriver_aes67
 Driver pour les entrées audio AES67 (Ethernet audio).
@@ -209,10 +185,10 @@ Driver pour les interfaces audio USB.
 - Plage de gain contrainte: les valeurs de gain sont automatiquement contraintes entre 0-24 pour les interfaces USB (plage valide plus petite que les microphones traditionnels).
 - Gestion d'erreur silencieuse: si l'interface USB n'est pas disponible, les erreurs sont gérées silencieusement avec des messages de debug appropriés.
 
-#### Notes spécifiques: EQ (AudioInputDriver_codeceq)
-- Connecteurs Microphone uniquement: ce driver adresse `Audio.Input.Microphone[connector].Gain/Mode` des appareils EQ/Bar/Board; ne pas utiliser `input: 'microphone'` dans la configuration (la propriété est ignorée).
-- Plage de gain 0-70: utiliser `gainLowLimit/gainHighLimit` dans cette plage. Les appels à `setMode('on'|'off')` basculent `Microphone[connector].Mode`.
-- Différences vs `codecpro`: pas de support pour `hdmi`/`ethernet` dans ce driver; pour AES67, utiliser `AudioInputDriver_aes67` dédié.
+#### Notes spécifiques: Generic (AudioInputDriver_generic)
+- Connecteurs supportés: microphone ou hdmi. Ce driver gère automatiquement si l'appareil attend `Level` (ex: Codec Pro) ou `Gain` (ex: Codec EQ).
+- Plage de gain : 0-70 pour la majorité des codecs récents (EQ, Bar, Board). Le fallback `Gain.set()` résout les erreurs rencontrées sur les nouveaux appareils.
+- Transparence : L'utilisation d'anciennes configurations (`codecpro` ou `codeceq`) est déconseillée; remplacez par `AudioInputDriver_generic`.
 
 ### AudioOutput
 - `void setDefaults(void)`: Active les paramètres par défaut définis dans la configuration comme le mode.
@@ -225,15 +201,15 @@ Driver pour les interfaces audio USB.
 
 #### Drivers disponibles
 
-##### AudioOutputDriver_codecpro
-Driver pour les sorties audio sur les codecs Pro (Line, HDMI).
+##### AudioOutputDriver_generic
+Driver universel pour les sorties audio analogiques et HDMI. Ce driver remplace l'ancien `codecpro` et supporte les configurations s'attendant à du "Gain" (EQ, Board) ou du "Level" (Pro).
 
 **Paramètres de configuration :**
 ```javascript
 {
   id: 'audio_out_line_1',
   type: 'AUDIOOUTPUT',
-  driver: AudioOutputDriver_codecpro,
+  driver: AudioOutputDriver_generic,
   output: 'line',  // 'line' ou 'hdmi'
   connector: 1,
   levelLowLimit: -24,

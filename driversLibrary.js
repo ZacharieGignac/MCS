@@ -1332,6 +1332,66 @@ export class AudioInputDriver_codeceq {
   }
 }
 
+export class AudioInputDriver_generic {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setGain(gain) {
+    debug(1, `DRIVER AudioInputDriver_generic (${this.config.id}): setGain: ${gain}`);
+    switch (this.config.input) {
+      case "microphone":
+        if (xapi.Config.Audio.Input.Microphone[this.config.connector].Gain) {
+          xapi.Config.Audio.Input.Microphone[this.config.connector].Gain.set(gain);
+        } else {
+          xapi.Config.Audio.Input.Microphone[this.config.connector].Level.set(gain);
+        }
+        break;
+      case "hdmi":
+        if (xapi.Config.Audio.Input.HDMI[this.config.connector].Gain) {
+          xapi.Config.Audio.Input.HDMI[this.config.connector].Gain.set(gain);
+        } else {
+          xapi.Config.Audio.Input.HDMI[this.config.connector].Level.set(gain);
+        }
+        break;
+    }
+  }
+
+  setMode(mute) {
+    if (mute.toLowerCase() == 'off') {
+      this.mute();
+    }
+    else {
+      this.unmute();
+    }
+  }
+
+  off() {
+    debug(1, `DRIVER AudioInputDriver_generic (${this.config.id}): Off`);
+    switch (this.config.input) {
+      case 'microphone':
+        xapi.Config.Audio.Input.Microphone[this.config.connector].Mode.set('Off');
+        break;
+      case 'hdmi':
+        xapi.Config.Audio.Input.HDMI[this.config.connector].Mode.set('Off');
+        break;
+    }
+  }
+
+  on() {
+    debug(1, `DRIVER AudioInputDriver_generic (${this.config.id}): On`);
+    switch (this.config.input) {
+      case 'microphone':
+        xapi.Config.Audio.Input.Microphone[this.config.connector].Mode.set('On');
+        break;
+      case 'hdmi':
+        xapi.Config.Audio.Input.HDMI[this.config.connector].Mode.set('On');
+        break;
+    }
+  }
+}
+
 export class AudioInputDriver_aes67 {
   constructor(device, config) {
     this.config = config;
@@ -1561,6 +1621,82 @@ export class AudioOutputDriver_codeceq {
 
   on() {
     debug(1, `DRIVER AudioOutputDriver_codeceq (${this.config.id}): On`);
+    switch (this.config.output) {
+      case 'line':
+        xapi.Config.Audio.Output.Line[this.config.connector].mode.set('On');
+        break;
+      case 'hdmi':
+        xapi.Config.Audio.Output.HDMI[this.config.connector].mode.set('On');
+        break;
+    }
+  }
+}
+
+export class AudioOutputDriver_generic {
+  constructor(device, config) {
+    this.config = config;
+    this.device = device;
+  }
+
+  setLevel(level) {
+    debug(1, `DRIVER AudioOutputDriver_generic (${this.config.id}): setLevel: ${level}`);
+    switch (this.config.output) {
+      case "line":
+        if (xapi.Config.Audio.Output.Line[this.config.connector].Gain) {
+          xapi.Config.Audio.Output.Line[this.config.connector].Gain.set(level);
+          setTimeout(() => {
+            xapi.Config.Audio.Output.Line[this.config.connector].Gain.set(level);
+          }, 2000);
+        } else {
+          xapi.Config.Audio.Output.Line[this.config.connector].Level.set(level);
+          setTimeout(() => {
+            xapi.Config.Audio.Output.Line[this.config.connector].Level.set(level);
+          }, 2000);
+        }
+        break;
+      case "hdmi":
+        if (xapi.Config.Audio.Output.HDMI[this.config.connector].Gain) {
+          xapi.Config.Audio.Output.HDMI[this.config.connector].Gain.set(level);
+          setTimeout(() => {
+            xapi.Config.Audio.Output.HDMI[this.config.connector].Gain.set(level);
+          }, 2000);
+        } else {
+          xapi.Config.Audio.Output.HDMI[this.config.connector].Level.set(level);
+          setTimeout(() => {
+            xapi.Config.Audio.Output.HDMI[this.config.connector].Level.set(level);
+          }, 2000);
+        }
+        break;
+    }
+  }
+
+  setGain(gain) {
+    this.setLevel(gain);
+  }
+
+  setMode(mute) {
+    if (mute.toLowerCase() == 'off') {
+      this.mute();
+    }
+    else {
+      this.unmute();
+    }
+  }
+
+  off() {
+    debug(1, `DRIVER AudioOutputDriver_generic (${this.config.id}): Off`);
+    switch (this.config.output) {
+      case 'line':
+        xapi.Config.Audio.Output.Line[this.config.connector].mode.set('Off');
+        break;
+      case 'hdmi':
+        xapi.Config.Audio.Output.HDMI[this.config.connector].mode.set('Off');
+        break;
+    }
+  }
+
+  on() {
+    debug(1, `DRIVER AudioOutputDriver_generic (${this.config.id}): On`);
     switch (this.config.output) {
       case 'line':
         xapi.Config.Audio.Output.Line[this.config.connector].mode.set('On');

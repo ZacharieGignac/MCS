@@ -13,12 +13,10 @@
 - [Epson](#epson)
   - [DisplayDriver_serial_epson](#displaydriver_serial_epson)
 - [Audio](#audio)
-  - [AudioInputDriver_codecpro](#audioinputdriver_codecpro)
-  - [AudioInputDriver_codeceq](#audioinputdriver_codeceq)
+  - [AudioInputDriver_generic](#audioinputdriver_generic)
   - [AudioInputDriver_aes67](#audioinputdriver_aes67)
   - [AudioInputDriver_usb](#audioinputdriver_usb)
-  - [AudioOutputDriver_codecpro](#audiooutputdriver_codecpro)
-  - [AudioOutputDriver_codeceq](#audiooutputdriver_codeceq)
+  - [AudioOutputDriver_generic](#audiooutputdriver_generic)
   - [AudioOutputDriver_aes67](#audiooutputdriver_aes67)
   - [AudioOutputDriver_usb](#audiooutputdriver_usb)
 - [Autres Drivers](#autres-drivers)
@@ -206,8 +204,8 @@ Driver pour projecteurs Epson contrôlés via RS-232.
 
 ## Audio
 
-### AudioInputDriver_codecpro
-Driver pour les entrées audio du Codec Pro (Microphone ou HDMI).
+### AudioInputDriver_generic
+Driver unifié pour les entrées audio des Codecs (Pro, EQ, Board, Bar...) supportant les entrées physiques ou HDMI. Il vérifie de lui-même si le volume est géré via "Level" ou "Gain" et applique la commande en conséquence.
 
 * **Device Class**: `AudioInput`
 * **Configuration**:
@@ -221,29 +219,8 @@ Driver pour les entrées audio du Codec Pro (Microphone ou HDMI).
   type: DEVICETYPE.AUDIOINPUT,
   name: 'Microphone 1',
   device: devicesLibrary.AudioInput,
-  driver: driversLibrary.AudioInputDriver_codecpro,
+  driver: driversLibrary.AudioInputDriver_generic,
   input: 'microphone',
-  connector: 1,
-  gainStep: 1,
-  defaultGain: 50
-}
-```
-
-### AudioInputDriver_codeceq
-Driver pour les entrées audio du Codec EQ / Room Kit EQ.
-
-* **Device Class**: `AudioInput`
-* **Configuration**:
-  * `connector`: (number) Numéro du connecteur physique (Microphone).
-
-**Exemple de configuration:**
-```javascript
-{
-  id: 'audio.mic1',
-  type: DEVICETYPE.AUDIOINPUT,
-  name: 'Microphone 1',
-  device: devicesLibrary.AudioInput,
-  driver: driversLibrary.AudioInputDriver_codeceq,
   connector: 1,
   gainStep: 1,
   defaultGain: 50
@@ -294,8 +271,8 @@ Driver pour les entrées audio USB.
 }
 ```
 
-### AudioOutputDriver_codecpro
-Driver pour les sorties audio du Codec Pro (Line ou HDMI).
+### AudioOutputDriver_generic
+Driver unifié pour les sorties audio analogiques et HDMI des codecs. Gère de manière transparente la différence entre le fonctionnement par Gain (série EQ) et par Level (série Pro).
 
 * **Device Class**: `AudioOutput`
 * **Configuration**:
@@ -309,28 +286,7 @@ Driver pour les sorties audio du Codec Pro (Line ou HDMI).
   type: DEVICETYPE.AUDIOOUTPUT,
   name: 'Line Out 1',
   device: devicesLibrary.AudioOutput,
-  driver: driversLibrary.AudioOutputDriver_codecpro,
-  output: 'line',
-  connector: 1
-}
-```
-
-### AudioOutputDriver_codeceq
-Driver pour les sorties audio du Codec EQ (Line ou HDMI).
-
-* **Device Class**: `AudioOutput`
-* **Configuration**:
-  * `output`: (string) Type de sortie: 'line' ou 'hdmi'.
-  * `connector`: (number) Numéro du connecteur physique.
-
-**Exemple de configuration:**
-```javascript
-{
-  id: 'audio.out.line1',
-  type: DEVICETYPE.AUDIOOUTPUT,
-  name: 'Line Out 1',
-  device: devicesLibrary.AudioOutput,
-  driver: driversLibrary.AudioOutputDriver_codeceq,
+  driver: driversLibrary.AudioOutputDriver_generic,
   output: 'line',
   connector: 1
 }

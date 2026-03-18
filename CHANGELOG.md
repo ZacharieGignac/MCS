@@ -4,6 +4,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 
 ## [1.3.0-dev] - En cours
 ### Ajouts / Modifications
+- Nouveaux drivers génériques : `AudioOutputDriver_generic` et `AudioInputDriver_generic`. Ces classes unifient le comportement des codecs pro (Level) et codecs eq (Gain) en proposant un fallback automatique.
 - Nouveau driver Sharp : `DisplayDriver_serial_sharp` pour le contrôle d'écrans via RS-232 (Power, Blanking). Envoi automatique de `RSPW0001` à l'initialisation. Support de la répétition des commandes d'état.
 - Driver Sharp (`DisplayDriver_serial_sharp`) : Suppression de la validation de réponse (ACK) et du timeout strict. Le driver envoie désormais les commandes et continue, s'appuyant sur la répétition périodique pour assurer l'état. Timeout par défaut augmenté à 1000ms.
 - Driver Sharp (`DisplayDriver_serial_sharp`) : Passage en mode "Fire and Forget". Le driver n'attend plus de réponse spécifique mais observe une pause de 200ms après chaque commande. Pacing réduit à 100ms.

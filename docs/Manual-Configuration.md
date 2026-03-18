@@ -370,49 +370,27 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 ### AudioInput (entrée audio du codec)
 Attention, le niveau de `AudioInput` va de 0 à 70.
 
-#### AudioInputDriver_codecpro (entrées audio traditionnelles)
+#### AudioInputDriver_generic (entrées audio codecs Pro, EQ, Bar, Board)
+Combinant l'ancien comportement des drivers "Pro" (gestion par Level) et "EQ" (gestion par Gain), ce driver permet de contrôler les entrées analogiques (Microphone, HDMI) sur tous les codecs pris en charge. Le fallback (Gain/Level) est géré automatiquement, il n'est donc plus nécessaire de choisir le driver en fonction du codec.
 ```JS
     {
       id: 'audioinput.presenter.sf1',                   //Identification unique
       type: DEVICETYPE.AUDIOINPUT,                      //Type = 'AUDIOINPUT'
       name: 'Micro sans-fil',                           //Nom
       device: devicesLibrary.AudioInput,                //Classe à utiliser
-      driver: driversLibrary.AudioInputDriver_codecpro, //Driver à utiliser par le device
-      connector: 7,                                     //Connecteur d'entrée du codec
-  input: 'microphone',                              //Type d'entrée: 'microphone' ou 'hdmi' (pour AES67, utiliser le driver dédié ci-dessous)
+      driver: driversLibrary.AudioInputDriver_generic,   //Driver à utiliser par le device
+      connector: 1,                                     //Connecteur d'entrée du codec
+      input: 'microphone',                              //Type d'entrée: 'microphone' ou 'hdmi'
       bias: 0,                                          //Biais de niveau audio, peut être positif ou négatif. Utilisé par l'analyze d'entrée audio
-      gainLowLimit: 20,                                 //Limite basse du gain de l'entrée
-      gainHighLimit: 70,                                //Limite supérieure du gain de l'entrée
+      gainLowLimit: 20,                                 //Limite basse du gain (0-70)
+      gainHighLimit: 70,                                //Limite supérieure du gain
       defaultGain: 60,                                  //Gain par défaut au démarrage du système
       gainStep: 1,                                      //Gain ajouté ou retiré de la valeur actuelle lorsque les fonctions increase() et decrease() sont appelées
       defaultMode: 'on',                                //Mode par défaut lors du démarrage du système
       lowGain: 60,                                      //Gain "bas" (utilisé par les widgets de type "button group")
       mediumGain: 65,                                   //Gain "moyen" (utilisé par les widgets de type "button group")
       highGain: 70,                                     //Gain "haut" (utilisé par les widgets de type "button group")
-      boost: 70                                         //Gain "Boost, utilisé par le module "AutoSauce"
-    }
-```
-
-#### AudioInputDriver_codeceq (entrées audio sur codecs EQ/Bar/Board)
-Driver pour les appareils Webex Room/Board/Bar de la famille « EQ » où le réglage se fait via Microphone.Gain/Mode. Ce driver ne supporte que des connecteurs de type microphone; ne pas définir la propriété `input`.
-```JS
-    {
-      id: 'audioinput.presenter.eq1',                   //Identification unique
-      type: DEVICETYPE.AUDIOINPUT,                      //Type = 'AUDIOINPUT'
-      name: 'Mic - Table (EQ)',                         //Nom
-      device: devicesLibrary.AudioInput,                //Classe à utiliser
-      driver: driversLibrary.AudioInputDriver_codeceq,  //Driver à utiliser par le device
-      connector: 1,                                     //Connecteur Microphone (1-N) du codec EQ/Bar/Board
-      bias: 0,                                          //Biais de niveau audio, utilisé par l'analyse d'entrée audio
-      gainLowLimit: 20,                                 //Limite basse du gain (0-70 sur EQ)
-      gainHighLimit: 70,                                //Limite haute du gain (0-70 sur EQ)
-      defaultGain: 60,                                  //Gain par défaut
-      gainStep: 1,                                      //Pas d'incrément de gain
-      defaultMode: 'on',                                //Mode par défaut
-      lowGain: 60,
-      mediumGain: 65,
-      highGain: 70,
-      boost: 70
+      boost: 70                                         //Gain "Boost", utilisé par le module "AutoSauce"
     }
 ```
 
@@ -466,7 +444,8 @@ Cet appareil prends automatiquement en charge certain widgets. Les widgets doive
 ### AudioOutput (sortie audio du codec)
 Attention, le niveau de `AudioOutput` va de -24 à 0.
 
-#### AudioOutputDriver_codecpro (sorties audio traditionnelles)
+#### AudioOutputDriver_generic (sorties audio traditionnelles)
+Driver universel remplaçant codecpro et codeceq. Il s'adapte automatiquement au système de contrôle de volume disponible (Level ou Gain).
 ```JS
     /* AUDIO OUTPUTS */
     {
@@ -474,9 +453,9 @@ Attention, le niveau de `AudioOutput` va de -24 à 0.
       type: DEVICETYPE.AUDIOOUTPUT,                      //Type = 'AUDIOOUTPUT'
       name: 'SnubWoofer',                                //Nom
       device: devicesLibrary.AudioOutput,                //Classe à utiliser
-      driver: driversLibrary.AudioOutputDriver_codecpro, //Driver à utiliser par le device
-      connector: 5,                                      //Connecteur de sortie du codec
-      output: 'line',                                    //line, hdmi, ethernet (ethernet require the "channel" property) : Connectors supported by driver AudioOutput_codecpro
+      driver: driversLibrary.AudioOutputDriver_generic,   //Driver à utiliser par le device
+      connector: 1,                                      //Connecteur de sortie du codec
+      output: 'line',                                    //line ou hdmi
       levelLowLimit: -20,                                //Limite basse de la sortie
       levelHighLimit: 0,                                 //Limite supérieure de la sortie
       defaultLevel: -10,                                 //Niveau par défaut au démarrage du système

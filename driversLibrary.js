@@ -1471,6 +1471,10 @@ export class AudioOutputDriver_codecpro {
     }
   }
 
+  setGain(gain) {
+    this.setLevel(gain);
+  }
+
   setMode(mute) {
     if (mute.toLowerCase() == 'off') {
       this.mute();
@@ -1528,6 +1532,10 @@ export class AudioOutputDriver_codeceq {
         }, 2000);
         break;
     }
+  }
+
+  setGain(gain) {
+    this.setLevel(gain);
   }
 
   setMode(mute) {
@@ -1612,6 +1620,10 @@ export class AudioOutputDriver_usb {
   setLevel(level) {
     // USB audio outputs don't support setLevel
     debug(2, `DRIVER AudioOutputDriver_usb (${this.config.id}): setLevel not supported for USB interfaces`);
+  }
+
+  setGain(gain) {
+    this.setLevel(gain);
   }
 
   setMode(mute) {

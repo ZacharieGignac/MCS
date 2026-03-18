@@ -127,7 +127,6 @@ Les deux scénarios partagent la même logique de routage audio intelligent intr
   id: 'teleprompter_1',
   type: 'DISPLAY',
   driver: DisplayDriver_serial_sonybpj,
-  group: 'system.presentation.teleprompter',
   connector: 2,
   // ... autres paramètres
 }
@@ -154,7 +153,6 @@ Les deux scénarios partagent la même logique de routage audio intelligent intr
   id: 'secondary_display_1',
   type: 'DISPLAY',
   driver: DisplayDriver_serial_epson,
-  group: 'system.presentation.secondary',
   connector: 2,
   // ... autres paramètres
 }
@@ -203,7 +201,6 @@ screens.secondary = zapi.devices.getDevicesByTypeInGroup(DEVICETYPE.SCREEN, 'sys
   id: 'screen_teleprompter',
   type: 'SCREEN',
   driver: ScreenDriver_gpio,
-  group: 'system.presentation.teleprompter',
   alwaysUse: false,  // Si true, ne se rétracte jamais même en mode "Clear Zone"
   defaultPosition: 'up',
   // ... paramètres du driver

@@ -122,6 +122,7 @@ Cette section est un array de tout les imports des modules. Si l'import n'est pa
   system: {
     coldBootTime: 120,                            // Temps (secondes) qui détermine un "cold boot"
     coldBootWait: 120,                            // Temps (secondes) à attendre après un "cold boot"
+    runtimeRestartOnColdBoot: true,               // <true, false> Si true, le framework macro (Macro Runtime) est redémarré après expiration de coldBootWait
     debugLevel: DEBUGLEVEL.MEDIUM,                // Niveau de débug (LOW, MEDIUM, HIGH)
     debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
     messagesPacing: 500,                          // Temps (ms) entre les messages de type "xapi.Command.Message"

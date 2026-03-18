@@ -16,8 +16,6 @@ import { debug } from './debug';
 
 const COREVERSION = '1.3.0-dev';
 const ZAPIVERSION = 1;
-// If true, skip restarting Macro Runtime after cold boot and proceed with scheduled preInit()
-const SKIP_FRAMEWORK_RESTART_AFTER_COLD_BOOT = false;
 
 function systemKill() {
   xapi.Command.Macros.Macro.Deactivate({ Name: 'core' });
@@ -2107,7 +2105,7 @@ async function checkUptimeAndRestart() {
   try {
     const uptime = await xapi.Status.SystemUnit.Uptime.get();
     if (uptime > systemconfig.system.coldBootTime) {
-      if (!SKIP_FRAMEWORK_RESTART_AFTER_COLD_BOOT) {
+      if (systemconfig.system.runtimeRestartOnColdBoot === true) {
         clearInterval(bootWaitPromptIntervalId); // Using the new name here
         xapi.Command.Macros.Runtime.Restart();
       }

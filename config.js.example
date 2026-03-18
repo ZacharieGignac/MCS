@@ -76,6 +76,7 @@ export var config = {
     storageFile: 'storage',
     coldBootTime: 120,                            // Temps (secondes) qui détermine un "cold boot"
     coldBootWait: 120,                            // Temps (secondes) à attendre après un "cold boot"
+    runtimeRestartOnColdBoot: true,               // <true, false> Redémarre l'environnement Macro après un "cold boot"
     debugLevel: DEBUGLEVEL.HIGH,                  // Niveau de débug (LOW, MEDIUM, HIGH)
     debugInternalMessages: false,                 // <true, false> Affichage des messages "xapi.Event.Messages"
     messagesPacing: 500,                          // Temps (ms) entre les messages de type "xpi.Command.Message"

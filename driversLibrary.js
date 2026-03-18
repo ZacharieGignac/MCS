@@ -1336,6 +1336,7 @@ export class AudioInputDriver_aes67 {
   constructor(device, config) {
     this.config = config;
     this.device = device;
+
   }
 
   setGain(gain) {
@@ -1343,7 +1344,15 @@ export class AudioInputDriver_aes67 {
     // AES67 supports gain control per channel
     // Default to channel 1 if no channel specified in config
     const channel = this.config.channel || 1;
-    xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[channel].Gain.set(gain);
+    //New gen (EQ, BarPro, ProG2)
+    if (typeof xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[this.config.channel].Gain?.set == 'function') {
+      xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[channel].Gain.set(gain);
+    }
+    else {
+      //Old Gen (ProG1)
+      xapi.Config.Audio.Input.Ethernet[this.config.connector].Channel[channel].Level.set(gain);
+    }
+
   }
 
   setMode(mute) {

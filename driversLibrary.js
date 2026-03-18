@@ -1571,7 +1571,16 @@ export class AudioOutputDriver_aes67 {
   }
 
   setLevel(level) {
-    //AES67 audio inputs don't support setLevel
+    if (typeof xapi.Config.Audio.Output.Ethernet[this.config.connector].Gain.set == 'function') {
+      xapi.Config.Audio.Output.Ethernet[this.config.connector].Gain.set(level);
+    }
+    else {
+      xapi.Config.Audio.Output.Ethernet[this.config.connector].Level.set(level);
+    }
+  }
+
+  setGain(gain) {
+    this.setLevel(gain);
   }
 
   setMode(mute) {

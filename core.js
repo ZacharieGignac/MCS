@@ -14,7 +14,7 @@ import { zapiv1 as zapi } from './zapi';
 import { debug } from './debug';
 
 
-const COREVERSION = '1.3.0-dev';
+const COREVERSION = '1.3.0-beta';
 const ZAPIVERSION = 1;
 
 function systemKill() {

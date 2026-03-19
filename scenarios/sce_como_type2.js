@@ -30,7 +30,7 @@ export var Manifest = {
   fileName: 'sce_como_type2',
   id: 'comotype2',
   friendlyName: 'Salle Comodale (Type 2)',
-  version: '1.0.0-dev',
+  version: '1.3.0-beta',
   description: 'Comportement normal pour une salle comodale de type 2 (évolution de type1). Includes display role debouncing to prevent flicker from rapid state changes.',
   panels: {
     hide: ['*'],

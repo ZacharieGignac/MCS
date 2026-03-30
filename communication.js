@@ -155,7 +155,6 @@ export class MessageQueue {
     catch (e) {
       try { debug(3, `MessageQueue: send error: ${e}`); } catch (_) {}
     }
-    this.sending = false;
     setTimeout(() => { this.sendNextMessage(); }, systemconfig.system.messagesPacing);
   }
 }

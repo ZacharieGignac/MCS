@@ -17,7 +17,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 - Scénario `sce_como_type2` : Suppression du fallback vers la configuration système pour `enableStateEvaluationDebounce`. Ce paramètre doit désormais être défini spécifiquement dans l'objet `sce_como_type2` de la configuration.
 - Scénario `sce_como_type1` et `sce_como_type2` : Ajout d'un mécanisme de "Probe" (sondage) pour détecter l'arrivée tardive des flux audio de présentation distants et appliquer le routage intelligent.
 - Scénario `sce_como_type2` : nouvelle version évoluée du scénario Comodale Type 1 avec support de groupes d'affichages supplémentaires (télésouffleur, affichages secondaires de présentation) et gestion fine des modes d'affichage. Voir `docs/Manual-ComoType2.md` pour la documentation complète.
-- Ajout de la configuration `runtimeRestartOnColdBoot` au bloc `system` permettant de définir le comportement du redémarrage du framework de macro post-cold-boot (remplace la constante codée en dur `SKIP_FRAMEWORK_RESTART_AFTER_COLD_BOOT`).
+- Ajout de la configuration `runtimeRestartOnColdBoot` au bloc `system` permettant de définir le comportement du redémarrage du framework de macro post-cold-boot 
 - Documentation complète des nouveaux drivers audio introduits en v1.2.0 : `AudioInputDriver_aes67`, `AudioOutputDriver_aes67`, `AudioInputDriver_usb`, `AudioOutputDriver_usb`, et `AudioInputDriver_codeceq`
 - Nouveau manuel `docs/Manual-ComoType2.md` documentant le scénario Comodale Type 2, ses différences avec le Type 1, les nouveaux groupes d'affichages, et les configurations avancées
 - Nouveau driver `USBSerialDriver` pour devices de type `SoftwareDevice` : communication série USB générique avec gestion automatique de la configuration du port série, file d'attente des commandes, et pacing entre les envois. Supporte les méthodes `send()`, `sendRaw()`, et `reset()`. Documentation complète dans `docs/Manual-Devices.md`.
@@ -26,6 +26,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 
 ### Bugfix
 - core: Protection try-catch pour `Video.Output.HDMI.Passthrough.Stop()` lors de la fermeture de session et de la mise en veille pour éviter les erreurs sur les systèmes ne supportant pas cette fonctionnalité.
+- communication: Le message pacing est maintenant respecté, et les messages sont envoyés un par un selon ce timing.
 
 ## [1.2.1] - 2025-11-25
 ### Ajouts / Modifications
